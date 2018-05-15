@@ -1,6 +1,0 @@
-## List of available test cases is in CONFIG/TEST_CASES/cfg.txt
-
-## HOW TO COMPILE TEST CASES :
-
-use makenemo to compile in "-a" alternative sub-directory for configurations (below CONFIG) 
-../makenemo -a TEST_CASES -n WAD2 -r WAD -m macport_osx -j 4
