@@ -1,1 +1,1 @@
-../../../NEMO/OPA_SRC/par_kind.F90
+../../../src/OCE/par_kind.F90

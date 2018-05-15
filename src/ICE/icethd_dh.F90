@@ -37,9 +37,9 @@ MODULE icethd_dh
    END INTERFACE
 
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , NEMO Consortium (2017)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icethd_dh.F90 8420 2017-08-08 12:18:46Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

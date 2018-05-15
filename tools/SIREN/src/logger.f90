@@ -138,7 +138,7 @@
 !> @date January, 2016
 !> - add logger_clean subroutine
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE logger
    USE kind                            ! F90 kind parameter

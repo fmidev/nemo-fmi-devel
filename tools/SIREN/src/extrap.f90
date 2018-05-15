@@ -69,7 +69,7 @@
 !> - create module for each extrapolation method
 !> - smooth extrapolated points
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE extrap
    USE netcdf                          ! nf90 library

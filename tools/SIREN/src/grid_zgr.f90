@@ -57,7 +57,7 @@
 !> @date November, 2016
 !> - J, Paul : vertical scale factors e3. = dk[gdep] or old definition
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE grid_zgr
    USE netcdf                          ! nf90 library

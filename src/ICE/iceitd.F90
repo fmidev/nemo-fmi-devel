@@ -49,9 +49,9 @@ MODULE iceitd
    REAL(wp), DIMENSION(0:100) ::   rn_catbnd    ! ice categories bounds
    !
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , NEMO Consortium (2017)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: iceitd.F90 8420 2017-08-08 12:18:46Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

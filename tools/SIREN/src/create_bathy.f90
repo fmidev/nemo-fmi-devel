@@ -141,7 +141,7 @@
 !> @todo
 !> - check tl_multi is not empty
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 PROGRAM create_bathy
 

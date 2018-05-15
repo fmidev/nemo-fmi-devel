@@ -29,9 +29,9 @@ MODULE p4zmort
    REAL(wp), PUBLIC ::   mprat2   !:
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
+   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

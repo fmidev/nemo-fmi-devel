@@ -74,9 +74,9 @@ MODULE icevar
    PUBLIC   ice_var_enthalpy           
 
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , NEMO Consortium (2017)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icevar.F90 8422 2017-08-08 13:58:05Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

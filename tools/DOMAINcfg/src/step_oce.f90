@@ -25,6 +25,6 @@ MODULE step_oce
    !!----------------------------------------------------------------------
    !! NEMO/OPA 3.7 , NEMO Consortium (2014)
    !! $Id: step_oce.F90 6140 2015-12-21 11:35:23Z timgraham $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!======================================================================
 END MODULE step_oce

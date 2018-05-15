@@ -79,11 +79,11 @@ MODULE iom_def
    END TYPE RST_FIELD
 !$AGRIF_END_DO_NOT_TREAT
    !
-   TYPE(RST_FIELD), PUBLIC :: rst_wfields(max_rst_fields), rst_rfields(max_rst_fields)
+   TYPE(RST_FIELD), PUBLIC, SAVE :: rst_wfields(max_rst_fields), rst_rfields(max_rst_fields)
    !
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!======================================================================
 END MODULE iom_def

@@ -35,9 +35,9 @@ MODULE p4zfechem
    REAL(wp) :: kl1, kl2, kb1, kb2, ks, kpr, spd, con, kth      !!gm  <<<== DOCTOR names SVP !!!
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
+   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
    !! $Id: p4zrem.F90 3160 2011-11-20 14:27:18Z cetlod $ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

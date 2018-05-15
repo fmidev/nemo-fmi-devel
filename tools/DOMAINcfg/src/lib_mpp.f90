@@ -171,9 +171,9 @@ MODULE lib_mpp
    LOGICAL, PUBLIC                                  ::   l_north_nogather = .FALSE.  ! internal control of northfold comms
    INTEGER, PUBLIC                                  ::   ityp
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: lib_mpp.F90 6490 2016-04-20 14:55:58Z mcastril $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

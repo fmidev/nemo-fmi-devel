@@ -92,8 +92,8 @@ MODULE par_oce
    INTEGER, PUBLIC  ::   jpij  ! = jpi*jpj                                          !:  jpi x jpj
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: par_oce.F90 5974 2015-12-02 10:52:05Z timgraham $ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!======================================================================
 END MODULE par_oce

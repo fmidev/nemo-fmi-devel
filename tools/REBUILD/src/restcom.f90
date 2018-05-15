@@ -1,1 +1,1 @@
-../../../EXTERNAL/IOIPSL/src/restcom.f90
+../../../ext/IOIPSL/src/restcom.f90

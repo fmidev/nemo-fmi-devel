@@ -38,9 +38,9 @@ MODULE domhgr
    PUBLIC   dom_hgr   ! called by domain.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.7 , NEMO Consortium (2016)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

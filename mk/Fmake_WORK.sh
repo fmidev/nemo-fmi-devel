@@ -6,7 +6,7 @@
 # Some functions called from makenemo
 # Fmake_WORK      : create links in the WORK
 ######################################################
-#set -x
+#set -vx
 set -o posix
 #set -u
 #set -e
@@ -44,7 +44,7 @@ set -o posix
 #
 # ::
 #
-#  $ ./Fmake_WORK.sh ORCA2_LIM OCE_SRC ICE_SRC
+#  $ ./Fmake_WORK.sh ORCA2_LIM OCE ICE
 #
 #
 # TODO
@@ -88,15 +88,15 @@ fi
 
 while [ $i -lt $NDIR ]
 do
-   [ "${ZTAB[i]}" = "OCE_SRC" ] && ln -sf ${NEMO_DIR}/OCE_SRC/*.[Ffh]90 ${ZCONF}/WORK
-   [ "${ZTAB[i]}" = "OCE_SRC" ] && ln -sf ${NEMO_DIR}/OCE_SRC/*/*.[Ffh]90 ${ZCONF}/WORK && break
+   [ "${ZTAB[i]}" = "OCE" ] && ln -sf ${NEMO_DIR}/OCE/*.[Ffh]90 ${ZCONF}/WORK
+   [ "${ZTAB[i]}" = "OCE" ] && ln -sf ${NEMO_DIR}/OCE/*/*.[Ffh]90 ${ZCONF}/WORK && break
    let i=$i+1
 done
 
 i=0
 while [ $i -lt $NDIR ]
 do
-   if [ "${ZTAB[i]}" != "OCE_SRC" ]; then
+   if [ "${ZTAB[i]}" != "OCE" ]; then
       ln -sf ${NEMO_DIR}/${ZTAB[i]}/*.[Ffh]90 ${ZCONF}/WORK
       ln -sf ${NEMO_DIR}/${ZTAB[i]}/*/*.[Ffh]90 ${ZCONF}/WORK 
       ln -sf ${NEMO_DIR}/${ZTAB[i]}/*/*/*.[Ffh]90 ${ZCONF}/WORK 2>/dev/null

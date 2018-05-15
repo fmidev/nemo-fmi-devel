@@ -22,9 +22,9 @@ MODULE mppini
    PUBLIC mpp_init2      ! called by opa.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: mppini.F90 6412 2016-03-31 16:22:32Z lovato $ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

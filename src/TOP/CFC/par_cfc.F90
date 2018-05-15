@@ -5,9 +5,9 @@ MODULE par_cfc
    !!======================================================================
    !! History :   2.0  !  2007-12  (C. Ethe, G. Madec)  revised architecture
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
+   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 
    IMPLICIT NONE

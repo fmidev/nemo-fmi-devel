@@ -33,9 +33,9 @@ MODULE crsfld
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.7 , NEMO Consortium (2015)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -168,7 +168,7 @@ CONTAINS
          CALL crs_dom_ope( z3d, 'VOL', 'T', tmask, zt_crs, p_e12=e1e2t, p_e3=ze3t, psgn=1.0 )
          CALL iom_put( "eken", zt_crs )
       ENDIF
-      !  Horizontal divergence ( following OCE_SRC/DYN/divhor.F90 ) 
+      !  Horizontal divergence ( following OCE/DYN/divhor.F90 ) 
       DO jk = 1, jpkm1
          DO ji = 2, jpi_crsm1
             DO jj = 2, jpj_crsm1

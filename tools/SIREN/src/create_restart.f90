@@ -167,7 +167,7 @@
 !> @todo
 !> - rewrite using meshmask instead of bathymetry and coordinates files
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 PROGRAM create_restart
 

@@ -38,7 +38,7 @@ set -o posix
 #
 # ::
 #
-#  $ ./Fmake_bld.sh NEMOGCM/CONFIG GYRE  /usr/tmp
+#  $ ./Fmake_bld.sh NEMOGCM/cfgs GYRE  /usr/tmp
 #
 #
 # TODO

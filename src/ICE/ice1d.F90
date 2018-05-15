@@ -161,9 +161,9 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   h_ib_2d
    
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , NEMO Consortium (2017)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: ice1D.F90 8379 2017-07-26 15:35:49Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

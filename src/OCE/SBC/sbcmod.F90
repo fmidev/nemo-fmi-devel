@@ -67,9 +67,9 @@ MODULE sbcmod
    INTEGER ::   nsbc   ! type of surface boundary condition (deduced from namsbc informations)
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO-consortium (2016) 
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
    !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

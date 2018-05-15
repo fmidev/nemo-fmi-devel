@@ -45,9 +45,9 @@ MODULE bdytides
    TYPE(OBC_DATA)  , PUBLIC, DIMENSION(jp_bdy) :: dta_bdy_s  !: bdy external data (slow component)
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

@@ -68,7 +68,7 @@ MODULE sbcisf
    TYPE(FLD_N)       , PUBLIC           :: sn_Leff_isf       !: information about the effective length     file to be read
    
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , LOCEAN-IPSL (2017)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
    !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------

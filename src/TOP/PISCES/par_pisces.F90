@@ -64,8 +64,8 @@ MODULE par_pisces
    INTEGER, PUBLIC  ::   jp_pcs1  !: Last  index of PISCES tracers
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
+   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!======================================================================
 END MODULE par_pisces

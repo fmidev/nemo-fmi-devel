@@ -75,7 +75,7 @@
 !> - add header
 !> - use interpolation method modules
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE interp
 

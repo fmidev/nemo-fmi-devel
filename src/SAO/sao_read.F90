@@ -21,9 +21,9 @@ MODULE sao_read
    PUBLIC sao_rea_dri
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.7 , NEMO Consortium (2015)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: trazdf_imp.F90 6140 2015-12-21 11:35:23Z timgraham $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

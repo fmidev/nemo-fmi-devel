@@ -57,9 +57,9 @@ MODULE storng
    REAL(KIND=wp), SAVE :: gran1, gran2
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: dynhpg.F90 2528 2010-12-27 17:33:53Z rblod $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

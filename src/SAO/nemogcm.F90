@@ -3,7 +3,7 @@ MODULE nemogcm
    !!                       ***  MODULE nemogcm   ***
    !! Ocean system   : NEMO GCM (ocean dynamics, on-line tracers, biochemistry and sea-ice)
    !!======================================================================
-   !! History :  3.6  ! 2015-12  (A. Ryan) Original code   (from OCE_SRC/) 
+   !! History :  3.6  ! 2015-12  (A. Ryan) Original code   (from OCE/) 
    !!            4.0  ! 2016-11  (G. Madec, S. Flavoni)  domain configuration / user defined interface
    !!----------------------------------------------------------------------
 
@@ -46,9 +46,9 @@ MODULE nemogcm
    CHARACTER(lc) ::   cform_aaa="( /, 'AAAAAAAA', / ) "     ! flag for output listing
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2016)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

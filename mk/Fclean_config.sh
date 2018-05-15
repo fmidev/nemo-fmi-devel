@@ -36,7 +36,7 @@ set -o posix
 #
 # - remove CONFIG_NAME/WORK
 # - remove CONFIG_NAME/BLD
-# - remove CONFIG_NAME from TOOLS/TOOLS/COMPILE/cfg.txt 
+# - remove CONFIG_NAME from TOOLS/mk/cfg.txt 
 # 
 # EXAMPLES
 # ========

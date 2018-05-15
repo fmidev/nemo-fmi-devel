@@ -17,7 +17,7 @@ set -o posix
 # DESCRIPTION
 # ===========
 # When an unsupported configuration is requested, 
-# Prepare sources for the NEMO sub-directories needed (OCE_SRC, TOP_SRC ...)
+# Prepare sources for the NEMO sub-directories needed (OCE, TOP ...)
 # EXAMPLES
 # ========
 # ::

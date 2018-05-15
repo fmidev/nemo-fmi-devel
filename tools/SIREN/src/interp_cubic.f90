@@ -28,7 +28,7 @@
 !> @date June, 2015
 !> - use math module
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE interp_cubic
 

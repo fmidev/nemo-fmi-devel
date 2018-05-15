@@ -35,9 +35,9 @@ MODULE p4zlys
    REAL(wp) ::   calcon = 1.03E-2   ! mean calcite concentration [Ca2+] in sea water [mole/kg solution]
  
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
+   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
    !! $Id: p4zlys.F90 3321 2012-03-05 17:10:55Z cetlod $ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 
 CONTAINS

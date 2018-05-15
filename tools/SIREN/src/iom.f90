@@ -86,7 +86,7 @@
 !> - see lbc_lnk
 !> - see goup netcdf4
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE iom
    USE netcdf                          ! nf90 library

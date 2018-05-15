@@ -54,9 +54,9 @@ MODULE zdfphy
    LOGICAL ::   l_zdfsh2   ! shear production term flag (=F for CST, =T otherwise (i.e. TKE, GLS, RIC))
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2017)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: zdfphy.F90 8160 2017-06-10 07:31:34Z gm $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

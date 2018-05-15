@@ -124,8 +124,8 @@ MODULE in_out_manager
    LOGICAL       ::   lsp_area = .TRUE.     !: to make a control print over a specific area
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: in_out_manager.F90 2715 2011-03-30 15:58:35Z rblod $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!=====================================================================
 END MODULE in_out_manager

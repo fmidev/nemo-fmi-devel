@@ -223,7 +223,7 @@
 !> @date April, 2016
 !> - add function to get closest grid point using coarse grid coordinates strucutre 
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE grid
    USE netcdf

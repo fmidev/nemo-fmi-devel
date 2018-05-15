@@ -65,7 +65,7 @@ MODULE nemogcm
    !!----------------------------------------------------------------------
    !! NEMO/OPA 3.7 , NEMO Consortium (2015)
    !! $Id: nemogcm.F90 6152 2015-12-21 22:33:57Z acc $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

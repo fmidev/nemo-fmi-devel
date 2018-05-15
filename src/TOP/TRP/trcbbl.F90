@@ -29,9 +29,9 @@ MODULE trcbbl
    PUBLIC   trc_bbl   !  routine called by trctrp.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 4.0 , NEMO Consortium (2017)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

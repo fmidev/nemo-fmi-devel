@@ -87,7 +87,7 @@
 !> - J, Paul : compute coriolis factor at f-point and at t-point 
 !> - J, Paul : do not use anymore special case for ORCA grid
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE grid_hgr
    USE netcdf                          ! nf90 library

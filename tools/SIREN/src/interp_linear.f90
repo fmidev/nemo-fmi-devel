@@ -25,7 +25,7 @@
 ! REVISION HISTORY:
 !> @date September, 2014 - Initial version
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 
 MODULE interp_linear

@@ -76,8 +76,8 @@ MODULE par_oce
    INTEGER, PUBLIC, PARAMETER ::   nn_hls = 1   !: halo width (applies to both rows and columns)
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2016)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!======================================================================
 END MODULE par_oce

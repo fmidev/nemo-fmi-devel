@@ -193,7 +193,7 @@
 !> @date November, 2016
 !> - choose vertical scale factors (e3.=dk[depth] or old definition)
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 PROGRAM create_meshmask
 

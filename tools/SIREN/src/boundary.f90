@@ -118,7 +118,7 @@
 !> 
 !> @todo add schematic to boundary structure description
 !> 
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE boundary
    USE netcdf                          ! nf90 library                           

@@ -70,7 +70,7 @@
 !> - add header
 !> @date June, 2015 - update subroutine with NEMO 3.6
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE vgrid
    USE netcdf                          ! nf90 library

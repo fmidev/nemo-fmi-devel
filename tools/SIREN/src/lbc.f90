@@ -29,7 +29,7 @@
 !> @date Marsh, 2015 
 !> - J.Paul : add hide subroutine
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE lbc
    USE kind                            ! F90 kind parameter

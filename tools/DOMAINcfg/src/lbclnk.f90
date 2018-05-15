@@ -53,9 +53,9 @@ MODULE lbclnk
    PUBLIC   lbc_lnk_icb   !
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: lbclnk.F90 6493 2016-04-22 13:52:52Z mathiot $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 
    !!======================================================================

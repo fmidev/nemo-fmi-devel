@@ -32,9 +32,9 @@ MODULE icethd_da
    REAL(wp) ::   rn_dmin   ! minimum floe diameter for lateral melting param.
 
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , NEMO Consortium (2017)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icethd_da.F90 5123 2015-03-04 16:06:03Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

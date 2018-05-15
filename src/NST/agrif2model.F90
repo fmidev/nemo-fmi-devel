@@ -1,8 +1,8 @@
 #if defined key_agrif
 !!----------------------------------------------------------------------
-!! NEMO/NST 3.6 , NEMO Consortium (2010)
+!! NEMO/NST 3.6 , NEMO Consortium (2018)
 !! $Id$
-!! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+!! Software governed by the CeCILL licence (./LICENSE)
 !!----------------------------------------------------------------------
 SUBROUTINE Agrif2Model
    !!---------------------------------------------

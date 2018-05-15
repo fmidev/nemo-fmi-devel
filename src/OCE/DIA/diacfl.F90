@@ -38,7 +38,7 @@ MODULE diacfl
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.2 , LOCEAN-IPSL (2009) 
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
    !! $Id$
    !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------

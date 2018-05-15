@@ -203,7 +203,7 @@
 !> - allow to print layout file (use lm_layout, hard coded)
 !> - add mpp__compute_halo and mpp__read_halo
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE mpp
    USE global                          ! global parameter

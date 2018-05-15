@@ -29,9 +29,9 @@ MODULE trczdf
    PUBLIC   trc_zdf         ! called by step.F90 
    
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.7 , NEMO Consortium (2015)
+   !! NEMO/TOP 3.7 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

@@ -33,9 +33,9 @@ MODULE icethd_ent
    PUBLIC   ice_thd_ent         ! called by icethd and icethd_do
 
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , NEMO Consortium (2017)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icethd_ent.F90 8420 2017-08-08 12:18:46Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
  

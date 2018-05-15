@@ -49,7 +49,7 @@ MODULE tramle
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2015)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
    !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------

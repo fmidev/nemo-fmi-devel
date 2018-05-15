@@ -5,7 +5,7 @@
 !  
 !  wheneq
 !!----------------------------------------------------------------------
-!!  OPA 9.0 , LOCEAN-IPSL (2005) 
+!!  OPA 9.0 , NEMO Consortium (2018) 
 !! $Id$ 
 !! This software is governed by the CeCILL licence see modipsl/doc/NEMO_CeCILL.txt 
 !!----------------------------------------------------------------------

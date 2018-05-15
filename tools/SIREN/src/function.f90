@@ -96,7 +96,7 @@
 !> @date September, 2014 
 !> - add header
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE fct
    USE kind                            ! F90 kind parameter

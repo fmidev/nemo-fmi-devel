@@ -18,7 +18,7 @@
 !> @todo
 !> - check i8 max value
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE kind
    IMPLICIT NONE

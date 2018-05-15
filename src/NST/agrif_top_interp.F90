@@ -26,9 +26,9 @@ MODULE agrif_top_interp
    PUBLIC Agrif_trc, interptrn
 
   !!----------------------------------------------------------------------
-   !! NEMO/NST 4.0 , NEMO Consortium (2017)
+   !! NEMO/NST 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

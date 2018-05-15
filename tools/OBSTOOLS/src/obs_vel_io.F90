@@ -20,9 +20,9 @@ MODULE obs_vel_io
    INTEGER, PARAMETER :: imaxlev = 10000
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: obs_vel_io.F90 2287 2010-10-18 07:53:52Z smasson $
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 
 CONTAINS

@@ -18,9 +18,9 @@ MODULE trcnam_my_trc
    PUBLIC   trc_nam_my_trc   ! called by trcnam.F90 module
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 4.0 , NEMO Consortium (2016)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 
 CONTAINS

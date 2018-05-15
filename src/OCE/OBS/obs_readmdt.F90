@@ -37,9 +37,9 @@ MODULE obs_readmdt
    REAL(wp), PUBLIC :: rn_mdtcutoff = 65.0_wp  ! MDT cutoff for computed correction
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

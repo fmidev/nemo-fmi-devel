@@ -14,7 +14,7 @@
 !> @date September, 2015
 !> - add physical constant to compute meshmask
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE phycst
    USE kind                         ! F90 kind parameter

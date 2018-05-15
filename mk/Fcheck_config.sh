@@ -38,7 +38,7 @@ set -o posix
 # - One is explicitely set
 # - Nothing set, use the previous in use 
 #
-# We use TOOLS/CONFIG_DIR/cfg.txt to check if the configuration exists.
+# We use TOOLS/cfgs_DIR/cfg.txt to check if the configuration exists.
 #
 # EXAMPLES
 # ========

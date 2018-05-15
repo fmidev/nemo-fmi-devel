@@ -91,7 +91,7 @@
 ! REVISION HISTORY:
 !> @date January, 2015 - Initial version
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE math
    USE kind                            ! F90 kind parameter

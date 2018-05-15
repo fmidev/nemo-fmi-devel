@@ -116,7 +116,7 @@ if [ ${#3} -eq 0 ]; then # arch not specified
 	fi
     fi
 else 
-    nb=$( find ${MAIN_DIR}/ARCH -name arch-${3}.fcm -print | wc -l )
+    nb=$( find ${MAIN_DIR}/arch -name arch-${3}.fcm -print | wc -l )
     if [ $nb -eq 0 ]; then # no arch file found
 	echo "Warning !!!"
 	echo "Compiler not existing"
@@ -127,12 +127,12 @@ else
     if [ $nb -gt 1 ]; then # more than 1 arch file found
 	echo "Warning !!!"
 	echo "more than 1 arch file for the same compiler have been found"
-	find ${MAIN_DIR}/ARCH -name arch-${3}.fcm -print
+	find ${MAIN_DIR}/arch -name arch-${3}.fcm -print
 	echo "keep only 1"
 	echo "EXITING..."
 	exit 1       
     fi
-    myarch=$( find ${MAIN_DIR}/ARCH -name arch-${3}.fcm -print )
+    myarch=$( find ${MAIN_DIR}/arch -name arch-${3}.fcm -print )
     # we were already using this arch file ?
     if [ "$myarch" == "$( cat ${COMPIL_DIR}/arch.history )" ]; then 
 	if [ -f ${COMPIL_DIR}/$1 ]; then
@@ -149,7 +149,7 @@ else
 		[ ${#mycpp} -ne 0 ] && cpeval ${myarch} ${COMPIL_DIR}/$1
 	    fi
 	    # has myarch file been updated since we copied it in ${COMPIL_DIR}?
-	    myarch=$( find -L ${MAIN_DIR}/ARCH -cnewer ${COMPIL_DIR}/$1 -name arch-${3}.fcm -print )
+	    myarch=$( find -L ${MAIN_DIR}/arch -cnewer ${COMPIL_DIR}/$1 -name arch-${3}.fcm -print )
 	    [ ${#myarch} -ne 0 ] && cpeval ${myarch} ${COMPIL_DIR}/$1
 	else
 	    cpeval ${myarch} ${COMPIL_DIR}/$1

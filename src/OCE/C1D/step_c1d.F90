@@ -27,9 +27,9 @@ MODULE step_c1d
    PUBLIC stp_c1d      ! called by opa.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/C1D 3.7 , NEMO Consortium (2015)
+   !! NEMO/C1D 3.7 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

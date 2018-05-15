@@ -20,9 +20,9 @@ MODULE trcice_pisces
    PUBLIC   trc_ice_ini_pisces ! called by trcini.F90 module
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 4.0 , NEMO Consortium (2017)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: trcsub.F90 9019 2017-12-13 14:58:53Z timgraham $ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

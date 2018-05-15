@@ -25,9 +25,9 @@ MODULE trcice
    PUBLIC   trc_ice_ini   ! called by trc_nam
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 4.0 , NEMO Consortium (2011)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: trcini.F90 9019 2017-12-13 14:58:53Z timgraham $ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
    

@@ -33,7 +33,7 @@ MODULE tide_mod
    REAL(wp) ::   sh_I, sh_x1ra, sh_N                       !
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , LOCEAN-IPSL (2010) 
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
    !! $Id$ 
    !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------

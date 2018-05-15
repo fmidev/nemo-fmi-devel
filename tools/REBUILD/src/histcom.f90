@@ -1,1 +1,1 @@
-../../../EXTERNAL/IOIPSL/src/histcom.f90
+../../../ext/IOIPSL/src/histcom.f90

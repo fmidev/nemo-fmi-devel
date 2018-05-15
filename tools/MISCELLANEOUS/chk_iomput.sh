@@ -36,7 +36,7 @@ do
 	    echo 'Examples'
 	    echo '      ./chk_iomput.sh'
 	    echo '      ./chk_iomput.sh --help'
-	    echo '      ./chk_iomput.sh ../../CONFIG/ORCA2_LIM/EXP00/context_nemo.xml "../../NEMO/OCE_SRC/ ../../NEMO/ICE_SRC/"'
+	    echo '      ./chk_iomput.sh ../../cfgs/ORCA2_LIM/EXP00/context_nemo.xml "../../src/OCE/ ../../src/ICE/"'
 	    echo
 	    exit ;;
         --inxml) inxml=1 ;;

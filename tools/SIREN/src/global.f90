@@ -14,7 +14,7 @@
 !> @date September, 2015
 !> - define fill value for each variable type
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE global
    USE kind                         ! F90 kind parameter

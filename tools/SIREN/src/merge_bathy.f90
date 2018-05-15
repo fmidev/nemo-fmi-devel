@@ -136,7 +136,7 @@
 !> - allow to choose the number of boundary point with coarse grid value.
 !> - dimension to be used select from configuration file
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 PROGRAM merge_bathy
 

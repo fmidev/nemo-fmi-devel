@@ -39,9 +39,9 @@ MODULE bdyice
    PUBLIC   bdy_ice_dyn ! routine called in limrhg
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2017)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: bdyice.F90 8306 2017-07-10 10:18:03Z clem $
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

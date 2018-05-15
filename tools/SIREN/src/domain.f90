@@ -126,7 +126,7 @@
 !> @date October, 2014
 !> - use mpp file structure instead of file
 !> 
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE dom
    USE kind                            ! F90 kind parameter

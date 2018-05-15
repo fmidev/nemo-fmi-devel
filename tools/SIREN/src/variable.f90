@@ -295,7 +295,7 @@
 !> - add subroutine to clean global array of extra information.
 !> - define logical for variable to be used
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE var
    USE netcdf                          ! nf90 library

@@ -1,1 +1,1 @@
-../../../NEMO/OPA_SRC/DOM/dom_oce.F90
+../../../src/OCE/DOM/dom_oce.F90

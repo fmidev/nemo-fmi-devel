@@ -57,7 +57,7 @@
 ! REVISION HISTORY:
 !> @date November, 2013 - Initial Version
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE filter
    USE kind                            ! F90 kind parameter

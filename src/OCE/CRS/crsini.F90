@@ -28,9 +28,9 @@ MODULE crsini
    PUBLIC   crs_init   ! called by nemogcm.F90 module
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
    
@@ -224,7 +224,7 @@ CONTAINS
      CALL crs_dom_facvol( tmask, 'W', e1t, e2t, ze3w, ocean_volume_crs_w, facvol_w )
      !
      !---------------------------------------------------------
-     ! 5.  Write out coarse meshmask  (see OCE_SRC/DOM/domwri.F90 for ideas later)
+     ! 5.  Write out coarse meshmask  (see OCE/DOM/domwri.F90 for ideas later)
      !---------------------------------------------------------
 
      IF( ln_msh_crs ) THEN 

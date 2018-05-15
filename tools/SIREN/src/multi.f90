@@ -63,7 +63,7 @@
 !> @date November, 2014 
 !> - Fix memory leaks bug
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE multi
    USE kind                            ! F90 kind parameter

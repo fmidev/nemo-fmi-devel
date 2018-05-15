@@ -88,7 +88,7 @@
 ! REVISION HISTORY:
 !> @date November, 2013 - Initial Version
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE iom_mpp
    USE netcdf                          ! nf90 library

@@ -73,9 +73,9 @@ MODULE phycst
    REAL(wp), PUBLIC ::   xlic     =  300.33e+6_wp    !: volumetric latent heat fusion of ice                  [J/m3]
    REAL(wp), PUBLIC ::   xsn      =    2.8e+6_wp     !: volumetric latent heat of sublimation of snow         [J/m3]
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: phycst.F90 5147 2015-03-13 10:01:32Z cetlod $ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
    
 CONTAINS

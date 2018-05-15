@@ -26,7 +26,7 @@ set -o posix
 #
 #
 # When a reference configuration is set, 
-# Copy NEMO sub-directories needed (OCE_SRC, TOP_SRC ...)
+# Copy NEMO sub-directories needed (OCE, TOP ...)
 #
 # EXAMPLES
 # ========

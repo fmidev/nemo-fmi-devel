@@ -158,7 +158,7 @@
 !> @date October, 2016
 !> - dimension allowed read in configuration file
 !>
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE dim
    USE global                          ! global variable

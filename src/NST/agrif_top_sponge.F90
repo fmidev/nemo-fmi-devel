@@ -29,9 +29,9 @@ MODULE agrif_top_sponge
    PUBLIC Agrif_Sponge_trc, interptrn_sponge
 
    !!----------------------------------------------------------------------
-   !! NEMO/NST 4.0 , NEMO Consortium (2017)
+   !! NEMO/NST 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

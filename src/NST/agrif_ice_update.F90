@@ -35,7 +35,7 @@ MODULE agrif_ice_update
    PUBLIC   agrif_update_si3   ! called by agrif_user.F90 and icestp.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/NST 4.0 , LOCEAN-IPSL (2017)
+   !! NEMO/NST 4.0 , NEMO Consortium (2018)
    !! $Id: agrif_ice_update.F90 6204 2016-01-04 13:47:06Z cetlod $
    !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------

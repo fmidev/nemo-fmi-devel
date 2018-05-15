@@ -1,1 +1,1 @@
-../../../NEMO/OPA_SRC/LBC/lbcnfd.F90
+../../../src/OCE/LBC/lbcnfd.F90

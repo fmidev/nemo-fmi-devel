@@ -1,1 +1,1 @@
-../OPA_SRC/OBS/obs_fbm.F90
+../OCE/OBS/obs_fbm.F90

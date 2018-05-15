@@ -52,4 +52,4 @@ set -o posix
 #
 #-
 
-cd ${MAIN_DIR}/TOOLS
+cd ${MAIN_DIR}/tools

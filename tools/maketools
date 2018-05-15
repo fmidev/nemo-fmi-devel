@@ -73,13 +73,13 @@ set -o posix
 
 #- Local variables ---
 b_n=$(basename ${0})
-export MAIN_DIR=${PWD%/TOOLS*}
-export TOOLS_DIR=${MAIN_DIR}/TOOLS
-export COMPIL_DIR=${MAIN_DIR}/TOOLS/COMPILE
+export MAIN_DIR=${PWD%/tools*}
+export TOOLS_DIR=${MAIN_DIR}/tools
+export COMPIL_DIR=${MAIN_DIR}/mk
 export NEMO_DIR=${MAIN_DIR}/NEMO
 #-
 #- FCM and functions location ---
-export PATH=${MAIN_DIR}/EXTERNAL/fcm/bin:$PATH
+export PATH=${MAIN_DIR}/ext/FCM/bin:$PATH
 
 #-
 #- Choice of the options ---
@@ -129,7 +129,7 @@ shift $(($OPTIND-1));
 [ "${#@}" -ne 0 ] && x_c="--$@"
 
 #-
-#- Go to NEMOGCM/TOOLS directory ---
+#- Go to NEMOGCM/tools directory ---
 cd ${TOOLS_DIR}
 
 #-

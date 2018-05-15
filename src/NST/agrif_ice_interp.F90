@@ -31,9 +31,9 @@ MODULE agrif_ice_interp
    PUBLIC   agrif_interp_si3   ! called by agrif_user.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/NST 3.6 , NEMO Consortium (2016)
+   !! NEMO/NST 3.6 , NEMO Consortium (2018)
    !! $Id: agrif_ice_interp.F90 6204 2016-01-04 13:47:06Z cetlod $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 
 CONTAINS

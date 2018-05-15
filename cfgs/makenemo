@@ -95,7 +95,7 @@ x_t="";
 x_c="";
 x_j=1;
 x_e="none";
-x_s=NEMO;
+x_s=src;
 x_v=1;
 
 #- Local variables ---
@@ -103,13 +103,13 @@ b_n=$(basename ${0})
 OPTIND=1
 MAIN_DIR=$(cd $(dirname "$0"); pwd)
 MAIN_DIR=${MAIN_DIR%/SETTE*}
-MAIN_DIR=${MAIN_DIR%/TOOLS*}
-MAIN_DIR=${MAIN_DIR%/CONFIG*}
+MAIN_DIR=${MAIN_DIR%/tools*}
+MAIN_DIR=${MAIN_DIR%/cfgs*}
 export MAIN_DIR
 #
-export CONFIG_DIR=${MAIN_DIR}/CONFIG
-export TOOLS_DIR=${MAIN_DIR}/TOOLS
-export COMPIL_DIR=${MAIN_DIR}/TOOLS/COMPILE
+export CONFIG_DIR=${MAIN_DIR}/cfgs
+export TOOLS_DIR=${MAIN_DIR}/tools
+export COMPIL_DIR=${MAIN_DIR}/mk
 export NEMO_DIR=${MAIN_DIR}/${x_s}
 export AGRIFUSE=10
 declare -a TAB
@@ -119,7 +119,7 @@ list_key=0
 chk_key=1
 #-
 #- FCM and functions location ---
-export PATH=${MAIN_DIR}/EXTERNAL/fcm/bin:$PATH
+export PATH=${MAIN_DIR}/ext/FCM/bin:$PATH
 
 #-
 #- Choice of the options ---
@@ -145,8 +145,8 @@ do
 	echo " -a dir       : alternative sub-directory for configurations (below CONFIG)"
 	echo "";
 	echo "Example to install a new configuration MY_CONFIG";
-	echo "with OCE_SRC and ICE_SRC ";
-	echo "makenemo -n MY_CONFIG -d \"OCE_SRC ICE_SRC\"";
+	echo "with OCE and ICE ";
+	echo "makenemo -n MY_CONFIG -d \"OCE ICE\"";
 	echo "";
 	echo "Available configurations :"; cat ${CONFIG_DIR}/cfg.txt;
 	echo "";
@@ -229,7 +229,7 @@ done
 
 
 #-
-#- Go to NEMOGCM/CONFIG directory ---
+#- Go to NEMOGCM/cfgs directory ---
 cd ${CONFIG_DIR}
 
 #-
@@ -239,7 +239,7 @@ if [ ! -z $ALT_DIR ]; then
  if [ -d ${CONFIG_DIR}/${ALT_DIR} ]; then
    export CONFIG_DIR=${CONFIG_DIR}/${ALT_DIR}
 #-
-#- Go to named subdirectory of the NEMOGCM/CONFIG directory ---
+#- Go to named subdirectory of the NEMOGCM/cfgs directory ---
    cd ${CONFIG_DIR}
  fi
 fi
@@ -273,20 +273,20 @@ if [ ${#NEW_CONF} -eq 0 ] ; then
     if [ ${#NEM_SUBDIR} -eq 0 ] && [ ${#REF_CONF} -eq 0 ] && [ ${#USP_CONF} -eq 0 ] ; then
 	echo "You are installing a new default (ORCA2_LIM3_PISCES) configuration"
 	ind=0
-	. ${COMPIL_DIR}/Fread_dir.sh OCE_SRC	 YES
-	. ${COMPIL_DIR}/Fread_dir.sh ICE_SRC     NO
-	. ${COMPIL_DIR}/Fread_dir.sh TOP_SRC	 NO
-	. ${COMPIL_DIR}/Fread_dir.sh NST_SRC	 YES
-	. ${COMPIL_DIR}/Fread_dir.sh OFF_SRC	 NO
-	. ${COMPIL_DIR}/Fread_dir.sh SAO_SRC	 NO
-	. ${COMPIL_DIR}/Fread_dir.sh SAS_SRC	 NO
+	. ${COMPIL_DIR}/Fread_dir.sh OCE	 YES
+	. ${COMPIL_DIR}/Fread_dir.sh ICE  NO
+	. ${COMPIL_DIR}/Fread_dir.sh TOP	 NO
+	. ${COMPIL_DIR}/Fread_dir.sh NST	 YES
+	. ${COMPIL_DIR}/Fread_dir.sh OFF	 NO
+	. ${COMPIL_DIR}/Fread_dir.sh SAO	 NO
+	. ${COMPIL_DIR}/Fread_dir.sh SAS	 NO
 	REF_CONF=ORCA2_LIM3_PISCES
     elif [ ${#NEM_SUBDIR} -gt 0 ] && [ ${#REF_CONF} -eq 0 ] && [ ${#USP_CONF} -eq 0 ] ; then
-	echo "You are  installing a new configuration based on ORCA2_LIM3_PISCES"
+	echo "You are installing a new configuration based on ORCA2_LIM3_PISCES"
 	TAB=( ${NEM_SUBDIR} )
 	REF_CONF=ORCA2_LIM3_PISCES
     elif [ ${#NEM_SUBDIR} -eq 0 ] && [ ${#REF_CONF} -gt 0 ]; then
-	echo "You are  installing a new configuration based on ${REF_CONF}"
+	echo "You are installing a new configuration based on ${REF_CONF}"
 	. ${COMPIL_DIR}/Fcopy_dir.sh ${REF_CONF}
     elif [ ${#NEM_SUBDIR} -gt 0 ] && [ ${#REF_CONF} -gt 0 ]; then
         echo "You are installing an hydrid configuration based on ${REF_CONF} with components ${NEM_SUBDIR}"
@@ -319,7 +319,7 @@ echo ${NEW_CONF} ${TAB[*]} >> ${CONFIG_DIR}/cfg.txt
 #-
 #- Create the WORK ---
 #- Clean links and librairies ---
-#- Creating the good links, at first on OCE_SRC ---
+#- Creating the good links, at first on OCE ---
 . ${COMPIL_DIR}/Fmake_WORK.sh ${x_e} ${NEW_CONF} ${TAB[*]} || exit 3
 
 . ${COMPIL_DIR}/Fmake_bld.sh ${CONFIG_DIR} ${NEW_CONF}  ${NEMO_TDIR} || exit 3

@@ -120,7 +120,7 @@
 !> @date November, 2013 - Initial Version
 !
 !> @note This module is based on Perderabo's date calculator (ksh)
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !>
 !> @todo
 !> - see calendar.f90 and select Gregorian, NoLeap, or D360 calendar

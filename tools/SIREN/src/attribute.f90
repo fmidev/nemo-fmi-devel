@@ -85,7 +85,7 @@
 !> @date September, 2015
 !> - manage useless (dummy) attributes
 !
-!> @note Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+!> @note Software governed by the CeCILL licence     (./LICENSE)
 !----------------------------------------------------------------------
 MODULE att
    USE netcdf                          ! nf90 library

@@ -7,9 +7,9 @@ MODULE iom_def
    !!             "   ! 07 07  (D. Storkey) Add uldname
    !!--------------------------------------------------------------------
    !!---------------------------------------------------------------------------------
-   !! NEMO/OPA 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: iom_def.F90 6140 2015-12-21 11:35:23Z timgraham $
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!---------------------------------------------------------------------------------
 
    USE par_kind

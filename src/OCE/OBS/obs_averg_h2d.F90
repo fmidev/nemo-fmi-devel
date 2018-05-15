@@ -43,9 +43,9 @@ MODULE obs_averg_h2d
       &   obs_max_fpsize      ! Works out the maximum number of grid points required for the averaging
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 3.3 , NEMO Consortium (2010)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: obs_averg_h2d.F90 2715 2011-03-30 15:58:35Z rblod $
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------
 
 CONTAINS

@@ -136,7 +136,7 @@ MODULE sbcblk
    !!----------------------------------------------------------------------
    !! NEMO/OPA 3.7 , NEMO-consortium (2014)
    !! $Id: sbcblk.F90 6416 2016-04-01 12:22:17Z clem $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

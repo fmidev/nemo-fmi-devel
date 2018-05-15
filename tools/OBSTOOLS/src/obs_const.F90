@@ -1,1 +1,1 @@
-../../../NEMO/OPA_SRC/OBS/obs_const.F90
+../../../src/OCE/OBS/obs_const.F90
