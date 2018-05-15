@@ -1,0 +1,42 @@
+Usage: ./trusting.sh        -u $USER -m $ARCH [OPTIONS]
+       ./install_new_branch -u $USER -m $ARCH [OPTIONS]
+
+./trusting.sh            Launch trusting test on $ARCH machine from $USER installation
+./install_new_branch     Install new branch in $USER installation for trusting test on $ARCH machine
+
+Examples: `./trusting.sh        -u romr005 -m X64_CURIE -p -b nemo_v3_6_STABLE`
+          `./install_new_branch -u romr005 -m X64_ADA   -w $HOME/NEMO         `
+
+Mandatory
+    Default settings to source in ./config, templates (arch_template.cfg & user_template.cfg)
+    -m,--machine      Architecture environment (compilation & computation settings)
+    -u,--user         User             ""      (NEMO & XIOS installation)		   
+
+
+Options (modify default settings)
+SVN
+    -b,--branch	      Branch name in working directory ('trunk'|'nemo_v3_6_stable'|...)
+    -v,--version      Action on working copy ('status' by default)
+  		           '{'YYYY-MM-DD'}'  Update to revision available at this date
+		           [0-9]*	       ""   ""    ""    number
+		           HEAD|up|update      ""   "" last revision
+		           st|status	     Show differences with repository
+    -w,--workdir      Installation directory for testing branches
+
+Inputs
+    -a,--archive      Forcing input files archive to extract, if void it will copy all files from given folder (see next line)
+    -f,--forcdir      Path to your personal folder of forcing inputs
+
+Testing configuration
+    -n,--new_conf     Testing   configuration folder created in ./CONFIG
+    -r,--ref_conf     Reference      " "      for trusting test
+
+Compiling & computation
+    -j,--job          Number of processes for compiling
+    -t,--time         Timeout for computation (s)
+
+Trusting output
+    -d,--debug        Verbose output for debugging purpose (`set -vx`)
+    -e,--email        Email trusting digest report to following addresses only on failure
+    -h,--help         Print this help & exit
+    -p,--prod         Production mode (append trusting logfile)

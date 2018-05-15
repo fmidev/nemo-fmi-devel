@@ -1,0 +1,12 @@
+!-----------------------------------------------------------------------
+&namc1d_uvd    !   data: U & V currents                                 ("key_c1d")
+!-----------------------------------------------------------------------
+!              !  file name  ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!              !             !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_ucur     = 'ucurrent'  ,         -1        ,'u_current',   .false.    , .true. , 'monthly' ,  ''      ,  'Ume'   , ''
+   sn_vcur     = 'vcurrent'  ,         -1        ,'v_current',   .false.    , .true. , 'monthly' ,  ''      ,  'Vme'   , ''
+!
+   cn_dir        = './'    !  root directory for the location of the files
+   ln_uvd_init   = .false. !  Initialisation of ocean U & V with U & V input data (T) or not (F)
+   ln_uvd_dyndmp = .false. !  damping of ocean U & V toward U & V input data (T) or not (F)
+/

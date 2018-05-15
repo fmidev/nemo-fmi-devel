@@ -1,0 +1,9 @@
+Generates automatic documentation: in ADM/DOC_SCRIPTS 
+Pre requisite: to have sphinx installed
+Input file is in ADM/DOC_SCRIPTS/sphinx/conf.py to be checked/modifies by user
+
+Once the input file is set up, run:
+cd ADM/DOC_SCRIPTS
+gmake -f makefile_compile before
+gmake -f makefile_compile man_pdf
+to generate documentation in pdf in ADM/DOC_SCRIPTS/doc/manuals/pdf/sphinx

@@ -1,0 +1,14 @@
+!-----------------------------------------------------------------------
+&namctl        !   Control prints 
+!-----------------------------------------------------------------------
+   ln_ctl      = .false.   !  trends control print (expensive!)
+   nn_print    =    0      !  level of print (0 no extra print)
+   nn_ictls    =    0      !  start i indice of control sum (use to compare mono versus
+   nn_ictle    =    0      !  end   i indice of control sum        multi processor runs
+   nn_jctls    =    0      !  start j indice of control               over a subdomain)
+   nn_jctle    =    0      !  end   j indice of control
+   nn_isplt    =    1      !  number of processors in i-direction
+   nn_jsplt    =    1      !  number of processors in j-direction
+   ln_timing   = .false.   !  timing by routine write out in timing.output file
+   ln_diacfl   = .false.   !  CFL diagnostics write out in cfl_diagnostics.ascii
+/

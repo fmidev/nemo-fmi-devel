@@ -1,0 +1,16 @@
+!-----------------------------------------------------------------------
+&namtra_qsr    !   penetrative solar radiation                          (ln_traqsr =T)
+!-----------------------------------------------------------------------
+!              !  file name  ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!              !             !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_chl      ='chlorophyll',        -1         , 'CHLA'    ,   .true.     , .true. , 'yearly'  , ''       , ''       , ''
+
+   cn_dir      = './'      !  root directory for the location of the runoff files
+   ln_qsr_rgb  = .true.    !  RGB (Red-Green-Blue) light penetration
+   ln_qsr_2bd  = .false.   !  2 bands              light penetration
+   ln_qsr_bio  = .false.   !  bio-model light penetration
+   nn_chldta   =      1    !  RGB : Chl data (=1) or cst value (=0)
+   rn_abs      =   0.58    !  RGB & 2 bands: fraction of light (rn_si1)
+   rn_si0      =   0.35    !  RGB & 2 bands: shortess depth of extinction
+   rn_si1      =   23.0    !  2 bands: longest depth of extinction
+/

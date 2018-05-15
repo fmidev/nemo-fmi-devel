@@ -1,0 +1,335 @@
+#+
+#
+# ========
+# makefile
+# ========
+#
+# -----------------------------------------------
+# generation of documentation of NEMO compilation
+# -----------------------------------------------
+#
+# TODO
+# ====
+#
+# add -W to sphinx command when encoding problems are solved
+#
+# usage of sphinx/source/Makefile
+#
+# revision of manual section of php and xsl
+#
+# EVOLUTIONS
+# ==========
+#
+# $Id$
+#
+# - fplod 20100419T145702Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * remove rest2web (sphinx is prefered)
+#
+# - fplod 20100323T135104Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * remove one pdf and html
+#
+# - fplod 20100311T143131Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * add rest2web (alternative to sphinx)
+#
+# - fplod 20100310T190253Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * add php and xsl files to man_troff
+#
+# - fplod 20100310T182201Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * usage of sphinx (for the first time !) not yet ok ...
+#
+# - fplod 20100310T091541Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * add man_troff with shell scripts possible now with docutils 0.6
+#     can be test with
+#      $ man -M ../doc//manuals/man bibopa.sh
+#
+# - fplod 2009-05-13T14:08:49Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * implicit rules
+#
+#     nb : may be will only work wih GNU make
+#     but easier to update : only one line to add in thi makefile when
+#     a new file is added in $(DIRSRC) directory
+#
+#   * rst2latex usage of manuals_many.sty and manual_one.sty (for TOC and parindent)
+#   * bug fix for PDF manual (missing one pdf2latex)
+#
+# - fplod 2008-10-28T10:59:44Z aedon.locean-ipsl.upmc.fr (Darwin)
+#
+#   * add newpage directive
+#     (thanks to http://docutils.sourceforge.net/docs/user/latex.html)
+#
+# - fplod 2008-09-17T09:16:08Z aedon.locean-ipsl.upmc.fr (Darwin)
+#   * add xsl files
+#
+# - fplod 2008-09-16T14:59:02Z aedon.locean-ipsl.upmc.fr (Darwin)
+#   * creation
+#
+# SEE ALSO
+# ========
+#
+# extract_rst.sh_
+#
+# .. _extract_rst.sh: ../extract_rst.sh.html
+#
+#-
+#
+PRODUCT = \
+NEMO_UTIL
+
+PRODUCTNAME = \
+$$(echo $(PRODUCT) | tr [:lower:] [:upper:])
+
+DIRSRC = \
+../../NEMOGCM/TOOLS/COMPILE
+
+DIRADM = \
+./
+
+DIRTMP = \
+./
+
+DIRDESIGN = \
+./design/
+
+DIRWWW = \
+./doc/
+
+URLPUBLISH = \
+http://192.168.0.12/~rblod/$(PRODUCT)
+
+LIST_SRCSH = $(wildcard $(DIRSRC)/*.sh) \
+$(DIRSRC)/../../CONFIG/makenemo \
+$(DIRSRC)/../maketools
+
+LIST_SRCSH_RST = $(addprefix $(DIRTMP)/, $(notdir $(addsuffix .rst,$(LIST_SRCSH))))
+
+LIST_SRCSH_R2W = $(addprefix $(DIRTMP)/rest2web_tmpdir/, $(notdir $(addsuffix .txt,$(LIST_SRCSH))))
+
+LIST_SRCSH_TROFF = $(addprefix $(DIRWWW)/manuals/man/man1/, $(notdir $(addsuffix .1,$(LIST_SRCSH))))
+
+LIST_SRCSH_HTML = $(adprefix $(DIRWWW)/manuals/html/many/, $(notdir $(addsuffix .html,$(LIST_SRCSH))))
+
+LIST_SRCSH_PDF = $(addprefix $(DIRSRC)+$(DIRWWW)/manuals/pdf/many/,$(notdir $(addsuffix .pdf,$(LIST_SRCSH))))
+
+RST2MAN = \
+rst2man.py
+
+RST2HTML = \
+rst2html.py
+
+RST2LATEX = \
+rst2latex.py
+
+RST2LATEX_OPTIONS_MANY = \
+--documentclass=article \
+--stylesheet=manuals_many.sty \
+--traceback \
+--use-verbatim-when-possible
+
+.PHONY : \
+help \
+before \
+clean \
+cleantmp \
+design \
+htmllinkcheckb \
+htmllinkchecka \
+spellcheck \
+all \
+man \
+man_troff \
+man_html \
+man_html_many \
+man_html_sphinx \
+man_pdf \
+man_pdf_many \
+man_pdf_sphinx
+
+help :
+	@echo "Prepare output directories :"
+	@echo "\$$ make before"
+	@echo ""
+	@echo "Following commands are available to build outputs :"
+	@echo "\$$ make all"
+	@echo " "
+	@echo "Check links before installation : "
+	@echo "\$$ make htmllinkcheckb"
+	@echo " "
+	@echo "Last step = installation"
+	@echo "\$$ make install"
+	@echo " "
+	@echo "Check links after installation : "
+	@echo "\$$ make htmllinkchecka"
+	@echo " "
+
+before :
+	@mkdir -p $(DIRWWW)/manuals/man/man1/
+	@mkdir -p $(DIRWWW)/manuals/html/many/
+	@mkdir -p $(DIRWWW)/manuals/html/rest2web/
+	@mkdir -p $(DIRWWW)/manuals/html/rest2web/css/
+	@mkdir -p $(DIRWWW)/manuals/html/sphinx/
+	@mkdir -p $(DIRWWW)/manuals/pdf/many/
+	@mkdir -p $(DIRWWW)/manuals/pdf/sphinx/
+	@mkdir -p $(DIRTMP)/sphinx_tmpdir/doctrees/
+	@mkdir -p $(DIRTMP)/rest2web_tmpdir/
+
+install :
+	@install.sh -w $(DIRWWW) -u $(URLPUBLISH)
+
+clean : \
+cleantmp
+	-@rm -fr $(DIRWWW)/
+	-@rm -fr $(DIRWWW)/manuals/man/
+	-@rm -fr $(DIRWWW)/manuals/html/
+	-@rm -fr $(DIRWWW)/manuals/pdf/
+
+cleantmp :
+	-@rm -f $(DIRTMP)/all.xml
+	-@rm -f $(DIRTMP)/*.rst
+	-@rm -f $(DIRTMP)/*.tex
+	-@rm -rf $(DIRTMP)/rest2web_tmpdir/
+	-@rm -f $(DIRTMP)/rest2web.log
+	-@rm -f $(DIRWWW)/manuals/pdf/many/*.aux
+	-@rm -f $(DIRWWW)/manuals/pdf/many/*.log
+	-@rm -f $(DIRWWW)/manuals/pdf/many/*.out
+	-@rm -rf $(DIRTMP)/sphinx_tmpdir/
+	-@rm -f $(DIRTMP)/sphinx_*.log
+
+design : \
+$(DIRDESIGN)/images/$(PRODUCT)_fulldependencies.png \
+$(DIRDESIGN)/images/$(PRODUCT)_fulldependencies.svg
+
+htmllinkcheckb :
+	@linkchecker.sh -d $(DIRWWW)/manuals/html/
+
+htmllinkchecka :
+	@linkchecker.sh -u $(URLPUBLISH)
+
+spellcheck :
+	@++aspell --mode=sgml --master=francais -c \
+	$(DIRSRC)/$(PRODUCT).xml
+
+all : \
+SPECIAL_RST \
+man_troff \
+man_html \
+man_pdf
+
+man_troff : \
+$(LIST_SRCSH_TROFF) 
+
+man_html : \
+man_html_many \
+man_html_sphinx
+
+man_html_many : \
+$(DIRWWW)/manuals/html/many/index.html \
+$(LIST_SRCSH_HTML) 
+
+man_html_sphinx : \
+$(DIRADM)/sphinx/conf.py \
+$(DIRTMP)/sphinx_tmpdir/index.rst \
+$(LIST_SRCSH_RST) 
+	@cp $(LIST_SRCSH_RST) $(DIRTMP)/sphinx_tmpdir/
+	sphinx-build -b html -c $(DIRADM)/sphinx \
+	    -d $(DIRTMP)/sphinx_tmpdir/doctrees \
+	    -w $(DIRTMP)/sphinx_html.log \
+	    $(DIRTMP)/sphinx_tmpdir/ \
+	    $(DIRWWW)/manuals/html/sphinx/
+
+man_pdf : \
+man_pdf_many \
+man_pdf_sphinx
+
+man_pdf_many : \
+$(LIST_SRCSH_PHP) 
+
+man_pdf_sphinx : \
+$(DIRADM)/sphinx/conf.py \
+$(DIRTMP)/sphinx_tmpdir/index.rst \
+$(LIST_SRCSH_RST) 
+	@cp $(LIST_SRCSH_RST) $(DIRTMP)/sphinx_tmpdir/
+	@sphinx-build -b latex -c $(DIRADM)/sphinx \
+	    -d $(DIRTMP)/sphinx_tmpdir/doctrees \
+	    -w $(DIRTMP)/sphinx_pdf.log \
+	    $(DIRTMP)/sphinx_tmpdir/ \
+	    $(DIRTMP)/sphinx_tmpdir/latex_output
+	cd $(DIRTMP)/sphinx_tmpdir/latex_output/; make all-pdf
+	cp $(DIRTMP)/sphinx_tmpdir/latex_output/*.pdf \
+	   $(DIRWWW)/manuals/pdf/sphinx/
+
+$(DIRWWW)/manuals/html/many/index.html : \
+$(DIRTMP)/index_many.rst
+	@$(RST2HTML) --input-encoding=ISO-8859-15 --strict \
+	$< $@
+
+$(DIRTMP)/index_many.rst :
+	@echo "$(PRODUCTNAME) manuals" | tr [:print:] = > $@
+	@echo "$(PRODUCTNAME) manuals" >> $@
+	@echo "$(PRODUCTNAME) manuals" | tr [:print:] = >> $@
+	@echo " " >> $@
+	@echo "Shell scripts" >> $@
+	@echo "Shell scripts" | tr [:print:] = >> $@
+	@for file in $(LIST_SRCSH); do echo " ";echo "$$(basename $${file})_"; echo " "; echo ".. _$$(basename $${file}) : $$(basename $${file}).html"; done >> $@
+
+$(DIRTMP)/sphinx_tmpdir/index.rst :
+	@echo ".. _index:" >> $@
+	@echo " " >> $@
+	@echo "$(PRODUCTNAME) manuals" | tr [:print:] = >> $@
+	@echo "$(PRODUCTNAME) manuals" >> $@
+	@echo "$(PRODUCTNAME) manuals" | tr [:print:] = >> $@
+	@echo " " >> $@
+	@echo "Shell scripts" >> $@
+	@echo "Shell scripts" | tr [:print:] = >> $@
+	@echo ".. toctree::" >> $@
+	@echo "   :maxdepth: 1" 1>> $@
+	@echo "   :glob:" 1>> $@
+	@echo " " >> $@
+	@for file in $(LIST_SRCSH); \
+	do \
+	   echo "   $$(basename $${file})"; \
+	done >> $@
+	@echo " " >> $@
+
+$(DIRWWW)/manuals/man/man1/%.1:$(DIRTMP)/%.rst
+	@$(RST2MAN) --input-encoding=ISO-8859-15 --strict \
+	$< $@
+
+$(DIRWWW)/manuals/html/many/%.html:$(DIRTMP)/%.rst
+	@$(RST2HTML) --input-encoding=ISO-8859-15 --strict \
+	$< $@
+
+$(DIRWWW)/manuals/pdf/many/%.pdf : $(DIRTMP)/%.tex
+	@-pdflatex -output-directory $(DIRWWW)/manuals/pdf/many/ $<
+	@-pdflatex -output-directory $(DIRWWW)/manuals/pdf/many/ $<
+
+$(DIRTMP)/%.tex : $(DIRTMP)/%.rst
+	@$(RST2LATEX) $(RST2LATEX_OPTIONS_MANY) --input-encoding=ISO-8859-15 --strict \
+	$< $@
+
+$(DIRTMP)/%.sh.rst : $(DIRSRC)/%.sh 
+	@$(DIRADM)/extract_rst.sh -i $< -l sh -o $@
+
+SPECIAL_RST : $(DIRTMP)/makenemo.rst $(DIRTMP)/maketools.rst
+
+$(DIRTMP)/makenemo.rst : $(DIRSRC)/../../CONFIG/makenemo
+	@$(DIRADM)/extract_rst.sh -i $< -l sh -o $@
+$(DIRTMP)/maketools.rst : $(DIRSRC)/../maketools
+	@$(DIRADM)/extract_rst.sh -i $< -l sh -o $@
+
+
+$(DIRDESIGN)/images/%.png : $(DIRDESIGN)/images/%.svg
+	@convert $< $@
+
+$(DIRDESIGN)/images/%.svg : $(DIRDESIGN)/%.dot
+	@dot -Tsvg -o $@ $<
+
+$(DIRDESIGN)/$(PRODUCT)_fulldependencies.dot : \
+./makefile
+	@makeppgraph --graphviz --output=$@

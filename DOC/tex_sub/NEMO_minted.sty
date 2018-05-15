@@ -1,0 +1,44 @@
+%% ==============================================================================
+%% minted.sty: syntax highlighting configuration
+%% ==============================================================================
+
+
+%% Global highlighting style
+%% ==============================================================================
+
+\setminted{style=emacs, fontsize=\scriptsize, breaklines, frame=leftline}
+
+
+%% Specific per language
+
+\setminted[xml]{style=borland}
+
+
+%% Oneliner
+%% ==============================================================================
+
+\newmint[forline]{fortran}{}			% \forline|...|
+\newmint[xmlline]{xml}{}			% \xmlline|...|
+\newmint[cmd]{console}{}			% \cmd|...|
+
+
+%% Multi-lines
+%% ==============================================================================
+
+\newminted[forlines]{fortran}{}			% \begin{forlines}
+\newminted[xmllines]{xml}{}			% \begin{xmllines}
+\newminted[cmds]{console}{}			% \begin{cmds}
+\newminted[clines]{c}{fontsize=\tiny}			% \begin{clines}
+
+
+%% File
+
+\newmintedfile[forfile]{fortran}{fontsize=\tiny}			% \forfile{../namelists/nam...}
+
+
+%% Inline
+%% ==============================================================================
+
+\newmintinline[forcode]{fortran}{fontsize=auto, frame=lines}			% \forcode{...}
+\newmintinline[xmlcode]{xml}{ 	fontsize=auto, frame=lines}			% \xmlcode{...}
+\newmintinline[snippet]{console}{fontsize=auto, frame=lines}			% \snippet{...}

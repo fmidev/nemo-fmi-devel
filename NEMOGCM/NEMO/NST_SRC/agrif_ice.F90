@@ -1,0 +1,28 @@
+MODULE agrif_ice
+   !!======================================================================
+   !!                       ***  MODULE agrif_ice  ***
+   !! AGRIF :   define in memory AGRIF variables for sea-ice
+   !!----------------------------------------------------------------------
+   !! History :  3.4  ! 2012-08  (R. Benshila)  Original code
+   !!            3.6  ! 2016-05  (C. Rousset)   Add LIM3 compatibility
+   !!----------------------------------------------------------------------
+#if defined key_agrif && defined key_si3
+   !!----------------------------------------------------------------------
+   !!   'key_agrif'                                              AGRIF zoom
+   !!   'key_si3'                                       SI3 sea-ice model
+   !!----------------------------------------------------------------------   
+   IMPLICIT NONE
+   PRIVATE 
+
+   INTEGER, PUBLIC ::  u_ice_id, v_ice_id, tra_ice_id
+   INTEGER, PUBLIC ::  lim_nbstep = 0    ! child time position in sea-ice model
+
+   !!----------------------------------------------------------------------
+   !! NEMO/NST 4.0 , NEMO Consortium (2017)
+   !! $Id$
+   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !!----------------------------------------------------------------------
+
+#endif
+   !!======================================================================
+END MODULE agrif_ice

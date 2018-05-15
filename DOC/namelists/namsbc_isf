@@ -1,0 +1,33 @@
+!-----------------------------------------------------------------------
+&namsbc_isf    !  Top boundary layer (ISF)                              (nn_isf >0)
+!-----------------------------------------------------------------------
+!              ! file name ! frequency (hours) ! variable ! time interp.!  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!              !           !  (if <0  months)  !   name   !  (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+! nn_isf == 4
+   sn_fwfisf   = 'rnfisf'  ,         -12       ,'sowflisf',   .false.   , .true. , 'yearly'  ,    ''    ,   ''     ,    ''
+! nn_isf == 3
+   sn_rnfisf   = 'rnfisf'  ,         -12       ,'sofwfisf',   .false.   , .true. , 'yearly'  ,    ''    ,   ''     ,    ''
+! nn_isf == 2 and 3
+   sn_depmax_isf='rnfisf'  ,         -12       ,'sozisfmax',  .false.   , .true. , 'yearly'  ,    ''    ,   ''     ,    ''
+   sn_depmin_isf='rnfisf'  ,         -12       ,'sozisfmin',  .false.   , .true. , 'yearly'  ,    ''    ,   ''     ,    ''
+! nn_isf == 2
+   sn_Leff_isf = 'rnfisf'  ,         -12       ,'Leff'    ,   .false.   , .true. , 'yearly'  ,    ''    ,   ''     ,    ''
+!
+! for all case
+   nn_isf      = 1         !  ice shelf melting/freezing
+                           !  1 = presence of ISF    2 = bg03 parametrisation 
+                           !  3 = rnf file for isf   4 = ISF fwf specified
+                           !  option 1 and 4 need ln_isfcav = .true. (domzgr)
+! only for nn_isf = 1 or 2
+   rn_gammat0  = 1.e-4     ! gammat coefficient used in blk formula
+   rn_gammas0  = 1.e-4     ! gammas coefficient used in blk formula
+! only for nn_isf = 1 or 4
+   rn_hisf_tbl =  30.      ! thickness of the top boundary layer    (Losh et al. 2008)
+   !                       ! 0 => thickness of the tbl = thickness of the first wet cell
+! only for nn_isf = 1
+   nn_isfblk   = 1         ! 1 ISOMIP  like: 2 equations formulation (Hunter et al., 2006)
+   !                       ! 2 ISOMIP+ like: 3 equations formulation (Asay-Davis et al., 2015)
+   nn_gammablk = 1         ! 0 = cst Gammat (= gammat/s)
+   !                       ! 1 = velocity dependend Gamma (u* * gammat/s)  (Jenkins et al. 2010)
+   !                       ! 2 = velocity and stability dependent Gamma    (Holland et al. 1999)
+/

@@ -1,0 +1,18 @@
+!-----------------------------------------------------------------------
+&namsbc_sas    !   Stand-Alone Surface boundary condition
+!-----------------------------------------------------------------------
+!              !  file name  ! frequency (hours) ! variable  ! time interp.!  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!              !             !  (if <0  months)  !   name    !  (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_usp      = 'sas_grid_U',     120           , 'uos'     ,   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+   sn_vsp      = 'sas_grid_V',     120           , 'vos'     ,   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+   sn_tem      = 'sas_grid_T',     120           , 'sosstsst',   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+   sn_sal      = 'sas_grid_T',     120           , 'sosaline',   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+   sn_ssh      = 'sas_grid_T',     120           , 'sossheig',   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+   sn_e3t      = 'sas_grid_T',     120           , 'e3t_m'   ,   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+   sn_frq      = 'sas_grid_T',     120           , 'frq_m'   ,   .true.    , .true. , 'yearly'  ,    ''    ,    ''    ,    ''
+
+   l_sasread   = .true.    !  =T Read the above fields in a file, =F initialize to 0. in sbcssm.F90
+   ln_3d_uve   = .false.   !  specify whether we are supplying a 3D u,v and e3 field
+   ln_read_frq = .false.   !  specify whether we must read frq or not
+   cn_dir      = './'      !  root directory for the location of the bulk files are
+/
