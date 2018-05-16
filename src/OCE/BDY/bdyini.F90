@@ -1122,35 +1122,17 @@ CONTAINS
  
       bdytmask(:,:) = ssmask(:,:)
 
-      IF( ln_mask_file ) THEN
-         CALL iom_open( cn_mask_file, inum )
-         CALL iom_get ( inum, jpdom_data, 'bdy_msk', bdytmask(:,:) )
-         CALL iom_close( inum )
+      ! Derive mask on U and V grid from mask on T grid
 
-         ! Derive mask on U and V grid from mask on T grid
-         bdyumask(:,:) = 0._wp
-         bdyvmask(:,:) = 0._wp
-         DO ij=1, jpjm1
-            DO ii=1, jpim1
-               bdyumask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii+1, ij )
-               bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
-            END DO
+      bdyumask(:,:) = 0._wp
+      bdyvmask(:,:) = 0._wp
+      DO ij = 1, jpjm1
+         DO ii = 1, jpim1
+            bdyumask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii+1, ij )
+            bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
          END DO
-         CALL lbc_lnk_multi( bdyumask, 'U', 1., bdyvmask, 'V', 1. )      ! Lateral boundary cond.
-      ENDIF ! ln_mask_file=.TRUE.
-      
-      IF( .NOT.ln_mask_file ) THEN
-         ! If .not. ln_mask_file then we need to derive mask on U and V grid from mask on T grid here.
-         bdyumask(:,:) = 0._wp
-         bdyvmask(:,:) = 0._wp
-         DO ij = 1, jpjm1
-            DO ii = 1, jpim1
-               bdyumask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii+1, ij )
-               bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
-            END DO
-         END DO
-         CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
-      ENDIF
+      END DO
+      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
 
       ! bdy masks are now set to zero on boundary points:
       !

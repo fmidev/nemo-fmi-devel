@@ -28,6 +28,7 @@ MODULE dommsk
    USE bdy_oce        ! open boundary
    !
    USE in_out_manager ! I/O manager
+   USE iom            ! IOM library
    USE lbclnk         ! ocean lateral boundary conditions (or mpp link)
    USE lib_mpp        ! Massively Parallel Processing library
 
@@ -154,6 +155,9 @@ CONTAINS
 904   IF( ios >  0 )   CALL ctl_nam ( ios , 'nambdy in configuration namelist', lwp )
       ! ------------------------
       IF ( ln_bdy .AND. ln_mask_file ) THEN
+         CALL iom_open( cn_mask_file, inum )
+         CALL iom_get ( inum, jpdom_data, 'bdy_msk', bdytmask(:,:) )
+         CALL iom_close( inum )
          DO jk = 1, jpkm1
             DO jj = 1, jpj
                DO ji = 1, jpi
