@@ -16,7 +16,7 @@ MODULE agrif_ice_update
    !!   'key_si3'  :                                 LIM 3.6 sea-ice model
    !!   'key_agrif' :                                 AGRIF library 
    !!----------------------------------------------------------------------
-   !!   agrif_update_si3  : update sea-ice on boundaries or total
+   !!   agrif_update_ice  : update sea-ice on boundaries or total
    !!                        child domain for velocities and ice properties
    !!   update_tra_ice     : sea-ice properties
    !!   update_u_ice       : zonal      ice velocity
@@ -32,7 +32,7 @@ MODULE agrif_ice_update
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   agrif_update_si3   ! called by agrif_user.F90 and icestp.F90
+   PUBLIC   agrif_update_ice   ! called by agrif_user.F90 and icestp.F90
 
    !!----------------------------------------------------------------------
    !! NEMO/NST 4.0 , NEMO Consortium (2018)
@@ -41,9 +41,9 @@ MODULE agrif_ice_update
    !!----------------------------------------------------------------------
 CONTAINS
 
-   SUBROUTINE agrif_update_si3( kt )
+   SUBROUTINE agrif_update_ice( kt )
       !!----------------------------------------------------------------------
-      !!                     *** ROUTINE agrif_update_si3 ***
+      !!                     *** ROUTINE agrif_update_ice ***
       !! ** Method  :   Call the hydrostaticupdate pressure at the boundary or the entire domain 
       !!
       !! ** Action : - Update (u_ice,v_ice) and ice tracers
@@ -69,7 +69,7 @@ CONTAINS
       Agrif_SpecialValueFineGrid    = 0.
       Agrif_UseSpecialValueInUpdate = .FALSE.
       !
-   END SUBROUTINE agrif_update_si3
+   END SUBROUTINE agrif_update_ice
 
 
    SUBROUTINE update_tra_ice( ptab, i1, i2, j1, j2, k1, k2, before )

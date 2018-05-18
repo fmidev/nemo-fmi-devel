@@ -296,7 +296,7 @@ CONTAINS
       IF( Agrif_NbStepint() == 0 ) THEN               ! AGRIF Update from zoom N to zoom 1 then to Parent 
 !!jc in fact update is useless at last time step, but do it for global diagnostics
 #if defined key_si3
-                              CALL Agrif_Update_si3( kstp )   ! update sea-ice
+                              CALL Agrif_Update_ice( kstp )   ! update sea-ice
 #endif
                               CALL Agrif_Update_ssh()          ! Update ssh
          IF(.NOT.ln_linssh)   CALL Agrif_Update_vvl()          ! Update vertical scale factors  

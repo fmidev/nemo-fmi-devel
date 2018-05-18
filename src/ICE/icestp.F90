@@ -131,9 +131,9 @@ CONTAINS
          !                              ! lim_nbstep ranges from 1 to the nb of child ocean steps inside one parent ice step
          IF( .NOT. Agrif_Root() )       lim_nbstep = MOD( lim_nbstep, Agrif_irhot() * Agrif_Parent(nn_fsbc) / nn_fsbc ) + 1
          !                              ! these calls must remain here for restartability purposes
-                                        CALL agrif_interp_si3( 'T' ) 
-                                        CALL agrif_interp_si3( 'U' )
-                                        CALL agrif_interp_si3( 'V' )
+                                        CALL agrif_interp_ice( 'T' ) 
+                                        CALL agrif_interp_ice( 'U' )
+                                        CALL agrif_interp_ice( 'V' )
 #endif
                                         CALL store_fields             ! Store now ice values
          !

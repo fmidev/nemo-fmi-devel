@@ -61,7 +61,7 @@ SUBROUTINE Agrif_InitValues
    CALL Agrif_InitValues_cont_top
 # endif
 # if defined key_si3
-   CALL Agrif_InitValues_cont_si3
+   CALL Agrif_InitValues_cont_ice
 # endif
    !
    IF ( Agrif_Level().EQ.Agrif_MaxLevel() ) CALL agrif_Update_ini()
@@ -326,7 +326,7 @@ RECURSIVE SUBROUTINE Agrif_Update_ini( )
 !!   CALL Agrif_Update_tke(0)
 
 #if defined key_si3
-   CALL agrif_update_si3(0)
+   CALL agrif_update_ice(0)
 #endif
    
    CALL Agrif_ChildGrid_To_ParentGrid()
@@ -492,9 +492,9 @@ SUBROUTINE agrif_declare_var
 END SUBROUTINE agrif_declare_var
 
 #if defined key_si3
-SUBROUTINE Agrif_InitValues_cont_si3
+SUBROUTINE Agrif_InitValues_cont_ice
    !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitValues_cont_si3 ***
+   !!                 *** ROUTINE Agrif_InitValues_cont_ice ***
    !!
    !! ** Purpose :: Initialisation of variables to be interpolated for LIM3
    !!----------------------------------------------------------------------
@@ -511,7 +511,7 @@ SUBROUTINE Agrif_InitValues_cont_si3
    !
    ! Declaration of the type of variable which have to be interpolated (parent=>child)
    !----------------------------------------------------------------------------------
-   CALL agrif_declare_var_si3
+   CALL agrif_declare_var_ice
 
    ! Controls
 
@@ -528,17 +528,17 @@ SUBROUTINE Agrif_InitValues_cont_si3
    ! First Interpolations (using "after" ice subtime step => lim_nbstep=1)
    !----------------------------------------------------------------------
    lim_nbstep = ( Agrif_irhot() * Agrif_Parent(nn_fsbc) / nn_fsbc ) ! clem: to have calledweight=1 in interp (otherwise the western border of the zoom is wrong)
-   CALL agrif_interp_si3('U') ! interpolation of ice velocities
-   CALL agrif_interp_si3('V') ! interpolation of ice velocities
-   CALL agrif_interp_si3('T') ! interpolation of ice tracers 
+   CALL agrif_interp_ice('U') ! interpolation of ice velocities
+   CALL agrif_interp_ice('V') ! interpolation of ice velocities
+   CALL agrif_interp_ice('T') ! interpolation of ice tracers 
    lim_nbstep = 0
    
    !
-END SUBROUTINE Agrif_InitValues_cont_si3
+END SUBROUTINE Agrif_InitValues_cont_ice
 
-SUBROUTINE agrif_declare_var_si3
+SUBROUTINE agrif_declare_var_ice
    !!----------------------------------------------------------------------
-   !!                 *** ROUTINE agrif_declare_var_si3 ***
+   !!                 *** ROUTINE agrif_declare_var_ice ***
    !!
    !! ** Purpose :: Declaration of variables to be interpolated for LIM3
    !!----------------------------------------------------------------------
@@ -589,7 +589,7 @@ SUBROUTINE agrif_declare_var_si3
    CALL Agrif_Set_Updatetype(v_ice_id  , update1 = Agrif_Update_Average, update2 = Agrif_Update_Copy   )
 #endif
 
-END SUBROUTINE agrif_declare_var_si3
+END SUBROUTINE agrif_declare_var_ice
 #endif
 
 

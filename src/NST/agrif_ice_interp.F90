@@ -13,7 +13,7 @@ MODULE agrif_ice_interp
    !!   'key_si3'  :                                 LIM 3.6 sea-ice model
    !!   'key_agrif' :                                 AGRIF library
    !!----------------------------------------------------------------------
-   !!  agrif_interp_si3    : interpolation of ice at "after" sea-ice time step
+   !!  agrif_interp_ice    : interpolation of ice at "after" sea-ice time step
    !!  agrif_interp_u_ice   : atomic routine to interpolate u_ice 
    !!  agrif_interp_v_ice   : atomic routine to interpolate v_ice 
    !!  agrif_interp_tra_ice : atomic routine to interpolate ice properties 
@@ -28,7 +28,7 @@ MODULE agrif_ice_interp
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   agrif_interp_si3   ! called by agrif_user.F90
+   PUBLIC   agrif_interp_ice   ! called by agrif_user.F90
 
    !!----------------------------------------------------------------------
    !! NEMO/NST 3.6 , NEMO Consortium (2018)
@@ -38,7 +38,7 @@ MODULE agrif_ice_interp
 
 CONTAINS
 
-   SUBROUTINE agrif_interp_si3( cd_type, kiter, kitermax )
+   SUBROUTINE agrif_interp_ice( cd_type, kiter, kitermax )
       !!-----------------------------------------------------------------------
       !!                 *** ROUTINE agrif_rhg_lim3  ***
       !!
@@ -76,7 +76,7 @@ CONTAINS
       Agrif_SpecialValue    = 0._wp
       Agrif_UseSpecialValue = .FALSE.
       !
-   END SUBROUTINE agrif_interp_si3
+   END SUBROUTINE agrif_interp_ice
 
 
    SUBROUTINE interp_u_ice( ptab, i1, i2, j1, j2, before )

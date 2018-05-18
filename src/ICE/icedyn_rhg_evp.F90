@@ -494,8 +494,8 @@ CONTAINS
             CALL lbc_lnk( v_ice, 'V', -1. )
             !
 #if defined key_agrif
-!!            CALL agrif_interp_si3( 'V', jter, nn_nevp )
-            CALL agrif_interp_si3( 'V' )
+!!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
+            CALL agrif_interp_ice( 'V' )
 #endif
             IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
             !
@@ -542,8 +542,8 @@ CONTAINS
             CALL lbc_lnk( u_ice, 'U', -1. )
             !
 #if defined key_agrif
-!!            CALL agrif_interp_si3( 'U', jter, nn_nevp )
-            CALL agrif_interp_si3( 'U' )
+!!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
+            CALL agrif_interp_ice( 'U' )
 #endif
             IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
             !
@@ -592,8 +592,8 @@ CONTAINS
             CALL lbc_lnk( u_ice, 'U', -1. )
             !
 #if defined key_agrif
-!!            CALL agrif_interp_si3( 'U', jter, nn_nevp )
-            CALL agrif_interp_si3( 'U' )
+!!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
+            CALL agrif_interp_ice( 'U' )
 #endif
             IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
             !
@@ -640,8 +640,8 @@ CONTAINS
             CALL lbc_lnk( v_ice, 'V', -1. )
             !
 #if defined key_agrif
-!!            CALL agrif_interp_si3( 'V', jter, nn_nevp )
-            CALL agrif_interp_si3( 'V' )
+!!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
+            CALL agrif_interp_ice( 'V' )
 #endif
             IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
             !
