@@ -4,6 +4,7 @@ MODULE icedyn_adv_umx
    !! sea-ice : advection using the ULTIMATE-MACHO scheme
    !!==============================================================================
    !! History :  3.6  !  2014-11  (C. Rousset, G. Madec)  Original code
+   !!            4.0  !  2018     (many people)           SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

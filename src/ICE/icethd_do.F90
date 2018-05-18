@@ -3,10 +3,8 @@ MODULE icethd_do
    !!                       ***  MODULE icethd_do   ***
    !!   sea-ice: sea ice growth in the leads (open water)  
    !!======================================================================
-   !! History :  LIM  ! 2005-12 (M. Vancoppenolle)  Original code
-   !!             -   ! 2006-01 (M. Vancoppenolle)  add ITD
-   !!            3.0  ! 2007-07 (M. Vancoppenolle)  Mass and energy conservation tested
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
+   !! History :       !  2005-12  (M. Vancoppenolle) Original code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -57,18 +55,17 @@ CONTAINS
       !!               ***   ROUTINE ice_thd_do  ***
       !!  
       !! ** Purpose : Computation of the evolution of the ice thickness and 
-      !!      concentration as a function of the heat balance in the leads.
+      !!              concentration as a function of the heat balance in the leads
       !!       
-      !! ** Method  : Ice is formed in the open water when ocean lose heat
-      !!      (heat budget of open water Bl is negative) .
-      !!      Computation of the increase of 1-A (ice concentration) fol-
-      !!      lowing the law :
-      !!      (dA/dt)acc = F[ (1-A)/(1-a) ] * [ Bl / (Li*h0) ]
-      !!       where - h0 is the thickness of ice created in the lead
-      !!             - a is a minimum fraction for leads
-      !!             - F is a monotonic non-increasing function defined as:
+      !! ** Method  : Ice is formed in the open water when ocean looses heat
+      !!              (heat budget of open water is negative) following
+      !!
+      !!       (dA/dt)acc = F[ (1-A)/(1-a) ] * [ Bl / (Li*h0) ]
+      !!          where - h0 is the thickness of ice created in the lead
+      !!                - a is a minimum fraction for leads
+      !!                - F is a monotonic non-increasing function defined as:
       !!                  F(X)=( 1 - X**exld )**(1.0/exld)
-      !!             - exld is the exponent closure rate (=2 default val.)
+      !!                - exld is the exponent closure rate (=2 default val.)
       !! 
       !! ** Action : - Adjustment of snow and ice thicknesses and heat
       !!                content in brine pockets
@@ -78,8 +75,8 @@ CONTAINS
       !!               update h_s_1d, h_i_1d      
       !!------------------------------------------------------------------------
       INTEGER  ::   ji, jj, jk, jl   ! dummy loop indices
-      INTEGER  ::   iter     !   -       -
-      REAL(wp) ::   ztmelts, zfrazb, zweight, zde                          ! local scalars
+      INTEGER  ::   iter             !   -       -
+      REAL(wp) ::   ztmelts, zfrazb, zweight, zde                               ! local scalars
       REAL(wp) ::   zgamafr, zvfrx, zvgx, ztaux, ztwogp, zf                     !   -      -
       REAL(wp) ::   ztenagm, zvfry, zvgy, ztauy, zvrel2, zfp, zsqcd , zhicrit   !   -      -
       !
@@ -104,14 +101,14 @@ CONTAINS
       REAL(wp), DIMENSION(jpij) ::   zv_frazb    ! accretion of frazil ice at the ice bottom
       REAL(wp), DIMENSION(jpij) ::   zvrel_1d    ! relative ice / frazil velocity (1D vector)
       !
-      REAL(wp), DIMENSION(jpij,jpl) ::   zv_b      ! old volume of ice in category jl
-      REAL(wp), DIMENSION(jpij,jpl) ::   za_b      ! old area of ice in category jl
+      REAL(wp), DIMENSION(jpij,jpl) ::   zv_b    ! old volume of ice in category jl
+      REAL(wp), DIMENSION(jpij,jpl) ::   za_b    ! old area of ice in category jl
       !
       REAL(wp), DIMENSION(jpij,nlay_i,jpl) ::   ze_i_2d !: 1-D version of e_i
       !
-      REAL(wp), DIMENSION(jpi,jpj) ::   zvrel     ! relative ice / frazil velocity
+      REAL(wp), DIMENSION(jpi,jpj) ::   zvrel    ! relative ice / frazil velocity
       !
-      REAL(wp) :: zcai = 1.4e-3_wp                     ! ice-air drag (clem: should be dependent on coupling/forcing used)
+      REAL(wp) :: zcai = 1.4e-3_wp               ! ice-air drag (clem: should be dependent on coupling/forcing used)
       !!-----------------------------------------------------------------------!
 
       IF( ln_icediachk )   CALL ice_cons_hsm( 0, 'icethd_do', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft )
@@ -120,17 +117,14 @@ CONTAINS
       CALL ice_var_glo2eqv
 
       !------------------------------------------------------------------------------!
-      ! 3) Collection thickness of ice formed in leads and polynyas
+      ! 1) Collection thickness of ice formed in leads and polynyas
       !------------------------------------------------------------------------------!    
       ! ht_i_new is the thickness of new ice formed in open water
-      ! ht_i_new can be either prescribed (frazswi = 0) or computed (frazswi = 1)
+      ! ht_i_new can be either prescribed (ln_frazil=F) or computed (ln_frazil=T)
       ! Frazil ice forms in open water, is transported by wind
       ! accumulates at the edge of the consolidated ice edge
       ! where it forms aggregates of a specific thickness called
       ! collection thickness.
-
-      ! Note : the following algorithm currently breaks vectorization
-      ! 
 
       zvrel(:,:) = 0._wp
 
@@ -141,23 +135,18 @@ CONTAINS
 
       IF( ln_frazil ) THEN
          !
-         !--------------------
-         ! Physical constants
-         !--------------------
          ht_i_new(:,:) = 0._wp
          !
-         zhicrit = 0.04 ! frazil ice thickness
+         ! Physical constants
+         zhicrit = 0.04                                          ! frazil ice thickness
          ztwogp  = 2. * rau0 / ( grav * 0.3 * ( rau0 - rhoic ) ) ! reduced grav
-         zsqcd   = 1.0 / SQRT( 1.3 * zcai ) ! 1/SQRT(airdensity*drag)
+         zsqcd   = 1.0 / SQRT( 1.3 * zcai )                      ! 1/SQRT(airdensity*drag)
          zgamafr = 0.03
          !
          DO jj = 2, jpjm1
             DO ji = 2, jpim1
                IF ( qlead(ji,jj) < 0._wp .AND. tau_icebfr(ji,jj) == 0._wp ) THEN ! activated if cooling and no landfast
-                  !-------------
-                  ! Wind stress
-                  !-------------
-                  ! C-grid wind stress components
+                  ! -- Wind stress -- !
                   ztaux         = ( utau_ice(ji-1,jj  ) * umask(ji-1,jj  ,1)   &
                      &          +   utau_ice(ji  ,jj  ) * umask(ji  ,jj  ,1) ) * 0.5_wp
                   ztauy         = ( vtau_ice(ji  ,jj-1) * vmask(ji  ,jj-1,1)   &
@@ -165,32 +154,22 @@ CONTAINS
                   ! Square root of wind stress
                   ztenagm       =  SQRT( SQRT( ztaux * ztaux + ztauy * ztauy ) )
 
-                  !---------------------
-                  ! Frazil ice velocity
-                  !---------------------
+                  ! -- Frazil ice velocity -- !
                   rswitch = MAX( 0._wp, SIGN( 1._wp , ztenagm - epsi10 ) )
                   zvfrx   = rswitch * zgamafr * zsqcd * ztaux / MAX( ztenagm, epsi10 )
                   zvfry   = rswitch * zgamafr * zsqcd * ztauy / MAX( ztenagm, epsi10 )
 
-                  !-------------------
-                  ! Pack ice velocity
-                  !-------------------
-                  ! C-grid ice velocity
+                  ! -- Pack ice velocity -- !
                   zvgx    = ( u_ice(ji-1,jj  ) * umask(ji-1,jj  ,1)  + u_ice(ji,jj) * umask(ji,jj,1) ) * 0.5_wp
                   zvgy    = ( v_ice(ji  ,jj-1) * vmask(ji  ,jj-1,1)  + v_ice(ji,jj) * vmask(ji,jj,1) ) * 0.5_wp
 
-                  !-----------------------------------
-                  ! Relative frazil/pack ice velocity
-                  !-----------------------------------
-                  ! absolute relative velocity
+                  ! -- Relative frazil/pack ice velocity -- !
                   rswitch      = MAX( 0._wp, SIGN( 1._wp , at_i(ji,jj) - epsi10 ) )
                   zvrel2       = MAX(  ( zvfrx - zvgx ) * ( zvfrx - zvgx )   &
                      &               + ( zvfry - zvgy ) * ( zvfry - zvgy ) , 0.15 * 0.15 ) * rswitch
                   zvrel(ji,jj) = SQRT( zvrel2 )
 
-                  !---------------------
-                  ! Iterative procedure
-                  !---------------------
+                  ! -- new ice thickness (iterative loop) -- !
                   ht_i_new(ji,jj) = zhicrit +   ( zhicrit + 0.1 )    &
                      &                   / ( ( zhicrit + 0.1 ) * ( zhicrit + 0.1 ) -  zhicrit * zhicrit ) * ztwogp * zvrel2
 
@@ -204,23 +183,21 @@ CONTAINS
                      iter = iter + 1
                   END DO
                   !
-               ENDIF ! end of selection of pixels where ice forms
+               ENDIF
                !
             END DO 
          END DO 
          ! 
          CALL lbc_lnk_multi( zvrel, 'T', 1., ht_i_new, 'T', 1.  )
 
-      ENDIF ! End of computation of frazil ice collection thickness
+      ENDIF
 
       !------------------------------------------------------------------------------!
-      ! 4) Identify grid points where new ice forms
+      ! 2) Compute thickness, salinity, enthalpy, age, area and volume of new ice
       !------------------------------------------------------------------------------!
-
-      !-------------------------------------
-      ! Select points for new ice formation
-      !-------------------------------------
       ! This occurs if open water energy budget is negative (cooling) and there is no landfast ice
+
+      ! Identify grid points where new ice forms
       npti = 0   ;   nptidx(:) = 0
       DO jj = 1, jpj
          DO ji = 1, jpi
@@ -231,11 +208,7 @@ CONTAINS
          END DO
       END DO
 
-      !------------------------------
       ! Move from 2-D to 1-D vectors
-      !------------------------------
-      ! If ocean gains heat do nothing. Otherwise compute new ice formation
-
       IF ( npti > 0 ) THEN
 
          CALL tab_2d_1d( npti, nptidx(1:npti), at_i_1d(1:npti)      , at_i        )
@@ -247,21 +220,19 @@ CONTAINS
                CALL tab_2d_1d( npti, nptidx(1:npti), ze_i_2d(1:npti,jk,jl), e_i(:,:,jk,jl) )
             END DO
          END DO
-         CALL tab_2d_1d( npti, nptidx(1:npti), qlead_1d  (1:npti) , qlead       )
-         CALL tab_2d_1d( npti, nptidx(1:npti), t_bo_1d   (1:npti) , t_bo        )
-         CALL tab_2d_1d( npti, nptidx(1:npti), sfx_opw_1d(1:npti) , sfx_opw     )
-         CALL tab_2d_1d( npti, nptidx(1:npti), wfx_opw_1d(1:npti) , wfx_opw     )
-         CALL tab_2d_1d( npti, nptidx(1:npti), zh_newice (1:npti) , ht_i_new    )
-         CALL tab_2d_1d( npti, nptidx(1:npti), zvrel_1d  (1:npti) , zvrel       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qlead_1d  (1:npti) , qlead      )
+         CALL tab_2d_1d( npti, nptidx(1:npti), t_bo_1d   (1:npti) , t_bo       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), sfx_opw_1d(1:npti) , sfx_opw    )
+         CALL tab_2d_1d( npti, nptidx(1:npti), wfx_opw_1d(1:npti) , wfx_opw    )
+         CALL tab_2d_1d( npti, nptidx(1:npti), zh_newice (1:npti) , ht_i_new   )
+         CALL tab_2d_1d( npti, nptidx(1:npti), zvrel_1d  (1:npti) , zvrel      )
 
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_thd_1d(1:npti) , hfx_thd     )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_opw_1d(1:npti) , hfx_opw     )
-         CALL tab_2d_1d( npti, nptidx(1:npti), rn_amax_1d(1:npti) , rn_amax_2d  )
-         CALL tab_2d_1d( npti, nptidx(1:npti), sss_1d    (1:npti) , sss_m       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_thd_1d(1:npti) , hfx_thd    )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_opw_1d(1:npti) , hfx_opw    )
+         CALL tab_2d_1d( npti, nptidx(1:npti), rn_amax_1d(1:npti) , rn_amax_2d )
+         CALL tab_2d_1d( npti, nptidx(1:npti), sss_1d    (1:npti) , sss_m      )
 
-         !------------------------------------------------------------------------------|
-         ! 2) Convert units for ice internal energy
-         !------------------------------------------------------------------------------|
+         ! Convert units for ice internal energy
          DO jl = 1, jpl
             DO jk = 1, nlay_i               
                WHERE( v_i_2d(1:npti,jl) > 0._wp )
@@ -271,19 +242,12 @@ CONTAINS
                END WHERE
             END DO
          END DO
-         !------------------------------------------------------------------------------!
-         ! 5) Compute thickness, salinity, enthalpy, age, area and volume of new ice
-         !------------------------------------------------------------------------------!
 
-         !-----------------------------------------
          ! Keep old ice areas and volume in memory
-         !-----------------------------------------
          zv_b(1:npti,:) = v_i_2d(1:npti,:) 
          za_b(1:npti,:) = a_i_2d(1:npti,:)
 
-         !----------------------
-         ! Salinity of new ice 
-         !----------------------
+         ! --- Salinity of new ice --- ! 
          SELECT CASE ( nn_icesal )
          CASE ( 1 )                    ! Sice = constant 
             zs_newice(1:npti) = rn_icesal
@@ -295,9 +259,7 @@ CONTAINS
             zs_newice(1:npti) =   2.3
          END SELECT
 
-         !-------------------------
-         ! Heat content of new ice
-         !-------------------------
+         ! --- Heat content of new ice --- !
          ! We assume that new ice is formed at the seawater freezing point
          DO ji = 1, npti
             ztmelts       = - tmut * zs_newice(ji)                  ! Melting point (C)
@@ -306,14 +268,10 @@ CONTAINS
                &                       - rcp  *         ztmelts )
          END DO
 
-         !----------------
-         ! Age of new ice
-         !----------------
+         ! --- Age of new ice --- !
          zo_newice(1:npti) = 0._wp
 
-         !-------------------
-         ! Volume of new ice
-         !-------------------
+         ! --- Volume of new ice --- !
          DO ji = 1, npti
 
             zEi           = - ze_newice(ji) * r1_rhoic             ! specific enthalpy of forming ice [J/kg]
@@ -350,20 +308,16 @@ CONTAINS
             END DO
          END IF
          
-         !-----------------
-         ! Area of new ice
-         !-----------------
+         ! --- Area of new ice --- !
          DO ji = 1, npti
             za_newice(ji) = zv_newice(ji) / zh_newice(ji)
          END DO
 
          !------------------------------------------------------------------------------!
-         ! 6) Redistribute new ice area and volume into ice categories                  !
+         ! 3) Redistribute new ice area and volume into ice categories                  !
          !------------------------------------------------------------------------------!
 
-         !------------------------
-         ! 6.1) lateral ice growth
-         !------------------------
+         ! --- lateral ice growth --- !
          ! If lateral ice growth gives an ice concentration gt 1, then
          ! we keep the excessive volume in memory and attribute it later to bottom accretion
          DO ji = 1, npti
@@ -406,9 +360,7 @@ CONTAINS
             END DO
          END DO
 
-         !------------------------------------------------
-         ! 6.2) bottom ice growth + ice enthalpy remapping
-         !------------------------------------------------
+         ! --- bottom ice growth + ice enthalpy remapping --- !
          DO jl = 1, jpl
 
             ! for remapping
@@ -435,26 +387,21 @@ CONTAINS
             CALL ice_thd_ent( ze_i_2d(1:npti,:,jl) ) 
          END DO
 
-         !-----------------
-         ! Update salinity
-         !-----------------
+         ! --- Update salinity --- !
          DO jl = 1, jpl
             DO ji = 1, npti
                sv_i_2d(ji,jl) = sv_i_2d(ji,jl) + zs_newice(ji) * ( v_i_2d(ji,jl) - zv_b(ji,jl) )
             END DO
          END DO
 
-         !------------------------------------------------------------------------------!
-         ! 8) Change units for e_i
-         !------------------------------------------------------------------------------!    
+         ! Change units for e_i
          DO jl = 1, jpl
             DO jk = 1, nlay_i
                ze_i_2d(1:npti,jk,jl) = ze_i_2d(1:npti,jk,jl) * v_i_2d(1:npti,jl) * r1_nlay_i 
             END DO
          END DO
-         !------------------------------------------------------------------------------!
-         ! 7) Change 2D vectors to 1D vectors 
-         !------------------------------------------------------------------------------!
+
+         ! Move 2D vectors to 1D vectors 
          CALL tab_2d_3d( npti, nptidx(1:npti), a_i_2d (1:npti,1:jpl), a_i (:,:,:) )
          CALL tab_2d_3d( npti, nptidx(1:npti), v_i_2d (1:npti,1:jpl), v_i (:,:,:) )
          CALL tab_2d_3d( npti, nptidx(1:npti), sv_i_2d(1:npti,1:jpl), sv_i(:,:,:) )

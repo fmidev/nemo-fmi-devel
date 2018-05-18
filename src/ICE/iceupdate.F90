@@ -3,15 +3,7 @@ MODULE iceupdate
    !!                       ***  MODULE iceupdate   ***
    !!  Sea-ice :   computation of the flux at the sea ice/ocean interface
    !!======================================================================
-   !! History :   -   ! 2006-07 (M. Vancoppelle)  LIM3 original code
-   !!            3.0  ! 2008-03 (C. Tallandier)  surface module
-   !!             -   ! 2008-04 (C. Tallandier)  split in 2 + new ice-ocean coupling
-   !!            3.3  ! 2010-05 (G. Madec) decrease ocean & ice reference salinities in the Baltic sea
-   !!                 !                  + simplification of the ice-ocean stress calculation
-   !!            3.4  ! 2011-02 (G. Madec) dynamical allocation
-   !!             -   ! 2012    (D. Iovino) salt flux change
-   !!             -   ! 2012-05 (C. Rousset) add penetration solar flux
-   !!            3.5  ! 2012-10 (A. Coward, G. Madec) salt fluxes ; ice+snow mass
+   !! History :  4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

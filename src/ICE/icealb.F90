@@ -3,7 +3,8 @@ MODULE icealb
    !!                       ***  MODULE  icealb  ***
    !! Atmospheric forcing:  Albedo over sea ice
    !!=====================================================================
-   !! History :  4.0  ! 2017-07  (C. Rousset) Split ice and ocean albedos
+   !! History :  4.0  !  2017-07  (C. Rousset)       Split ice and ocean albedos
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -27,12 +28,6 @@ MODULE icealb
    PUBLIC   ice_alb        ! called in iceforcing.F90 and iceupdate.F90
 
    REAL(wp), PUBLIC, PARAMETER ::   rn_alb_oce = 0.066   !: ocean or lead albedo (Pegau and Paulson, Ann. Glac. 2001)
-
-   REAL(wp) , PARAMETER ::   ppc1    = 0.05    ! snow thickness (only for nn_ice_alb=0)
-   REAL(wp) , PARAMETER ::   ppc2    = 0.10    !  "        "
-   REAL(wp) , PARAMETER ::   ppcloud = 0.06    ! cloud effect on albedo (only-for nn_ice_alb=0)
-   REAL(wp) , PARAMETER ::   pp1_c1 = 1. / ppc1
-   REAL(wp) , PARAMETER ::   pp1_c2 = 1. / ppc2
    !
    !                             !!* albedo namelist (namalb)
    REAL(wp) ::   rn_alb_sdry      ! dry snow albedo

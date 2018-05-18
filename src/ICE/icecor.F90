@@ -1,10 +1,11 @@
 MODULE icecor
    !!======================================================================
    !!                     ***  MODULE  icecor  ***
-   !!   SI3 : Corrections on sea-ice variables at the end of the time step
+   !!   sea-ice: Corrections on sea-ice variables at the end of the time step
    !!======================================================================
    !! History :  3.0  !  2006-04  (M. Vancoppenolle) Original code
    !!            3.5  !  2014-06  (C. Rousset)       Complete rewriting/cleaning
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

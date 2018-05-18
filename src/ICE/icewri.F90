@@ -3,6 +3,8 @@ MODULE icewri
    !!                     ***  MODULE  icewri  ***
    !!   sea-ice : output ice variables
    !!======================================================================
+   !! History :  4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
+   !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
    !!   'key_si3'                                       SI3 sea-ice model
@@ -41,8 +43,7 @@ CONTAINS
 
    SUBROUTINE ice_wri( kt )
       !!-------------------------------------------------------------------
-      !!  This routine computes the average of some variables and write it
-      !!  on the ouput files.
+      !!  This routine ouputs some (most?) of the sea ice fields
       !!-------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! time-step
       !
@@ -59,11 +60,8 @@ CONTAINS
 
       IF( ln_timing )   CALL timing_start('icewri')
 
-      !----------------------------------------
-      ! Brine volume, switches, missing values
-      !----------------------------------------
-
-      CALL ice_var_bv      ! brine volume
+      ! brine volume
+      CALL ice_var_bv
 
       ! tresholds for outputs
       DO jj = 1, jpj

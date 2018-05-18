@@ -3,8 +3,8 @@ MODULE ice
    !!                        ***  MODULE  ice  ***
    !!   sea-ice:  ice variables defined in memory
    !!======================================================================
-   !! History :  3.0  ! 2008-03  (M. Vancoppenolle) original code LIM-3
-   !!            4.0  ! 2011-02  (G. Madec) dynamical allocation
+   !! History :  3.0  !  2008-03  (M. Vancoppenolle) Original code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -18,31 +18,6 @@ MODULE ice
 
    PUBLIC   ice_alloc   ! called by icestp.F90
 
-   !!======================================================================
-   !! LIM3 by the use of sweat, agile fingers and sometimes brain juice, 
-   !!  was developed in Louvain-la-Neuve by : 
-   !!    * Martin Vancoppenolle (UCL-ASTR, Belgium)
-   !!    * Sylvain Bouillon (UCL-ASTR, Belgium)
-   !!    * Miguel Angel Morales Maqueda (NOC-L, UK)
-   !! 
-   !! Based on extremely valuable earlier work by
-   !!    * Thierry Fichefet
-   !!    * Hugues Goosse
-   !!
-   !! The following persons also contributed to the code in various ways
-   !!    * Gurvan Madec, Claude Talandier, Christian Ethe (LOCEAN, France)
-   !!    * Xavier Fettweis (UCL-ASTR), Ralph Timmermann (AWI, Germany)
-   !!    * Bill Lipscomb (LANL), Cecilia Bitz (UWa) 
-   !!      and Elisabeth Hunke (LANL), USA.
-   !! 
-   !! For more info, the interested user is kindly invited to consult the following references
-   !!    For model description and validation :
-   !!    * Vancoppenolle et al., Ocean Modelling, 2008a.
-   !!    * Vancoppenolle et al., Ocean Modelling, 2008b.
-   !!    For a specific description of EVP :
-   !!    * Bouillon et al., Ocean Modelling 2009.
-   !!
-   !!    Or the reference manual, that should be available by 2011
    !!======================================================================
    !!                                                                     |
    !!              I C E   S T A T E   V A R I A B L E S                  |
@@ -61,25 +36,6 @@ MODULE ice
    !! * Intensive (or equivalent) variables.                              |
    !!   These are the variables that are either physically more           |
    !!   meaningful and/or used in ice thermodynamics                      |
-   !!                                                                     |
-   !! Routines in icevar.F90 perform conversions                          |
-   !!  - ice_var_glo2eqv  : from global to equivalent variables           |
-   !!  - ice_var_eqv2glo  : from equivalent to global variables           |
-   !!                                                                     |
-   !! For various purposes, the sea ice state variables have sometimes    |
-   !! to be aggregated over all ice thickness categories. This operation  |
-   !! is done in :                                                        |
-   !!  - ice_var_agg                                                      |
-   !!                                                                     |
-   !! in icestp.F90, the routines that compute the changes in the ice     |
-   !! state variables are called                                          |
-   !! - ice_rhg : ice dynamics                                            |
-   !! - ice_adv : ice advection                                           |
-   !! - ice_rdgrft : ice ridging and rafting                              |
-   !! - ice_thd : ice halo-thermodynamics and creation of new ice         |
-   !! - ice_itd : thermodynamic changes in ice thickness distribution     |
-   !!                                                                     |
-   !! See the associated routines for more information                    |
    !!                                                                     |
    !! List of ice state variables :                                       |
    !! -----------------------------                                       |
@@ -248,24 +204,24 @@ MODULE ice
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   strength    !: ice strength
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   stress1_i, stress2_i, stress12_i   !: 1st, 2nd & diagonal stress tensor element
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   delta_i     !: ice rheology elta factor (Flato & Hibler 95) [s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   divu_i      !: Divergence of the velocity field [s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   shear_i     !: Shear of the velocity field [s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   divu_i      !: Divergence of the velocity field             [s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   shear_i     !: Shear of the velocity field                  [s-1]
    !
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   t_bo        !: Sea-Ice bottom temperature [Kelvin]     
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   qlead       !: heat balance of the lead (or of the open ocean)
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   fhtur       !: net downward heat flux from the ice to the ocean
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   fhld        !: heat flux from the lead used for bottom melting
 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw     !: snow-ocean mass exchange   [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw     !: snow-ocean mass exchange             [kg.m-2.s-1]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_sni !: snow ice growth component of wfx_snw [kg.m-2.s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_sum !: surface melt component of wfx_snw [kg.m-2.s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_pnd     !: melt pond-ocean mass exchange   [kg.m-2.s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_spr     !: snow precipitation on ice  [kg.m-2.s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_sub     !: sublimation of snow/ice    [kg.m-2.s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_sub !: snow sublimation           [kg.m-2.s-1]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_ice_sub !: ice sublimation            [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_sum !: surface melt component of wfx_snw    [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_pnd     !: melt pond-ocean mass exchange        [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_spr     !: snow precipitation on ice            [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_sub     !: sublimation of snow/ice              [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_sub !: snow sublimation                     [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_ice_sub !: ice sublimation                      [kg.m-2.s-1]
 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_dyn !: dynamical component of wfx_snw    [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw_dyn !: dynamical component of wfx_snw       [kg.m-2.s-1]
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_ice     !: ice-ocean mass exchange                   [kg.m-2.s-1]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_sni     !: snow ice growth component of wfx_ice      [kg.m-2.s-1]
@@ -277,7 +233,7 @@ MODULE ice
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_lam     !: lateral melt component of wfx_ice         [kg.m-2.s-1]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_res     !: residual component of wfx_ice             [kg.m-2.s-1]
 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   afx_tot     !: ice concentration tendency (total)          [s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   afx_tot     !: ice concentration tendency (total)        [s-1]
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   sfx_bog     !: salt flux due to ice growth/melt                      [PSU/m2/s]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   sfx_bom     !: salt flux due to ice growth/melt                      [PSU/m2/s]
@@ -291,20 +247,20 @@ MODULE ice
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   sfx_sub     !: salt flux due to ice sublimation
 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_bog     !: total heat flux causing bottom ice growth        [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_bom     !: total heat flux causing bottom ice melt          [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_sum     !: total heat flux causing surface ice melt         [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_opw     !: total heat flux causing open water ice formation [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_dif     !: total heat flux causing Temp change in the ice   [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_snw     !: heat flux for snow melt                          [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_bog     !: total heat flux causing bottom ice growth           [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_bom     !: total heat flux causing bottom ice melt             [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_sum     !: total heat flux causing surface ice melt            [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_opw     !: total heat flux causing open water ice formation    [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_dif     !: total heat flux causing Temp change in the ice      [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_snw     !: heat flux for snow melt                             [W.m-2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_err_dif !: heat flux remaining due to change in non-solar flux [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_err_rem !: heat flux error after heat remapping             [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_in      !: heat flux available for thermo transformations   [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_err_rem !: heat flux error after heat remapping                [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_in      !: heat flux available for thermo transformations      [W.m-2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_out     !: heat flux remaining at the end of thermo transformations  [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_err_sub !: mass flux error after sublimation [kg.m-2.s-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_err_sub !: mass flux error after sublimation                   [kg.m-2.s-1]
    
    ! heat flux associated with ice-atmosphere mass exchange
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_sub     !: heat flux for sublimation  [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_sub     !: heat flux for sublimation            [W.m-2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_spr     !: heat flux of the snow precipitation  [W.m-2]
 
    ! heat flux associated with ice-ocean mass exchange
@@ -420,30 +376,27 @@ CONTAINS
       !!-----------------------------------------------------------------
       INTEGER :: ice_alloc
       !
-      INTEGER :: ierr(18), ii
+      INTEGER :: ierr(15), ii
       !!-----------------------------------------------------------------
-
       ierr(:) = 0
 
-      ! What could be one huge allocate statement is broken-up to try to
-      ! stay within Fortran's max-line length limit.
       ii = 1
-      ALLOCATE( u_oce   (jpi,jpj) , v_oce    (jpi,jpj) , ht_i_new (jpi,jpj) ,                        &
-         &      strength(jpi,jpj) , stress1_i(jpi,jpj) , stress2_i(jpi,jpj) , stress12_i(jpi,jpj) ,  &
-         &      delta_i (jpi,jpj) , divu_i   (jpi,jpj) , shear_i  (jpi,jpj) , STAT=ierr(ii) )
+      ALLOCATE( u_oce    (jpi,jpj) , v_oce    (jpi,jpj) , ht_i_new  (jpi,jpj) , strength(jpi,jpj) ,  &
+         &      stress1_i(jpi,jpj) , stress2_i(jpi,jpj) , stress12_i(jpi,jpj) ,                      &
+         &      delta_i  (jpi,jpj) , divu_i   (jpi,jpj) , shear_i   (jpi,jpj) , STAT=ierr(ii) )
 
       ii = ii + 1
       ALLOCATE( t_bo   (jpi,jpj) , wfx_snw_sni(jpi,jpj) ,                                                &
          &      wfx_snw(jpi,jpj) , wfx_snw_dyn(jpi,jpj) , wfx_snw_sum(jpi,jpj) , wfx_snw_sub(jpi,jpj) ,  &
          &      wfx_ice(jpi,jpj) , wfx_sub    (jpi,jpj) , wfx_ice_sub(jpi,jpj) , wfx_lam    (jpi,jpj) ,  &
-         &      wfx_pnd(jpi,jpj) ,                                                              &
-         &      wfx_bog(jpi,jpj) , wfx_dyn(jpi,jpj) , wfx_bom(jpi,jpj) , wfx_sum(jpi,jpj) ,     &
-         &      wfx_res(jpi,jpj) , wfx_sni(jpi,jpj) , wfx_opw(jpi,jpj) , wfx_spr(jpi,jpj) ,     &
-         &      afx_tot(jpi,jpj) , rn_amax_2d(jpi,jpj),                                         &
-         &      fhtur  (jpi,jpj) , qlead  (jpi,jpj) ,                                           &
+         &      wfx_pnd(jpi,jpj) ,                                                                       &
+         &      wfx_bog(jpi,jpj) , wfx_dyn(jpi,jpj) , wfx_bom(jpi,jpj) , wfx_sum(jpi,jpj) ,              &
+         &      wfx_res(jpi,jpj) , wfx_sni(jpi,jpj) , wfx_opw(jpi,jpj) , wfx_spr(jpi,jpj) ,              &
+         &      afx_tot(jpi,jpj) , rn_amax_2d(jpi,jpj),                                                  &
+         &      fhtur  (jpi,jpj) , qlead  (jpi,jpj) ,                                                    &
          &      sfx_res(jpi,jpj) , sfx_bri(jpi,jpj) , sfx_dyn(jpi,jpj) , sfx_sub(jpi,jpj) , sfx_lam(jpi,jpj) ,  &
          &      sfx_bog(jpi,jpj) , sfx_bom(jpi,jpj) , sfx_sum(jpi,jpj) , sfx_sni(jpi,jpj) , sfx_opw(jpi,jpj) ,  &
-         &      hfx_res(jpi,jpj) , hfx_snw(jpi,jpj) , hfx_sub(jpi,jpj) ,     & 
+         &      hfx_res(jpi,jpj) , hfx_snw(jpi,jpj) , hfx_sub(jpi,jpj) ,                        & 
          &      hfx_in (jpi,jpj) , hfx_out(jpi,jpj) , fhld   (jpi,jpj) ,                        &
          &      hfx_sum(jpi,jpj) , hfx_bom(jpi,jpj) , hfx_bog(jpi,jpj) , hfx_dif(jpi,jpj) ,     &
          &      hfx_opw(jpi,jpj) , hfx_thd(jpi,jpj) , hfx_dyn(jpi,jpj) , hfx_spr(jpi,jpj) ,     &
@@ -451,32 +404,37 @@ CONTAINS
 
       ! * Ice global state variables
       ii = ii + 1
-      ALLOCATE( ftr_ice(jpi,jpj,jpl) , cnd_ice(jpi,jpj,jpl) , t1_ice(jpi,jpj,jpl) , &
-         &      h_i (jpi,jpj,jpl) , a_i (jpi,jpj,jpl) , v_i (jpi,jpj,jpl) ,     &
-         &      v_s (jpi,jpj,jpl) , h_s (jpi,jpj,jpl) , t_su(jpi,jpj,jpl) ,     &
-         &      s_i (jpi,jpj,jpl) , sv_i(jpi,jpj,jpl) , o_i (jpi,jpj,jpl) ,     &
-         &      oa_i(jpi,jpj,jpl) , bv_i(jpi,jpj,jpl) ,  STAT=ierr(ii) )
+      ALLOCATE( ftr_ice(jpi,jpj,jpl) , cnd_ice(jpi,jpj,jpl) , t1_ice(jpi,jpj,jpl) ,  &
+         &      h_i    (jpi,jpj,jpl) , a_i    (jpi,jpj,jpl) , v_i   (jpi,jpj,jpl) ,  &
+         &      v_s    (jpi,jpj,jpl) , h_s    (jpi,jpj,jpl) , t_su  (jpi,jpj,jpl) ,  &
+         &      s_i    (jpi,jpj,jpl) , sv_i   (jpi,jpj,jpl) , o_i   (jpi,jpj,jpl) ,  &
+         &      oa_i   (jpi,jpj,jpl) , bv_i   (jpi,jpj,jpl) , STAT=ierr(ii) )
+
       ii = ii + 1
-      ALLOCATE( u_ice(jpi,jpj) , v_ice(jpi,jpj) ,                                      &
-         &      vt_i (jpi,jpj) , vt_s (jpi,jpj) , at_i(jpi,jpj) , ato_i(jpi,jpj) ,     &
-         &      et_i (jpi,jpj) , et_s (jpi,jpj) , tm_i(jpi,jpj) , tm_s (jpi,jpj) , bvm_i(jpi,jpj) ,  &
-         &      sm_i (jpi,jpj) , tm_su(jpi,jpj) , hm_i(jpi,jpj) , hm_s (jpi,jpj) ,     &
-         &      om_i (jpi,jpj) , tau_icebfr(jpi,jpj)                             , STAT=ierr(ii) )
+      ALLOCATE( u_ice(jpi,jpj) , v_ice(jpi,jpj) ,                                   &
+         &      vt_i (jpi,jpj) , vt_s (jpi,jpj) , at_i(jpi,jpj) , ato_i(jpi,jpj) ,  &
+         &      et_i (jpi,jpj) , et_s (jpi,jpj) , tm_i(jpi,jpj) , tm_s (jpi,jpj) ,  &
+         &      sm_i (jpi,jpj) , tm_su(jpi,jpj) , hm_i(jpi,jpj) , hm_s (jpi,jpj) ,  &
+         &      om_i (jpi,jpj) , bvm_i(jpi,jpj) , tau_icebfr(jpi,jpj)            , STAT=ierr(ii) )
+
       ii = ii + 1
       ALLOCATE( t_s(jpi,jpj,nlay_s,jpl) , e_s(jpi,jpj,nlay_s,jpl) , STAT=ierr(ii) )
+
       ii = ii + 1
       ALLOCATE( t_i(jpi,jpj,nlay_i,jpl) , e_i(jpi,jpj,nlay_i,jpl) , sz_i(jpi,jpj,nlay_i,jpl) , STAT=ierr(ii) )
 
       ii = ii + 1
       ALLOCATE( a_ip(jpi,jpj,jpl) , v_ip(jpi,jpj,jpl) , a_ip_frac(jpi,jpj,jpl) , h_ip(jpi,jpj,jpl) , STAT = ierr(ii) )
+
       ii = ii + 1
       ALLOCATE( at_ip(jpi,jpj) , vt_ip(jpi,jpj) , STAT = ierr(ii) )
 
       ! * Old values of global variables
       ii = ii + 1
-      ALLOCATE( v_s_b  (jpi,jpj,jpl) , v_i_b (jpi,jpj,jpl) , h_s_b(jpi,jpj,jpl)        , h_i_b(jpi,jpj,jpl)        ,   &
-         &      a_i_b  (jpi,jpj,jpl) , sv_i_b(jpi,jpj,jpl) , e_i_b(jpi,jpj,nlay_i,jpl) , e_s_b(jpi,jpj,nlay_s,jpl) ,   &
-         &      oa_i_b (jpi,jpj,jpl)                                                   , STAT=ierr(ii) )
+      ALLOCATE( v_s_b (jpi,jpj,jpl) , v_i_b (jpi,jpj,jpl) , h_s_b(jpi,jpj,jpl)        , h_i_b(jpi,jpj,jpl)        ,   &
+         &      a_i_b (jpi,jpj,jpl) , sv_i_b(jpi,jpj,jpl) , e_i_b(jpi,jpj,nlay_i,jpl) , e_s_b(jpi,jpj,nlay_s,jpl) ,   &
+         &      oa_i_b(jpi,jpj,jpl)                                                   , STAT=ierr(ii) )
+
       ii = ii + 1
       ALLOCATE( u_ice_b(jpi,jpj) , v_ice_b(jpi,jpj) , at_i_b(jpi,jpj) , STAT=ierr(ii) )
       

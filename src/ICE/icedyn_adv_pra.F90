@@ -3,9 +3,8 @@ MODULE icedyn_adv_pra
    !!                       ***  MODULE icedyn_adv_pra   ***
    !!   sea-ice : advection => Prather scheme
    !!======================================================================
-   !! History :  LIM  ! 2008-03 (M. Vancoppenolle)  LIM-3 from LIM-2 code
-   !!            3.2  ! 2009-06 (F. Dupont)  correct a error in the North fold b.c.
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
+   !! History :       !  2008-03  (M. Vancoppenolle) LIM-3 from LIM-2 code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!--------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

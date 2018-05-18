@@ -3,10 +3,8 @@ MODULE iceitd
    !!                       ***  MODULE iceitd ***
    !!   sea-ice : ice thickness distribution
    !!======================================================================
-   !! History :   -   !          (W. H. Lipscomb and E.C. Hunke) CICE (c) original code
-   !!            3.0  ! 2005-12  (M. Vancoppenolle) adaptation to LIM-3
-   !!             -   ! 2006-06  (M. Vancoppenolle) adaptation to include salt, age
-   !!             -   ! 2007-04  (M. Vancoppenolle) Mass conservation checked
+   !! History :  3.0  !  2005-12  (M. Vancoppenolle) original code (based on CICE)
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

@@ -3,9 +3,7 @@ MODULE icedyn_rhg
    !!                     ***  MODULE  icedyn_rhg  ***
    !!   Sea-Ice dynamics : master routine for rheology 
    !!======================================================================
-   !! history :  1.0  ! 2002-08  (C. Ethe, G. Madec)  original VP code 
-   !!            3.0  ! 2007-03  (MA Morales Maqueda, S. Bouillon, M. Vancoppenolle)  LIM3: EVP-Cgrid
-   !!            3.5  ! 2011-02  (G. Madec) dynamical allocation
+   !! history :  4.0  !  2018     (C. Rousset)      Original code
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

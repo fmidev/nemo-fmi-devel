@@ -1,8 +1,15 @@
 MODULE icevar
    !!======================================================================
    !!                       ***  MODULE icevar ***
-   !!   sea-ice:     Different sets of ice model variables 
-   !!                   how to switch from one to another
+   !!   sea-ice:  series of functions to transform or compute ice variables
+   !!======================================================================
+   !! History :   -   !  2006-01  (M. Vancoppenolle) Original code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
+   !!----------------------------------------------------------------------
+#if defined key_si3
+   !!----------------------------------------------------------------------
+   !!   'key_si3'                                       SI3 sea-ice model
+   !!----------------------------------------------------------------------
    !!
    !!                 There are three sets of variables
    !!                 VGLO : global variables of the model
@@ -11,6 +18,7 @@ MODULE icevar
    !!                        - a_i (jpi,jpj,jpl)
    !!                        - t_s (jpi,jpj,jpl)
    !!                        - e_i (jpi,jpj,nlay_i,jpl)
+   !!                        - e_s (jpi,jpj,nlay_s,jpl)
    !!                        - sv_i(jpi,jpj,jpl)
    !!                        - oa_i(jpi,jpj,jpl)
    !!                 VEQV : equivalent variables sometimes used in the model
@@ -28,15 +36,6 @@ MODULE icevar
    !!                        - sm_i(jpi,jpj)  mean ice salinity
    !!                        - tm_i(jpi,jpj)  mean ice temperature
    !!                        - tm_s(jpi,jpj)  mean snw temperature
-   !!======================================================================
-   !! History :   -   ! 2006-01 (M. Vancoppenolle) Original code
-   !!            3.4  ! 2011-02 (G. Madec) dynamical allocation
-   !!            3.5  ! 2012    (M. Vancoppenolle)  add ice_var_itd
-   !!            3.6  ! 2014-01 (C. Rousset) add ice_var_zapsmall, rewrite ice_var_itd
-   !!----------------------------------------------------------------------
-#if defined key_si3
-   !!----------------------------------------------------------------------
-   !!   'key_si3'                                       SI3 sea-ice model
    !!----------------------------------------------------------------------
    !!   ice_var_agg       : integrate variables over layers and categories
    !!   ice_var_glo2eqv   : transform from VGLO to VEQV

@@ -1,22 +1,17 @@
 MODULE icethd_zdf
    !!======================================================================
    !!                       ***  MODULE icethd_zdf ***
-   !!   sea-ice: vertical heat diffusion in sea ice (computation of temperatures) 
+   !!   sea-ice: master routine for vertical heat diffusion in sea ice 
    !!======================================================================
-   !! History :  LIM  ! 02-2003 (M. Vancoppenolle) original 1D code
-   !!                 ! 06-2005 (M. Vancoppenolle) 3d version
-   !!                 ! 11-2006 (X Fettweis) Vectorization by Xavier
-   !!                 ! 04-2007 (M. Vancoppenolle) Energy conservation
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
-   !!             -   ! 2012-05 (C. Rousset) add penetration solar flux
+   !! History :  4.0  !  2018     (C. Rousset)      Original code SI3
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
    !!   'key_si3'                                       SI3 sea-ice model
    !!----------------------------------------------------------------------
    !!  ice_thd_zdf      : select the appropriate routine for vertical heat diffusion calculation
-   !!  ice_thd_zdf_BL99 : 
-   !!  ice_thd_zdf_init :
+   !!  ice_thd_zdf_BL99 : heat diffusion from Bitz and Lipscomb 1999 
+   !!  ice_thd_zdf_init : initialization
    !!----------------------------------------------------------------------
    USE dom_oce         ! ocean space and time domain
    USE phycst          ! physical constants (ocean directory) 

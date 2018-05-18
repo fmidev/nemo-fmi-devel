@@ -3,7 +3,7 @@ MODULE icedyn
    !!                     ***  MODULE  icedyn  ***
    !!   Sea-Ice dynamics : master routine for sea ice dynamics 
    !!======================================================================
-   !! history :  4.0  ! 2017-09  (C. Rousset)  original code 
+   !! history :  4.0  ! 2018  (C. Rousset)  original code SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -62,8 +62,11 @@ CONTAINS
       !!               
       !! ** Purpose :   this routine manages sea ice dynamics
       !!
-      !! ** Action : - Initialisation of some variables
-      !!             - call ice_rhg
+      !! ** Action : - calculation of friction in case of landfast ice
+      !!             - call ice_dyn_rhg    = rheology
+      !!             - call ice_dyn_adv    = advection
+      !!             - call ice_dyn_rdgrft = ridging/rafting
+      !!             - call ice_cor        = corrections if fields are out of bounds
       !!--------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt     ! ice time step
       !!

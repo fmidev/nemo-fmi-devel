@@ -3,11 +3,9 @@ MODULE icethd_dh
    !!                       ***  MODULE icethd_dh ***
    !!   seaice : thermodynamic growth and melt 
    !!======================================================================
-   !! History :  LIM  ! 2003-05 (M. Vancoppenolle) Original code in 1D
-   !!                 ! 2005-06 (M. Vancoppenolle) 3D version 
-   !!            3.2  ! 2009-07 (M. Vancoppenolle, Y. Aksenov, G. Madec) bug correction in wfx_snw & wfx_ice
-   !!            3.4  ! 2011-02 (G. Madec) dynamical allocation
-   !!            3.5  ! 2012-10 (G. Madec & co) salt flux + bug fixes 
+   !! History :       !  2003-05  (M. Vancoppenolle) Original code in 1D
+   !!                 !  2005-06  (M. Vancoppenolle) 3D version 
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -124,10 +122,9 @@ CONTAINS
          END DO
       END DO
       !
-      ! ---------------------------------------------- !
-      ! Available heat for surface and bottom ablation !
-      ! ---------------------------------------------- !
-      !
+      !                       ! ============================================== !
+      !                       ! Available heat for surface and bottom ablation !
+      !                       ! ============================================== !
       SELECT CASE( nice_jules )
       !
       CASE( np_jules_ACTIVE )

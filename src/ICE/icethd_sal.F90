@@ -3,9 +3,9 @@ MODULE icethd_sal
    !!                       ***  MODULE icethd_sal ***
    !!   sea-ice : computation of salinity variations in the ice
    !!======================================================================
-   !! History :   -   ! 2003-05 (M. Vancoppenolle) UCL-ASTR first coding for LIM3-1D
-   !!            3.0  ! 2005-12 (M. Vancoppenolle) adapted to the 3-D version
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
+   !! History :   -   !  2003-05  (M. Vancoppenolle) UCL-ASTR first coding for LIM3-1D
+   !!            3.0  !  2005-12  (M. Vancoppenolle) adapted to the 3-D version
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!---------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

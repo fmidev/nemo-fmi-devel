@@ -1,11 +1,9 @@
 MODULE icedyn_adv
    !!======================================================================
    !!                       ***  MODULE icedyn_adv   ***
-   !!   SI3 : sea-ice advection
+   !!   sea-ice: advection
    !!======================================================================
-   !! History : LIM-2 ! 2000-01 (M.A. Morales Maqueda, H. Goosse, and T. Fichefet)  Original code
-   !!            3.0  ! 2005-11 (M. Vancoppenolle)   Multi-layer sea ice, salinity variations
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
+   !! History :  4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

@@ -3,9 +3,8 @@ MODULE icedyn_rdgrft
    !!                       ***  MODULE icedyn_rdgrft ***
    !!    sea-ice : Mechanical impact on ice thickness distribution      
    !!======================================================================
-   !! History :  LIM  ! 2006-02  (M. Vancoppenolle) Original code 
-   !!            3.2  ! 2009-07  (M. Vancoppenolle, Y. Aksenov, G. Madec) bug correction in smsw & sfx_dyn
-   !!            4.0  ! 2011-02  (G. Madec) dynamical allocation
+   !! History :       !  2006-02  (M. Vancoppenolle) Original code 
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

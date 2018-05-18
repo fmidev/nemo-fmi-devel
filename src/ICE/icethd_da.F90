@@ -3,7 +3,8 @@ MODULE icethd_da
    !!                       ***  MODULE icethd_da ***
    !!   sea-ice : lateral melting
    !!======================================================================
-   !! History :  4.0  ! 2016-03 (C. Rousset)  original code
+   !! History :  3.7  !  2016-03  (C. Rousset)       Original code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!---------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

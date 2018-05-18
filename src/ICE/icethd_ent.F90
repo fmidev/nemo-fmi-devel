@@ -4,12 +4,10 @@ MODULE icethd_ent
    !!   sea-ice: redistribution of enthalpy in the ice on the new vertical grid
    !!                       after vertical growth/melt
    !!======================================================================
-   !! History :  LIM  ! 2003-05 (M. Vancoppenolle) Original code in 1D
-   !!                 ! 2005-07 (M. Vancoppenolle) 3D version 
-   !!                 ! 2006-11 (X. Fettweis) Vectorized 
-   !!            3.0  ! 2008-03 (M. Vancoppenolle) Energy conservation and clean code
-   !!            3.4  ! 2011-02 (G. Madec) dynamical allocation
-   !!             -   ! 2014-05 (C. Rousset) complete rewriting
+   !! History :       !  2003-05  (M. Vancoppenolle) Original code in 1D
+   !!                 !  2005-07  (M. Vancoppenolle) 3D version 
+   !!            3.6  !  2014-05  (C. Rousset)       New version
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

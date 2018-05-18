@@ -3,11 +3,9 @@ MODULE iceistate
    !!                     ***  MODULE  iceistate  ***
    !!   sea-ice : Initialization of ice variables
    !!======================================================================
-   !! History :  2.0  ! 2004-01 (C. Ethe, G. Madec)  Original code
-   !!            3.0  ! 2007    (M. Vancoppenolle)  Rewrite for ice cats
-   !!            3.0  ! 2009-11 (M. Vancoppenolle)  Enhanced version for ice cats
-   !!            3.0  ! 2011-02 (G. Madec)  dynamical allocation
-   !!             -   ! 2014    (C. Rousset)  add N/S initializations
+   !! History :  2.0  !  2004-01  (C. Ethe, G. Madec) Original code
+   !!            3.0  !  2007     (M. Vancoppenolle)  Rewrite for ice cats
+   !!            4.0  !  2018     (many people)       SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

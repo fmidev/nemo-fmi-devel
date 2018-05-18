@@ -6,10 +6,12 @@ MODULE icedyn_rhg_evp
    !! History :   -   !  2007-03  (M.A. Morales Maqueda, S. Bouillon) Original code
    !!            3.0  !  2008-03  (M. Vancoppenolle) LIM3
    !!             -   !  2008-11  (M. Vancoppenolle, S. Bouillon, Y. Aksenov) add surface tilt in ice rheolohy 
-   !!            3.3  !  2009-05  (G.Garric) addition of the evp cas
-   !!            3.4  !  2011-01  (A. Porter)  dynamical allocation 
-   !!            3.5  !  2012-08  (R. Benshila)  AGRIF
-   !!            3.6  !  2016-06  (C. Rousset) Rewriting + landfast ice + possibility to use mEVP (Bouillon 2013)
+   !!            3.3  !  2009-05  (G.Garric)    addition of the evp case
+   !!            3.4  !  2011-01  (A. Porter)   dynamical allocation 
+   !!            3.5  !  2012-08  (R. Benshila) AGRIF
+   !!            3.6  !  2016-06  (C. Rousset)  Rewriting + landfast ice + possibility to use mEVP (Bouillon 2013)
+   !!            3.7  !  2017     (C. Rousset)  add aEVP (Kimmritz 2016-2017)
+   !!            4.0  !  2018     (many people) SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

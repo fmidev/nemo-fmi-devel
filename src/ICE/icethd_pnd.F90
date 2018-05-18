@@ -1,11 +1,11 @@
 MODULE icethd_pnd 
    !!======================================================================
    !!                     ***  MODULE  icethd_pnd   ***
-   !!   Melt ponds
+   !!   sea-ice: Melt ponds on top of sea ice
    !!======================================================================
-   !! history :       ! Original code by Daniela Flocco and Adrian Turner
-   !!            1.0  ! 2012    (O. Lecomte) Adaptation for scientific tests (NEMO3.1)
-   !!            2.0  ! 2017    (M. Vancoppenolle, O. Lecomte, C. Rousset) Implementation in NEMO4
+   !! history :       !  2012     (O. Lecomte)       Adaptation to LIM from Flocco and Turner
+   !!                 !  2017     (M. Vancoppenolle, O. Lecomte, C. Rousset) Implementation
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -73,12 +73,12 @@ CONTAINS
       !! ** Purpose :   Compute melt pond evolution
       !!
       !! ** Method  :   Melt pond fraction and thickness are prescribed 
-      !!              to non-zero values when t_su = 0C
+      !!                to non-zero values when t_su = 0C
       !!
       !! ** Tunable parameters : pond fraction (rn_apnd), pond depth (rn_hpnd)
       !!                
       !! ** Note   : Coupling with such melt ponds is only radiative
-      !!         Advection, ridging, rafting... are bypassed
+      !!             Advection, ridging, rafting... are bypassed
       !!
       !! ** References : Bush, G.W., and Trump, D.J. (2017)
       !!-------------------------------------------------------------------

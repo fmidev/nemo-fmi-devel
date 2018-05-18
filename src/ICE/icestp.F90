@@ -1,17 +1,29 @@
 MODULE icestp
    !!======================================================================
    !!                       ***  MODULE  icestp  ***
-   !! Surface module :  update the ocean surface boundary condition over ice
-   !!                   covered area using SI3 sea-ice model
+   !! sea ice : Master routine for all the sea ice model
    !!=====================================================================
-   !! History :  2.0  ! 2006-12  (M. Vancoppenolle) Original code
-   !!            3.0  ! 2008-02  (C. Talandier)  Surface module from icestp.F90
-   !!             -   ! 2008-04  (G. Madec)  sltyle and ice_ctl routine
-   !!            3.3  ! 2010-11  (G. Madec) ice-ocean stress always computed at each ocean time-step
-   !!            3.4  ! 2011-01  (A Porter)  dynamical allocation
-   !!             -   ! 2012-10  (C. Rousset)  add ice_dia
-   !!            3.6  ! 2014-07  (M. Vancoppenolle, G. Madec, O. Marti) revise coupled interface
-   !!            4.0  ! 2016-06  (L. Brodeau) new unified bulk routine (based on AeroBulk)
+   !!
+   !! The sea ice model SI3 (Sea Ice modelling Integrated Initiative),
+   !!                        aka Sea Ice cube for its nickname
+   !!
+   !!    is originally based on LIM3, developed in Louvain-la-Neuve by: 
+   !!       * Martin Vancoppenolle (UCL-ASTR, Belgium)
+   !!       * Sylvain Bouillon (UCL-ASTR, Belgium)
+   !!       * Miguel Angel Morales Maqueda (NOC-L, UK)
+   !!      thanks to valuable earlier work by
+   !!       * Thierry Fichefet
+   !!       * Hugues Goosse
+   !!      thanks also to the following persons who contributed
+   !!       * Gurvan Madec, Claude Talandier, Christian Ethe (LOCEAN, France)
+   !!       * Xavier Fettweis (UCL-ASTR), Ralph Timmermann (AWI, Germany)
+   !!       * Bill Lipscomb (LANL), Cecilia Bitz (UWa) and Elisabeth Hunke (LANL), USA.
+   !!
+   !! SI3 has been made possible by a handful of persons who met as working group
+   !!     in France and UK:
+   !!    * ...
+   !!======================================================================
+   !! History :  4.0  !  2018     (C. Rousset)      Original code SI3
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -314,9 +326,9 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '   nn_virtual_itd forced to 0 as jpl>1, no need with multiple categories to emulate them'
       ENDIF
       !
-	  IF( ln_cpl .AND. nn_cats_cpl /= 1 .AND. nn_cats_cpl /= jpl ) THEN
-	     CALL ctl_stop( 'STOP', 'par_init: in coupled mode, nn_cats_cpl should be either 1 or jpl' )
-	  ENDIF
+      IF( ln_cpl .AND. nn_cats_cpl /= 1 .AND. nn_cats_cpl /= jpl ) THEN
+         CALL ctl_stop( 'STOP', 'par_init: in coupled mode, nn_cats_cpl should be either 1 or jpl' )
+      ENDIF
       !
       IF( ln_bdy .AND. ln_icediachk )   CALL ctl_warn('par_init: online conservation check does not work with BDY')
       !

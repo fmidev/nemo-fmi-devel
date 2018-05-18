@@ -3,12 +3,9 @@ MODULE icethd_zdf_BL99
    !!                       ***  MODULE icethd_zdf_BL99 ***
    !!   sea-ice: vertical heat diffusion in sea ice (computation of temperatures) 
    !!======================================================================
-   !! History :  LIM  ! 02-2003 (M. Vancoppenolle) original 1D code
-   !!                 ! 06-2005 (M. Vancoppenolle) 3d version
-   !!                 ! 11-2006 (X Fettweis) Vectorization by Xavier
-   !!                 ! 04-2007 (M. Vancoppenolle) Energy conservation
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
-   !!             -   ! 2012-05 (C. Rousset) add penetration solar flux
+   !! History :       !  2003-02  (M. Vancoppenolle) original 1D code LIM
+   !!                 !  2005-06  (M. Vancoppenolle) 3d version
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

@@ -3,10 +3,7 @@ MODULE icerst
    !!                     ***  MODULE  icerst  ***
    !!   sea-ice :  write/read the ice restart file
    !!======================================================================
-   !! History:   3.0  ! 2005-04 (M. Vancoppenolle) Original code
-   !!             -   ! 2008-03 (C. Ethe) restart files in using IOM interface
-   !!            3.4  ! 2011-02 (G. Madec) dynamical allocation
-   !!            4.0  ! 2017-11 (M. Andrejczuk) Extend IOM interface to write 3D ice fields
+   !! History:   4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

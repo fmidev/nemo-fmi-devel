@@ -3,7 +3,8 @@ MODULE iceforcing
    !!                       ***  MODULE  iceforcing  ***
    !! Sea-Ice :   air-ice forcing fields
    !!=====================================================================
-   !! History :  4.0  ! 2017-08  (C. Rousset) Original code
+   !! History :  4.0  !  2017-08  (C. Rousset)       Original code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------

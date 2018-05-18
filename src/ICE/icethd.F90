@@ -3,14 +3,10 @@ MODULE icethd
    !!                  ***  MODULE icethd   ***
    !!   sea-ice : master routine for thermodynamics
    !!======================================================================
-   !! History :  LIM  ! 2000-01 (M.A. Morales Maqueda, H. Goosse, T. Fichefet) LIM-1
-   !!            2.0  ! 2002-07 (C. Ethe, G. Madec)  LIM-2 (F90 rewriting)
-   !!            3.0  ! 2005-11 (M. Vancoppenolle)  LIM-3 : Multi-layer thermodynamics + salinity variations
-   !!             -   ! 2007-04 (M. Vancoppenolle) add ice_thd_glohec, ice_thd_con_dh and ice_thd_con_dif
-   !!            3.2  ! 2009-07 (M. Vancoppenolle, Y. Aksenov, G. Madec) bug correction in wfx_snw
-   !!            3.3  ! 2010-11 (G. Madec) corrected snow melting heat (due to factor betas)
-   !!            4.0  ! 2011-02 (G. Madec) dynamical allocation
-   !!             -   ! 2012-05 (C. Rousset) add penetration solar flux
+   !! History :  1.0  !  2000-01  (M.A. Morales Maqueda, H. Goosse, T. Fichefet) LIM-1
+   !!            2.0  !  2002-07  (C. Ethe, G. Madec) LIM-2
+   !!            3.0  !  2005-11  (M. Vancoppenolle)  LIM-3
+   !!            4.0  !  2018     (many people)       SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
@@ -72,20 +68,21 @@ CONTAINS
       !!  
       !! ** Purpose : This routine manages ice thermodynamics
       !!         
-      !! ** Action : - Initialisation of some variables
-      !!             - Some preliminary computation (oceanic heat flux
-      !!               at the ice base, snow acc.,heat budget of the leads)
-      !!             - selection of the icy points and put them in an array
-      !!             - call ice_thd_zdf  for vertical heat diffusion
-      !!             - call ice_thd_dh   for vertical ice growth and melt
-      !!             - call ice_thd_ent  for enthalpy remapping
-      !!             - call ice_thd_sal  for ice desalination
-      !!             - call ice_thd_temp to  retrieve temperature from ice enthalpy
-      !!             - call ice_thd_lam  for extra lateral ice melt if active virtual thickness distribution
-      !!             - call ice_thd_da   for lateral ice melt
+      !! ** Action : - computation of oceanic sensible heat flux at the ice base
+      !!                              energy budget in the leads
+      !!                              net fluxes on top of ice and of ocean
+      !!             - selection of grid cells with ice
+      !!                - call ice_thd_zdf  for vertical heat diffusion
+      !!                - call ice_thd_dh   for vertical ice growth and melt
+      !!                - call ice_thd_pnd  for melt ponds
+      !!                - call ice_thd_ent  for enthalpy remapping
+      !!                - call ice_thd_sal  for ice desalination
+      !!                - call ice_thd_temp to  retrieve temperature from ice enthalpy
+      !!                - call ice_thd_lam  for extra lateral ice melt if active virtual thickness distribution
+      !!                - call ice_thd_da   for lateral ice melt
       !!             - back to the geographic grid
-      !!             - call ice_thd_rem  for remapping thickness distribution
-      !!             - call ice_thd_do   for ice growth in leads
+      !!                - call ice_thd_rem  for remapping thickness distribution
+      !!                - call ice_thd_do   for ice growth in leads
       !!-------------------------------------------------------------------
       INTEGER, INTENT(in) :: kt    ! number of iteration
       !

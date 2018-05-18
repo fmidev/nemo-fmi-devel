@@ -1,10 +1,10 @@
 MODULE icedia
    !!======================================================================
    !!                       ***  MODULE icedia  ***
-   !!  Sea-Ice model :   global budgets 
+   !!  Sea-Ice:   global budgets 
    !!======================================================================
-   !! History :  3.4  ! 2012-10  (C. Rousset)  original code
-   !!            4.0  ! 2017-08  (C. Rousset)  fits nemo4.0 standards
+   !! History :  3.4  !  2012-10  (C. Rousset)       original code
+   !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
