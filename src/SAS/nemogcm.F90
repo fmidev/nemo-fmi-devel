@@ -85,7 +85,7 @@ CONTAINS
       CALL Agrif_Declare_Var_top   !  "      "   "   "      "  TOP
 # endif
 # if defined key_si3
-      CALL Agrif_Declare_Var_si3  !  "      "   "   "      "  LIM3
+      CALL Agrif_Declare_Var_ice   !  "      "   "   "      "  Sea ice
 # endif
 #endif
       ! check that all process are still there... If some process have an error,
