@@ -10,7 +10,7 @@
    nyear_res  = 1932      !  iannee1
    !
    ! Formatted file of annual hemisperic CFCs concentration in the atmosphere (ppt)
-   clname     = 'CFCs_CMIP6.dat'
+   clname     = 'CFCs_CDIAC.dat'
 /
 !
 !-----------------------------------------------------------------------

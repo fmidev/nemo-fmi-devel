@@ -150,7 +150,7 @@ CONTAINS
                !    speed transfert : formulae revised in Wanninkhof (2014)
                zv2     = wndm(ji,jj) * wndm(ji,jj)
                zsch    = zsch / 660.
-               zak_cfc = ( 0.31 * xconv2 * zv2 / SQRT(zsch) ) * tmask(ji,jj,1)
+               zak_cfc = ( 0.251 * xconv2 * zv2 / SQRT(zsch) ) * tmask(ji,jj,1)
 
                ! Input function  : speed *( conc. at equil - concen at surface )
                ! trn in pico-mol/l idem qtr; ak in en m/a
