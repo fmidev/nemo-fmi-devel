@@ -699,6 +699,11 @@ CONTAINS
          jstart = jend + 1
       ENDDO
 
+      DO jfld = 1, nb_bdy_fld_sum
+         bf(jfld)%igrd = igrid(jfld)
+         bf(jfld)%ibdy = ibdy(jfld)
+      ENDDO
+
       ! Initialise local boundary data arrays
       ! nn_xxx_dta=0 : allocate space - will be filled from initial conditions later
       ! nn_xxx_dta=1 : point to "fnow" arrays
