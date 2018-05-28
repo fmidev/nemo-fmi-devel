@@ -67,7 +67,7 @@ CONTAINS
          &             ln_mask_file, cn_mask_file, cn_dyn2d, nn_dyn2d_dta,     &
          &             cn_dyn3d, nn_dyn3d_dta, cn_tra, nn_tra_dta,             &
          &             ln_tra_dmp, ln_dyn3d_dmp, rn_time_dmp, rn_time_dmp_out, &
-         &             cn_ice_lim, nn_ice_lim_dta,                             &
+         &             cn_ice, nn_ice_dta,                                     &
          &             rn_ice_tem, rn_ice_sal, rn_ice_age,                     &
          &             ln_vol, nn_volctl, nn_rimwidth, nb_jpk_bdy
          !
@@ -345,7 +345,7 @@ CONTAINS
 
 #if defined key_si3
         IF(lwp) WRITE(numout,*) 'Boundary conditions for sea ice:  '
-        SELECT CASE( cn_ice_lim(ib_bdy) )                  
+        SELECT CASE( cn_ice(ib_bdy) )                  
           CASE('none')
              IF(lwp) WRITE(numout,*) '      no open boundary condition'        
              dta_bdy(ib_bdy)%ll_a_i  = .false.
@@ -356,13 +356,13 @@ CONTAINS
              dta_bdy(ib_bdy)%ll_a_i  = .true.
              dta_bdy(ib_bdy)%ll_ht_i = .true.
              dta_bdy(ib_bdy)%ll_ht_s = .true.
-          CASE DEFAULT   ;   CALL ctl_stop( 'unrecognised value for cn_ice_lim' )
+          CASE DEFAULT   ;   CALL ctl_stop( 'unrecognised value for cn_ice' )
         END SELECT
-        IF( cn_ice_lim(ib_bdy) /= 'none' ) THEN 
-           SELECT CASE( nn_ice_lim_dta(ib_bdy) )                   ! 
+        IF( cn_ice(ib_bdy) /= 'none' ) THEN 
+           SELECT CASE( nn_ice_dta(ib_bdy) )                   ! 
               CASE( 0 )      ;   IF(lwp) WRITE(numout,*) '      initial state used for bdy data'        
               CASE( 1 )      ;   IF(lwp) WRITE(numout,*) '      boundary data taken from file'
-              CASE DEFAULT   ;   CALL ctl_stop( 'nn_ice_lim_dta must be 0 or 1' )
+              CASE DEFAULT   ;   CALL ctl_stop( 'nn_ice_dta must be 0 or 1' )
            END SELECT
         ENDIF
         IF(lwp) WRITE(numout,*)

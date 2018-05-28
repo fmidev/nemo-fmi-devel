@@ -158,12 +158,12 @@
     cn_tra        =  'frs'                !
     nn_tra_dta    =  0                    !  = 0, bdy data are equal to the initial state
                                           !  = 1, bdy data are read in 'bdydata   .nc' files
-    cn_ice_lim      =  'none'             !
-    nn_ice_lim_dta  =  0                  !  = 0, bdy data are equal to the initial state
+    cn_ice        =  'none'               !
+    nn_ice_dta    =  0                    !  = 0, bdy data are equal to the initial state
                                           !  = 1, bdy data are read in 'bdydata   .nc' files
-    rn_ice_tem      = 270.                !  lim3 only: arbitrary temperature of incoming sea ice
-    rn_ice_sal      = 10.                 !  lim3 only:      --   salinity           --
-    rn_ice_age      = 30.                 !  lim3 only:      --   age                --
+    rn_ice_tem    = 270.                  !  si3 only: arbitrary temperature of incoming sea ice
+    rn_ice_sal    = 10.                   !  si3 only:      --   salinity           --
+    rn_ice_age    = 30.                   !  si3 only:      --   age                --
 
     ln_tra_dmp    =.false.                !  open boudaries conditions for tracers
     ln_dyn3d_dmp  =.false.                !  open boundary condition for baroclinic velocities

@@ -26,9 +26,9 @@ MODULE usrdef_sbc
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   usrdef_sbc_oce    ! routine called in sbcmod module
-   PUBLIC   usrdef_sbc_ice_tau  ! routine called by sbcice_lim.F90 for ice dynamics
-   PUBLIC   usrdef_sbc_ice_flx  ! routine called by sbcice_lim.F90 for ice thermo
+   PUBLIC   usrdef_sbc_oce      ! routine called in sbcmod module
+   PUBLIC   usrdef_sbc_ice_tau  ! routine called by icestp.F90 for ice dynamics
+   PUBLIC   usrdef_sbc_ice_flx  ! routine called by icestp.F90 for ice thermo
 
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
