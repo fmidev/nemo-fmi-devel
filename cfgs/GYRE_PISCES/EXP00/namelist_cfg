@@ -236,8 +236,23 @@
 !!======================================================================
 
 !!======================================================================
-!!               ***  Observation & Assimilation  ***                 !!
+!!                  ***  Miscellaneous namelists  ***                 !!
 !!                                                                    !!
-!!   namobs       observation and model comparison                      (default: OFF)
-!!   nam_asminc   assimilation increments                               ('key_asminc')
+!!   nammpp            Massively Parallel Processing                    ("key_mpp_mpi")
+!!   namctl            Control prints                                   (default: OFF)
+!!   namsto            Stochastic parametrization of EOS                (default: OFF)
 !!======================================================================
+!
+!
+!-----------------------------------------------------------------------
+&nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namctl        !   Control prints                                       (default: OFF)
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namsto        ! Stochastic parametrization of EOS                      (default: OFF)
+!-----------------------------------------------------------------------
+/
