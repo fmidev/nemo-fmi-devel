@@ -75,7 +75,7 @@
          !                    
          IF( nbondi == 2) THEN                  ! neither subdomain to the east nor to the west
             !                                      !* Cyclic
-            IF( nperio == 1 .OR. nperio == 4 .OR. nperio == 6 ) THEN
+            IF( l_Iperio ) THEN
                ARRAY_IN( 1 ,:,:,:,jf) = ARRAY_IN(jpim1,:,:,:,jf)
                ARRAY_IN(jpi,:,:,:,jf) = ARRAY_IN(  2  ,:,:,:,jf)
             ELSE                                   !* Closed
@@ -90,11 +90,22 @@
          ENDIF
          !                                ! North-South boundaries
          !
-         IF (nbondj == 2 .OR. nbondj == -1) THEN      !* closed
-           IF( .NOT. NAT_IN(jf) == 'F' )   ARRAY_IN(:,1:nn_hls,:,:,jf) = zland            ! south except F-point
-         ELSEIF (nbondj == 2 .OR. nbondj == 1) THEN
-                                           ARRAY_IN(:,nlcj-nn_hls+1:jpj,:,:,jf) = zland   ! north
+         IF( nbondj == 2) THEN                  ! neither subdomain to the north nor to the south
+            !                                      !* Cyclic
+            IF( l_Jperio ) THEN
+               ARRAY_IN(:, 1 ,:,:,jf) = ARRAY_IN(:,jpjm1,:,:,jf)
+               ARRAY_IN(:,jpj,:,:,jf) = ARRAY_IN(:,  2  ,:,:,jf)
+            ELSE                                   !* Closed
+               IF( .NOT. NAT_IN(jf) == 'F' )   ARRAY_IN(:,     1       :nn_hls,:,:,jf) = zland  ! east except F-point
+                                               ARRAY_IN(:,nlcj-nn_hls+1:jpj   ,:,:,jf) = zland  ! west
+            ENDIF
+         ELSEIF(nbondi == -1) THEN              ! subdomain to the east only
+            IF( .NOT. NAT_IN(jf) == 'F' )   ARRAY_IN(:,1:nn_hls,:,:,jf) = zland     ! south except F-point
+            !
+         ELSEIF(nbondi == 1) THEN               ! subdomain to the west only
+            ARRAY_IN(:,nlcj-nn_hls+1:jpj,:,:,jf) = zland    ! north
          ENDIF
+         !
       END DO
 
       ! 2. East and west directions exchange

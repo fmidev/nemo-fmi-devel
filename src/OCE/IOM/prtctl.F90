@@ -386,12 +386,10 @@ CONTAINS
       !!                (global boundary or neighbouring domain) and of the global
       !!                periodic
       !!                Type :         jperio global periodic condition
-      !!                               nperio local  periodic condition
       !!
       !! ** Action  : - set domain parameters
       !!                    nimpp     : longitudinal index 
       !!                    njmpp     : latitudinal  index
-      !!                    nperio    : lateral condition type 
       !!                    narea     : number for local area
       !!                    nlcil      : first dimension
       !!                    nlcjl      : second dimension

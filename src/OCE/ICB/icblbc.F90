@@ -84,7 +84,7 @@ CONTAINS
       !! periodic east/west boundaries
       !! =============================
 
-      IF( nperio == 1 .OR. nperio == 4 .OR. nperio == 6 ) THEN
+      IF( l_Iperio ) THEN
 
          this => first_berg
          DO WHILE( ASSOCIATED(this) )
@@ -102,10 +102,9 @@ CONTAINS
 
       !! north/south boundaries
       !! ======================
-      ! south symmetric
-      IF( nperio == 2 )   CALL ctl_stop(' south symmetric condition not implemented for icebergs')
+      IF( l_Jperio)      CALL ctl_stop(' north-south periodicity not implemented for icebergs')
       ! north fold
-      IF( nperio == 3 .OR. nperio == 4 .OR. nperio == 5 .OR. nperio == 6 )   CALL icb_lbc_nfld()
+      IF( npolj /= 0 )   CALL icb_lbc_nfld()
       !
    END SUBROUTINE icb_lbc
 

@@ -59,16 +59,14 @@
       INTEGER  ::    ji,  jj,  jk,  jl, jh, jf   ! dummy loop indices
       INTEGER  ::   ipi, ipj, ipk, ipl, ipf      ! dimension of the input array
       REAL(wp) ::   zland
-      LOGICAL  ::   ll_Iperio, ll_Jperio, ll_nfd
+      LOGICAL  ::   ll_nfd
       !!----------------------------------------------------------------------
       !
       ipk = K_SIZE(ptab)   ! 3rd dimension
       ipl = L_SIZE(ptab)   ! 4th    -
       ipf = F_SIZE(ptab)   ! 5th    -      use in "multi" case (array of pointers)
       !
-      ll_Iperio = nperio==1 .OR. nperio==4 .OR. nperio==6
-      ll_Jperio = jperio==7
-      ll_nfd    = nperio==3 .OR. nperio==4 .OR. nperio==5 .OR. nperio==6
+      ll_nfd    = jperio==3 .OR. jperio==4 .OR. jperio==5 .OR. jperio==6
       !
       IF( PRESENT( pval ) ) THEN   ;   zland = pval      ! set land value
       ELSE                         ;   zland = 0._wp     ! zero by default
@@ -88,7 +86,7 @@
          DO jf = 1, ipf                   ! number of arrays to be treated
             !
             !                                ! East-West boundaries
-            IF( ll_Iperio ) THEN                   !* cyclic
+            IF( l_Iperio ) THEN                   !* cyclic
                ARRAY_IN( 1 ,:,:,:,jf) = ARRAY_IN(jpim1,:,:,:,jf)
                ARRAY_IN(jpi,:,:,:,jf) = ARRAY_IN(  2  ,:,:,:,jf)
             ELSE                                   !* closed
@@ -96,7 +94,7 @@
                                                ARRAY_IN(jpi,:,:,:,jf) = zland    ! west
             ENDIF
             !                                ! North-South boundaries
-            IF( ll_Jperio ) THEN                   !* cyclic
+            IF( l_Jperio ) THEN                   !* cyclic
                ARRAY_IN(:, 1 ,:,:,jf) = ARRAY_IN(:, jpjm1,:,:,jf)
                ARRAY_IN(:,jpj,:,:,jf) = ARRAY_IN(:,   2  ,:,:,jf)
             ELSEIF( ll_nfd ) THEN                  !* north fold

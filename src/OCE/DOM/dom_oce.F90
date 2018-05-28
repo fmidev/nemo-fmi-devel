@@ -65,13 +65,14 @@ MODULE dom_oce
    !!----------------------------------------------------------------------
    !! space domain parameters
    !!----------------------------------------------------------------------
-   INTEGER, PUBLIC ::   jperio   !: Global domain lateral boundary type (between 0 and 6)
+   INTEGER, PUBLIC ::   jperio   !: Global domain lateral boundary type (between 0 and 7)
    !                                !  = 0 closed                 ;   = 1 cyclic East-West
-   !                                !  = 2 equatorial symmetric   ;   = 3 North fold T-point pivot
+   !                                !  = 2 cyclic North-South     ;   = 3 North fold T-point pivot
    !                                !  = 4 cyclic East-West AND North fold T-point pivot
    !                                !  = 5 North fold F-point pivot
    !                                !  = 6 cyclic East-West AND North fold F-point pivot
-   INTEGER, PUBLIC ::   nperio   !: Local domain lateral boundary type (deduced from jperio and MPP decomposition)
+   !                                !  = 7 bi-cyclic East-West AND North-South
+   LOGICAL, PUBLIC ::   l_Iperio, l_Jperio   !   should we explicitely take care I/J periodicity 
 
    !                                 !  domain MPP decomposition parameters
    INTEGER             , PUBLIC ::   nimpp, njmpp     !: i- & j-indexes for mpp-subdomain left bottom

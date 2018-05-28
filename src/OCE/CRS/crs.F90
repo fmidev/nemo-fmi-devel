@@ -275,7 +275,7 @@ CONTAINS
       jpj    = jpj_full
       jpim1  = jpim1_full
       jpjm1  = jpjm1_full
-      nperio = nperio_full
+      jperio = nperio_full
 
       npolj  = npolj_full
       jpiglo = jpiglo_full
@@ -314,7 +314,7 @@ CONTAINS
       jpj    = jpj_crs
       jpim1  = jpi_crsm1
       jpjm1  = jpj_crsm1
-      nperio = nperio_crs
+      jperio = nperio_crs
 
       npolj  = npolj_crs
       jpiglo = jpiglo_crs

@@ -136,17 +136,17 @@ can be quite shallow.
 \label{sec:LBC_jperio}
 
 At the model domain boundaries several choices are offered: closed, cyclic east-west, 
-south symmetric across the equator, a north-fold, and combination closed-north fold 
-or cyclic-north-fold. The north-fold boundary condition is associated with the 3-pole ORCA mesh. 
+cyclic north-south, a north-fold, and combination closed-north fold 
+or bi-cyclic east-west and north-fold. The north-fold boundary condition is associated with the 3-pole ORCA mesh. 
 
 % -------------------------------------------------------------------------------------------------------------
-%        Closed, cyclic, south symmetric (\np{jperio}\forcode{ = 0..2}) 
+%        Closed, cyclic (\np{jperio}\forcode{ = 0..2}) 
 % -------------------------------------------------------------------------------------------------------------
-\subsection{Closed, cyclic, south symmetric (\protect\np{jperio}\forcode{= 0..2})}
+\subsection{Closed, cyclic (\protect\np{jperio}\forcode{= [0127]})}
 \label{subsec:LBC_jperio012}
 
-The choice of closed, cyclic or symmetric model domain boundary condition is made 
-by setting \np{jperio} to 0, 1 or 2 in namelist \ngn{namcfg}. Each time such a boundary 
+The choice of closed or cyclic model domain boundary condition is made 
+by setting \np{jperio} to 0, 1, 2 or 7 in namelist \ngn{namcfg}. Each time such a boundary 
 condition is needed, it is set by a call to routine \mdl{lbclnk}. The computation of 
 momentum and tracer trends proceeds from $i=2$ to $i=jpi-1$ and from $j=2$ to 
 $j=jpj-1$, $i.e.$ in the model interior. To choose a lateral model boundary condition 
@@ -161,18 +161,15 @@ boundaries: first and last rows and columns are set to zero.
 to zero (closed) whilst the first column is set to the value of the last-but-one column 
 and the last column to the value of the second one (\autoref{fig:LBC_jperio}-a). 
 Whatever flows out of the eastern (western) end of the basin enters the western 
-(eastern) end. Note that there is no option for north-south cyclic or for doubly 
-cyclic cases.
+(eastern) end.
 
-\item[For symmetric boundary condition across the equator (\np{jperio}\forcode{ = 2})], 
-last rows, and first and last columns are set to zero (closed). The row of symmetry 
-is chosen to be the $u$- and $T-$points equator line ($j=2$, i.e. at the southern 
-end of the domain). For arrays defined at $u-$ or $T-$points, the first row is set 
-to the value of the third row while for most of $v$- and $f$-point arrays ($v$, $\zeta$, 
-$j\psi$, but \gmcomment{not sure why this is "but"} scalar arrays such as eddy coefficients) 
-the first row is set to minus the value of the second row (\autoref{fig:LBC_jperio}-b). 
-Note that this boundary condition is not yet available for the case of a massively 
-parallel computer (\textbf{key{\_}mpp} defined).
+\item[For cyclic north-south boundary (\np{jperio}\forcode{ = 2})], first and last columns are set 
+to zero (closed) whilst the first row is set to the value of the last-but-one row 
+and the last row to the value of the second one (\autoref{fig:LBC_jperio}-a). 
+Whatever flows out of the northern (southern) end of the basin enters the southern  
+(northern) end.
+
+\item[Bi-cyclic east-west and north-south boundary (\np{jperio}\forcode{ = 7})] combines cases 1 and 2.
 
 \end{description}
 

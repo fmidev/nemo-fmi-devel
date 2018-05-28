@@ -2036,7 +2036,7 @@ CONTAINS
       jpj_full    = jpj
       jpim1_full  = jpim1
       jpjm1_full  = jpjm1
-      nperio_full = nperio
+      nperio_full = jperio
 
       npolj_full  = npolj
       jpiglo_full = jpiglo
@@ -2120,7 +2120,7 @@ CONTAINS
 
       CASE ( 0 ) 
 
-         SELECT CASE ( nperio )
+         SELECT CASE ( jperio )
      
  
         CASE ( 0, 1, 3, 4 )    !   3, 4 : T-Pivot at North Fold

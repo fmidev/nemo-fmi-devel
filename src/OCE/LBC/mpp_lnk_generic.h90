@@ -61,7 +61,6 @@
       INTEGER  ::   imigr, iihom, ijhom          ! local integers
       INTEGER  ::   ml_req1, ml_req2, ml_err     ! for key_mpi_isend
       REAL(wp) ::   zland
-      LOGICAL  ::   ll_Iperio, ll_Jperio
       INTEGER , DIMENSION(MPI_STATUS_SIZE)      ::   ml_stat        ! for key_mpi_isend
       REAL(wp), DIMENSION(:,:,:,:,:,:), ALLOCATABLE ::   zt3ns, zt3sn   ! north-south & south-north  halos
       REAL(wp), DIMENSION(:,:,:,:,:,:), ALLOCATABLE ::   zt3ew, zt3we   ! east -west  & west - east  halos
@@ -73,9 +72,6 @@
       !
       ALLOCATE( zt3ns(jpi,nn_hls,ipk,ipl,ipf,2), zt3sn(jpi,nn_hls,ipk,ipl,ipf,2),   &
          &      zt3ew(jpj,nn_hls,ipk,ipl,ipf,2), zt3we(jpj,nn_hls,ipk,ipl,ipf,2)  )
-      !
-      ll_Iperio = nbondi == 2 .AND. (nperio == 1 .OR. nperio == 4 .OR. nperio == 6)
-      ll_Jperio = nbondj == 2 .AND.  jperio == 7
       !
       IF( PRESENT( pval ) ) THEN   ;   zland = pval      ! set land value
       ELSE                         ;   zland = 0._wp     ! zero by default
@@ -110,8 +106,8 @@
          !
          DO jf = 1, ipf                      ! number of arrays to be treated
             !
-            !                             ! East-West boundaries
-            IF( ll_Iperio ) THEN                   !* cyclic
+            !                                ! East-West boundaries
+            IF( l_Iperio ) THEN                    !* cyclic
                ARRAY_IN( 1 ,:,:,:,jf) = ARRAY_IN(jpim1,:,:,:,jf)
                ARRAY_IN(jpi,:,:,:,jf) = ARRAY_IN(  2  ,:,:,:,jf)
             ELSE                                   !* closed
@@ -119,7 +115,7 @@
                                                ARRAY_IN(nlci-nn_hls+1:jpi   ,:,:,:,jf) = zland    ! west
             ENDIF
             !                                ! North-South boundaries
-            IF( ll_Jperio ) THEN                   !* cyclic (only with no mpp j-split)
+            IF( l_Jperio ) THEN                    !* cyclic (only with no mpp j-split)
                ARRAY_IN(:, 1 ,:,:,jf) = ARRAY_IN(:, jpjm1,:,:,jf)
                ARRAY_IN(:,jpj,:,:,jf) = ARRAY_IN(:,   2  ,:,:,jf)
             ELSE                                   !* closed

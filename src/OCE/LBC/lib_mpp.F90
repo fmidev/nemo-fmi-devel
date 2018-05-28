@@ -1465,13 +1465,21 @@ CONTAINS
       !
       !                                      ! East-West boundaries
       !                                           !* Cyclic east-west
-      IF( nbondi == 2 .AND. (nperio == 1 .OR. nperio == 4 .OR. nperio == 6) ) THEN
-         pt2d(1-kexti:     1    ,:) = pt2d(jpim1-kexti:  jpim1 ,:)       ! east
-         pt2d(   jpi  :jpi+kexti,:) = pt2d(     2      :2+kexti,:)       ! west
+      IF( l_Iperio ) THEN
+         pt2d(1-kexti:     1   ,:) = pt2d(jpim1-kexti: jpim1 ,:)       ! east
+         pt2d(  jpi  :jpi+kexti,:) = pt2d(     2     :2+kexti,:)       ! west
          !
       ELSE                                        !* closed
-         IF( .NOT. cd_type == 'F' )   pt2d(  1-kexti   :nn_hls    ,:) = 0._wp    ! south except at F-point
-                                      pt2d(jpi-nn_hls+1:jpi+kexti,:) = 0._wp    ! north
+         IF( .NOT. cd_type == 'F' )   pt2d(  1-kexti   :nn_hls   ,:) = 0._wp    ! east except at F-point
+                                      pt2d(jpi-nn_hls+1:jpi+kexti,:) = 0._wp    ! west
+      ENDIF
+      !                                      ! North-South boundaries
+      IF( l_Jperio ) THEN                         !* cyclic (only with no mpp j-split)
+         pt2d(:,1-kextj:     1   ) = pt2d(:,jpjm1-kextj:  jpjm1)       ! north
+         pt2d(:,  jpj  :jpj+kextj) = pt2d(:,     2     :2+kextj)       ! south
+      ELSE                                        !* closed
+         IF( .NOT. cd_type == 'F' )   pt2d(:,  1-kextj   :nn_hls   ) = 0._wp    ! north except at F-point
+                                      pt2d(:,jpj-nn_hls+1:jpj+kextj) = 0._wp    ! south
       ENDIF
       !
 

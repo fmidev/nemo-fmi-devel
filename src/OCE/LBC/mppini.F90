@@ -77,26 +77,24 @@ CONTAINS
       nldj   = 1
       nlei   = jpi
       nlej   = jpj
-      nperio = jperio
       nbondi = 2
       nbondj = 2
       nidom  = FLIO_DOM_NONE
       npolj = jperio
+      l_Iperio = jpni == 1 .AND. (jperio == 1 .OR. jperio == 4 .OR. jperio == 6 .OR. jperio == 7)
+      l_Jperio = jpnj == 1 .AND. (jperio == 2 .OR. jperio == 7)
       !
       IF(lwp) THEN
          WRITE(numout,*)
          WRITE(numout,*) 'mpp_init : NO massively parallel processing'
          WRITE(numout,*) '~~~~~~~~ '
-         WRITE(numout,*) '   nperio = ', nperio, '   nimpp  = ', nimpp
-         WRITE(numout,*) '   npolj  = ', npolj , '   njmpp  = ', njmpp
+         WRITE(numout,*) '   l_Iperio = ', l_Iperio, '    l_Jperio = ', l_Jperio 
+         WRITE(numout,*) '     npolj  = ',   npolj , '      njmpp  = ', njmpp
       ENDIF
       !
       IF(  jpni /= 1 .OR. jpnj /= 1 .OR. jpnij /= 1 )                                     &
          CALL ctl_stop( 'mpp_init: equality  jpni = jpnj = jpnij = 1 is not satisfied',   &
             &           'the domain is lay out for distributed memory computing!' )
-         !
-      IF( jperio == 7 ) CALL ctl_stop( 'mpp_init: jperio = 7 needs distributed memory computing ',       &
-         &                             'with 1 process. Add key_mpp_mpi in the list of active cpp keys ' )
          !
    END SUBROUTINE mpp_init
 
@@ -121,12 +119,10 @@ CONTAINS
       !!      (global boundary or neighbouring domain) and of the global
       !!      periodic
       !!      Type :         jperio global periodic condition
-      !!                     nperio local  periodic condition
       !!
       !! ** Action : - set domain parameters
       !!                    nimpp     : longitudinal index 
       !!                    njmpp     : latitudinal  index
-      !!                    nperio    : lateral condition type 
       !!                    narea     : number for local area
       !!                    nlci      : first dimension
       !!                    nlcj      : second dimension
@@ -275,7 +271,11 @@ CONTAINS
 
       ! 3. Subdomain description in the Regular Case
       ! --------------------------------------------
-      nperio = 0
+      ! specific cases where there is no communication -> must do the periodicity by itself
+      ! Warning: because of potential land-area suppression, do not use nbond[ij] == 2  
+      l_Iperio = jpni == 1 .AND. (jperio == 1 .OR. jperio == 4 .OR. jperio == 6 .OR. jperio == 7)
+      l_Jperio = jpnj == 1 .AND. (jperio == 2 .OR. jperio == 7)
+      
       icont = -1
       DO jarea = 1, jpni*jpnj
          iarea0 = jarea - 1
@@ -283,14 +283,14 @@ CONTAINS
          ij = 1 +     iarea0/jpni
          ili = ilci(ii,ij)
          ilj = ilcj(ii,ij)
-         ibondj(ii,ij) = -1
-         IF( jarea >  jpni          )   ibondj(ii,ij) = 0
-         IF( jarea >  (jpnj-1)*jpni )   ibondj(ii,ij) = 1
-         IF( jpnj  == 1             )   ibondj(ii,ij) = 2
-         ibondi(ii,ij) = 0
-         IF( MOD(jarea,jpni) ==  1  )   ibondi(ii,ij) = -1
-         IF( MOD(jarea,jpni) ==  0  )   ibondi(ii,ij) =  1
-         IF( jpni            ==  1  )   ibondi(ii,ij) =  2
+         ibondi(ii,ij) = 0                         ! default: has e-w neighbours
+         IF( ii   ==    1 )   ibondi(ii,ij) = -1   ! first column, has only e neighbour
+         IF( ii   == jpni )   ibondi(ii,ij) =  1   ! last column,  has only w neighbour
+         IF( jpni ==    1 )   ibondi(ii,ij) =  2   ! has no e-w neighbour
+         ibondj(ii,ij) = 0                         ! default: has n-s neighbours
+         IF( ij   ==    1 )   ibondj(ii,ij) = -1   ! first row, has only n neighbour
+         IF( ij   == jpnj )   ibondj(ii,ij) =  1   ! last row,  has only s neighbour
+         IF( jpnj ==    1 )   ibondj(ii,ij) =  2   ! has no n-s neighbour
 
          ! Subdomain neighbors (get their zone number): default definition
          ioso(ii,ij) = iarea0 - jpni
@@ -304,18 +304,16 @@ CONTAINS
 
          ! East-West periodicity: change ibondi, ioea, iowe
          IF( jperio == 1 .OR. jperio == 4 .OR. jperio == 6 .OR. jperio == 7 ) THEN
-            IF( jpni == 1 )THEN
-               ibondi(ii,ij) = 2
-               nperio = 1
-            ELSE
-               ibondi(ii,ij) = 0
-            ENDIF
-            IF( MOD(jarea,jpni) == 0 ) THEN
-               ioea(ii,ij) = iarea0 - (jpni-1)
-            ENDIF
-            IF( MOD(jarea,jpni) == 1 ) THEN
-               iowe(ii,ij) = iarea0 + jpni - 1
-            ENDIF
+            IF( jpni  /= 1 )   ibondi(ii,ij) = 0                        ! redefine: all have e-w neighbours
+            IF( ii ==    1 )   iowe(ii,ij) = iarea0 +        (jpni-1)   ! redefine: first column, address of w neighbour
+            IF( ii == jpni )   ioea(ii,ij) = iarea0 -        (jpni-1)   ! redefine: last column,  address of e neighbour
+         ENDIF
+
+         ! Simple North-South periodicity: change ibondj, ioso, iono
+         IF( jperio == 2 .OR. jperio == 7 ) THEN
+            IF( jpnj  /= 1 )   ibondj(ii,ij) = 0                        ! redefine: all have n-s neighbours
+            IF( ij ==    1 )   ioso(ii,ij) = iarea0 + jpni * (jpnj-1)   ! redefine: first row, address of s neighbour
+            IF( ij == jpnj )   iono(ii,ij) = iarea0 - jpni * (jpnj-1)   ! redefine: last row,  address of n neighbour
          ENDIF
 
          ! North fold: define ipolj, change iono. Warning: we do not change ibondj...
@@ -392,35 +390,38 @@ CONTAINS
       DO jarea = 1, jpni*jpnj
          ii = 1 + MOD( jarea-1  , jpni )
          ij = 1 +     (jarea-1) / jpni
+         ! land-only area with an active n neigbour
          IF ( ipproc(ii,ij) == -1 .AND. 0 <= iono(ii,ij) .AND. iono(ii,ij) <= jpni*jpnj-1 ) THEN
-            iino = 1 + MOD( iono(ii,ij) , jpni )
-            ijno = 1 +      iono(ii,ij) / jpni
-            ! Need to reverse the logical direction of communication 
-            ! for northern neighbours of northern row processors (north-fold)
-            ! i.e. need to check that the northern neighbour only communicates
-            ! to the SOUTH (or not at all) if this area is land-only (#1057)
-            idir = 1
-            IF( ij == jpnj .AND. ijno == jpnj )   idir = -1    
-            IF( ibondj(iino,ijno) == idir     )   ibondj(iino,ijno) =   2
-            IF( ibondj(iino,ijno) == 0        )   ibondj(iino,ijno) = -idir
+            iino = 1 + MOD( iono(ii,ij) , jpni )                    ! ii index of this n neigbour
+            ijno = 1 +      iono(ii,ij) / jpni                      ! ij index of this n neigbour
+            ! In case of north fold exchange: I am the n neigbour of my n neigbour!! (#1057)
+            ! --> for northern neighbours of northern row processors (in case of north-fold)
+            !     need to reverse the LOGICAL direction of communication 
+            idir = 1                                           ! we are indeed the s neigbour of this n neigbour
+            IF( ij == jpnj .AND. ijno == jpnj )   idir = -1    ! both are on the last row, we are in fact the n neigbour
+            IF( ibondj(iino,ijno) == idir     )   ibondj(iino,ijno) =   2     ! this n neigbour had only a s/n neigbour -> no more
+            IF( ibondj(iino,ijno) == 0        )   ibondj(iino,ijno) = -idir   ! this n neigbour had both, n-s neighbours -> keep 1
          ENDIF
+         ! land-only area with an active s neigbour
          IF( ipproc(ii,ij) == -1 .AND. 0 <= ioso(ii,ij) .AND. ioso(ii,ij) <= jpni*jpnj-1 ) THEN
-            iiso = 1 + MOD( ioso(ii,ij) , jpni )
-            ijso = 1 +      ioso(ii,ij) / jpni
-            IF( ibondj(iiso,ijso) == -1 )   ibondj(iiso,ijso) = 2
-            IF( ibondj(iiso,ijso) ==  0 )   ibondj(iiso,ijso) = 1
+            iiso = 1 + MOD( ioso(ii,ij) , jpni )                    ! ii index of this s neigbour
+            ijso = 1 +      ioso(ii,ij) / jpni                      ! ij index of this s neigbour
+            IF( ibondj(iiso,ijso) == -1 )   ibondj(iiso,ijso) = 2   ! this s neigbour had only a n neigbour    -> no more neigbour
+            IF( ibondj(iiso,ijso) ==  0 )   ibondj(iiso,ijso) = 1   ! this s neigbour had both, n-s neighbours -> keep s neigbour
          ENDIF
+         ! land-only area with an active e neigbour
          IF( ipproc(ii,ij) == -1 .AND. 0 <= ioea(ii,ij) .AND. ioea(ii,ij) <= jpni*jpnj-1 ) THEN
-            iiea = 1 + MOD( ioea(ii,ij) , jpni )
-            ijea = 1 +      ioea(ii,ij) / jpni
-            IF( ibondi(iiea,ijea) == 1 )   ibondi(iiea,ijea) =  2
-            IF( ibondi(iiea,ijea) == 0 )   ibondi(iiea,ijea) = -1
+            iiea = 1 + MOD( ioea(ii,ij) , jpni )                    ! ii index of this e neigbour
+            ijea = 1 +      ioea(ii,ij) / jpni                      ! ij index of this e neigbour
+            IF( ibondi(iiea,ijea) == 1 )   ibondi(iiea,ijea) =  2   ! this e neigbour had only a w neigbour    -> no more neigbour
+            IF( ibondi(iiea,ijea) == 0 )   ibondi(iiea,ijea) = -1   ! this e neigbour had both, e-w neighbours -> keep e neigbour
          ENDIF
+         ! land-only area with an active w neigbour
          IF( ipproc(ii,ij) == -1 .AND. 0 <= iowe(ii,ij) .AND. iowe(ii,ij) <= jpni*jpnj-1) THEN
-            iiwe = 1 + MOD( iowe(ii,ij) , jpni )
-            ijwe = 1 +      iowe(ii,ij) / jpni
-            IF( ibondi(iiwe,ijwe) == -1 )   ibondi(iiwe,ijwe) = 2
-            IF( ibondi(iiwe,ijwe) ==  0 )   ibondi(iiwe,ijwe) = 1
+            iiwe = 1 + MOD( iowe(ii,ij) , jpni )                    ! ii index of this w neigbour
+            ijwe = 1 +      iowe(ii,ij) / jpni                      ! ij index of this w neigbour
+            IF( ibondi(iiwe,ijwe) == -1 )   ibondi(iiwe,ijwe) = 2   ! this w neigbour had only a e neigbour    -> no more neigbour
+            IF( ibondi(iiwe,ijwe) ==  0 )   ibondi(iiwe,ijwe) = 1   ! this w neigbour had both, e-w neighbours -> keep w neigbour
          ENDIF
       END DO
 
@@ -561,7 +562,8 @@ CONTAINS
          WRITE(numout,*) '      nbondi = ', nbondi
          WRITE(numout,*) '      nbondj = ', nbondj
          WRITE(numout,*) '      npolj  = ', npolj
-         WRITE(numout,*) '      nperio = ', nperio
+         WRITE(numout,*) '    l_Iperio = ', l_Iperio
+         WRITE(numout,*) '    l_Jperio = ', l_Jperio
          WRITE(numout,*) '      nlci   = ', nlci
          WRITE(numout,*) '      nlcj   = ', nlcj
          WRITE(numout,*) '      nimpp  = ', nimpp
@@ -570,11 +572,6 @@ CONTAINS
          WRITE(numout,*) '      nrecj  = ', nrecj  
          WRITE(numout,*) '      nn_hls = ', nn_hls 
       ENDIF
- 
-      IF( nperio == 1 .AND. jpni /= 1 )   CALL ctl_stop( 'mpp_init: error on cyclicity' )
-
-      IF( jperio == 7 .AND. ( jpni /= 1 .OR. jpnj /= 1 ) )   &
-         &                  CALL ctl_stop( ' mpp_init: error jperio = 7 works only with jpni = jpnj = 1' )
 
       !                          ! Prepare mpp north fold
       IF( jperio >= 3 .AND. jperio <= 6 .AND. jpni > 1 ) THEN
