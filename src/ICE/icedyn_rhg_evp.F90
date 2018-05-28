@@ -497,7 +497,8 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
             CALL agrif_interp_ice( 'V' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
+!clem: this call makes rheology numerically unstable, thus I removed it but one has to check the effect on the boundaries
+!            IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
             !
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1          
@@ -545,7 +546,8 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
             CALL agrif_interp_ice( 'U' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
+!clem: this call makes rheology numerically unstable, thus I removed it but one has to check the effect on the boundaries
+!            IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
             !
          ELSE ! odd iterations
             !
@@ -595,7 +597,8 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
             CALL agrif_interp_ice( 'U' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
+!clem: this call makes rheology numerically unstable, thus I removed it but one has to check the effect on the boundaries
+!            IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
             !
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
@@ -643,7 +646,8 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
             CALL agrif_interp_ice( 'V' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
+!clem: this call makes rheology numerically unstable, thus I removed it but one has to check the effect on the boundaries
+!            IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
             !
          ENDIF
          
