@@ -1,15 +1,15 @@
 MODULE bdyice
    !!======================================================================
    !!                       ***  MODULE  bdyice  ***
-   !! Unstructured Open Boundary Cond. :  Open boundary conditions for sea-ice (LIM3)
+   !! Unstructured Open Boundary Cond. :  Open boundary conditions for sea-ice (SI3)
    !!======================================================================
    !!  History :  3.3  !  2010-09 (D. Storkey)  Original code
-   !!             3.4  !  2011    (D. Storkey)  rewrite in preparation for OBC-BDY merge
-   !!              -   !  2012-01 (C. Rousset)  add lim3 and remove useless jk loop 
+   !!             3.4  !  2012-01 (C. Rousset)  add new sea ice model 
+   !!             4.0  !  2018    (C. Rousset)  SI3 compatibility 
    !!----------------------------------------------------------------------
 #if defined key_si3
    !!----------------------------------------------------------------------
-   !!   'key_si3'                                                 LIM-3 sea ice model
+   !!   'key_si3'                                          SI3 sea ice model
    !!----------------------------------------------------------------------
    !!   bdy_ice        : Application of open boundaries to ice
    !!   bdy_ice_frs    : Application of Flow Relaxation Scheme
@@ -36,7 +36,7 @@ MODULE bdyice
    PRIVATE
 
    PUBLIC   bdy_ice     ! routine called in sbcmod
-   PUBLIC   bdy_ice_dyn ! routine called in limrhg
+   PUBLIC   bdy_ice_dyn ! routine called in icedyn_rhg_evp
 
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
@@ -49,7 +49,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!                  ***  SUBROUTINE bdy_ice  ***
       !!
-      !! ** Purpose : - Apply open boundary conditions for ice (LIM3)
+      !! ** Purpose : - Apply open boundary conditions for ice (SI3)
       !!
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! Main time step counter

@@ -37,7 +37,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!                     ***  ROUTINE stp_c1d  ***
       !!                      
-      !! ** Purpose :  - Time stepping of SBC including LIM (dynamic and thermodynamic eqs.)
+      !! ** Purpose :  - Time stepping of SBC including sea ice (dynamic and thermodynamic eqs.)
       !!               - Time stepping of OPA (momentum and active tracer eqs.)
       !!               - Time stepping of TOP (passive tracer eqs.)
       !! 

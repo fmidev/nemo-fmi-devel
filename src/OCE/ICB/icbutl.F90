@@ -22,7 +22,7 @@ MODULE icbutl
    USE icb_oce                             ! define iceberg arrays
    USE sbc_oce                             ! ocean surface boundary conditions
 #if defined key_si3
-   USE ice,    ONLY: u_ice, v_ice, hm_i    ! LIM-3 variables
+   USE ice,    ONLY: u_ice, v_ice, hm_i    ! SI3 variables
 #endif
 
    IMPLICIT NONE

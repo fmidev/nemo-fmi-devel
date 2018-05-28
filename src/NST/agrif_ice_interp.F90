@@ -2,16 +2,15 @@ MODULE agrif_ice_interp
    !!=====================================================================================
    !!                       ***  MODULE agrif_ice_interp ***
    !! Nesting module :  interp surface ice boundary condition from a parent grid
-   !! Sea-Ice model  :  LIM 3.6 Sea ice model time-stepping
    !!=====================================================================================
-   !! History :  2.0   !  04-2008  (F. Dupont)  initial version
+   !! History :  2.0   !  04-2008  (F. Dupont)               initial version
    !!            3.4   !  09-2012  (R. Benshila, C. Herbaut) update and EVP
-   !!            3.6   !  05-2016  (C. Rousset)  Add LIM3 compatibility
+   !!            4.0   !  2018     (C. Rousset)              SI3 compatibility
    !!----------------------------------------------------------------------
 #if defined key_agrif && defined key_si3 
    !!----------------------------------------------------------------------
-   !!   'key_si3'  :                                 LIM 3.6 sea-ice model
-   !!   'key_agrif' :                                 AGRIF library
+   !!   'key_si3'                                         SI3 sea-ice model
+   !!   'key_agrif'                                       AGRIF library
    !!----------------------------------------------------------------------
    !!  agrif_interp_ice    : interpolation of ice at "after" sea-ice time step
    !!  agrif_interp_u_ice   : atomic routine to interpolate u_ice 
@@ -40,7 +39,7 @@ CONTAINS
 
    SUBROUTINE agrif_interp_ice( cd_type, kiter, kitermax )
       !!-----------------------------------------------------------------------
-      !!                 *** ROUTINE agrif_rhg_lim3  ***
+      !!                 *** ROUTINE agrif_interp_ice  ***
       !!
       !!  ** Method  : simple call to atomic routines using stored values to
       !!  fill the boundaries depending of the position of the point and

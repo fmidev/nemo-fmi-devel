@@ -825,7 +825,7 @@ CONTAINS
       INTEGER  ::   it
       REAL(wp) ::   zincwgt   ! IAU weight for current time step
 #if defined key_si3
-      REAL(wp), DIMENSION(jpi,jpj) ::   zofrld, zohicif, zseaicendg, zhicifinc  ! LIM
+      REAL(wp), DIMENSION(jpi,jpj) ::   zofrld, zohicif, zseaicendg, zhicifinc
       REAL(wp) ::   zhicifmin = 0.5_wp      ! ice minimum depth in metres
 #endif
       !!----------------------------------------------------------------------
@@ -846,7 +846,7 @@ CONTAINS
                WRITE(numout,*) '~~~~~~~~~~~~'
             ENDIF
             !
-            ! Sea-ice : LIM-3 case
+            ! Sea-ice : SI3 case
             !
 #if defined key_si3
             zofrld (:,:) = 1._wp - at_i(:,:)
@@ -895,7 +895,7 @@ CONTAINS
             !
             neuler = 0                    ! Force Euler forward step
             !
-            ! Sea-ice : LIM-3 case
+            ! Sea-ice : SI3 case
             !
 #if defined key_si3
             zofrld (:,:) = 1._wp - at_i(:,:)

@@ -33,9 +33,9 @@ MODULE sbcmod
    USE sbcblk         ! surface boundary condition: bulk formulation
    USE sbcice_if      ! surface boundary condition: ice-if sea-ice model
 #if defined key_si3
-   USE icestp         ! surface boundary condition: LIM 3.0 sea-ice model
+   USE icestp         ! surface boundary condition: SI3 sea-ice model
 #endif
-   USE sbcice_cice    ! surface boundary condition: CICE    sea-ice model
+   USE sbcice_cice    ! surface boundary condition: CICE sea-ice model
    USE sbcisf         ! surface boundary condition: ice-shelf
    USE sbccpl         ! surface boundary condition: coupled formulation
    USE cpl_oasis3     ! OASIS routines for coupling
@@ -215,7 +215,7 @@ CONTAINS
       SELECT CASE( nn_ice )
       CASE( 0 )                        !- no ice in the domain
       CASE( 1 )                        !- Ice-cover climatology ("Ice-if" model)  
-      CASE( 2 )                        !- LIM3 ice model
+      CASE( 2 )                        !- SI3  ice model
       CASE( 3 )                        !- CICE ice model
          IF( .NOT.( ln_blk .OR. ln_cpl ) )   CALL ctl_stop( 'sbc_init : CICE sea-ice model requires ln_blk or ln_cpl = T' )
          IF( lk_agrif                    )   CALL ctl_stop( 'sbc_init : CICE sea-ice model not currently available with AGRIF' ) 
@@ -426,7 +426,7 @@ CONTAINS
       SELECT CASE( nn_ice )                                       ! Update heat and freshwater fluxes over sea-ice areas
       CASE(  1 )   ;         CALL sbc_ice_if   ( kt )             ! Ice-cover climatology ("Ice-if" model)
 #if defined key_si3
-      CASE(  2 )   ;         CALL ice_stp  ( kt, nsbc )           ! LIM-3 ice model
+      CASE(  2 )   ;         CALL ice_stp  ( kt, nsbc )           ! SI3 ice model
 #endif
       CASE(  3 )   ;         CALL sbc_ice_cice ( kt, nsbc )       ! CICE ice model
       END SELECT

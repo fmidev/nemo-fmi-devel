@@ -3,13 +3,13 @@ MODULE agrif_ice
    !!                       ***  MODULE agrif_ice  ***
    !! AGRIF :   define in memory AGRIF variables for sea-ice
    !!----------------------------------------------------------------------
-   !! History :  3.4  ! 2012-08  (R. Benshila)  Original code
-   !!            3.6  ! 2016-05  (C. Rousset)   Add LIM3 compatibility
+   !! History :  3.4   !  2012-08  (R. Benshila)          Original code
+   !!            4.0   !  2018     (C. Rousset)           SI3 compatibility
    !!----------------------------------------------------------------------
 #if defined key_agrif && defined key_si3
    !!----------------------------------------------------------------------
    !!   'key_agrif'                                              AGRIF zoom
-   !!   'key_si3'                                       SI3 sea-ice model
+   !!   'key_si3'                                         SI3 sea-ice model
    !!----------------------------------------------------------------------   
    IMPLICIT NONE
    PRIVATE 

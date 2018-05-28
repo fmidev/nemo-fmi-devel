@@ -70,7 +70,7 @@ CONTAINS
       !!              - qsr         solar heat flux
       !!              - emp         upward mass flux (evap. - precip.)
       !!              - sfx         salt flux; set to zero at nit000 but possibly non-zero
-      !!                            if ice is present (computed in limsbc(_2).F90)
+      !!                            if ice is present
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! ocean time step
       !!
@@ -119,7 +119,7 @@ CONTAINS
          !                                         ! fill sf with slf_i and control print
          CALL fld_fill( sf, slf_i, cn_dir, 'sbc_flx', 'flux formulation for ocean surface boundary condition', 'namsbc_flx' )
          !
-         sfx(:,:) = 0.0_wp                         ! salt flux due to freezing/melting (non-zero only if ice is present; set in limsbc(_2).F90)
+         sfx(:,:) = 0.0_wp                         ! salt flux due to freezing/melting (non-zero only if ice is present)
          !
       ENDIF
 

@@ -12,7 +12,7 @@ MODULE nemogcm
    !!            8.0  ! 1996-03  (M. Imbard, C. Levy, G. Madec, O. Marti, M. Guyon, A. Lazar,
    !!                             P. Delecluse, L.Terray, M.A. Filiberti, J. Vialar, A.M. Treguier, M. Levy) release 8.0
    !!            8.1  ! 1997-06  (M. Imbard, G. Madec)
-   !!            8.2  ! 1999-11  (M. Imbard, H. Goosse)  LIM sea-ice model
+   !!            8.2  ! 1999-11  (M. Imbard, H. Goosse)  sea-ice model
    !!                 ! 1999-12  (V. Thierry, A-M. Treguier, M. Imbard, M-A. Foujols)  OPEN-MP
    !!                 ! 2000-07  (J-M Molines, M. Imbard)  Open Boundary Conditions  (CLIPPER)
    !!   NEMO     1.0  ! 2002-08  (G. Madec)  F90: Free form and modules

@@ -5,22 +5,21 @@ MODULE agrif_ice_update
    !!=====================================================================================
    !!                       ***  MODULE agrif_ice_update ***
    !! Nesting module :  update surface ocean boundary condition over ice from a child grid
-   !! Sea-Ice model  :  LIM 3.6 Sea ice model time-stepping
    !!=====================================================================================
-   !! History :  2.0   !  04-2008  (F. Dupont)  initial version
+   !! History :  2.0   !  04-2008  (F. Dupont)               initial version
    !!            3.4   !  08-2012  (R. Benshila, C. Herbaut) update and EVP
-   !!            3.6   !  05-2016  (C. Rousset)  Add LIM3 compatibility
+   !!            4.0   !  2018     (C. Rousset)              SI3 compatibility
    !!----------------------------------------------------------------------
 #if defined key_agrif && defined key_si3
    !!----------------------------------------------------------------------
-   !!   'key_si3'  :                                 LIM 3.6 sea-ice model
-   !!   'key_agrif' :                                 AGRIF library 
+   !!   'key_si3'  :                                      SI3 sea-ice model
+   !!   'key_agrif' :                                     AGRIF library 
    !!----------------------------------------------------------------------
    !!   agrif_update_ice  : update sea-ice on boundaries or total
    !!                        child domain for velocities and ice properties
-   !!   update_tra_ice     : sea-ice properties
-   !!   update_u_ice       : zonal      ice velocity
-   !!   update_v_ice       : meridional ice velocity
+   !!   update_tra_ice    : sea-ice properties
+   !!   update_u_ice      : zonal      ice velocity
+   !!   update_v_ice      : meridional ice velocity
    !!----------------------------------------------------------------------
    USE dom_oce
    USE sbc_oce

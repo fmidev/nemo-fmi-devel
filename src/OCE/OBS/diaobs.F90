@@ -500,7 +500,7 @@ CONTAINS
       USE oce    , ONLY : tsn, un, vn, sshn   ! Ocean dynamics and tracers variables
       USE phycst , ONLY : rday                ! Physical constants
 #if defined  key_si3
-      USE ice    , ONLY : at_i                ! LIM3 Ice model variables
+      USE ice    , ONLY : at_i                ! SI3 Ice model variables
 #endif
 #if defined key_cice
       USE sbc_oce, ONLY : fr_i     ! ice fraction

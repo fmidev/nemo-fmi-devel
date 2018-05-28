@@ -3,7 +3,7 @@ MODULE icethd_pnd
    !!                     ***  MODULE  icethd_pnd   ***
    !!   sea-ice: Melt ponds on top of sea ice
    !!======================================================================
-   !! history :       !  2012     (O. Lecomte)       Adaptation to LIM from Flocco and Turner
+   !! history :       !  2012     (O. Lecomte)       Adaptation from Flocco and Turner
    !!                 !  2017     (M. Vancoppenolle, O. Lecomte, C. Rousset) Implementation
    !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------

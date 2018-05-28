@@ -3,7 +3,7 @@ MODULE icethd_zdf_BL99
    !!                       ***  MODULE icethd_zdf_BL99 ***
    !!   sea-ice: vertical heat diffusion in sea ice (computation of temperatures) 
    !!======================================================================
-   !! History :       !  2003-02  (M. Vancoppenolle) original 1D code LIM
+   !! History :       !  2003-02  (M. Vancoppenolle) original 1D code
    !!                 !  2005-06  (M. Vancoppenolle) 3d version
    !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------

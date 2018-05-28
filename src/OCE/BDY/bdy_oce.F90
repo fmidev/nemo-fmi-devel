@@ -7,7 +7,8 @@ MODULE bdy_oce
    !!            3.0  !  2008-04  (NEMO team)  add in the reference version     
    !!            3.3  !  2010-09  (D. Storkey) add ice boundary conditions
    !!            3.4  !  2011     (D. Storkey) rewrite in preparation for OBC-BDY merge
-   !!            3.6  !  2014-01  (C. Rousset) add ice boundary conditions for lim3
+   !!            3.6  !  2014-01  (C. Rousset) add ice boundary conditions for new model
+   !!            4.0  !  2018     (C. Rousset) SI3 compatibility
    !!----------------------------------------------------------------------
    USE par_oce         ! ocean parameters
    USE lib_mpp         ! distributed memory computing

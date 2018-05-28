@@ -3,7 +3,7 @@ MODULE icedyn_adv_pra
    !!                       ***  MODULE icedyn_adv_pra   ***
    !!   sea-ice : advection => Prather scheme
    !!======================================================================
-   !! History :       !  2008-03  (M. Vancoppenolle) LIM-3 from LIM-2 code
+   !! History :       !  2008-03  (M. Vancoppenolle) original code
    !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
    !!--------------------------------------------------------------------
 #if defined key_si3

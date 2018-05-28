@@ -3,9 +3,7 @@ MODULE icethd
    !!                  ***  MODULE icethd   ***
    !!   sea-ice : master routine for thermodynamics
    !!======================================================================
-   !! History :  1.0  !  2000-01  (M.A. Morales Maqueda, H. Goosse, T. Fichefet) LIM-1
-   !!            2.0  !  2002-07  (C. Ethe, G. Madec) LIM-2
-   !!            3.0  !  2005-11  (M. Vancoppenolle)  LIM-3
+   !! History :  1.0  !  2000-01  (M.A. Morales Maqueda, H. Goosse, T. Fichefet) original code 1D
    !!            4.0  !  2018     (many people)       SI3 [aka Sea Ice cube]
    !!----------------------------------------------------------------------
 #if defined key_si3

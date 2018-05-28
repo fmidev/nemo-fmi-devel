@@ -496,7 +496,7 @@ SUBROUTINE Agrif_InitValues_cont_ice
    !!----------------------------------------------------------------------
    !!                 *** ROUTINE Agrif_InitValues_cont_ice ***
    !!
-   !! ** Purpose :: Initialisation of variables to be interpolated for LIM3
+   !! ** Purpose :: Initialisation of variables to be interpolated for ice
    !!----------------------------------------------------------------------
    USE Agrif_Util
    USE sbc_oce, ONLY : nn_fsbc  ! clem: necessary otherwise Agrif_Parent(nn_fsbc) = nn_fsbc
@@ -540,7 +540,7 @@ SUBROUTINE agrif_declare_var_ice
    !!----------------------------------------------------------------------
    !!                 *** ROUTINE agrif_declare_var_ice ***
    !!
-   !! ** Purpose :: Declaration of variables to be interpolated for LIM3
+   !! ** Purpose :: Declaration of variables to be interpolated for ice
    !!----------------------------------------------------------------------
    USE Agrif_Util
    USE ice

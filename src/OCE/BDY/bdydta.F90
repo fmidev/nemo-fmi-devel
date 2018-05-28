@@ -10,7 +10,8 @@ MODULE bdydta
    !!            3.3  !  2010-09  (E.O'Dea) modifications for Shelf configurations 
    !!            3.3  !  2010-09  (D.Storkey) add ice boundary conditions
    !!            3.4  !  2011     (D. Storkey) rewrite in preparation for OBC-BDY merge
-   !!            3.6  !  2012-01  (C. Rousset) add ice boundary conditions for lim3
+   !!            3.6  !  2012-01  (C. Rousset) add ice boundary conditions for sea ice
+   !!            4.0  !  2018     (C. Rousset) SI3 compatibility
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------

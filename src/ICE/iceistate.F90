@@ -259,7 +259,7 @@ CONTAINS
                   IF( lwp .AND. SUM(itest) /= 4 ) THEN 
                      WRITE(numout,*)
                      WRITE(numout,*) ' !!!! ALERT itest is not equal to 4      !!! '
-                     WRITE(numout,*) ' !!!! Something is wrong in the LIM3 initialization procedure '
+                     WRITE(numout,*) ' !!!! Something is wrong in the SI3 initialization procedure '
                      WRITE(numout,*)
                      WRITE(numout,*) ' *** itest_i (i=1,4) = ', itest(:)
                      WRITE(numout,*) ' zat_i_ini : ', zat_i_ini(ji,jj)

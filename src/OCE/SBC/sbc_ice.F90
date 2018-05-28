@@ -1,12 +1,13 @@
 MODULE sbc_ice
    !!======================================================================
    !!                 ***  MODULE  sbc_ice  ***
-   !! Surface module - LIM-3: parameters & variables defined in memory
+   !! Surface module - SI3 & CICE: parameters & variables defined in memory
    !!======================================================================
-   !! History :  3.0  ! 2006-08  (G. Madec)  Surface module
-   !!            3.2  ! 2009-06  (S. Masson) merge with ice_oce
-   !!            3.3.1! 2011-01  (A. R. Porter, STFC Daresbury) dynamical allocation
-   !!            3.4  ! 2011-11  (C. Harris) CICE added as an option
+   !! History :  3.0   !  2006-08  (G. Madec)        Surface module
+   !!            3.2   !  2009-06  (S. Masson)       merge with ice_oce
+   !!            3.3.1 !  2011-01  (A. R. Porter, STFC Daresbury) dynamical allocation
+   !!            3.4   !  2011-11  (C. Harris)       CICE added as an option
+   !!            4.0   !  2018     (many people)     SI3 compatibility
    !!----------------------------------------------------------------------
 #if defined key_si3 || defined key_cice
    !!----------------------------------------------------------------------
@@ -15,7 +16,7 @@ MODULE sbc_ice
    USE par_oce          ! ocean parameters
    USE sbc_oce          ! surface boundary condition: ocean
 # if defined key_si3
-   USE ice              ! LIM-3 parameters
+   USE ice              ! SI3 parameters
 # endif
 # if defined key_cice
    USE ice_domain_size, only: ncat 
@@ -29,12 +30,12 @@ MODULE sbc_ice
    PUBLIC   sbc_ice_alloc   ! called in sbcmod.F90 or sbcice_cice.F90
 
 # if defined  key_si3
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .TRUE.   !: LIM-3 ice model
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .TRUE.   !: SI3 ice model
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE 
    CHARACTER(len=1), PUBLIC, PARAMETER ::   cp_ice_msh = 'C'      !: 'C'-grid ice-velocity
 # endif
 # if defined  key_cice
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no LIM-3
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no SI3
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .TRUE.   !: CICE ice model
    CHARACTER(len=1), PUBLIC            ::   cp_ice_msh = 'F'      !: 'F'-grid ice-velocity
 # endif
@@ -75,7 +76,7 @@ MODULE sbc_ice
 
 #if defined key_cice
    !
-   ! for consistency with LIM, these are declared with three dimensions
+   ! for consistency with SI3, these are declared with three dimensions
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qlw_ice            !: incoming long-wave
    !
    ! other forcing arrays are two dimensional
@@ -92,7 +93,7 @@ MODULE sbc_ice
    INTEGER , PUBLIC, PARAMETER ::   jpl = ncat
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   u_ice, v_ice          ! jpi, jpj
    
-   ! already defined in ice.F90 for LIM3
+   ! already defined in ice.F90 for SI3
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  a_i
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  h_i, h_s
 
@@ -166,8 +167,8 @@ CONTAINS
 
    PUBLIC   sbc_ice_alloc   !
 
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no LIM-3 ice model
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE  ice model
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no SI3 ice model
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE ice model
    CHARACTER(len=1), PUBLIC, PARAMETER ::   cp_ice_msh = '-'      !: no grid ice-velocity
    REAL(wp)        , PUBLIC, PARAMETER ::   cldf_ice = 0.81       !: cloud fraction over sea ice, summer CLIO value   [-]
    INTEGER         , PUBLIC, PARAMETER ::   jpl = 1 

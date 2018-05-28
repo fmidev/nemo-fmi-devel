@@ -83,7 +83,7 @@ MODULE phycst
    REAL(wp), PUBLIC ::   xsn      =    2.8e+6_wp     !: volumetric latent heat of sublimation of snow         [J/m3]
 #endif
 #if defined key_cice
-   REAL(wp), PUBLIC ::   rcdsn    =    0.31_wp       !: thermal conductivity of snow                          [W/m/K], now namelist parameter for LIM3
+   REAL(wp), PUBLIC ::   rcdsn    =    0.31_wp       !: thermal conductivity of snow                          [W/m/K]
 #endif
 #if defined key_si3
    REAL(wp), PUBLIC ::   r1_rhoic                    !: 1 / rhoic
