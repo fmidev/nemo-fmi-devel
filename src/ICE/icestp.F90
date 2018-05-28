@@ -20,8 +20,16 @@ MODULE icestp
    !!       * Bill Lipscomb (LANL), Cecilia Bitz (UWa) and Elisabeth Hunke (LANL), USA.
    !!
    !! SI3 has been made possible by a handful of persons who met as working group
-   !!     in France and UK:
-   !!    * ...
+   !!      (in France, Belgium, UK and Italy)
+   !!    * Clement Rousset, Martin Vancoppenolle & Gurvan Madec (LOCEAN, France)
+   !!    * Matthieu Chevalier & David Salas (Meteo France, France)
+   !!    * Gilles Garric (Mercator Ocean, France)
+   !!    * Thierry Fichefet & Francois Massonnet (UCL, Belgium)
+   !!    * Ed Blockley & Jeff Ridley (Met Office, UK)
+   !!    * Danny Feltham & David Schroeder (CPOM, UK)
+   !!    * Yevgeny Aksenov (NOC, UK)
+   !!    * Paul Holland (BAS, UK)
+   !!    * Dorotea Iovino (CMCC, Italy)
    !!======================================================================
    !! History :  4.0  !  2018     (C. Rousset)      Original code SI3
    !!----------------------------------------------------------------------
