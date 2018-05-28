@@ -1,5 +1,5 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! ESIM configuration namelist: Overwrites SHARED/namelist_ice_lim3_ref
+!! SI3 configuration namelist: Overwrites SHARED/namelist_ice_ref
 !!              1 - Generic parameters                 (nampar)
 !!              2 - Ice thickness discretization       (namitd)
 !!              3 - Ice dynamics                       (namdyn)

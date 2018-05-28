@@ -105,9 +105,9 @@ MODULE bdy_oce
    REAL(wp), DIMENSION(jp_bdy) ::   rn_time_dmp             !: Damping time scale in days
    REAL(wp), DIMENSION(jp_bdy) ::   rn_time_dmp_out         !: Damping time scale in days at radiation outflow points
 
-   CHARACTER(len=20), DIMENSION(jp_bdy) ::   cn_ice_lim       ! Choice of boundary condition for sea ice variables 
-   INTEGER , DIMENSION(jp_bdy)          ::   nn_ice_lim_dta   !: = 0 use the initial state as bdy dta ; 
-                                                              !: = 1 read it in a NetCDF file
+   CHARACTER(len=20), DIMENSION(jp_bdy) ::   cn_ice         ! Choice of boundary condition for sea ice variables 
+   INTEGER , DIMENSION(jp_bdy)          ::   nn_ice_dta     !: = 0 use the initial state as bdy dta ; 
+                                                            !: = 1 read it in a NetCDF file
    REAL(wp), DIMENSION(jp_bdy) ::   rn_ice_tem              !: choice of the temperature of incoming sea ice
    REAL(wp), DIMENSION(jp_bdy) ::   rn_ice_sal              !: choice of the salinity    of incoming sea ice
    REAL(wp), DIMENSION(jp_bdy) ::   rn_ice_age              !: choice of the age         of incoming sea ice

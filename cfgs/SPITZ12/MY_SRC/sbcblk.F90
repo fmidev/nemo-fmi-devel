@@ -691,7 +691,7 @@ CONTAINS
 
 #if defined key_si3
    !!----------------------------------------------------------------------
-   !!   'key_si3'                                       ESIM sea-ice model
+   !!   'key_si3'                                         SI3 sea-ice model
    !!----------------------------------------------------------------------
    !!   blk_ice_tau : provide the air-ice stress
    !!   blk_ice_flx : provide the heat and mass fluxes at air-ice interface

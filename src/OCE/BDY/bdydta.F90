@@ -179,7 +179,7 @@ CONTAINS
             ENDIF
 
 #if defined key_si3
-            IF( nn_ice_lim_dta(jbdy) == 0 ) THEN    ! set ice to initial values
+            IF( nn_ice_dta(jbdy) == 0 ) THEN    ! set ice to initial values
                ilen1(:) = nblen(:)
                IF( dta%ll_a_i ) THEN
                   igrd = 1   
@@ -349,7 +349,7 @@ CONTAINS
 
                ENDIF
 #if defined key_si3
-               IF( cn_ice_lim(jbdy) /= 'none' .AND. nn_ice_lim_dta(jbdy) == 1 ) THEN
+               IF( cn_ice(jbdy) /= 'none' .AND. nn_ice_dta(jbdy) == 1 ) THEN
                   IF( nice_cat == 1 ) THEN ! case input cat = 1
                      CALL ice_var_itd ( bf(jfld_hti)%fnow(:,1,1), bf(jfld_hts)%fnow(:,1,1), bf(jfld_ai)%fnow(:,1,1), &
                         &               dta_bdy(jbdy)%h_i     , dta_bdy(jbdy)%h_s     , dta_bdy(jbdy)%a_i    )
@@ -452,7 +452,7 @@ CONTAINS
             &                , nn_dyn3d_dta  (jbdy)    &
             &                , nn_tra_dta    (jbdy)    &
 #if defined key_si3
-            &                , nn_ice_lim_dta(jbdy)    &
+            &                , nn_ice_dta    (jbdy)    &
 #endif
                               )
          IF(nn_dta(jbdy) > 1)   nn_dta(jbdy) = 1
@@ -473,7 +473,7 @@ CONTAINS
             nb_bdy_fld(jbdy) = nb_bdy_fld(jbdy) + 2
          ENDIF
 #if defined key_si3
-         IF( cn_ice_lim(jbdy) /= 'none' .AND. nn_ice_lim_dta(jbdy) == 1  ) THEN
+         IF( cn_ice(jbdy) /= 'none' .AND. nn_ice_dta(jbdy) == 1  ) THEN
             nb_bdy_fld(jbdy) = nb_bdy_fld(jbdy) + 3
          ENDIF
 #endif               
@@ -614,7 +614,7 @@ CONTAINS
 
 #if defined key_si3
             ! sea ice
-            IF( nn_ice_lim_dta(jbdy) == 1 ) THEN
+            IF( nn_ice_dta(jbdy) == 1 ) THEN
                ! Test for types of ice input (1cat or Xcat) 
                ! Build file name to find dimensions 
                clname=TRIM( cn_dir )//TRIM(bn_a_i%clname)
@@ -797,8 +797,8 @@ CONTAINS
          ENDIF
 
 #if defined key_si3
-         IF (cn_ice_lim(jbdy) /= 'none') THEN
-            IF( nn_ice_lim_dta(jbdy) == 0 ) THEN
+         IF (cn_ice(jbdy) /= 'none') THEN
+            IF( nn_ice_dta(jbdy) == 0 ) THEN
                ALLOCATE( dta_bdy(jbdy)%a_i(nblen(1),jpl) )
                ALLOCATE( dta_bdy(jbdy)%h_i(nblen(1),jpl) )
                ALLOCATE( dta_bdy(jbdy)%h_s(nblen(1),jpl) )

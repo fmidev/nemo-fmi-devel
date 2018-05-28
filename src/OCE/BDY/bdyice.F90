@@ -63,7 +63,7 @@ CONTAINS
       !
       DO ib_bdy = 1, nb_bdy
          !
-         SELECT CASE( cn_ice_lim(ib_bdy) )
+         SELECT CASE( cn_ice(ib_bdy) )
          CASE('none')   ;   CYCLE
          CASE('frs' )   ;   CALL bdy_ice_frs( idx_bdy(ib_bdy), dta_bdy(ib_bdy), kt, ib_bdy )
          CASE DEFAULT
@@ -156,8 +156,8 @@ CONTAINS
             IF( v_ice(ji  ,jj+1) < 0. .AND. vmask(ji  ,jj-1,1) == 0. ) jpbound = 1; ii = ji  ; ij = jj+1
             IF( v_ice(ji  ,jj-1) > 0. .AND. vmask(ji  ,jj+1,1) == 0. ) jpbound = 1; ii = ji  ; ij = jj-1
             !
-            IF( nn_ice_lim_dta(ib_bdy) == 0 ) jpbound = 0; ii = ji; ij = jj   ! case ice boundaries = initial conditions
-            !                                                                 !      do not make state variables dependent on velocity
+            IF( nn_ice_dta(ib_bdy) == 0 ) jpbound = 0; ii = ji; ij = jj   ! case ice boundaries = initial conditions
+            !                                                             !      do not make state variables dependent on velocity
             !
             rswitch = MAX( 0.0_wp , SIGN ( 1.0_wp , at_i(ii,ij) - 0.01 ) ) ! 0 if no ice
             !
@@ -277,15 +277,15 @@ CONTAINS
       !
       DO ib_bdy=1, nb_bdy
          !
-         SELECT CASE( cn_ice_lim(ib_bdy) )
+         SELECT CASE( cn_ice(ib_bdy) )
          !
          CASE('none')
             CYCLE
             !
          CASE('frs')
             !
-            IF( nn_ice_lim_dta(ib_bdy) == 0 ) CYCLE            ! case ice boundaries = initial conditions 
-            !                                                  !      do not change ice velocity (it is only computed by rheology)
+            IF( nn_ice_dta(ib_bdy) == 0 ) CYCLE            ! case ice boundaries = initial conditions 
+            !                                              !      do not change ice velocity (it is only computed by rheology)
             SELECT CASE ( cd_type )
             !     
             CASE ( 'U' )  

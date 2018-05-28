@@ -98,8 +98,8 @@ CONTAINS
          &             ln_mask_file, cn_mask_file, cn_dyn2d, nn_dyn2d_dta,     &
          &             cn_dyn3d, nn_dyn3d_dta, cn_tra, nn_tra_dta,             &
          &             ln_tra_dmp, ln_dyn3d_dmp, rn_time_dmp, rn_time_dmp_out, &
-         &             cn_ice_lim, nn_ice_lim_dta,                           &
-         &             rn_ice_tem, rn_ice_sal, rn_ice_age,                 &
+         &             cn_ice, nn_ice_dta,                                     &
+         &             rn_ice_tem, rn_ice_sal, rn_ice_age,                     &
          &             ln_vol, nn_volctl, nn_rimwidth, nb_jpk_bdy
       !!---------------------------------------------------------------------
       !
