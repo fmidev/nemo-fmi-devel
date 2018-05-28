@@ -84,27 +84,17 @@ MODULE diawri
    !!----------------------------------------------------------------------
 CONTAINS
 
-   INTEGER FUNCTION dia_wri_alloc()
-      !!----------------------------------------------------------------------
-      INTEGER, DIMENSION(2) :: ierr
-      !!----------------------------------------------------------------------
-      ierr = 0
-      ALLOCATE( ndex_hT(jpi*jpj) , ndex_T(jpi*jpj*jpk) ,     &
-         &      ndex_hU(jpi*jpj) , ndex_U(jpi*jpj*jpk) ,     &
-         &      ndex_hV(jpi*jpj) , ndex_V(jpi*jpj*jpk) , STAT=ierr(1) )
-         !
-      dia_wri_alloc = MAXVAL(ierr)
-      IF( lk_mpp )   CALL mpp_sum( dia_wri_alloc )
-      !
-  END FUNCTION dia_wri_alloc
-
-   !!----------------------------------------------------------------------
-   !!   Default option                                   NetCDF output file
-   !!----------------------------------------------------------------------
 #if defined key_iomput
    !!----------------------------------------------------------------------
    !!   'key_iomput'                                        use IOM library
    !!----------------------------------------------------------------------
+
+   INTEGER FUNCTION dia_wri_alloc()
+      !
+      dia_wri_alloc = 0
+      !
+   END FUNCTION dia_wri_alloc
+
 
    SUBROUTINE dia_wri( kt )
       !!---------------------------------------------------------------------
@@ -514,7 +504,22 @@ CONTAINS
    !!----------------------------------------------------------------------
    !!   Default option                                  use IOIPSL  library
    !!----------------------------------------------------------------------
-
+   
+   INTEGER FUNCTION dia_wri_alloc()
+      !!----------------------------------------------------------------------
+      INTEGER, DIMENSION(2) :: ierr
+      !!----------------------------------------------------------------------
+      ierr = 0
+      ALLOCATE( ndex_hT(jpi*jpj) , ndex_T(jpi*jpj*jpk) ,     &
+         &      ndex_hU(jpi*jpj) , ndex_U(jpi*jpj*jpk) ,     &
+         &      ndex_hV(jpi*jpj) , ndex_V(jpi*jpj*jpk) , STAT=ierr(1) )
+         !
+      dia_wri_alloc = MAXVAL(ierr)
+      IF( lk_mpp )   CALL mpp_sum( dia_wri_alloc )
+      !
+   END FUNCTION dia_wri_alloc
+  
+  
    SUBROUTINE dia_wri( kt )
       !!---------------------------------------------------------------------
       !!                  ***  ROUTINE dia_wri  ***
