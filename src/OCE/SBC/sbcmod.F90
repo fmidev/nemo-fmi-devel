@@ -116,11 +116,11 @@ CONTAINS
       !                             !* overwrite namelist parameter using CPP key information
 #if defined key_agrif
       IF( Agrif_Root() ) THEN                ! AGRIF zoom (cf r1242: possibility to run without ice in fine grid)
-         IF( lk_lim3 )   nn_ice      = 2
+         IF( lk_si3  )   nn_ice      = 2
          IF( lk_cice )   nn_ice      = 3
       ENDIF
 #else
-      IF( lk_lim3 )   nn_ice      = 2
+      IF( lk_si3  )   nn_ice      = 2
       IF( lk_cice )   nn_ice      = 3
 #endif
       !

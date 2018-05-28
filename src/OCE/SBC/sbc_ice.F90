@@ -10,7 +10,7 @@ MODULE sbc_ice
    !!----------------------------------------------------------------------
 #if defined key_si3 || defined key_cice
    !!----------------------------------------------------------------------
-   !!   'key_si3' or 'key_cice' :              LIM-3 or CICE sea-ice model
+   !!   'key_si3' or 'key_cice' :              SI3 or CICE sea-ice model
    !!----------------------------------------------------------------------
    USE par_oce          ! ocean parameters
    USE sbc_oce          ! surface boundary condition: ocean
@@ -29,12 +29,12 @@ MODULE sbc_ice
    PUBLIC   sbc_ice_alloc   ! called in sbcmod.F90 or sbcice_cice.F90
 
 # if defined  key_si3
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_lim3    = .TRUE.   !: LIM-3 ice model
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .TRUE.   !: LIM-3 ice model
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE 
    CHARACTER(len=1), PUBLIC, PARAMETER ::   cp_ice_msh = 'C'      !: 'C'-grid ice-velocity
 # endif
 # if defined  key_cice
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_lim3    = .FALSE.  !: no LIM-3
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no LIM-3
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .TRUE.   !: CICE ice model
    CHARACTER(len=1), PUBLIC            ::   cp_ice_msh = 'F'      !: 'F'-grid ice-velocity
 # endif
@@ -156,7 +156,7 @@ CONTAINS
 
 #else
    !!----------------------------------------------------------------------
-   !!   Default option                      NO LIM3 or CICE sea-ice model
+   !!   Default option                      NO SI3 or CICE sea-ice model
    !!----------------------------------------------------------------------
    USE lib_mpp          ! MPP library
    USE in_out_manager   ! I/O manager
@@ -166,7 +166,7 @@ CONTAINS
 
    PUBLIC   sbc_ice_alloc   !
 
-   LOGICAL         , PUBLIC, PARAMETER ::   lk_lim3    = .FALSE.  !: no LIM-3 ice model
+   LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no LIM-3 ice model
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE  ice model
    CHARACTER(len=1), PUBLIC, PARAMETER ::   cp_ice_msh = '-'      !: no grid ice-velocity
    REAL(wp)        , PUBLIC, PARAMETER ::   cldf_ice = 0.81       !: cloud fraction over sea ice, summer CLIO value   [-]

@@ -19,7 +19,7 @@ MODULE restart
    !!----------------------------------------------------------------------
    USE oce             ! ocean dynamics and tracers 
    USE dom_oce         ! ocean space and time domain
-   USE sbc_ice         ! only lk_lim3 
+   USE sbc_ice         ! only lk_si3 
    USE phycst          ! physical constants
    USE eosbn2          ! equation of state            (eos bn2 routine)
    USE trdmxl_oce      ! ocean active mixed layer tracers trends variables
