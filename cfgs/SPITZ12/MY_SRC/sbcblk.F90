@@ -314,7 +314,6 @@ CONTAINS
       !!              - qns, qsr    non-solar and solar heat fluxes
       !!              - emp         upward mass flux (evapo. - precip.)
       !!              - sfx         salt flux due to freezing/melting (non-zero only if ice is present)
-      !!                            (set in limsbc(_2).F90)
       !!
       !! ** References :   Large & Yeager, 2004 / Large & Yeager, 2008
       !!                   Brodeau et al. Ocean Modelling 2010
