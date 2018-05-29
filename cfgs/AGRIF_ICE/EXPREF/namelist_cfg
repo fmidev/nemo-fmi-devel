@@ -33,7 +33,7 @@
 &namcfg        !   parameters of the configuration                      (default: user defined GYRE)
 !-----------------------------------------------------------------------
    ln_read_cfg = .true.    !  (=T) read the domain configuration file
-      cn_domcfg = "ORCA_R2_zps_domcfg"    ! domain configuration filename
+      cn_domcfg = "ORCA_R2_zps_domcfg_agrif"    ! domain configuration filename
       !
       ln_closea    = .false.    !  F => suppress closed seas (defined by closea_mask field) 
       !                         !       from the bathymetry at runtime.
@@ -114,7 +114,7 @@
    !                       ! type of penetration                        (default: NO selection)
    ln_qsr_rgb  = .true.       !  RGB light penetration (Red-Green-Blue)
    !
-   nn_chldta   =      0       !  RGB : Chl data (=1) or cst value (=0)
+   nn_chldta   =      1       !  RGB : Chl data (=1) or cst value (=0)
 
    cn_dir = './'  !  root directory for the chlorophyl data location
    !___________!_________________________!___________________!___________!_____________!________!___________!__________________!__________!_______________!
