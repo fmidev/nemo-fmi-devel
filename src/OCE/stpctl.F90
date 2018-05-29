@@ -136,7 +136,7 @@ CONTAINS
          ENDIF
          IF(lwp) THEN
             WRITE(numout,cform_err)
-            WRITE(numout,*) ' stp_ctl: |ssh| > 10 m   or   |U| > 10 m/s   or   S < 0   or   NaN encounter in the tests'
+            WRITE(numout,*) ' stp_ctl: |ssh| > 10 m   or   |U| > 10 m/s   or   S <= 0   or   NaN encounter in the tests'
             WRITE(numout,*) ' ======= '
             WRITE(numout,9100) kt,   zmax(1), iih, ijh
             WRITE(numout,9200) kt,   zmax(2), iiu, iju, iku
@@ -152,7 +152,7 @@ CONTAINS
       ENDIF
 9100  FORMAT (' kt=',i8,'   |ssh| max: ',1pg11.4,', at  i j  : ',2i5)
 9200  FORMAT (' kt=',i8,'   |U|   max: ',1pg11.4,', at  i j k: ',3i5)
-9300  FORMAT (' kt=',i8,'   S     min: ',1pg11.4,', at  i j  : ',2i5)
+9300  FORMAT (' kt=',i8,'   S     min: ',1pg11.4,', at  i j  : ',3i5)
       !
       !                                            !==  run statistics  ==!   ("run.stat" file)
       IF(lwp) WRITE(numrun,9400) kt, zmax(1), zmax(2), - zmax(3)
