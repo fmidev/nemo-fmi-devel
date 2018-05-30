@@ -85,7 +85,7 @@
          ELSEIF(nbondi == -1) THEN              ! subdomain to the east only
             IF( .NOT. NAT_IN(jf) == 'F' )   ARRAY_IN(1:nn_hls,:,:,:,jf) = zland     ! south except F-point
             !
-         ELSEIF(nbondi == 1) THEN               ! subdomain to the west only
+         ELSEIF(nbondi ==  1) THEN              ! subdomain to the west only
             ARRAY_IN(nlci-nn_hls+1:jpi,:,:,:,jf) = zland    ! north
          ENDIF
          !                                ! North-South boundaries
@@ -99,10 +99,10 @@
                IF( .NOT. NAT_IN(jf) == 'F' )   ARRAY_IN(:,     1       :nn_hls,:,:,jf) = zland  ! east except F-point
                                                ARRAY_IN(:,nlcj-nn_hls+1:jpj   ,:,:,jf) = zland  ! west
             ENDIF
-         ELSEIF(nbondi == -1) THEN              ! subdomain to the east only
+         ELSEIF(nbondj == -1) THEN              ! subdomain to the east only
             IF( .NOT. NAT_IN(jf) == 'F' )   ARRAY_IN(:,1:nn_hls,:,:,jf) = zland     ! south except F-point
             !
-         ELSEIF(nbondi == 1) THEN               ! subdomain to the west only
+         ELSEIF(nbondj ==  1) THEN              ! subdomain to the west only
             ARRAY_IN(:,nlcj-nn_hls+1:jpj,:,:,jf) = zland    ! north
          ENDIF
          !
