@@ -1,7 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  Configuration namelist : used to overwrite defaults values defined in SHARED/namelist_ref
+!! NEMO/OPA  Configuration namelist : overwrite defaults values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!
+!!                         VORTEX configuration                       !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
@@ -16,6 +16,14 @@
 !!   namc1d_uvd   1D data (currents)                                    ("key_c1d")
 !!======================================================================
 !
+!-----------------------------------------------------------------------
+&namusr_def    !   User defined :   VORTEX configuration: Flat bottom, beta-plane
+!-----------------------------------------------------------------------
+   rn_dx       =  30000.   !  x horizontal resolution   [meters]
+   rn_dy       =  30000.   !  y horizontal resolution   [meters]
+   rn_dz       =    500.   !  z vertical resolution [meters]
+   rn_ppgphi0  =   38.5    !  Reference latitude [degrees]
+/
 !-----------------------------------------------------------------------
 &namrun        !   parameters of the run
 !-----------------------------------------------------------------------
@@ -38,19 +46,6 @@
 &namcfg        !   parameters of the configuration                      (default: use namusr_def in namelist_cfg)
 !-----------------------------------------------------------------------
 /
-!-----------------------------------------------------------------------
-&namusr_def    !   User defined :   VORTEX configuration: Flat bottom, beta-plane
-!-----------------------------------------------------------------------
-   rn_dx       =  30000.   !  x horizontal resolution   [meters]
-   rn_dy       =  30000.   !  y horizontal resolution   [meters]
-   rn_dz       =    500.   !  z vertical resolution [meters]
-   rn_ppgphi0  =   38.5    !  Reference latitude [degrees]
-/
-!-----------------------------------------------------------------------
-&namtsd        !   data : Temperature  & Salinity
-!-----------------------------------------------------------------------
-/
-
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
 !!                                                                    !!
@@ -71,7 +66,7 @@
 !!======================================================================
 !
 !-----------------------------------------------------------------------
-&namsbc        !   Surface Boundary Condition (surface module)
+&namsbc        !   Surface Boundary Condition manager                   (default: NO selection)
 !-----------------------------------------------------------------------
   nn_fsbc     = 1         !  frequency of surface boundary condition computation
                           !     (also = the frequency of sea-ice & iceberg model call)
@@ -83,7 +78,6 @@
   ln_ssr      = .false.   !  Sea Surface Restoring on T and/or S       (T => fill namsbc_ssr)
   nn_fwb      = 0         !  FreshWater Budget: =0 unchecked
 /
-
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
 !!                                                                    !!
@@ -100,7 +94,6 @@
 !-----------------------------------------------------------------------
   rn_shlat     =    0.    !  free slip
 /
-
 !!======================================================================
 !!                ***  Top/Bottom boundary condition  ***             !!
 !!                                                                    !!
@@ -116,7 +109,6 @@
 !-----------------------------------------------------------------------
    ln_OFF     = .true.    !  free-slip       : Cd = 0
 /
-
 !!======================================================================
 !!                        Tracer (T-S) namelists                      !!
 !!                                                                    !!
@@ -129,7 +121,7 @@
 !!======================================================================
 !
 !-----------------------------------------------------------------------
-&nameos        !   ocean Equation Of Seawater                           (default: OFF)
+&nameos        !   ocean Equation Of Seawater                           (default: NO selection)
 !-----------------------------------------------------------------------
    ln_seos     = .true.         !  = Use simplified equation of state (S-EOS)
    !                            !  rd(T,S,Z)*rau0 = -a0*(1+.5*lambda*dT+mu*Z+nu*dS)*dT+b0*dS
@@ -163,7 +155,6 @@
    ln_traldf_lap   =  .false.  !    laplacian operator
    ln_traldf_blp   =  .false.  !  bilaplacian operator
 /
-
 !!======================================================================
 !!                      ***  Dynamics namelists  ***                  !!
 !!                                                                    !!
@@ -236,7 +227,6 @@
       rn_Uv      = 0.1              !  lateral viscous velocity [m/s] (nn_ahm_ijk_t= 0, 10, 20, 30)
       rn_Lv      = 30.e+3           !  lateral viscous length   [m]   (nn_ahm_ijk_t= 0, 10)
 /
-
 !!======================================================================
 !!                     vertical physics namelists                     !!
 !!                                                                    !!
@@ -249,7 +239,7 @@
 !!======================================================================
 !
 !-----------------------------------------------------------------------
-&namzdf        !   vertical physics                                     (default: NO selection)
+&namzdf        !   vertical physics manager                             (default: NO selection)
 !-----------------------------------------------------------------------
    !                       ! type of vertical closure
    ln_zdfcst   = .true.       !  constant mixing
@@ -264,7 +254,6 @@
    nn_avb      =    0         !  profile for background avt & avm (=1) or not (=0)
    nn_havtb    =    0         !  horizontal shape for avtb (=1) or not (=0)
 /
-
 !!======================================================================
 !!                  ***  Diagnostics namelists  ***                   !!
 !!                                                                    !!
@@ -296,3 +285,15 @@
 !!   namsto            Stochastic parametrization of EOS                (default: OFF)
 !!======================================================================
 !
+!-----------------------------------------------------------------------
+&nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namctl        !   Control prints                                       (default: OFF)
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namsto        ! Stochastic parametrization of EOS                      (default: OFF)
+!-----------------------------------------------------------------------
+/

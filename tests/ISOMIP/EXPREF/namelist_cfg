@@ -1,14 +1,19 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  : ISOMIP Configuration namelist : overwrite reference dynamical namelist
+!! NEMO/OPA  Configuration namelist : overwrite defaults values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+!!                         ISOMIP configuration                       !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
 !!   namrun       parameters of the run
 !!   namdom       space and time domain
-!!   namcfg       parameters of the configuration                       (default: use namusr_def in namelist_cfg)
-!!   namusr_def   user defined configuration
+!!   namcfg       parameters of the configuration                       (default: user defined GYRE)
+!!   namwad       Wetting and drying                                    (default: OFF)
+!!   namtsd       data: temperature & salinity                          (default: OFF)
+!!   namcrs       coarsened grid (for outputs and/or TOP)               (ln_crs =T)
+!!   namc1d       1D configuration options                              ("key_c1d")
+!!   namc1d_dyndmp 1D newtonian damping applied on currents             ("key_c1d")
+!!   namc1d_uvd   1D data (currents)                                    ("key_c1d")
 !!======================================================================
 !
 !-----------------------------------------------------------------------
@@ -40,7 +45,6 @@
    ln_linssh   = .false.   !  =T  linear free surface  ==>>  model level are fixed in time
    rn_rdt      = 1800.     !  time step for the dynamics (and tracer if nn_acc=0)
 /
-
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
 !!                                                                    !!
@@ -56,6 +60,8 @@
 !!   namsbc_apr      Atmospheric Pressure                               (ln_apr_dyn =T)
 !!   namsbc_isf      ice shelf melting/freezing                         (ln_isfcav  =T : read (ln_read_cfg=T) or set or usr_def_zgr )
 !!   namsbc_iscpl    coupling option between land ice model and ocean   (ln_isfcav  =T)
+!!   namsbc_wave     external fields from wave model                    (ln_wave    =T)
+!!   namberg         iceberg floats                                     (ln_icebergs=T)
 !!======================================================================
 !
 !-----------------------------------------------------------------------
@@ -66,8 +72,8 @@
    ln_isf      = .true.    !  ice shelf melting/freezing                (T => fill namsbc_isf)
 /
 !-----------------------------------------------------------------------
-&namsbc_isf    !  Top boundary layer (ISF)                              (nn_isf >0)
-!-----------------------------------------------------------------------
+&namsbc_isf    !  Top boundary layer (ISF)                              (ln_isfcav =T : read (ln_read_cfg=T) 
+!-----------------------------------------------------------------------             or set or usr_def_zgr )
 !              ! file name ! frequency (hours) ! variable ! time interpol. !  clim   ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
 !              !           !  (if <0  months)  !   name   !    (logical)   !  (T/F)  ! 'monthly' ! filename ! pairing  ! filename      !
 ! nn_isf == 4
@@ -101,12 +107,11 @@
 &namsbc_iscpl  !   land ice / ocean coupling option                     
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
 !!                                                                    !!
-!!   namlbc        lateral momentum boundary condition                  (default: no slip)
-!!   namagrif      agrif nested grid ( read by child model only )       ("key_agrif")
+!!   namlbc        lateral momentum boundary condition                  (default: NO selection)
+!!   namagrif      agrif nested grid   (read by child model only)       ("key_agrif")
 !!   nam_tide      Tidal forcing                                        (default: OFF)
 !!   nambdy        Unstructured open boundaries                         (default: OFF)
 !!   nambdy_dta    Unstructured open boundaries - external data         (see  nambdy)
@@ -122,8 +127,8 @@
 !!                ***  Top/Bottom boundary condition  ***             !!
 !!                                                                    !!
 !!   namdrg        top/bottom drag coefficient                          (default: NO selection)
-!!   namdrg_top    top    friction                                      (ln_OFF =F & ln_isfcav=T)
-!!   namdrg_bot    bottom friction                                      (ln_OFF =F)
+!!   namdrg_top    top    friction                                      (ln_OFF=F & ln_isfcav=T)
+!!   namdrg_bot    bottom friction                                      (ln_OFF=F)
 !!   nambbc        bottom temperature boundary condition                (default: OFF)
 !!   nambbl        bottom boundary layer scheme                         (default: OFF)
 !!======================================================================
@@ -160,9 +165,8 @@
    ln_boost   = .false.   !  =T regional boost of Cd0 ; =F constant
       rn_boost=  50.         !  local boost factor  [-]
 /
-
 !!======================================================================
-!!                        Tracer (T & S) namelists                    !!
+!!                        Tracer (T-S) namelists                      !!
 !!                                                                    !!
 !!   nameos        equation of state                                    (default: NO selection)
 !!   namtra_adv    advection scheme                                     (default: NO selection)
@@ -194,7 +198,6 @@
       rn_Ud        = 0.02           !  lateral diffusive velocity [m/s]
       rn_Ld        = 10.e+3         !  lateral diffusive length   [m]
 /
-
 !!======================================================================
 !!                      ***  Dynamics namelists  ***                  !!
 !!                                                                    !!
@@ -237,7 +240,6 @@
       rn_Uv      = 0.12             !  lateral viscous velocity [m/s]
       rn_Lv      = 10.e+3           !  lateral viscous length   [m]
 /
-
 !!======================================================================
 !!                     vertical physics namelists                     !!
 !!                                                                    !!
@@ -260,4 +262,47 @@
    !                       ! coefficients
    rn_avm0     =   1.e-3     !  vertical eddy viscosity   [m2/s]
    rn_avt0     =   5.e-5     !  vertical eddy diffusivity [m2/s]
+/
+!!======================================================================
+!!                  ***  Diagnostics namelists  ***                   !!
+!!                                                                    !!
+!!   namtrd       dynamics and/or tracer trends                         (default: OFF)
+!!   namptr       Poleward Transport Diagnostics                        (default: OFF)
+!!   namhsb       Heat and salt budgets                                 (default: OFF)
+!!   namdiu       Cool skin and warm layer models                       (default: OFF)
+!!   namdiu       Cool skin and warm layer models                       (default: OFF)
+!!   namflo       float parameters                                      ("key_float")
+!!   nam_diaharm  Harmonic analysis of tidal constituents               ("key_diaharm")
+!!   namdct       transports through some sections                      ("key_diadct")
+!!   nam_diatmb   Top Middle Bottom Output                              (default: OFF)
+!!   nam_dia25h   25h Mean Output                                       (default: OFF)
+!!   namnc4       netcdf4 chunking and compression settings             ("key_netcdf4")
+!!======================================================================
+!
+!!======================================================================
+!!               ***  Observation & Assimilation  ***                 !!
+!!                                                                    !!
+!!   namobs       observation and model comparison                      (default: OFF)
+!!   nam_asminc   assimilation increments                               ('key_asminc')
+!!======================================================================
+!
+!!======================================================================
+!!                  ***  Miscellaneous namelists  ***                 !!
+!!                                                                    !!
+!!   nammpp            Massively Parallel Processing                    ("key_mpp_mpi")
+!!   namctl            Control prints                                   (default: OFF)
+!!   namsto            Stochastic parametrization of EOS                (default: OFF)
+!!======================================================================
+!
+!-----------------------------------------------------------------------
+&nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namctl        !   Control prints                                       (default: OFF)
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namsto        ! Stochastic parametrization of EOS                      (default: OFF)
+!-----------------------------------------------------------------------
 /
