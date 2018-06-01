@@ -496,9 +496,15 @@ CONTAINS
       !
       ! coeficient for linearisation of potential tfreez
       ! Crude approximation for pressure (but commonly used)
-      zlamb1 =-0.0573_wp
-      zlamb2 = 0.0832_wp
-      zlamb3 =-7.53e-08_wp * grav * rau0
+      IF ( l_useCT ) THEN   ! linearisation from Jourdain et al. (2017)
+         zlamb1 =-0.0564_wp
+         zlamb2 = 0.0773_wp
+         zlamb3 =-7.8633e-8 * grav * rau0
+      ELSE                  ! linearisation from table 4 (Asay-Davis et al., 2015)
+         zlamb1 =-0.0573_wp
+         zlamb2 = 0.0832_wp
+         zlamb3 =-7.53e-8 * grav * rau0
+      ENDIF
       !
       ! initialisation
       zgammat(:,:) = rn_gammat0 ; zgammas (:,:) = rn_gammas0
