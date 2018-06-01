@@ -63,9 +63,9 @@ MODULE domvvl
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.7 , NEMO-Consortium (2015) 
-   !! $Id: domvvl.F90 9190 2018-01-06 14:18:23Z gm $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
+   !! $Id: domvvl.F90 9598 2018-05-15 22:47:16Z nicolasmartin $
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -146,6 +146,11 @@ CONTAINS
       CALL dom_vvl_interpol( e3u_b(:,:,:), e3uw_b(:,:,:), 'UW' )
       CALL dom_vvl_interpol( e3v_n(:,:,:), e3vw_n(:,:,:), 'VW' )  ! from V to UW
       CALL dom_vvl_interpol( e3v_b(:,:,:), e3vw_b(:,:,:), 'VW' )
+
+      ! We need to define e3[tuv]_a for AGRIF initialisation (should not be a problem for the restartability...)
+      e3t_a(:,:,:) = e3t_n(:,:,:)
+      e3u_a(:,:,:) = e3u_n(:,:,:)
+      e3v_a(:,:,:) = e3v_n(:,:,:)
       !
       !                    !==  depth of t and w-point  ==!   (set the isf depth as it is in the initial timestep)
       gdept_n(:,:,1) = 0.5_wp * e3w_n(:,:,1)       ! reference to the ocean surface (used for MLD and light penetration)
@@ -235,6 +240,24 @@ CONTAINS
                frq_rst_hdv( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  1.e0_wp / rdt
             ENDIF
          ENDIF
+      ENDIF
+      !
+      IF(lwxios) THEN
+! define variables in restart file when writing with XIOS
+         CALL iom_set_rstw_var_active('e3t_b')
+         CALL iom_set_rstw_var_active('e3t_n')
+         !                                           ! ----------------------- !
+         IF( ln_vvl_ztilde .OR. ln_vvl_layer ) THEN  ! z_tilde and layer cases !
+            !                                        ! ----------------------- !
+            CALL iom_set_rstw_var_active('tilde_e3t_b')
+            CALL iom_set_rstw_var_active('tilde_e3t_n')
+         END IF
+         !                                           ! -------------!    
+         IF( ln_vvl_ztilde ) THEN                    ! z_tilde case !
+            !                                        ! ------------ !
+            CALL iom_set_rstw_var_active('hdiv_lf')
+         ENDIF
+         !
       ENDIF
       !
    END SUBROUTINE dom_vvl_init
@@ -780,7 +803,7 @@ CONTAINS
          !                                   ! ===============
          IF( ln_rstart ) THEN                   !* Read the restart file
             CALL rst_read_open                  !  open the restart file if necessary
-            CALL iom_get( numror, jpdom_autoglo, 'sshn'   , sshn    )
+            CALL iom_get( numror, jpdom_autoglo, 'sshn'   , sshn, ldxios = lrxios    )
             !
             id1 = iom_varid( numror, 'e3t_b', ldstop = .FALSE. )
             id2 = iom_varid( numror, 'e3t_n', ldstop = .FALSE. )
@@ -791,8 +814,8 @@ CONTAINS
             !                             ! all cases !
             !                             ! --------- !
             IF( MIN( id1, id2 ) > 0 ) THEN       ! all required arrays exist
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:) )
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:) )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:), ldxios = lrxios )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:), ldxios = lrxios )
                ! needed to restart if land processor not computed 
                IF(lwp) write(numout,*) 'dom_vvl_rst : e3t_b and e3t_n found in restart files'
                WHERE ( tmask(:,:,:) == 0.0_wp ) 
@@ -806,14 +829,14 @@ CONTAINS
                IF(lwp) write(numout,*) 'dom_vvl_rst WARNING : e3t_n not found in restart files'
                IF(lwp) write(numout,*) 'e3t_n set equal to e3t_b.'
                IF(lwp) write(numout,*) 'neuler is forced to 0'
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:) )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:), ldxios = lrxios )
                e3t_n(:,:,:) = e3t_b(:,:,:)
                neuler = 0
             ELSE IF( id2 > 0 ) THEN
                IF(lwp) write(numout,*) 'dom_vvl_rst WARNING : e3t_b not found in restart files'
                IF(lwp) write(numout,*) 'e3t_b set equal to e3t_n.'
                IF(lwp) write(numout,*) 'neuler is forced to 0'
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:) )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:), ldxios = lrxios )
                e3t_b(:,:,:) = e3t_n(:,:,:)
                neuler = 0
             ELSE
@@ -838,8 +861,8 @@ CONTAINS
             ELSE                          ! z_tilde and layer cases !
                !                          ! ----------------------- !
                IF( MIN( id3, id4 ) > 0 ) THEN  ! all required arrays exist
-                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_b', tilde_e3t_b(:,:,:) )
-                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_n', tilde_e3t_n(:,:,:) )
+                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_b', tilde_e3t_b(:,:,:), ldxios = lrxios )
+                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_n', tilde_e3t_n(:,:,:), ldxios = lrxios )
                ELSE                            ! one at least array is missing
                   tilde_e3t_b(:,:,:) = 0.0_wp
                   tilde_e3t_n(:,:,:) = 0.0_wp
@@ -848,7 +871,7 @@ CONTAINS
                IF( ln_vvl_ztilde ) THEN   ! z_tilde case !
                   !                       ! ------------ !
                   IF( id5 > 0 ) THEN  ! required array exists
-                     CALL iom_get( numror, jpdom_autoglo, 'hdiv_lf', hdiv_lf(:,:,:) )
+                     CALL iom_get( numror, jpdom_autoglo, 'hdiv_lf', hdiv_lf(:,:,:), ldxios = lrxios )
                   ELSE                ! array is missing
                      hdiv_lf(:,:,:) = 0.0_wp
                   ENDIF
@@ -928,23 +951,25 @@ CONTAINS
       ELSEIF( TRIM(cdrw) == 'WRITE' ) THEN   ! Create restart file
          !                                   ! ===================
          IF(lwp) WRITE(numout,*) '---- dom_vvl_rst ----'
+         IF( lwxios ) CALL iom_swap(      cwxios_context          )
          !                                           ! --------- !
          !                                           ! all cases !
          !                                           ! --------- !
-         CALL iom_rstput( kt, nitrst, numrow, 'e3t_b', e3t_b(:,:,:) )
-         CALL iom_rstput( kt, nitrst, numrow, 'e3t_n', e3t_n(:,:,:) )
+         CALL iom_rstput( kt, nitrst, numrow, 'e3t_b', e3t_b(:,:,:), ldxios = lwxios )
+         CALL iom_rstput( kt, nitrst, numrow, 'e3t_n', e3t_n(:,:,:), ldxios = lwxios )
          !                                           ! ----------------------- !
          IF( ln_vvl_ztilde .OR. ln_vvl_layer ) THEN  ! z_tilde and layer cases !
             !                                        ! ----------------------- !
-            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_b', tilde_e3t_b(:,:,:) )
-            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_n', tilde_e3t_n(:,:,:) )
+            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_b', tilde_e3t_b(:,:,:), ldxios = lwxios)
+            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_n', tilde_e3t_n(:,:,:), ldxios = lwxios)
          END IF
          !                                           ! -------------!    
          IF( ln_vvl_ztilde ) THEN                    ! z_tilde case !
             !                                        ! ------------ !
-            CALL iom_rstput( kt, nitrst, numrow, 'hdiv_lf', hdiv_lf(:,:,:) )
+            CALL iom_rstput( kt, nitrst, numrow, 'hdiv_lf', hdiv_lf(:,:,:), ldxios = lwxios)
          ENDIF
          !
+         IF( lwxios ) CALL iom_swap(      cxios_context          )
       ENDIF
       !
    END SUBROUTINE dom_vvl_rst
