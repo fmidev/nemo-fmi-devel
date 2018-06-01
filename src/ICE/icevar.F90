@@ -105,6 +105,8 @@ CONTAINS
       !
       ato_i(:,:) = 1._wp - at_i(:,:)         ! open water fraction  
 
+      ! The following fields are calculated for diagnostics and outputs only
+      ! ==> Do not use them for other purposes
       IF( kn > 1 ) THEN
          !
          ALLOCATE( z1_at_i(jpi,jpj) , z1_vt_i(jpi,jpj) , z1_vt_s(jpi,jpj) )

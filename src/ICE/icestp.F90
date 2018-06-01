@@ -263,7 +263,7 @@ CONTAINS
          CALL ice_rst_read
       ENDIF
       CALL ice_var_glo2eqv
-      CALL ice_var_agg(2)
+      CALL ice_var_agg(1)
       !
       CALL ice_forcing_init            ! set ice-ocean and ice-atm. coupling parameters
       !
