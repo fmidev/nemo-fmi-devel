@@ -141,6 +141,9 @@ CONTAINS
          !                                                        ! add to qns the heat due to e-p
          qns(:,:) = qns(:,:) - emp(:,:) * sst_m(:,:) * rcp        ! mass flux is at SST
          !
+         qns(:,:) = qns(:,:) * tmask(:,:,1)
+         emp(:,:) = emp(:,:) * tmask(:,:,1)
+         !
          !                                                        ! module of wind stress and wind speed at T-point
          zcoef = 1. / ( zrhoa * zcdrag )
          DO jj = 2, jpjm1

@@ -491,7 +491,7 @@ CONTAINS
       ! -----------------------------
 
       ! zqla used as temporary array, for rho*U (common term of bulk formulae):
-      zqla(:,:) = zrhoa(:,:) * zU_zu(:,:)
+      zqla(:,:) = zrhoa(:,:) * zU_zu(:,:) * tmask(:,:,1)
 
       IF( ABS( rn_zu - rn_zqt) < 0.01_wp ) THEN
          !! q_air and t_air are given at 10m (wind reference height)
@@ -531,7 +531,8 @@ CONTAINS
          &     + ( sf(jp_prec)%fnow(:,:,1) - sf(jp_snow)%fnow(:,:,1) ) * rn_pfac  &   ! add liquid precip heat content at Tair
          &     * ( sf(jp_tair)%fnow(:,:,1) - rt0 ) * rcp                          &
          &     + sf(jp_snow)%fnow(:,:,1) * rn_pfac                                &   ! add solid  precip heat content at min(Tair,Tsnow)
-         &     * ( MIN( sf(jp_tair)%fnow(:,:,1), rt0_snow ) - rt0 ) * cpic * tmask(:,:,1)
+         &     * ( MIN( sf(jp_tair)%fnow(:,:,1), rt0_snow ) - rt0 ) * cpic
+      qns(:,:) = qns(:,:) * tmask(:,:,1)
       !
 #if defined key_si3
       qns_oce(:,:) = zqlw(:,:) - zqsb(:,:) - zqla(:,:)                                ! non solar without emp (only needed by SI3)
@@ -546,8 +547,8 @@ CONTAINS
          CALL iom_put( "qns_oce" ,   qns  )                 ! output downward non solar heat over the ocean
          CALL iom_put( "qsr_oce" ,   qsr  )                 ! output downward solar heat over the ocean
          CALL iom_put( "qt_oce"  ,   qns+qsr )              ! output total downward heat over the ocean
-         tprecip(:,:) = sf(jp_prec)%fnow(:,:,1) * rn_pfac   ! output total precipitation [kg/m2/s]
-         sprecip(:,:) = sf(jp_snow)%fnow(:,:,1) * rn_pfac   ! output solid precipitation [kg/m2/s]
+         tprecip(:,:) = sf(jp_prec)%fnow(:,:,1) * rn_pfac * tmask(:,:,1) ! output total precipitation [kg/m2/s]
+         sprecip(:,:) = sf(jp_snow)%fnow(:,:,1) * rn_pfac * tmask(:,:,1) ! output solid precipitation [kg/m2/s]
          CALL iom_put( 'snowpre', sprecip )                 ! Snow
          CALL iom_put( 'precip' , tprecip )                 ! Total precipitation
       ENDIF
@@ -896,8 +897,8 @@ CONTAINS
          !
       END DO
       !
-      tprecip(:,:) = sf(jp_prec)%fnow(:,:,1) * rn_pfac      ! total precipitation [kg/m2/s]
-      sprecip(:,:) = sf(jp_snow)%fnow(:,:,1) * rn_pfac      ! solid precipitation [kg/m2/s]
+      tprecip(:,:) = sf(jp_prec)%fnow(:,:,1) * rn_pfac * tmask(:,:,1)  ! total precipitation [kg/m2/s]
+      sprecip(:,:) = sf(jp_snow)%fnow(:,:,1) * rn_pfac * tmask(:,:,1)  ! solid precipitation [kg/m2/s]
       CALL iom_put( 'snowpre', sprecip )                    ! Snow precipitation
       CALL iom_put( 'precip' , tprecip )                    ! Total precipitation
 

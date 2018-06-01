@@ -117,7 +117,7 @@ CONTAINS
       !
       IF( MOD( kt - 1, nn_fsbc ) == 0 ) THEN
          !
-         IF( .NOT. l_rnfcpl )   rnf(:,:) = rn_rfact * ( sf_rnf(1)%fnow(:,:,1) )       ! updated runoff value at time step kt
+         IF( .NOT. l_rnfcpl )   rnf(:,:) = rn_rfact * ( sf_rnf(1)%fnow(:,:,1) ) * tmask(:,:,1)       ! updated runoff value at time step kt
          !
          !                                                           ! set temperature & salinity content of runoffs
          IF( ln_rnf_tem ) THEN                                       ! use runoffs temperature data

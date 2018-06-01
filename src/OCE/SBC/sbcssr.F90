@@ -91,7 +91,7 @@ CONTAINS
             IF( nn_sstr == 1 ) THEN                                   !* Temperature restoring term
                DO jj = 1, jpj
                   DO ji = 1, jpi
-                     zqrp = rn_dqdt * ( sst_m(ji,jj) - sf_sst(1)%fnow(ji,jj,1) )
+                     zqrp = rn_dqdt * ( sst_m(ji,jj) - sf_sst(1)%fnow(ji,jj,1) ) * tmask(ji,jj,1)
                      qns(ji,jj) = qns(ji,jj) + zqrp
                      qrp(ji,jj) = zqrp
                   END DO
@@ -104,7 +104,7 @@ CONTAINS
                DO jj = 1, jpj
                   DO ji = 1, jpi
                      zerp = zsrp * ( 1. - 2.*rnfmsk(ji,jj) )   &      ! No damping in vicinity of river mouths
-                        &        * ( sss_m(ji,jj) - sf_sss(1)%fnow(ji,jj,1) ) 
+                        &        * ( sss_m(ji,jj) - sf_sss(1)%fnow(ji,jj,1) ) * tmask(ji,jj,1)
                      sfx(ji,jj) = sfx(ji,jj) + zerp                 ! salt flux
                      erp(ji,jj) = zerp / MAX( sss_m(ji,jj), 1.e-20 ) ! converted into an equivalent volume flux (diagnostic only)
                   END DO
@@ -118,7 +118,7 @@ CONTAINS
                   DO ji = 1, jpi                            
                      zerp = zsrp * ( 1. - 2.*rnfmsk(ji,jj) )   &      ! No damping in vicinity of river mouths
                         &        * ( sss_m(ji,jj) - sf_sss(1)%fnow(ji,jj,1) )   &
-                        &        / MAX(  sss_m(ji,jj), 1.e-20   )
+                        &        / MAX(  sss_m(ji,jj), 1.e-20   ) * tmask(ji,jj,1)
                      IF( ln_sssr_bnd )   zerp = SIGN( 1., zerp ) * MIN( zerp_bnd, ABS(zerp) )
                      emp(ji,jj) = emp (ji,jj) + zerp
                      qns(ji,jj) = qns(ji,jj) - zerp * rcp * sst_m(ji,jj)
