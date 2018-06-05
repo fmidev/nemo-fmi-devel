@@ -202,7 +202,7 @@
                      ! Sea-ice :
    nn_ice      = 0         !  =0 no ice boundary condition    
       !                    !  =1 use observed ice-cover                 (  => fill namsbc_iif )
-      !                    !  =2 or 3 automatically for LIM3 or CICE    ("key_lim3" or "key_cice")
+      !                    !  =2 or 3 automatically for SI3 or CICE    ("key_si3" or "key_cice")
       !                    !          except in AGRIF zoom where it has to be specified
    ln_ice_embd = .false.   !  =T embedded sea-ice (pressure + mass and salt exchanges)
       !                    !  =F levitating ice (no pressure, mass and salt exchanges)
@@ -594,9 +594,9 @@
    cn_ice        =  'none'    !
    nn_ice_dta    =  0         !  = 0, bdy data are equal to the initial state
    !                          !  = 1, bdy data are read in 'bdydata   .nc' files
-   rn_ice_tem    = 270.       !  lim3 only: arbitrary temperature of incoming sea ice
-   rn_ice_sal    = 10.        !  lim3 only:      --   salinity           --
-   rn_ice_age    = 30.        !  lim3 only:      --   age                --
+   rn_ice_tem    = 270.       !  si3 only: arbitrary temperature of incoming sea ice
+   rn_ice_sal    = 10.        !  si3 only:      --   salinity           --
+   rn_ice_age    = 30.        !  si3 only:      --   age                --
    !
    ln_tra_dmp    =.false.     !  open boudaries conditions for tracers
    ln_dyn3d_dmp  =.false.     !  open boundary condition for baroclinic velocities

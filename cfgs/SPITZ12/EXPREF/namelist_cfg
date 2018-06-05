@@ -1,5 +1,5 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO SPITZ namelist : overwrite some defaults values defined in SHARED/namelist_ref
+!! NEMO/OPA Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !!                       SPITZ 1/12 configuration                     !!
 !!======================================================================
@@ -22,7 +22,6 @@
    cn_exp      =  "SPITZ"  !  experience name
    nn_it000    = 1         !  first time step
    nn_itend    = 100       !  last  time step (std 5475)
-   nn_date0    = 20020101  !  date at nit_0000 (format yyyymmdd) used if ln_rstart=F or (ln_rstart=T and nn_rstctl=0 or 1)
 /
 !-----------------------------------------------------------------------
 &namdom        !   time and space domain
@@ -79,7 +78,7 @@
    ln_flx      = .false.   !  flux formulation                          (T => fill namsbc_flx )
    ln_blk      = .true.    !  Bulk formulation                          (T => fill namsbc_blk )
                      ! Sea-ice :
-   nn_ice      = 2         !  LIM3
+   nn_ice      = 2         !  SI3
                      ! Misc. options of sbc :
    ln_traqsr   = .true.    !  Light penetration in the ocean            (T => fill namtra_qsr )
 /
@@ -189,9 +188,9 @@
    cn_ice        =  'frs'     !
    nn_ice_dta    =  1         !  = 0, bdy data are equal to the initial state
    !                          !  = 1, bdy data are read in 'bdydata   .nc' files
-   rn_ice_tem    = 267.       !  lim3 only: arbitrary temperature of incoming sea ice
-   rn_ice_sal    =   6.       !  lim3 only:      --   salinity           --
-   rn_ice_age    = 365.       !  lim3 only:      --   age                --
+   rn_ice_tem    = 267.       !  si3 only: arbitrary temperature of incoming sea ice
+   rn_ice_sal    =   6.       !  si3 only:      --   salinity           --
+   rn_ice_age    = 365.       !  si3 only:      --   age                --
    !
    nn_rimwidth   = 1          !  width of the relaxation zone
    ln_vol        = .false.    !  total volume correction (see nn_volctl parameter)
@@ -331,7 +330,7 @@
 &namdyn_spg    !   surface pressure gradient                            (default: NO selection)
 !-----------------------------------------------------------------------
    ln_dynspg_ts  = .true.  !  split-explicit free surface
-      ln_bt_fw      = .false.     ! Forward integration of barotropic Eqs.
+!!clem      ln_bt_fw      = .false.     ! Forward integration of barotropic Eqs.
 /
 !-----------------------------------------------------------------------
 &namdyn_ldf    !   lateral diffusion on momentum                        (default: NO selection)
