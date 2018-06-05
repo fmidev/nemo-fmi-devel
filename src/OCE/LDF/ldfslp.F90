@@ -457,7 +457,9 @@ CONTAINS
                      zdkt = 0._wp                                             ! 1st level gradient set to zero
                      zdks = 0._wp
                   ENDIF
-                  zdzrho_raw = ( - zalbet(ji,jj,jk) * zdkt + zbeta0*zdks ) / e3w_n(ji,jj,jk+kp)
+                  zdzrho_raw = ( - rab_b(ji,jj,jk+kp,jp_tem) * zdkt & 
+                             &   + rab_b(ji,jj,jk+kp,jp_sal) * zdks &
+                             & ) / e3w_n(ji,jj,jk+kp)  
                   zdzrho(ji,jj,jk,kp) = - MIN( - repsln , zdzrho_raw )    ! force zdzrho >= repsln
                  END DO
             END DO
@@ -585,9 +587,9 @@ CONTAINS
                         ztj_lim = zfactj * ztj_lim + ( 1._wp - zfactj ) * ztj_raw
                      ENDIF
                      !                                      ! switching triad scheme 
-                     zisw = (rn_sw_triad - 1._wp ) + rn_sw_triad    &
+                     zisw = (1._wp - rn_sw_triad ) + rn_sw_triad    &
                         &            * 2._wp * ABS( 0.5_wp - kp - ( 0.5_wp - ip ) * SIGN( 1._wp , zdxrho(ji+ip,jj,jk,1-ip) )  )
-                     zjsw = (rn_sw_triad - 1._wp ) + rn_sw_triad    &
+                     zjsw = (1._wp - rn_sw_triad ) + rn_sw_triad    &
                         &            * 2._wp * ABS( 0.5_wp - kp - ( 0.5_wp - jp ) * SIGN( 1._wp , zdyrho(ji,jj+jp,jk,1-jp) )  )
                      !
                      triadi(ji+ip,jj   ,jk,1-ip,kp) = zti_lim * zisw
