@@ -194,10 +194,11 @@ CONTAINS
       !
       IF( .NOT.ln_traldf_OFF ) THEN    !==  direction ==>> type of operator  ==!
          ioptio = 0
-         IF( ln_traldf_lev )   ioptio = ioptio + 1
-         IF( ln_traldf_hor )   ioptio = ioptio + 1
-         IF( ln_traldf_iso )   ioptio = ioptio + 1
-         IF( ioptio /=  1  )   CALL ctl_stop( 'tra_ldf_init: use ONE direction (level/hor/iso)' )
+         IF( ln_traldf_lev   )   ioptio = ioptio + 1
+         IF( ln_traldf_hor   )   ioptio = ioptio + 1
+         IF( ln_traldf_iso   )   ioptio = ioptio + 1
+         IF( ln_traldf_triad )   ioptio = ioptio + 1
+         IF( ioptio /=  1  )   CALL ctl_stop( 'tra_ldf_init: use ONE direction (level/hor/iso/triad)' )
          !
          !                                ! defined the type of lateral diffusion from ln_traldf_... logicals
          ierr = 0
