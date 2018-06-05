@@ -1,7 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  ORCA2 namelist : overwrite some defaults values defined in SHARED/namelist_ref
+!! NEMO/OPA  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!!                      ORCA2 - IC3 configuration                     !!
+!!             ORCA2 - ICE - PISCES configuration                     !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!

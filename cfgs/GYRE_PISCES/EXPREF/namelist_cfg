@@ -1,7 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  : GYRE Configuration namelist : overwrite reference namelist
+!! NEMO/OPA  Configuration namelist : overwrite reference namelist
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+!!                      GYRE PISCES configuration                     !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
@@ -46,7 +46,6 @@
    !
    rn_rdt      = 7200.     !  time step for the dynamics
 /
-
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
 !!                                                                    !!
@@ -79,7 +78,6 @@
    ln_qsr_2bd  = .true.    !  2 bands              light penetration
    nn_chldta   =      0    !  RGB : Chl data (=1) or cst value (=0)
 /
-
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
 !!                                                                    !!
@@ -96,7 +94,6 @@
 !-----------------------------------------------------------------------
    rn_shlat    =    0.     !  free slip
 /
-
 !!======================================================================
 !!                ***  Top/Bottom boundary condition  ***             !!
 !!                                                                    !!
@@ -112,7 +109,6 @@
 !-----------------------------------------------------------------------
    ln_non_lin = .true.     !  non-linear  drag: Cd = Cd0 |U|
 /
-
 !!======================================================================
 !!                        Tracer (T & S) namelists                    !!
 !!                                                                    !!
@@ -145,7 +141,6 @@
       rn_Ud        = 0.02           !  lateral diffusive velocity [m/s]
       rn_Ld        = 100.e+3        !  lateral diffusive length   [m]
 /
-
 !!======================================================================
 !!                      ***  Dynamics namelists  ***                  !!
 !!                                                                    !!
@@ -188,7 +183,6 @@
       rn_Uv      = 2.0              !  lateral viscous velocity [m/s] 
       rn_Lv      = 100.e+3          !  lateral viscous length   [m]
 /
-
 !!======================================================================
 !!                     vertical physics namelists                     !!
 !!                                                                    !!
@@ -218,7 +212,6 @@
 !-----------------------------------------------------------------------
    nn_etau     =   0       !  penetration of tke below the mixed layer (ML) due to internal & intertial waves
 /
-
 !!======================================================================
 !!                  ***  Diagnostics namelists  ***                   !!
 !!                                                                    !!
@@ -234,7 +227,7 @@
 !!   nam_dia25h   25h Mean Output                                       (default: OFF)
 !!   namnc4       netcdf4 chunking and compression settings             ("key_netcdf4")
 !!======================================================================
-
+!
 !!======================================================================
 !!                  ***  Miscellaneous namelists  ***                 !!
 !!                                                                    !!

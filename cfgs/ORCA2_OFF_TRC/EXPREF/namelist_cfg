@@ -1,21 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OCE :   Reference namelist_ref                                !!
+!! NEMO/OPA  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  :  1 - Domain & run manager (namrun, namcfg, namdom, namtsd, namcrs, namc1d, namc1d_uvd)
-!! namelists    2 - Surface boundary (namsbc, namsbc_flx, namsbc_blk, namsbc_cpl,
-!!                                    namsbc_sas, namtra_qsr, namsbc_rnf,
-!!                                    namsbc_isf, namsbc_iscpl, namsbc_apr, 
-!!                                    namsbc_ssr, namsbc_wave, namberg)
-!!              3 - lateral boundary (namlbc, namagrif, nambdy, nambdy_tide)
-!!              4 - top/bot boundary (namdrg, namdrg_top, namdrg_bot, nambbc, nambbl)
-!!              5 - Tracer           (nameos, namtra_adv, namtra_ldf, namtra_eiv, namtra_dmp)
-!!              6 - dynamics         (namdyn_adv, namdyn_vor, namdyn_hpg, namdyn_spg, namdyn_ldf)
-!!              7 - Vertical physics (namzdf, namzdf_ric, namzdf_tke, namzdf_gls, namzdf_iwm)
-!!              8 - diagnostics      (namnc4, namtrd, namspr, namflo, namhsb)
-!!              9 - Obs & Assim      (namobs, nam_asminc)
-!!             10 - miscellaneous    (nammpp, namctl, namsto)
-!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+!!               ORCA2 - OFF - TRC configuration                     !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
@@ -81,7 +67,6 @@
 &namc1d_uvd    !   data: U & V currents                                 ("key_c1d" default: OFF)
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
 !!                                                                    !!
@@ -161,7 +146,6 @@
 &namberg       !   iceberg parameters                                   (default: OFF)
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
 !!                                                                    !!
@@ -199,7 +183,6 @@
 &nambdy_tide   !  tidal forcing at open boundaries                      (default: OFF)
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!                ***  Top/Bottom boundary condition  ***             !!
 !!                                                                    !!
@@ -230,7 +213,6 @@
 &nambbl        !   bottom boundary layer scheme                         (default: OFF)
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!                        Tracer (T-S) namelists                      !!
 !!                                                                    !!
@@ -286,7 +268,6 @@
 &namtra_dmp    !   tracer: T & S newtonian damping                      (default: OFF)
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!                      ***  Dynamics namelists  ***                  !!
 !!                                                                    !!
@@ -349,7 +330,6 @@
    sn_ubl      = 'dyna_grid_U'           ,       120         , 'sobblcox'  ,  .true.   , .true. , 'yearly'  , ''               , ''       , ''
    sn_vbl      = 'dyna_grid_V'           ,       120         , 'sobblcoy'  ,  .true.   , .true. , 'yearly'  , ''               , ''       , ''
 /
-
 !!======================================================================
 !!                     vertical physics namelists                     !!
 !!                                                                    !!
@@ -385,7 +365,6 @@
 &namzdf_iwm    !    internal wave-driven mixing parameterization        (ln_zdfiwm =T)
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!                  ***  Diagnostics namelists  ***                   !!
 !!                                                                    !!
@@ -442,7 +421,6 @@
 &namnc4        !   netcdf4 chunking and compression settings            ("key_netcdf4")
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!               ***  Observation & Assimilation  ***                 !!
 !!                                                                    !!
@@ -458,7 +436,6 @@
 &nam_asminc    !   assimilation increments                              ('key_asminc')
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!                  ***  Miscellaneous namelists  ***                 !!
 !!                                                                    !!

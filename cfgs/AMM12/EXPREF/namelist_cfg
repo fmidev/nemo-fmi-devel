@@ -40,7 +40,6 @@
    ln_read_cfg = .true.   !  (=T) read the domain configuration file
       cn_domcfg = "AMM_R12_sco_domcfg" ! domain configuration filename
 /
-
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
 !!                                                                    !!
@@ -135,7 +134,6 @@
    !           !                         !  (if <0  months)  !   name    !   (logical) !  (T/F) ! 'monthly' !                  ! pairing  !    filename   !
    sn_apr      = 'amm12_mslp'            ,          1        ,'p_msl'    ,   .false.   , .false., 'daily'  ,    ''            ,    ''    ,      ''
 /
-
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
 !!                                                                    !!
@@ -207,7 +205,6 @@
 !-----------------------------------------------------------------------
    filtide      = 'bdydta/amm12_bdytide_'         !  file name root of tidal forcing files
 /
-
 !!======================================================================
 !!                ***  Top/Bottom boundary condition  ***             !!
 !!                                                                    !!
@@ -232,7 +229,6 @@
    rn_ke0     =  0.0e0    !  background kinetic energy  [m2/s2] (non-linear cases)
    rn_z0      =  0.003    !  roughness [m]  (ln_loglayer=T)
 /
-
 !!======================================================================
 !!                        Tracer (T & S) namelists                    !!
 !!                                                                    !!
@@ -266,7 +262,6 @@
       rn_Ud        = 0.01           !  lateral diffusive velocity [m/s] (nn_aht_ijk_t= 0, 10, 20, 30)
       rn_Ld        = 10.e+3         !  lateral diffusive length   [m]   (nn_aht_ijk_t= 0, 10)
 /
-
 !!======================================================================
 !!                      ***  Dynamics namelists  ***                  !!
 !!                                                                    !!
@@ -316,7 +311,6 @@
       rn_Uv      =  0.12            !  lateral viscous velocity [m/s]
       rn_Lv      = 10.e+3           !  lateral viscous length   [m]  
 /
-
 !!======================================================================
 !!                     vertical physics namelists                     !!
 !!                                                                    !!
@@ -344,7 +338,6 @@
    rn_charn    =  100000.  !  Charnock constant for wb induced roughness length
    nn_z0_met   = 1         !  Method for surface roughness computation (0/1/2)
 /
-
 !!======================================================================
 !!                  ***  Diagnostics namelists  ***                   !!
 !!                                                                    !!
@@ -371,7 +364,6 @@
 !-----------------------------------------------------------------------
    ln_dia25h  = .true.    ! Choose 25h mean output or not
 /
-
 !!======================================================================
 !!               ***  Observation & Assimilation  ***                 !!
 !!                                                                    !!

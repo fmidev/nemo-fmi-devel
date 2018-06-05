@@ -1,13 +1,19 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  SAS Configuration namelist : overwrite some defaults values defined in SHARED/namelist_ref
+!! NEMO/OPA  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+!!                ORCA2-ICE (with SAS) configuration                  !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
 !!   namrun       parameters of the run
 !!   namdom       space and time domain
 !!   namcfg       parameters of the configuration                       (default: user defined GYRE)
+!!   namwad       Wetting and drying                                    (default: OFF)
+!!   namtsd       data: temperature & salinity                          (default: OFF)
+!!   namcrs       coarsened grid (for outputs and/or TOP)               (ln_crs =T)
+!!   namc1d       1D configuration options                              ("key_c1d")
+!!   namc1d_dyndmp 1D newtonian damping applied on currents             ("key_c1d")
+!!   namc1d_uvd   1D data (currents)                                    ("key_c1d")
 !!======================================================================
 !
 !-----------------------------------------------------------------------
@@ -29,7 +35,6 @@
    ln_read_cfg = .true.    !  (=T) read the domain configuration file
       cn_domcfg = "ORCA_R2_zps_domcfg"    ! domain configuration filename
 /
-
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
 !!                                                                    !!
@@ -98,7 +103,6 @@
    sn_e3t      = 'sas_grid_T'            ,       120         , 'e3t_m'   ,   .true.    , .true. , 'yearly'  ,    ''            ,    ''    ,    ''
    sn_frq      = 'sas_grid_T'            ,       120         , 'frq_m'   ,   .true.    , .true. , 'yearly'  ,    ''            ,    ''    ,    ''
 /
-
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
 !!                                                                    !!
@@ -115,18 +119,85 @@
 !-----------------------------------------------------------------------
    rn_shlat    =    0.     !  free slip
 /
-
 !!======================================================================
-!!                        Tracer (T & S) namelists                    !!
+!!                ***  Top/Bottom boundary condition  ***             !!
 !!                                                                    !!
-!!                           SAS case : only EOS                      !!
+!!   namdrg        top/bottom drag coefficient                          (default: NO selection)
+!!   namdrg_top    top    friction                                      (ln_OFF=F & ln_isfcav=T)
+!!   namdrg_bot    bottom friction                                      (ln_OFF=F)
+!!   nambbc        bottom temperature boundary condition                (default: OFF)
+!!   nambbl        bottom boundary layer scheme                         (default: OFF)
+!!======================================================================
+!
+!!======================================================================
+!!                        Tracer (T-S) namelists                      !!
 !!                                                                    !!
-!!   nameos           equation of state                                 (default: NO selection)
+!!   nameos        equation of state                                    (default: NO selection)
+!!   namtra_adv    advection scheme                                     (default: NO selection)
+!!   namtra_ldf    lateral diffusion scheme                             (default: NO selection)
+!!   namtra_mle    mixed layer eddy param. (Fox-Kemper param.)          (default: OFF)
+!!   namtra_eiv    eddy induced velocity param.                         (default: OFF)
+!!   namtra_dmp    T & S newtonian damping                              (default: OFF)
+!!======================================================================
+!
 !-----------------------------------------------------------------------
 &nameos        !   ocean Equation Of Seawater                           (default: OFF)
 !-----------------------------------------------------------------------
    ln_teos10    = .true.         !  = Use TEOS-10 equation of state
 /
+!!======================================================================
+!!                      ***  Dynamics namelists  ***                  !!
+!!                                                                    !!
+!!   nam_vvl       vertical coordinate options                          (default: z-star)
+!!   namdyn_adv    formulation of the momentum advection                (default: NO selection)
+!!   namdyn_vor    advection scheme                                     (default: NO selection)
+!!   namdyn_hpg    hydrostatic pressure gradient                        (default: NO selection)
+!!   namdyn_spg    surface pressure gradient                            (default: NO selection)
+!!   namdyn_ldf    lateral diffusion scheme                             (default: NO selection)
+!!   namdta_dyn    offline TOP: dynamics read in files                  (OFF_SRC only)
+!!======================================================================
+!
+!!======================================================================
+!!                     vertical physics namelists                     !!
+!!                                                                    !!
+!!    namzdf        vertical physics manager                            (default: NO selection)
+!!    namzdf_ric    richardson number vertical mixing                   (ln_zdfric=T)
+!!    namzdf_tke    TKE vertical mixing                                 (ln_zdftke=T)
+!!    namzdf_gls    GLS vertical mixing                                 (ln_zdfgls=T)
+!!    namzdf_osm    OSM vertical diffusion                              (ln_zdfosm=T)
+!!    namzdf_iwm    tidal mixing parameterization                       (ln_zdfiwm=T)
+!!======================================================================
+!
+!!======================================================================
+!!                  ***  Diagnostics namelists  ***                   !!
+!!                                                                    !!
+!!   namtrd       dynamics and/or tracer trends                         (default: OFF)
+!!   namptr       Poleward Transport Diagnostics                        (default: OFF)
+!!   namhsb       Heat and salt budgets                                 (default: OFF)
+!!   namdiu       Cool skin and warm layer models                       (default: OFF)
+!!   namdiu       Cool skin and warm layer models                       (default: OFF)
+!!   namflo       float parameters                                      ("key_float")
+!!   nam_diaharm  Harmonic analysis of tidal constituents               ("key_diaharm")
+!!   namdct       transports through some sections                      ("key_diadct")
+!!   nam_diatmb   Top Middle Bottom Output                              (default: OFF)
+!!   nam_dia25h   25h Mean Output                                       (default: OFF)
+!!   namnc4       netcdf4 chunking and compression settings             ("key_netcdf4")
+!!======================================================================
+!
+!!======================================================================
+!!               ***  Observation & Assimilation  ***                 !!
+!!                                                                    !!
+!!   namobs       observation and model comparison                      (default: OFF)
+!!   nam_asminc   assimilation increments                               ('key_asminc')
+!!======================================================================
+!
+!!======================================================================
+!!                  ***  Miscellaneous namelists  ***                 !!
+!!                                                                    !!
+!!   nammpp            Massively Parallel Processing                    ("key_mpp_mpi")
+!!   namctl            Control prints                                   (default: OFF)
+!!   namsto            Stochastic parametrization of EOS                (default: OFF)
+!!======================================================================
 !
 !-----------------------------------------------------------------------
 &nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
