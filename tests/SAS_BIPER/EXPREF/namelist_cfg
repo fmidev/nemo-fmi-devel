@@ -1,5 +1,5 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  Configuration namelist : overwrite defaults values defined in SHARED/namelist_ref
+!! NEMO/OPA  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !!                    SAS BIPERIODIC configuration                    !!
 !!======================================================================
