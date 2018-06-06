@@ -76,7 +76,7 @@ CONTAINS
       !!                - call ice_thd_ent  for enthalpy remapping
       !!                - call ice_thd_sal  for ice desalination
       !!                - call ice_thd_temp to  retrieve temperature from ice enthalpy
-      !!                - call ice_thd_lam  for extra lateral ice melt if active virtual thickness distribution
+      !!                - call ice_thd_mono for extra lateral ice melt if active virtual thickness distribution
       !!                - call ice_thd_da   for lateral ice melt
       !!             - back to the geographic grid
       !!                - call ice_thd_rem  for remapping thickness distribution
@@ -223,9 +223,10 @@ CONTAINS
                               CALL ice_thd_1d2d( jl, 1 )            ! --- Move to 1D arrays --- !
             !                                                       ! --- & Change units of e_i, e_s from J/m2 to J/m3 --- !
             !
-            s_i_new   (1:npti) = 0._wp ; dh_s_tot (1:npti) = 0._wp  ! --- some init --- !  (important to have them here) 
-            dh_i_surf (1:npti) = 0._wp ; dh_i_bott(1:npti) = 0._wp
-            dh_snowice(1:npti) = 0._wp ; dh_i_sub (1:npti) = 0._wp ; dh_s_mlt(1:npti) = 0._wp
+            s_i_new   (1:npti) = 0._wp ; dh_s_tot(1:npti) = 0._wp  ! --- some init --- !  (important to have them here) 
+            dh_i_sum  (1:npti) = 0._wp ; dh_i_bom(1:npti) = 0._wp ; dh_i_itm  (1:npti) = 0._wp 
+            dh_i_sub  (1:npti) = 0._wp ; dh_i_bog(1:npti) = 0._wp
+            dh_snowice(1:npti) = 0._wp ; dh_s_mlt(1:npti) = 0._wp
             !
             IF( ln_icedH ) THEN                                     ! --- growing/melting --- !
                               CALL ice_thd_zdf                             ! Ice/Snow Temperature profile
@@ -238,13 +239,13 @@ CONTAINS
             !
                               CALL ice_thd_temp                     ! --- temperature update --- !
             !
-!!gm please create a new logical (l_thd_lam or a better explicit name) set one for all in icestp.F90 module
-!!gm        l_thd_lam = ln_icedH .AND. ( ( nn_virtual_itd == 1 .OR. nn_virtual_itd == 4 ) .AND. jpl == 1 )
+!!gm please create a new logical (l_thd_mono or a better explicit name) set one for all in icestp.F90 module
+!!gm        l_thd_mono = ln_icedH .AND. ( ( nn_virtual_itd == 1 .OR. nn_virtual_itd == 4 ) .AND. jpl == 1 )
 !!gm        by the way, the different options associated with nn_virtual_itd =1 to 4  are quite impossible to identify
 !!gm        more comment to add when ready the namelist, with an explicit print in the ocean.output
             IF( ln_icedH ) THEN
                IF ( ( nn_virtual_itd == 1 .OR. nn_virtual_itd == 3 ) .AND. jpl == 1 ) THEN
-                              CALL ice_thd_lam                      ! --- extra lateral melting if virtual_itd --- !
+                              CALL ice_thd_mono                      ! --- extra lateral melting if virtual_itd --- !
                END IF
             END IF
             !
@@ -306,9 +307,9 @@ CONTAINS
    END SUBROUTINE ice_thd_temp
 
 
-   SUBROUTINE ice_thd_lam
+   SUBROUTINE ice_thd_mono
       !!-----------------------------------------------------------------------
-      !!                   ***  ROUTINE ice_thd_lam *** 
+      !!                   ***  ROUTINE ice_thd_mono *** 
       !!                 
       !! ** Purpose :   Lateral melting in case virtual_itd
       !!                          ( dA = A/2h dh )
@@ -320,7 +321,7 @@ CONTAINS
       !!-----------------------------------------------------------------------
       !
       DO ji = 1, npti
-         zdh_mel = MIN( 0._wp, dh_i_surf(ji) + dh_i_bott(ji) + dh_snowice(ji) + dh_i_sub(ji) )
+         zdh_mel = MIN( 0._wp, dh_i_itm(ji) + dh_i_sum(ji) + dh_i_bom(ji) + dh_snowice(ji) + dh_i_sub(ji) )
          IF( zdh_mel < 0._wp .AND. a_i_1d(ji) > 0._wp )  THEN
             zvi          = a_i_1d(ji) * h_i_1d(ji)
             zvs          = a_i_1d(ji) * h_s_1d(ji)
@@ -337,7 +338,7 @@ CONTAINS
          END IF
       END DO
       !
-   END SUBROUTINE ice_thd_lam
+   END SUBROUTINE ice_thd_mono
 
 
    SUBROUTINE ice_thd_1d2d( kl, kn )

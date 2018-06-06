@@ -332,7 +332,7 @@ CONTAINS
                                                                       ! this should normally not happen, but sometimes, heat diffusion leads to this
                zfmdt          = - zdeltah(ji,jk) * rhoic              ! Mass flux x time step > 0
                          
-               dh_i_surf(ji)  = dh_i_surf(ji) + zdeltah(ji,jk)        ! Cumulate surface melt
+               dh_i_itm(ji)   = dh_i_itm(ji) + zdeltah(ji,jk)         ! Cumulate internal melting
                
                zfmdt          = - rhoic * zdeltah(ji,jk)              ! Recompute mass flux [kg/m2, >0]
 
@@ -356,7 +356,7 @@ CONTAINS
                
                zq_su(ji)      = MAX( 0._wp , zq_su(ji) - zdeltah(ji,jk) * rhoic * zdE ) ! update available heat
                
-               dh_i_surf(ji)  = dh_i_surf(ji) + zdeltah(ji,jk)        ! Cumulate surface melt
+               dh_i_sum(ji)   = dh_i_sum(ji) + zdeltah(ji,jk)         ! Cumulate surface melt
                
                zfmdt          = - rhoic * zdeltah(ji,jk)              ! Recompute mass flux [kg/m2, >0]
                
@@ -403,7 +403,7 @@ CONTAINS
       
       ! update ice thickness
       DO ji = 1, npti
-         h_i_1d(ji) =  MAX( 0._wp , h_i_1d(ji) + dh_i_surf(ji) + dh_i_sub(ji) )
+         h_i_1d(ji) =  MAX( 0._wp , h_i_1d(ji) + dh_i_sum(ji) + dh_i_itm(ji) + dh_i_sub(ji) )
       END DO
 
       ! remaining "potential" evap is sent to ocean
@@ -421,8 +421,8 @@ CONTAINS
 
       ! If salinity varies in time, an iterative procedure is required, because
       ! the involved quantities are inter-dependent.
-      ! Basal growth (dh_i_bott) depends upon new ice specific enthalpy (zEi),
-      ! which depends on forming ice salinity (s_i_new), which depends on dh/dt (dh_i_bott)
+      ! Basal growth (dh_i_bog) depends upon new ice specific enthalpy (zEi),
+      ! which depends on forming ice salinity (s_i_new), which depends on dh/dt (dh_i_bog)
       ! -> need for an iterative procedure, which converges quickly
 
       num_iter_max = 1
@@ -436,7 +436,7 @@ CONTAINS
                !--- zswi1  if dh/dt < 2.0e-8
                !--- zswi12 if 2.0e-8 < dh/dt < 3.6e-7 
                !--- zswi2  if dh/dt > 3.6e-7
-               zgrr     = MIN( 1.0e-3, MAX ( dh_i_bott(ji) * r1_rdtice , epsi10 ) )
+               zgrr     = MIN( 1.0e-3, MAX ( dh_i_bog(ji) * r1_rdtice , epsi10 ) )
                zswi2    = MAX( 0._wp , SIGN( 1._wp , zgrr - 3.6e-7 ) )
                zswi12   = MAX( 0._wp , SIGN( 1._wp , zgrr - 2.0e-8 ) ) * ( 1.0 - zswi2 )
                zswi1    = 1. - zswi2 * zswi12
@@ -456,22 +456,22 @@ CONTAINS
 
                zdE           = zEi - zEw                                                              ! Specific enthalpy difference (J/kg, <0)
 
-               dh_i_bott(ji) = rdt_ice * MAX( 0._wp , zf_tt(ji) / ( zdE * rhoic ) )
+               dh_i_bog(ji)  = rdt_ice * MAX( 0._wp , zf_tt(ji) / ( zdE * rhoic ) )
                
             END DO
             ! Contribution to Energy and Salt Fluxes                                    
-            zfmdt          = - rhoic * dh_i_bott(ji)                                                  ! Mass flux x time step (kg/m2, < 0)
+            zfmdt          = - rhoic * dh_i_bog(ji)                                                   ! Mass flux x time step (kg/m2, < 0)
             
             hfx_thd_1d(ji) = hfx_thd_1d(ji) + zfmdt * a_i_1d(ji) * zEw * r1_rdtice                           ! Heat flux to the ocean [W.m-2], >0
             hfx_bog_1d(ji) = hfx_bog_1d(ji) - zfmdt * a_i_1d(ji) * zdE * r1_rdtice                           ! Heat flux used in this process [W.m-2], <0
             
-            sfx_bog_1d(ji) = sfx_bog_1d(ji) - rhoic * a_i_1d(ji) * dh_i_bott(ji) * s_i_new(ji) * r1_rdtice   ! Salt flux, <0
+            sfx_bog_1d(ji) = sfx_bog_1d(ji) - rhoic * a_i_1d(ji) * dh_i_bog(ji) * s_i_new(ji) * r1_rdtice    ! Salt flux, <0
 
-            wfx_bog_1d(ji) = wfx_bog_1d(ji) - rhoic * a_i_1d(ji) * dh_i_bott(ji) * r1_rdtice                 ! Mass flux, <0
+            wfx_bog_1d(ji) = wfx_bog_1d(ji) - rhoic * a_i_1d(ji) * dh_i_bog(ji) * r1_rdtice                  ! Mass flux, <0
 
             ! update heat content (J.m-2) and layer thickness
-            eh_i_old(ji,nlay_i+1) = eh_i_old(ji,nlay_i+1) + dh_i_bott(ji) * (-zEi * rhoic)
-            h_i_old (ji,nlay_i+1) = h_i_old (ji,nlay_i+1) + dh_i_bott(ji)
+            eh_i_old(ji,nlay_i+1) = eh_i_old(ji,nlay_i+1) + dh_i_bog(ji) * (-zEi * rhoic)
+            h_i_old (ji,nlay_i+1) = h_i_old (ji,nlay_i+1) + dh_i_bog(ji)
 
          ENDIF
 
@@ -494,7 +494,7 @@ CONTAINS
                   zdeltah   (ji,jk) = MIN( 0._wp , - zh_i(ji,jk) )  ! internal melting occurs when the internal temperature is above freezing     
                                                                     ! this should normally not happen, but sometimes, heat diffusion leads to this
 
-                  dh_i_bott (ji)    = dh_i_bott(ji) + zdeltah(ji,jk)
+                  dh_i_itm (ji)     = dh_i_itm(ji) + zdeltah(ji,jk)
 
                   zfmdt             = - zdeltah(ji,jk) * rhoic      ! Mass flux x time step > 0
 
@@ -522,7 +522,7 @@ CONTAINS
                   
                   zq_bo(ji)       = MAX( 0._wp , zq_bo(ji) - zdeltah(ji,jk) * rhoic * zdE )   ! update available heat. MAX is necessary for roundup errors
 
-                  dh_i_bott(ji)   = dh_i_bott(ji) + zdeltah(ji,jk)                            ! Update basal melt
+                  dh_i_bom(ji)    = dh_i_bom(ji) + zdeltah(ji,jk)                            ! Update basal melt
 
                   zfmdt           = - zdeltah(ji,jk) * rhoic                                  ! Mass flux x time step > 0
 
@@ -548,7 +548,7 @@ CONTAINS
       ! Update temperature, energy
       ! --------------------------
       DO ji = 1, npti
-         h_i_1d(ji) = MAX( 0._wp , h_i_1d(ji) + dh_i_bott(ji) )
+         h_i_1d(ji) = MAX( 0._wp , h_i_1d(ji) + dh_i_bog(ji) + dh_i_bom(ji) )
       END DO  
 
       ! If heat still available then melt more snow

@@ -156,7 +156,7 @@ CONTAINS
             v_ip_1d(ji) = h_ip_1d(ji) * a_ip_1d(ji)   ! record pond volume at previous time step
             !
             ! available meltwater for melt ponding [m, >0] and fraction
-            zdv_mlt = -( dh_i_surf(ji)*rhoic + dh_s_mlt(ji)*rhosn ) * z1_rhofw * a_i_1d(ji)
+            zdv_mlt = -( dh_i_sum(ji)*rhoic + dh_s_mlt(ji)*rhosn ) * z1_rhofw * a_i_1d(ji)
             zfr_mlt = zrmin + ( zrmax - zrmin ) * a_i_1d(ji)  ! from CICE doc
             !zfr_mlt = zrmin + zrmax * a_i_1d(ji)             ! from Holland paper 
             !

@@ -262,7 +262,7 @@ CONTAINS
       !                              ! hfxdhc = hfxbog + hfxbom + hfxsum + hfxopw + hfxdif + hfxsnw - ( hfxthd + hfxdyn + hfxres + hfxsub + hfxspr )
       IF( iom_use('hfxbog'     ) )   CALL iom_put ("hfxbog"     , hfx_bog             )   ! heat flux used for ice bottom growth 
       IF( iom_use('hfxbom'     ) )   CALL iom_put ("hfxbom"     , hfx_bom             )   ! heat flux used for ice bottom melt
-      IF( iom_use('hfxsum'     ) )   CALL iom_put ("hfxsum"     , hfx_sum             )   ! heat flux used for ice surface growth
+      IF( iom_use('hfxsum'     ) )   CALL iom_put ("hfxsum"     , hfx_sum             )   ! heat flux used for ice surface melt
       IF( iom_use('hfxopw'     ) )   CALL iom_put ("hfxopw"     , hfx_opw             )   ! heat flux used for ice formation in open water
       IF( iom_use('hfxdif'     ) )   CALL iom_put ("hfxdif"     , hfx_dif             )   ! heat flux used for ice temperature change
       IF( iom_use('hfxsnw'     ) )   CALL iom_put ("hfxsnw"     , hfx_snw             )   ! heat flux used for snow melt 

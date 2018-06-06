@@ -111,9 +111,11 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fc_su         !: Surface Conduction flux 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fc_bo_i       !: Bottom  Conduction flux 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_s_tot      !: Snow accretion/ablation        [m]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_surf     !: Ice surface accretion/ablation [m]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_sum      !: Ice surface ablation [m]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_itm      !: Ice internal ablation [m]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_bom      !: Ice bottom ablation  [m]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_bog      !: Ice bottom accretion  [m]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_sub      !: Ice surface sublimation [m]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_bott     !: Ice bottom accretion/ablation  [m]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_s_mlt      !: Snow melt [m]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_snowice    !: Snow ice formation             [m of ice]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   s_i_1d        !: Ice bulk salinity [ppt]
@@ -202,13 +204,13 @@ CONTAINS
          &      sfx_lam_1d    (jpij) , sfx_dyn_1d(jpij)  , STAT=ierr(ii) )
       !
       ii = ii + 1
-      ALLOCATE( t_su_1d  (jpij) , t_si_1d  (jpij) , a_i_1d    (jpij) , a_ib_1d(jpij) ,                  &
-         &      h_i_1d   (jpij) , h_ib_1d  (jpij) , h_s_1d    (jpij) , fc_su  (jpij) , fc_bo_i(jpij) ,  &    
-         &      dh_s_tot (jpij) , dh_i_surf(jpij) , dh_i_sub  (jpij) ,                                  &    
-         &      dh_i_bott(jpij) , dh_s_mlt (jpij) , dh_snowice(jpij) , s_i_1d (jpij) , s_i_new(jpij) ,  &
-         &      a_ip_1d  (jpij) , v_ip_1d  (jpij) , v_i_1d    (jpij) , v_s_1d (jpij) ,                  &
-         &      h_ip_1d  (jpij) , a_ip_frac_1d(jpij) ,                                                  &
-         &      sv_i_1d  (jpij) , oa_i_1d  (jpij) , STAT=ierr(ii) )
+      ALLOCATE( t_su_1d (jpij) , t_si_1d (jpij) , a_i_1d    (jpij) , a_ib_1d (jpij) ,                   &
+         &      h_i_1d  (jpij) , h_ib_1d (jpij) , h_s_1d    (jpij) , fc_su   (jpij) , fc_bo_i (jpij) ,  &    
+         &      dh_s_tot(jpij) , dh_i_sum(jpij) , dh_i_itm  (jpij) , dh_i_bom(jpij) , dh_i_bog(jpij) ,  &    
+         &      dh_i_sub(jpij) , dh_s_mlt(jpij) , dh_snowice(jpij) , s_i_1d  (jpij) , s_i_new (jpij) ,  &
+         &      a_ip_1d (jpij) , v_ip_1d (jpij) , v_i_1d    (jpij) , v_s_1d  (jpij) ,                   &
+         &      h_ip_1d (jpij) , a_ip_frac_1d(jpij) ,                                                   &
+         &      sv_i_1d (jpij) , oa_i_1d (jpij) , STAT=ierr(ii) )
       !
       ii = ii + 1
       ALLOCATE( t_s_1d  (jpij,nlay_s)     , t_i_1d (jpij,nlay_i)     , sz_i_1d(jpij,nlay_i) ,  &            
