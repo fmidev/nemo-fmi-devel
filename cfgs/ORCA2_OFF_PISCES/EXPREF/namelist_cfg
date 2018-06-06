@@ -1,7 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
+!! NEMO/OCE  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!!             ORCA2 - OFF - PISCES configuration                     !!
+!!               ORCA2 - OFF - TRC configuration                     !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
@@ -19,11 +19,11 @@
 !-----------------------------------------------------------------------
 &namrun        !   parameters of the run
 !-----------------------------------------------------------------------
-   cn_exp      =  "PISCES"   !  experience name
+   cn_exp      =  "TRACERS"  !  experience name
    nn_it000    =       1     !  first time step
-   nn_itend    =    1460     !  last  time step (std 5475)
-   nn_date0    =  010101     !  date at nit_0000 (format yyyymmdd) used if ln_rstart=F or (ln_rstart=T and nn_rstctl=0 or 1)
-   nn_stock    =    1460     !  frequency of creation of a restart file (modulo referenced to 1)
+   nn_itend    =    14600    !  last  time step (std 5475)
+   nn_date0    =  19600101   !  date at nit_0000 (format yyyymmdd) used if ln_rstart=F or (ln_rstart=T and nn_rstctl=0 or 1)
+   nn_stock    =    14600    !  frequency of creation of a restart file (modulo referenced to 1)
    ln_mskland  = .true.      !  mask land points in NetCDF outputs (costly: + ~15%)
    ln_cfmeta   = .true.      !  output additional data to netCDF files required for compliance with the CF metadata standard
    ln_clobber  = .true.      !  clobber (overwrite) an existing file
@@ -93,6 +93,7 @@
       !                    !  (control sea-ice & iceberg model call)
                      ! Type of air-sea fluxes 
    ln_usr      = .true.   !  user defined formulation                  (T => check usrdef_sbc)
+   ln_traqsr   = .true.    !  Light penetration in the ocean            (T => fill namtra_qsr)
 /
 !-----------------------------------------------------------------------
 &namsbc_flx    !   surface boundary condition : flux formulation        (ln_flx =T)
@@ -117,6 +118,7 @@
 !-----------------------------------------------------------------------
 &namtra_qsr    !   penetrative solar radiation                          (ln_traqsr =T)
 !-----------------------------------------------------------------------
+   rn_si0      =   0.35       !  RGB & 2BD: shortess depth of extinction
 /
 !-----------------------------------------------------------------------
 &namsbc_ssr    !   surface boundary condition : sea surface restoring   (ln_ssr =T)
@@ -421,7 +423,6 @@
 &namnc4        !   netcdf4 chunking and compression settings            ("key_netcdf4")
 !-----------------------------------------------------------------------
 /
-
 !!======================================================================
 !!               ***  Observation & Assimilation  ***                 !!
 !!                                                                    !!

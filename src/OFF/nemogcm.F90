@@ -29,6 +29,7 @@ MODULE nemogcm
    !              ! ocean physics
    USE ldftra         ! lateral diffusivity setting    (ldf_tra_init routine)
    USE ldfslp         ! slopes of neutral surfaces     (ldf_slp_init routine)
+   USE traqsr         ! solar radiation penetration    (tra_qsr_init routine)
    USE trabbl         ! bottom boundary layer          (tra_bbl_init routine)
    USE traldf         ! lateral physics                (tra_ldf_init routine)
    USE sbcmod         ! surface boundary condition     (sbc_init     routine)
@@ -279,6 +280,7 @@ CONTAINS
                            CALL ldf_eiv_init    ! Eddy induced velocity param
                            CALL tra_ldf_init    ! lateral mixing
       IF( l_ldfslp     )   CALL ldf_slp_init    ! slope of lateral mixing
+      IF( ln_traqsr    )   CALL tra_qsr_init    ! penetrative solar radiation
       IF( ln_trabbl    )   CALL tra_bbl_init    ! advective (and/or diffusive) bottom boundary layer scheme
 
       !                                      ! Passive tracers

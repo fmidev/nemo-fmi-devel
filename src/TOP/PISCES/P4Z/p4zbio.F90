@@ -98,12 +98,12 @@ CONTAINS
          CALL p5z_meso ( kt, knt )           ! mesozooplankton
       ENDIF
       !
-      CALL p4z_agg  ( kt, knt )     ! Aggregation of particles
+      CALL p4z_agg     ( kt, knt )     ! Aggregation of particles
       CALL p4z_rem     ( kt, knt )     ! remineralization terms of organic matter+scavenging of Fe
       CALL p4z_poc     ( kt, knt )     ! Remineralization of organic particles
-      IF( ln_ligand ) THEN
-        CALL p4z_ligand( kt, knt )
-      ENDIF
+      !
+      IF( ln_ligand )  &
+      & CALL p4z_ligand( kt, knt )
       !                                                             !
       IF(ln_ctl)   THEN  ! print mean trends (used for debugging)
          WRITE(charout, FMT="('bio ')")

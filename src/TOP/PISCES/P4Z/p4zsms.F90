@@ -281,6 +281,7 @@ CONTAINS
          IF( iom_varid( numrtr, 'PH', ldstop = .FALSE. ) > 0 ) THEN
             CALL iom_get( numrtr, jpdom_autoglo, 'PH' , hi(:,:,:)  )
          ELSE
+            CALL p4z_che                              ! initialize the chemical constants
             CALL ahini_for_at(hi)
          ENDIF
          CALL iom_get( numrtr, jpdom_autoglo, 'Silicalim', xksi(:,:) )
