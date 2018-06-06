@@ -445,9 +445,10 @@ SUBROUTINE agrif_declare_var
    CALL Agrif_Set_bc( ub2b_interp_id, (/0,ind1-1/) )
    CALL Agrif_Set_bc( vb2b_interp_id, (/0,ind1-1/) )
 
-   CALL Agrif_Set_bc(  e3t_id, (/-2*Agrif_irhox()-1,ind1-1/) )   ! if west and rhox=3 and ghost=1: column 2 to 9
-   CALL Agrif_Set_bc( umsk_id, (/0,ind1-1/)                  )
-   CALL Agrif_Set_bc( vmsk_id, (/0,ind1-1/)                  )
+   CALL Agrif_Set_bc(  e3t_id, (/-1*Agrif_irhox(),ind1-1/) )   ! if west and rhox=3 and ghost=1: column 2 to 6 
+   CALL Agrif_Set_bc( umsk_id, (/0,0/) )
+   CALL Agrif_Set_bc( vmsk_id, (/0,0/) )
+
 
    IF( ln_zdftke.OR.ln_zdfgls )   CALL Agrif_Set_bc( avm_id, (/0,ind1/) )
 

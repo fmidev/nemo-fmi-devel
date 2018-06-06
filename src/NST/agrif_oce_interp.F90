@@ -1236,17 +1236,23 @@ CONTAINS
                DO ji = i1, i2
                   !
                   IF( ABS( ptab(ji,jj,jk) - tmask(ji,jj,jk) * e3t_0(ji,jj,jk) ) > 1.D-2) THEN
-                     IF (western_side) THEN
+                     IF (western_side.AND.(ptab(i1+nbghostcells-1,jj,jk)>0._wp)) THEN
                         WRITE(numout,*) 'ERROR bathymetry merge at the western border ji,jj,jk ', ji+nimpp-1,jj+njmpp-1,jk
-                     ELSEIF (eastern_side) THEN
+                        WRITE(numout,*)  ptab(ji,jj,jk), e3t_0(ji,jj,jk) 
+                        kindic_agr = kindic_agr + 1
+                     ELSEIF (eastern_side.AND.(ptab(i2-nbghostcells+1,jj,jk)>0._wp)) THEN
                         WRITE(numout,*) 'ERROR bathymetry merge at the eastern border ji,jj,jk ', ji+nimpp-1,jj+njmpp-1,jk
-                     ELSEIF (southern_side) THEN
+                        WRITE(numout,*)  ptab(ji,jj,jk), e3t_0(ji,jj,jk)
+                        kindic_agr = kindic_agr + 1
+                     ELSEIF (southern_side.AND.(ptab(ji,j1+nbghostcells-1,jk)>0._wp)) THEN
                         WRITE(numout,*) 'ERROR bathymetry merge at the southern border ji,jj,jk', ji+nimpp-1,jj+njmpp-1,jk
-                     ELSEIF (northern_side) THEN
+                        WRITE(numout,*)  ptab(ji,jj,jk), e3t_0(ji,jj,jk)
+                        kindic_agr = kindic_agr + 1
+                     ELSEIF (northern_side.AND.(ptab(ji,j2-nbghostcells+1,jk)>0._wp)) THEN
                         WRITE(numout,*) 'ERROR bathymetry merge at the northen border ji,jj,jk', ji+nimpp-1,jj+njmpp-1,jk
+                        WRITE(numout,*)  ptab(ji,jj,jk), e3t_0(ji,jj,jk)
+                        kindic_agr = kindic_agr + 1
                      ENDIF
-                     WRITE(numout,*) '      ptab(ji,jj,jk), e3t(ji,jj,jk) ', ptab(ji,jj,jk), e3t_0(ji,jj,jk)
-                     kindic_agr = kindic_agr + 1
                   ENDIF
                END DO
             END DO
