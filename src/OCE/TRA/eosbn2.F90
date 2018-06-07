@@ -808,7 +808,7 @@ CONTAINS
       REAL(wp) ::   zn , zn0, zn1, zn2, zn3   !   -      -
       !!----------------------------------------------------------------------
       !
-      IF( ln_timing )   CALL timing_start('rab_2d')
+      IF( ln_timing )   CALL timing_start('rab_0d')
       !
       pab(:) = 0._wp
       !
@@ -884,7 +884,7 @@ CONTAINS
          !
       END SELECT
       !
-      IF( ln_timing )   CALL timing_stop('rab_2d')
+      IF( ln_timing )   CALL timing_stop('rab_0d')
       !
    END SUBROUTINE rab_0d
 
