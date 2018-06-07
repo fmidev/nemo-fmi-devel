@@ -21,6 +21,7 @@
 !-----------------------------------------------------------------------
    rn_dx       =    1000.   ! horizontal resolution in meters
    rn_dy       =    1000.   ! horizontal resolution in meters
+   rn_ppgphi0  =     70.    ! Reference latitude [degrees]
 /
 !-----------------------------------------------------------------------
 &namrun        !   parameters of the run

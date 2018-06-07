@@ -15,8 +15,8 @@ MODULE usrdef_hgr
    USE dom_oce         ! ocean space and time domain
    USE par_oce         ! ocean space and time domain
    USE phycst          ! physical constants
-   USE usrdef_nam, ONLY: rn_dx, rn_dy   ! horizontal resolution in meters
-   !
+   USE usrdef_nam, ONLY: rn_dx, rn_dy, rn_ppgphi0   ! horizontal resolution in meters
+   !                                                  and reference latitude
    USE in_out_manager  ! I/O manager
    USE lib_mpp         ! MPP library
    
@@ -63,8 +63,7 @@ CONTAINS
       !
       INTEGER  ::   ji, jj   ! dummy loop indices
       REAL(wp) ::   zphi0, zlam0, zbeta, zf0
-      REAL(wp) ::   zti, zui, zvi, zfi   ! local scalars
-      REAL(wp) ::   ztj, zuj, zvj, zfj   !   -      -
+      REAL(wp) ::   zti, zui, ztj, zvj   ! local scalars
       !!-------------------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
@@ -74,8 +73,6 @@ CONTAINS
       IF(lwp) WRITE(numout,*) '          the max is given by rn_dx and rn_dy' 
 
       !                          ==========
-!clem      zlam0 = 0._wp
-!clem      zphi0 = 0._wp
       zlam0 = -(jpiglo-1)/2 * 1.e-3 * rn_dx
       zphi0 = -(jpjglo-1)/2 * 1.e-3 * rn_dy
 
@@ -87,60 +84,58 @@ CONTAINS
             &  + ( Agrif_Ix() + nbghostcells - 1 ) * Agrif_irhox() * rn_dx * 1.e-3 - ( 0.5_wp + nbghostcells ) * rn_dx * 1.e-3
          zphi0 = ( 0.5_wp - ( Agrif_parent(jpjglo) - 1 ) / 2 ) * 1.e-3 * Agrif_irhoy() * rn_dy  &
             &  + ( Agrif_Iy() + nbghostcells - 1 ) * Agrif_irhoy() * rn_dy * 1.e-3 - ( 0.5_wp + nbghostcells ) * rn_dy * 1.e-3
-         rn_dx = Agrif_Parent(rn_dx)/Agrif_Rhox()
-         rn_dy = Agrif_Parent(rn_dy)/Agrif_Rhoy()          
       ENDIF
 #endif         
 
       DO jj = 1, jpj
          DO ji = 1, jpi
-            zti = FLOAT( ji - 1 + nimpp - 1 )         ;   ztj = FLOAT( jj - 1 + njmpp - 1 )
-            zui = FLOAT( ji - 1 + nimpp - 1 ) + 0.5   ;   zuj = FLOAT( jj - 1 + njmpp - 1 )
-            zvi = FLOAT( ji - 1 + nimpp - 1 )         ;   zvj = FLOAT( jj - 1 + njmpp - 1 ) + 0.5
-            zfi = FLOAT( ji - 1 + nimpp - 1 ) + 0.5   ;   zfj = FLOAT( jj - 1 + njmpp - 1 ) + 0.5
+            zti = FLOAT( ji - 1 + nimpp - 1 )          ;  ztj = FLOAT( jj - 1 + njmpp - 1 )
+            zui = FLOAT( ji - 1 + nimpp - 1 ) + 0.5_wp ;  zvj = FLOAT( jj - 1 + njmpp - 1 ) + 0.5_wp
 
-            plamt(ji,jj) = zlam0 + rn_dx * 1.e-5 * zti
-            plamu(ji,jj) = zlam0 + rn_dx * 1.e-5 * zui
-            plamv(ji,jj) = zlam0 + rn_dx * 1.e-5 * zvi
-            plamf(ji,jj) = zlam0 + rn_dx * 1.e-5 * zfi
+            plamt(ji,jj) = zlam0 + rn_dx * 1.e-3 * zti
+            plamu(ji,jj) = zlam0 + rn_dx * 1.e-3 * zui
+            plamv(ji,jj) = plamt(ji,jj) 
+            plamf(ji,jj) = plamu(ji,jj) 
    
-            pphit(ji,jj) = zphi0 + rn_dy * 1.e-5 * ztj
-            pphiu(ji,jj) = zphi0 + rn_dy * 1.e-5 * zuj
-            pphiv(ji,jj) = zphi0 + rn_dy * 1.e-5 * zvj
-            pphif(ji,jj) = zphi0 + rn_dy * 1.e-5 * zfj
+            pphit(ji,jj) = zphi0 + rn_dy * 1.e-3 * ztj
+            pphiv(ji,jj) = zphi0 + rn_dy * 1.e-3 * zvj
+            pphiu(ji,jj) = pphit(ji,jj) 
+            pphif(ji,jj) = pphiv(ji,jj) 
          END DO
       END DO
          
          ! Horizontal scale factors (in meters)
          !                              ======
 !! ==> EITHER 1) variable scale factors
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               !!pe1t(ji,jj) = rn_dx * EXP( -0.8/REAL(jpiglo**2) * (mi0(ji)-REAL(jpiglo+1)*0.5)**2 )  ! gaussian shape
-               !!pe2t(ji,jj) = rn_dy * EXP( -0.8/REAL(jpjglo**2) * (mj0(jj)-REAL(jpjglo+1)*0.5)**2 )  ! gaussian shape
-               pe1t(ji,jj) = rn_dx * ( 1. -0.1 * ABS(REAL(mi0(ji))-REAL(jpiglo+1)*0.5) / (1.-REAL(jpiglo+1)*0.5) ) ! linear shape
-               pe2t(ji,jj) = rn_dy * ( 1. -0.1 * ABS(REAL(mj0(jj))-REAL(jpjglo+1)*0.5) / (1.-REAL(jpjglo+1)*0.5) ) ! linear shape
-            END DO
-         END DO
-#if defined key_agrif 
-         IF( .NOT. Agrif_Root() ) THEN ! only works if the zoom is positioned at the center of the parent grid
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  pe1t(ji,jj) = rn_dx * ( 1. -0.1 * ABS(REAL(mi0(ji))-REAL(jpiglo+1)*0.5) / (1.-REAL(jpiglo+1)*0.5)  &
-                     &                            * REAL(jpiglo) / REAL(Agrif_Parent(jpiglo) * Agrif_Rhox()) )       ! factor to match parent grid
-                  pe2t(ji,jj) = rn_dy * ( 1. -0.1 * ABS(REAL(mj0(jj))-REAL(jpjglo+1)*0.5) / (1.-REAL(jpjglo+1)*0.5)  &
-                     &                            * REAL(jpjglo) / REAL(Agrif_Parent(jpjglo) * Agrif_Rhoy()) )       ! factor to match parent grid
-               END DO
-            END DO
-         ENDIF
-#endif
+!! clem: This can be used with a 1proc simulation but I think it breaks repro when >1procs are used      
+!!         DO jj = 1, jpj
+!!            DO ji = 1, jpi
+!!               !!pe1t(ji,jj) = rn_dx * EXP( -0.8/REAL(jpiglo**2) * (mi0(ji)-REAL(jpiglo+1)*0.5)**2 )  ! gaussian shape
+!!               !!pe2t(ji,jj) = rn_dy * EXP( -0.8/REAL(jpjglo**2) * (mj0(jj)-REAL(jpjglo+1)*0.5)**2 )  ! gaussian shape
+!!               pe1t(ji,jj) = rn_dx * ( 1. -0.1 * ABS(REAL(mi0(ji))-REAL(jpiglo+1)*0.5) / (1.-REAL(jpiglo+1)*0.5) ) ! linear shape
+!!               pe2t(ji,jj) = rn_dy * ( 1. -0.1 * ABS(REAL(mj0(jj))-REAL(jpjglo+1)*0.5) / (1.-REAL(jpjglo+1)*0.5) ) ! linear shape
+!!            END DO
+!!         END DO
+!!#if defined key_agrif 
+!!         IF( .NOT. Agrif_Root() ) THEN ! only works if the zoom is positioned at the center of the parent grid
+!!            DO jj = 1, jpj
+!!               DO ji = 1, jpi
+!!                  pe1t(ji,jj) = rn_dx * ( 1. -0.1 * ABS(REAL(mi0(ji))-REAL(jpiglo+1)*0.5) / (1.-REAL(jpiglo+1)*0.5)  &
+!!                     &                            * REAL(jpiglo) / REAL(Agrif_Parent(jpiglo) * Agrif_Rhox()) )       ! factor to match parent grid
+!!                  pe2t(ji,jj) = rn_dy * ( 1. -0.1 * ABS(REAL(mj0(jj))-REAL(jpjglo+1)*0.5) / (1.-REAL(jpjglo+1)*0.5)  &
+!!                     &                            * REAL(jpjglo) / REAL(Agrif_Parent(jpjglo) * Agrif_Rhoy()) )       ! factor to match parent grid
+!!               END DO
+!!            END DO
+!!         ENDIF
+!!#endif
 !! ==> OR 2) constant scale factors
-!!         pe1t(:,:) = rn_dx
-!!         pe2t(:,:) = rn_dy
+         pe1t(:,:) = rn_dx
+         pe2t(:,:) = rn_dy
+!! ==> END
          
-         pe1u(:,:) = pe1t(:,:)      ;      pe2u(:,:) = pe2t(:,:)
-         pe1v(:,:) = pe1t(:,:)      ;      pe2v(:,:) = pe2t(:,:)
-         pe1f(:,:) = pe1t(:,:)      ;      pe2f(:,:) = pe2t(:,:)
+      pe1u(:,:) = pe1t(:,:)      ;      pe2u(:,:) = pe2t(:,:)
+      pe1v(:,:) = pe1t(:,:)      ;      pe2v(:,:) = pe2t(:,:)
+      pe1f(:,:) = pe1t(:,:)      ;      pe2f(:,:) = pe2t(:,:)
 
       !                             ! NO reduction of grid size in some straits 
       ke1e2u_v = 0                  !    ==>> u_ & v_surfaces will be computed in dom_ghr routine
@@ -151,12 +146,10 @@ CONTAINS
       !                       !==  Coriolis parameter  ==!
       kff = 1                       !  indicate not to compute Coriolis parameter afterward
       !
-!!jerome      zbeta = 2._wp * omega * COS( rad * rn_ppgphi0 ) / ra
-!!      zf0   = 2._wp * omega * SIN( rad * rn_ppgphi0 )
-!!      pff_f(:,:) = zf0 + zbeta * pphif(:,:) * 1.e+3
-!!jerome      pff_t(:,:) = zf0 + zbeta * pphit(:,:) * 1.e+3
-      pff_f(:,:) = 0._wp            ! here No earth rotation: f=0
-      pff_t(:,:) = 0._wp
+      zbeta = 2._wp * omega * COS( rad * rn_ppgphi0 ) / ra
+      zf0   = 2._wp * omega * SIN( rad * rn_ppgphi0 )
+      pff_f(:,:) = zf0 + zbeta * pphif(:,:) * 1.e+3
+      pff_t(:,:) = zf0 + zbeta * pphit(:,:) * 1.e+3
       !
    END SUBROUTINE usr_def_hgr
 

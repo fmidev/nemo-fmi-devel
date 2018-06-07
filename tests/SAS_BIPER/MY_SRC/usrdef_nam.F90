@@ -14,7 +14,6 @@ MODULE usrdef_nam
    !!   usr_def_hgr   : initialize the horizontal mesh 
    !!----------------------------------------------------------------------
    USE dom_oce  , ONLY: nimpp , njmpp            ! i- & j-indices of the local domain
-   USE dom_oce  , ONLY: ln_zco, ln_zps, ln_sco   ! flag of type of coordinate
    USE par_oce        ! ocean space and time domain
    USE phycst         ! physical constants
    !
@@ -27,9 +26,10 @@ MODULE usrdef_nam
 
    PUBLIC   usr_def_nam   ! called by nemogcm.F90
 
-   !                              !!* namusr_def namelist *!!
-   REAL(wp), PUBLIC ::   rn_dx     ! resolution in meters defining the horizontal domain size
-   REAL(wp), PUBLIC ::   rn_dy     ! resolution in meters defining the horizontal domain size
+   !                               !!* namusr_def namelist *!!
+   REAL(wp), PUBLIC ::   rn_dx      ! resolution in meters defining the horizontal domain size
+   REAL(wp), PUBLIC ::   rn_dy      ! resolution in meters defining the horizontal domain size
+   REAL(wp), PUBLIC ::   rn_ppgphi0 ! reference latitude for beta-plane 
 
    !!----------------------------------------------------------------------
    !! NEMO/OPA 4.0 , NEMO Consortium (2016)
@@ -57,8 +57,9 @@ CONTAINS
       INTEGER                       , INTENT(out) ::   kperio          ! lateral global domain b.c. 
       !
       INTEGER ::   ios, ii   ! Local integer
+      REAL(wp)::   zlx, zly  ! Local scalars
       !!
-      NAMELIST/namusr_def/ ln_zco, rn_dx, rn_dy
+      NAMELIST/namusr_def/ ln_zco, rn_dx, rn_dy, rn_ppgphi0
       !!----------------------------------------------------------------------
       !
       ii = 1
@@ -66,6 +67,15 @@ CONTAINS
       REWIND( numnam_cfg )          ! Namelist namusr_def (exist in namelist_cfg only)
       READ  ( numnam_cfg, namusr_def, IOSTAT = ios, ERR = 902 )
 902   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namusr_def in configuration namelist', .TRUE. )
+      !
+#if defined key_agrif 
+      ! Domain parameters are taken from parent:
+      IF( .NOT. Agrif_Root() ) THEN
+         rn_dx = Agrif_Parent(rn_dx)/Agrif_Rhox()
+         rn_dy = Agrif_Parent(rn_dy)/Agrif_Rhoy()
+         rn_ppgphi0 = Agrif_Parent(rn_ppgphi0)
+      ENDIF
+#endif
       !
       WRITE( ldnam(:), namusr_def )
       !
@@ -83,18 +93,20 @@ CONTAINS
 #endif
       kpk = 1
       !
+!!      zlx = (kpi-2)*rn_dx*1.e-3
+!!      zly = (kpj-2)*rn_dy*1.e-3
+      zlx = kpi*rn_dx*1.e-3
+      zly = kpj*rn_dy*1.e-3
       !                             ! control print
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) 'usr_def_nam  : read the user defined namelist (namusr_def) in namelist_cfg'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '~~~~~~~~~~~ '                                                                 ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '   Namelist namusr_def : SAS_BIPER test case'                                 ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      type of vertical coordinate : '                                         ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '         z-coordinate flag                     ln_zco = ', ln_zco             ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '         z-partial-step coordinate flag        ln_zps = ', ln_zps             ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '         s-coordinate flag                     ln_sco = ', ln_sco             ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dx  = ', rn_dx, ' meters'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dy  = ', rn_dy, ' meters'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      SAS_BIPER domain = 300 km x 300Km x 1 grid-point '                      ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '         LX [km]: ', zlx                                                      ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '         LY [km]: ', zly                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         resulting global domain size :        jpiglo = ', kpi                ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '                                               jpjglo = ', kpj                ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '                                               jpkglo = ', kpk                ;   ii = ii + 1
