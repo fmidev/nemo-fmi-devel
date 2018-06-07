@@ -711,7 +711,9 @@ CONTAINS
          ptab_child(i1:i2,j1:j2,1:jpk,1:jpts) = ptab(i1:i2,j1:j2,1:jpk,1:jpts)
 # endif
          !
-         tsa(i1:i2,j1:j2,1:jpk,1:jpts) = ptab_child(i1:i2,j1:j2,1:jpk,1:jpts)
+         DO jn=1, jpts
+            tsa(i1:i2,j1:j2,1:jpk,jn)=ptab_child(i1:i2,j1:j2,1:jpk,jn)*tmask(i1:i2,j1:j2,1:jpk) 
+         END DO
 
          IF ( .NOT.lk_agrif_clp ) THEN 
             !
