@@ -300,7 +300,7 @@ CONTAINS
       REAL(wp) :: h_in(k1:k2)
       REAL(wp) :: h_out(1:jpk)
       INTEGER  :: N_in, N_out
-      REAL(wp) :: h_diff
+      REAL(wp) :: zrho_xy, h_diff
       REAL(wp) :: tabin(k1:k2,n1:n2)
       !!---------------------------------------------
       !
