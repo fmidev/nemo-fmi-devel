@@ -21,8 +21,8 @@
 !-----------------------------------------------------------------------
    cn_exp      =  "ORCA2"  !  experience name
    nn_it000    =       1   !  first time step
-   nn_itend    =      10   !  last  time step (std 5475)
-   nn_istate   =       1   !  output the initial state (1) or not (0)
+   nn_itend    =      75   !  last  time step (std 5475)
+   nn_istate   =       0   !  output the initial state (1) or not (0)
 /
 !-----------------------------------------------------------------------
 &namdom        !   time and space domain
