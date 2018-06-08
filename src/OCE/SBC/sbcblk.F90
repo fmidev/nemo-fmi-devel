@@ -718,33 +718,16 @@ CONTAINS
       ! ------------------------------------------------------------ !
       !    Wind module relative to the moving ice ( U10m - U_ice )   !
       ! ------------------------------------------------------------ !
-      SELECT CASE( cp_ice_msh )
-      CASE( 'I' )                  ! B-grid ice dynamics :   I-point (i.e. F-point with sea-ice indexation)
-         !                           and scalar wind at T-point ( = | U10m - U_ice | ) (masked)
-         DO jj = 2, jpjm1
-            DO ji = 2, jpim1   ! B grid : NO vector opt
-               ! ... scalar wind at T-point (fld being at T-point)
-               zwndi_t = sf(jp_wndi)%fnow(ji,jj,1) - rn_vfac * 0.25 * (  u_ice(ji,jj+1) + u_ice(ji+1,jj+1)   &
-                  &                                                    + u_ice(ji,jj  ) + u_ice(ji+1,jj  )  )
-               zwndj_t = sf(jp_wndj)%fnow(ji,jj,1) - rn_vfac * 0.25 * (  v_ice(ji,jj+1) + v_ice(ji+1,jj+1)   &
-                  &                                                    + v_ice(ji,jj  ) + v_ice(ji+1,jj  )  )
-               wndm_ice(ji,jj) = SQRT( zwndi_t * zwndi_t + zwndj_t * zwndj_t ) * tmask(ji,jj,1)
-            END DO
+      ! C-grid ice dynamics :   U & V-points (same as ocean)
+      DO jj = 2, jpjm1
+         DO ji = fs_2, fs_jpim1   ! vect. opt.
+            zwndi_t = (  sf(jp_wndi)%fnow(ji,jj,1) - rn_vfac * 0.5 * ( u_ice(ji-1,jj  ) + u_ice(ji,jj) )  )
+            zwndj_t = (  sf(jp_wndj)%fnow(ji,jj,1) - rn_vfac * 0.5 * ( v_ice(ji  ,jj-1) + v_ice(ji,jj) )  )
+            wndm_ice(ji,jj) = SQRT( zwndi_t * zwndi_t + zwndj_t * zwndj_t ) * tmask(ji,jj,1)
          END DO
-         CALL lbc_lnk( wndm_ice, 'T',  1. )
-         !
-      CASE( 'C' )                  ! C-grid ice dynamics :   U & V-points (same as ocean)
-         DO jj = 2, jpjm1
-            DO ji = fs_2, fs_jpim1   ! vect. opt.
-               zwndi_t = (  sf(jp_wndi)%fnow(ji,jj,1) - rn_vfac * 0.5 * ( u_ice(ji-1,jj  ) + u_ice(ji,jj) )  )
-               zwndj_t = (  sf(jp_wndj)%fnow(ji,jj,1) - rn_vfac * 0.5 * ( v_ice(ji  ,jj-1) + v_ice(ji,jj) )  )
-               wndm_ice(ji,jj) = SQRT( zwndi_t * zwndi_t + zwndj_t * zwndj_t ) * tmask(ji,jj,1)
-            END DO
-         END DO
-         CALL lbc_lnk( wndm_ice, 'T',  1. )
-         !
-      END SELECT
-
+      END DO
+      CALL lbc_lnk( wndm_ice, 'T',  1. )
+      !
       ! Make ice-atm. drag dependent on ice concentration
       IF    ( ln_Cd_L12 ) THEN   ! calculate new drag from Lupkes(2012) equations
          CALL Cdn10_Lupkes2012( Cd_atm )
@@ -768,35 +751,17 @@ CONTAINS
       ! ------------------------------------------------------------ !
       !    Wind stress relative to the moving ice ( U10m - U_ice )   !
       ! ------------------------------------------------------------ !
-      SELECT CASE( cp_ice_msh )
-      CASE( 'I' )                  ! B-grid ice dynamics :   I-point (i.e. F-point with sea-ice indexation)
-         DO jj = 2, jpjm1
-            DO ji = 2, jpim1   ! B grid : NO vector opt
-               ! ... scalar wind at I-point (fld being at T-point)
-               zwndi_f = 0.25 * (  sf(jp_wndi)%fnow(ji-1,jj  ,1) + sf(jp_wndi)%fnow(ji  ,jj  ,1)   &
-                  &              + sf(jp_wndi)%fnow(ji-1,jj-1,1) + sf(jp_wndi)%fnow(ji  ,jj-1,1)  ) - rn_vfac * u_ice(ji,jj)
-               zwndj_f = 0.25 * (  sf(jp_wndj)%fnow(ji-1,jj  ,1) + sf(jp_wndj)%fnow(ji  ,jj  ,1)   &
-                  &              + sf(jp_wndj)%fnow(ji-1,jj-1,1) + sf(jp_wndj)%fnow(ji  ,jj-1,1)  ) - rn_vfac * v_ice(ji,jj)
-               ! ... ice stress at I-point
-               zwnorm_f = zrhoa(ji,jj) * Cd_atm(ji,jj) * SQRT( zwndi_f * zwndi_f + zwndj_f * zwndj_f )
-               utau_ice(ji,jj) = zwnorm_f * zwndi_f
-               vtau_ice(ji,jj) = zwnorm_f * zwndj_f
-            END DO
+      ! C-grid ice dynamics :   U & V-points (same as ocean)
+      DO jj = 2, jpjm1
+         DO ji = fs_2, fs_jpim1   ! vect. opt.
+            utau_ice(ji,jj) = 0.5 * zrhoa(ji,jj) * Cd_atm(ji,jj) * ( wndm_ice(ji+1,jj  ) + wndm_ice(ji,jj) )            &
+               &          * ( 0.5 * (sf(jp_wndi)%fnow(ji+1,jj,1) + sf(jp_wndi)%fnow(ji,jj,1) ) - rn_vfac * u_ice(ji,jj) )
+            vtau_ice(ji,jj) = 0.5 * zrhoa(ji,jj) * Cd_atm(ji,jj) * ( wndm_ice(ji,jj+1  ) + wndm_ice(ji,jj) )            &
+               &          * ( 0.5 * (sf(jp_wndj)%fnow(ji,jj+1,1) + sf(jp_wndj)%fnow(ji,jj,1) ) - rn_vfac * v_ice(ji,jj) )
          END DO
-         CALL lbc_lnk_multi( utau_ice, 'I', -1., vtau_ice, 'I', -1. )
-         !
-      CASE( 'C' )                  ! C-grid ice dynamics :   U & V-points (same as ocean)
-         DO jj = 2, jpjm1
-            DO ji = fs_2, fs_jpim1   ! vect. opt.
-               utau_ice(ji,jj) = 0.5 * zrhoa(ji,jj) * Cd_atm(ji,jj) * ( wndm_ice(ji+1,jj  ) + wndm_ice(ji,jj) )            &
-                  &          * ( 0.5 * (sf(jp_wndi)%fnow(ji+1,jj,1) + sf(jp_wndi)%fnow(ji,jj,1) ) - rn_vfac * u_ice(ji,jj) )
-               vtau_ice(ji,jj) = 0.5 * zrhoa(ji,jj) * Cd_atm(ji,jj) * ( wndm_ice(ji,jj+1  ) + wndm_ice(ji,jj) )            &
-                  &          * ( 0.5 * (sf(jp_wndj)%fnow(ji,jj+1,1) + sf(jp_wndj)%fnow(ji,jj,1) ) - rn_vfac * v_ice(ji,jj) )
-            END DO
-         END DO
-         CALL lbc_lnk_multi( utau_ice, 'U', -1., vtau_ice, 'V', -1. )
-         !
-      END SELECT
+      END DO
+      CALL lbc_lnk_multi( utau_ice, 'U', -1., vtau_ice, 'V', -1. )
+      !
       !
       IF(ln_ctl) THEN
          CALL prt_ctl(tab2d_1=utau_ice  , clinfo1=' blk_ice: utau_ice : ', tab2d_2=vtau_ice  , clinfo2=' vtau_ice : ')

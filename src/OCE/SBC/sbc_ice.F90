@@ -32,12 +32,10 @@ MODULE sbc_ice
 # if defined  key_si3
    LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .TRUE.   !: SI3 ice model
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE 
-   CHARACTER(len=1), PUBLIC, PARAMETER ::   cp_ice_msh = 'C'      !: 'C'-grid ice-velocity
 # endif
 # if defined  key_cice
    LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no SI3
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .TRUE.   !: CICE ice model
-   CHARACTER(len=1), PUBLIC            ::   cp_ice_msh = 'F'      !: 'F'-grid ice-velocity
 # endif
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qns_ice        !: non solar heat flux over ice                  [W/m2]
@@ -169,7 +167,6 @@ CONTAINS
 
    LOGICAL         , PUBLIC, PARAMETER ::   lk_si3     = .FALSE.  !: no SI3 ice model
    LOGICAL         , PUBLIC, PARAMETER ::   lk_cice    = .FALSE.  !: no CICE ice model
-   CHARACTER(len=1), PUBLIC, PARAMETER ::   cp_ice_msh = '-'      !: no grid ice-velocity
    REAL(wp)        , PUBLIC, PARAMETER ::   cldf_ice = 0.81       !: cloud fraction over sea ice, summer CLIO value   [-]
    INTEGER         , PUBLIC, PARAMETER ::   jpl = 1 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   u_ice, v_ice                        ! jpi, jpj

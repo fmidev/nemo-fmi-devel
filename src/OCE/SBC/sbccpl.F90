@@ -1455,9 +1455,8 @@ CONTAINS
       !!
       !! ** Method  :   transform the received stress from the atmosphere into
       !!             an atmosphere-ice stress in the (i,j) ocean referencial
-      !!             and at the velocity point of the sea-ice model (cp_ice_msh):
+      !!             and at the velocity point of the sea-ice model:
       !!                'C'-grid : i- (j-) components given at U- (V-) point 
-      !!                'I'-grid : B-grid lower-left corner: both components given at I-point 
       !!
       !!                The received stress are :
       !!                 - defined by 3 components (if cartesian coordinate)
@@ -1470,15 +1469,14 @@ CONTAINS
       !!             processed in order to obtain them 
       !!                 first  as  2 components on the sphere 
       !!                 second as  2 components oriented along the local grid
-      !!                 third  as  2 components on the cp_ice_msh point 
+      !!                 third  as  2 components on the ice grid point 
       !!
       !!                Except in 'oce and ice' case, only one vector stress field 
       !!             is received. It has already been processed in sbc_cpl_rcv
       !!             so that it is now defined as (i,j) components given at U-
-      !!             and V-points, respectively. Therefore, only the third
-      !!             transformation is done and only if the ice-grid is a 'I'-grid. 
+      !!             and V-points, respectively.  
       !!
-      !! ** Action  :   return ptau_i, ptau_j, the stress over the ice at cp_ice_msh point
+      !! ** Action  :   return ptau_i, ptau_j, the stress over the ice
       !!----------------------------------------------------------------------
       REAL(wp), INTENT(out), DIMENSION(:,:) ::   p_taui   ! i- & j-components of atmos-ice stress [N/m2]
       REAL(wp), INTENT(out), DIMENSION(:,:) ::   p_tauj   ! at I-point (B-grid) or U & V-point (C-grid)
@@ -1537,113 +1535,43 @@ CONTAINS
          !                                                      ! ======================= !
          !    
          !                                                  j+1   j     -----V---F
-         ! ice stress on ice velocity point (cp_ice_msh)                 !       |
-         ! (C-grid ==>(U,V) or B-grid ==> I or F)                 j      |   T   U
+         ! ice stress on ice velocity point                              !       |
+         ! (C-grid ==>(U,V))                                      j      |   T   U
          !                                                               |       |
          !                                                   j    j-1   -I-------|
          !                                               (for I)         |       |
          !                                                              i-1  i   i
          !                                                               i      i+1 (for I)
-         SELECT CASE ( cp_ice_msh )
-            !
-         CASE( 'I' )                                         ! B-grid ==> I
-            SELECT CASE ( srcv(jpr_itx1)%clgrid )
-            CASE( 'U' )
-               DO jj = 2, jpjm1                                   ! (U,V) ==> I
-                  DO ji = 2, jpim1   ! NO vector opt.
-                     p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji-1,jj  ,1) + frcv(jpr_itx1)%z3(ji-1,jj-1,1) )
-                     p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji  ,jj-1,1) + frcv(jpr_ity1)%z3(ji-1,jj-1,1) )
-                  END DO
+         SELECT CASE ( srcv(jpr_itx1)%clgrid )
+         CASE( 'U' )
+            p_taui(:,:) = frcv(jpr_itx1)%z3(:,:,1)                   ! (U,V) ==> (U,V)
+            p_tauj(:,:) = frcv(jpr_ity1)%z3(:,:,1)
+         CASE( 'F' )
+            DO jj = 2, jpjm1                                   ! F ==> (U,V)
+               DO ji = fs_2, fs_jpim1   ! vector opt.
+                  p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji,jj,1) + frcv(jpr_itx1)%z3(ji  ,jj-1,1) )
+                  p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji,jj,1) + frcv(jpr_ity1)%z3(ji-1,jj  ,1) )
                END DO
-            CASE( 'F' )
-               DO jj = 2, jpjm1                                   ! F ==> I
-                  DO ji = 2, jpim1   ! NO vector opt.
-                     p_taui(ji,jj) = frcv(jpr_itx1)%z3(ji-1,jj-1,1)
-                     p_tauj(ji,jj) = frcv(jpr_ity1)%z3(ji-1,jj-1,1)
-                  END DO
+            END DO
+         CASE( 'T' )
+            DO jj = 2, jpjm1                                   ! T ==> (U,V)
+               DO ji = fs_2, fs_jpim1   ! vector opt.
+                  p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji+1,jj  ,1) + frcv(jpr_itx1)%z3(ji,jj,1) )
+                  p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji  ,jj+1,1) + frcv(jpr_ity1)%z3(ji,jj,1) )
                END DO
-            CASE( 'T' )
-               DO jj = 2, jpjm1                                   ! T ==> I
-                  DO ji = 2, jpim1   ! NO vector opt.
-                     p_taui(ji,jj) = 0.25 * ( frcv(jpr_itx1)%z3(ji,jj  ,1) + frcv(jpr_itx1)%z3(ji-1,jj  ,1)   &
-                        &                   + frcv(jpr_itx1)%z3(ji,jj-1,1) + frcv(jpr_itx1)%z3(ji-1,jj-1,1) ) 
-                     p_tauj(ji,jj) = 0.25 * ( frcv(jpr_ity1)%z3(ji,jj  ,1) + frcv(jpr_ity1)%z3(ji-1,jj  ,1)   &
-                        &                   + frcv(jpr_oty1)%z3(ji,jj-1,1) + frcv(jpr_ity1)%z3(ji-1,jj-1,1) )
-                  END DO
+            END DO
+         CASE( 'I' )
+            DO jj = 2, jpjm1                                   ! I ==> (U,V)
+               DO ji = 2, jpim1   ! NO vector opt.
+                  p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji+1,jj+1,1) + frcv(jpr_itx1)%z3(ji+1,jj  ,1) )
+                  p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji+1,jj+1,1) + frcv(jpr_ity1)%z3(ji  ,jj+1,1) )
                END DO
-            CASE( 'I' )
-               p_taui(:,:) = frcv(jpr_itx1)%z3(:,:,1)                   ! I ==> I
-               p_tauj(:,:) = frcv(jpr_ity1)%z3(:,:,1)
-            END SELECT
-            IF( srcv(jpr_itx1)%clgrid /= 'I' ) THEN 
-               CALL lbc_lnk_multi( p_taui, 'I',  -1., p_tauj, 'I',  -1. )
-            ENDIF
-            !
-         CASE( 'F' )                                         ! B-grid ==> F
-            SELECT CASE ( srcv(jpr_itx1)%clgrid )
-            CASE( 'U' )
-               DO jj = 2, jpjm1                                   ! (U,V) ==> F
-                  DO ji = fs_2, fs_jpim1   ! vector opt.
-                     p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji,jj,1) + frcv(jpr_itx1)%z3(ji  ,jj+1,1) )
-                     p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji,jj,1) + frcv(jpr_ity1)%z3(ji+1,jj  ,1) )
-                  END DO
-               END DO
-            CASE( 'I' )
-               DO jj = 2, jpjm1                                   ! I ==> F
-                  DO ji = 2, jpim1   ! NO vector opt.
-                     p_taui(ji,jj) = frcv(jpr_itx1)%z3(ji+1,jj+1,1)
-                     p_tauj(ji,jj) = frcv(jpr_ity1)%z3(ji+1,jj+1,1)
-                  END DO
-               END DO
-            CASE( 'T' )
-               DO jj = 2, jpjm1                                   ! T ==> F
-                  DO ji = 2, jpim1   ! NO vector opt.
-                     p_taui(ji,jj) = 0.25 * ( frcv(jpr_itx1)%z3(ji,jj  ,1) + frcv(jpr_itx1)%z3(ji+1,jj  ,1)   &
-                        &                   + frcv(jpr_itx1)%z3(ji,jj+1,1) + frcv(jpr_itx1)%z3(ji+1,jj+1,1) ) 
-                     p_tauj(ji,jj) = 0.25 * ( frcv(jpr_ity1)%z3(ji,jj  ,1) + frcv(jpr_ity1)%z3(ji+1,jj  ,1)   &
-                        &                   + frcv(jpr_ity1)%z3(ji,jj+1,1) + frcv(jpr_ity1)%z3(ji+1,jj+1,1) )
-                  END DO
-               END DO
-            CASE( 'F' )
-               p_taui(:,:) = frcv(jpr_itx1)%z3(:,:,1)                   ! F ==> F
-               p_tauj(:,:) = frcv(jpr_ity1)%z3(:,:,1)
-            END SELECT
-            IF( srcv(jpr_itx1)%clgrid /= 'F' ) THEN 
-               CALL lbc_lnk_multi( p_taui, 'F',  -1., p_tauj, 'F',  -1. )
-            ENDIF
-            !
-         CASE( 'C' )                                         ! C-grid ==> U,V
-            SELECT CASE ( srcv(jpr_itx1)%clgrid )
-            CASE( 'U' )
-               p_taui(:,:) = frcv(jpr_itx1)%z3(:,:,1)                   ! (U,V) ==> (U,V)
-               p_tauj(:,:) = frcv(jpr_ity1)%z3(:,:,1)
-            CASE( 'F' )
-               DO jj = 2, jpjm1                                   ! F ==> (U,V)
-                  DO ji = fs_2, fs_jpim1   ! vector opt.
-                     p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji,jj,1) + frcv(jpr_itx1)%z3(ji  ,jj-1,1) )
-                     p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji,jj,1) + frcv(jpr_ity1)%z3(ji-1,jj  ,1) )
-                  END DO
-               END DO
-            CASE( 'T' )
-               DO jj = 2, jpjm1                                   ! T ==> (U,V)
-                  DO ji = fs_2, fs_jpim1   ! vector opt.
-                     p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji+1,jj  ,1) + frcv(jpr_itx1)%z3(ji,jj,1) )
-                     p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji  ,jj+1,1) + frcv(jpr_ity1)%z3(ji,jj,1) )
-                  END DO
-               END DO
-            CASE( 'I' )
-               DO jj = 2, jpjm1                                   ! I ==> (U,V)
-                  DO ji = 2, jpim1   ! NO vector opt.
-                     p_taui(ji,jj) = 0.5 * ( frcv(jpr_itx1)%z3(ji+1,jj+1,1) + frcv(jpr_itx1)%z3(ji+1,jj  ,1) )
-                     p_tauj(ji,jj) = 0.5 * ( frcv(jpr_ity1)%z3(ji+1,jj+1,1) + frcv(jpr_ity1)%z3(ji  ,jj+1,1) )
-                  END DO
-               END DO
-            END SELECT
-            IF( srcv(jpr_itx1)%clgrid /= 'U' ) THEN 
-               CALL lbc_lnk_multi( p_taui, 'U',  -1., p_tauj, 'V',  -1. )
-            ENDIF
+            END DO
          END SELECT
-
+         IF( srcv(jpr_itx1)%clgrid /= 'U' ) THEN 
+            CALL lbc_lnk_multi( p_taui, 'U',  -1., p_tauj, 'V',  -1. )
+         ENDIF
+         
       ENDIF
       !
    END SUBROUTINE sbc_cpl_ice_tau
@@ -2391,75 +2319,25 @@ CONTAINS
                      zoty1(ji,jj) = 0.5 * ( vn(ji,jj,1) + vn(ji  ,jj-1,1) ) 
                   END DO
                END DO
-            CASE( 'weighted oce and ice' )   
-               SELECT CASE ( cp_ice_msh )
-               CASE( 'C' )                      ! Ocean and Ice on C-grid ==> T
-                  DO jj = 2, jpjm1
-                     DO ji = fs_2, fs_jpim1   ! vector opt.
-                        zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)  
-                        zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj)
-                        zitx1(ji,jj) = 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj)
-                        zity1(ji,jj) = 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj)
-                     END DO
+            CASE( 'weighted oce and ice' )      ! Ocean and Ice on C-grid ==> T  
+               DO jj = 2, jpjm1
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)  
+                     zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj)
+                     zitx1(ji,jj) = 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj)
+                     zity1(ji,jj) = 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj)
                   END DO
-               CASE( 'I' )                      ! Ocean on C grid, Ice on I-point (B-grid) ==> T
-                  DO jj = 2, jpjm1
-                     DO ji = 2, jpim1   ! NO vector opt.
-                        zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)  
-                        zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)  
-                        zitx1(ji,jj) = 0.25 * ( u_ice(ji+1,jj+1) + u_ice(ji,jj+1)                     &
-                           &                  + u_ice(ji+1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                        zity1(ji,jj) = 0.25 * ( v_ice(ji+1,jj+1) + v_ice(ji,jj+1)                     &
-                           &                  + v_ice(ji+1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                     END DO
-                  END DO
-               CASE( 'F' )                      ! Ocean on C grid, Ice on F-point (B-grid) ==> T
-                  DO jj = 2, jpjm1
-                     DO ji = 2, jpim1   ! NO vector opt.
-                        zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)  
-                        zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)  
-                        zitx1(ji,jj) = 0.25 * ( u_ice(ji-1,jj-1) + u_ice(ji,jj-1)                     &
-                           &                  + u_ice(ji-1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                        zity1(ji,jj) = 0.25 * ( v_ice(ji-1,jj-1) + v_ice(ji,jj-1)                     &
-                           &                  + v_ice(ji-1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                     END DO
-                  END DO
-               END SELECT
+               END DO
                CALL lbc_lnk_multi( zitx1, 'T', -1., zity1, 'T', -1. )
-            CASE( 'mixed oce-ice'        )
-               SELECT CASE ( cp_ice_msh )
-               CASE( 'C' )                      ! Ocean and Ice on C-grid ==> T
-                  DO jj = 2, jpjm1
-                     DO ji = fs_2, fs_jpim1   ! vector opt.
-                        zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)   &
-                           &         + 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj)
-                        zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj)   &
-                           &         + 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj)
-                     END DO
+            CASE( 'mixed oce-ice'        )      ! Ocean and Ice on C-grid ==> T
+               DO jj = 2, jpjm1
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)   &
+                        &         + 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj)
+                     zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj)   &
+                        &         + 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj)
                   END DO
-               CASE( 'I' )                      ! Ocean on C grid, Ice on I-point (B-grid) ==> T
-                  DO jj = 2, jpjm1
-                     DO ji = 2, jpim1   ! NO vector opt.
-                        zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)   &   
-                           &         + 0.25 * ( u_ice(ji+1,jj+1) + u_ice(ji,jj+1)                     &
-                           &                  + u_ice(ji+1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                        zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)   & 
-                           &         + 0.25 * ( v_ice(ji+1,jj+1) + v_ice(ji,jj+1)                     &
-                           &                  + v_ice(ji+1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                     END DO
-                  END DO
-               CASE( 'F' )                      ! Ocean on C grid, Ice on F-point (B-grid) ==> T
-                  DO jj = 2, jpjm1
-                     DO ji = 2, jpim1   ! NO vector opt.
-                        zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)   &   
-                           &         + 0.25 * ( u_ice(ji-1,jj-1) + u_ice(ji,jj-1)                     &
-                           &                  + u_ice(ji-1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                        zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)   & 
-                           &         + 0.25 * ( v_ice(ji-1,jj-1) + v_ice(ji,jj-1)                     &
-                           &                  + v_ice(ji-1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj)
-                     END DO
-                  END DO
-               END SELECT
+               END DO
             END SELECT
             CALL lbc_lnk_multi( zotx1, ssnd(jps_ocx1)%clgrid, -1.,  zoty1, ssnd(jps_ocy1)%clgrid, -1. )
             !
@@ -2524,76 +2402,26 @@ CONTAINS
                    zoty1(ji,jj) = 0.5 * ( vn(ji,jj,1) + vn(ji , jj-1,1) )  
                 END DO 
              END DO 
-          CASE( 'weighted oce and ice' )    
-             SELECT CASE ( cp_ice_msh ) 
-             CASE( 'C' )                      ! Ocean and Ice on C-grid ==> T 
-                DO jj = 2, jpjm1 
-                   DO ji = fs_2, fs_jpim1   ! vector opt. 
-                      zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)   
-                      zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj) 
-                      zitx1(ji,jj) = 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj) 
-                      zity1(ji,jj) = 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj) 
-                   END DO 
-                END DO 
-             CASE( 'I' )                      ! Ocean on C grid, Ice on I-point (B-grid) ==> T 
-                DO jj = 2, jpjm1 
-                   DO ji = 2, jpim1   ! NO vector opt. 
-                      zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)   
-                      zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)   
-                      zitx1(ji,jj) = 0.25 * ( u_ice(ji+1,jj+1) + u_ice(ji,jj+1)                     & 
-                         &                  + u_ice(ji+1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                      zity1(ji,jj) = 0.25 * ( v_ice(ji+1,jj+1) + v_ice(ji,jj+1)                     & 
-                         &                  + v_ice(ji+1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                   END DO 
-                END DO 
-             CASE( 'F' )                      ! Ocean on C grid, Ice on F-point (B-grid) ==> T 
-                DO jj = 2, jpjm1 
-                   DO ji = 2, jpim1   ! NO vector opt. 
-                      zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)   
-                      zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)   
-                      zitx1(ji,jj) = 0.25 * ( u_ice(ji-1,jj-1) + u_ice(ji,jj-1)                     & 
-                         &                  + u_ice(ji-1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                      zity1(ji,jj) = 0.25 * ( v_ice(ji-1,jj-1) + v_ice(ji,jj-1)                     & 
-                         &                  + v_ice(ji-1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                   END DO 
-                END DO 
-             END SELECT 
+          CASE( 'weighted oce and ice' )      ! Ocean and Ice on C-grid ==> T   
+             DO jj = 2, jpjm1 
+                DO ji = fs_2, fs_jpim1   ! vector opt. 
+                   zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)   
+                   zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj) 
+                   zitx1(ji,jj) = 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj) 
+                   zity1(ji,jj) = 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj) 
+                END DO
+             END DO
              CALL lbc_lnk_multi( zitx1, 'T', -1.,  zity1, 'T', -1. ) 
-          CASE( 'mixed oce-ice'        ) 
-             SELECT CASE ( cp_ice_msh ) 
-             CASE( 'C' )                      ! Ocean and Ice on C-grid ==> T 
-                DO jj = 2, jpjm1 
-                   DO ji = fs_2, fs_jpim1   ! vector opt. 
-                      zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)   & 
-                         &         + 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj) 
-                      zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj)   & 
-                         &         + 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj) 
-                   END DO 
-                END DO 
-             CASE( 'I' )                      ! Ocean on C grid, Ice on I-point (B-grid) ==> T 
-                DO jj = 2, jpjm1 
-                   DO ji = 2, jpim1   ! NO vector opt. 
-                      zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)   &    
-                         &         + 0.25 * ( u_ice(ji+1,jj+1) + u_ice(ji,jj+1)                     & 
-                         &                  + u_ice(ji+1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                      zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)   &  
-                         &         + 0.25 * ( v_ice(ji+1,jj+1) + v_ice(ji,jj+1)                     & 
-                         &                  + v_ice(ji+1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                   END DO 
-                END DO 
-             CASE( 'F' )                      ! Ocean on C grid, Ice on F-point (B-grid) ==> T 
-                DO jj = 2, jpjm1 
-                   DO ji = 2, jpim1   ! NO vector opt. 
-                      zotx1(ji,jj) = 0.5  * ( un(ji,jj,1)      + un(ji-1,jj  ,1) ) * zfr_l(ji,jj)   &    
-                         &         + 0.25 * ( u_ice(ji-1,jj-1) + u_ice(ji,jj-1)                     & 
-                         &                  + u_ice(ji-1,jj  ) + u_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                      zoty1(ji,jj) = 0.5  * ( vn(ji,jj,1)      + vn(ji  ,jj-1,1) ) * zfr_l(ji,jj)   &  
-                         &         + 0.25 * ( v_ice(ji-1,jj-1) + v_ice(ji,jj-1)                     & 
-                         &                  + v_ice(ji-1,jj  ) + v_ice(ji,jj  )  ) *  fr_i(ji,jj) 
-                   END DO 
-                END DO 
-             END SELECT 
-          END SELECT 
+          CASE( 'mixed oce-ice'        )      ! Ocean and Ice on C-grid ==> T  
+             DO jj = 2, jpjm1 
+                DO ji = fs_2, fs_jpim1   ! vector opt. 
+                   zotx1(ji,jj) = 0.5 * ( un   (ji,jj,1) + un   (ji-1,jj  ,1) ) * zfr_l(ji,jj)   & 
+                      &         + 0.5 * ( u_ice(ji,jj  ) + u_ice(ji-1,jj    ) ) *  fr_i(ji,jj) 
+                   zoty1(ji,jj) = 0.5 * ( vn   (ji,jj,1) + vn   (ji  ,jj-1,1) ) * zfr_l(ji,jj)   & 
+                      &         + 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj) 
+                END DO
+             END DO
+          END SELECT
          CALL lbc_lnk_multi( zotx1, ssnd(jps_ocxw)%clgrid, -1., zoty1, ssnd(jps_ocyw)%clgrid, -1. ) 
          ! 
          ! 
