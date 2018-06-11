@@ -360,9 +360,10 @@ CONTAINS
       !                                      !==  every ocean time-step  ==!
       !
       DO jj = 2, jpjm1                                !* update the stress WITHOUT an ice-ocean rotation angle
-         DO ji = fs_2, fs_jpim1   ! Vect. Opt.
-            zat_u  = ( at_i(ji,jj) + at_i(ji+1,jj) ) * 0.5_wp   ! ice area at u and V-points
-            zat_v  = ( at_i(ji,jj) + at_i(ji,jj+1) ) * 0.5_wp
+         DO ji = fs_2, fs_jpim1   ! Vect. Opt.   
+            ! ice area at u and v-points 
+            zat_u  = ( at_i(ji,jj) * tmask(ji,jj) + at_i(ji+1,jj  ) * tmask(ji+1,jj  ) ) / MAX(1.0_wp,tmask(ji,jj)+tmask(ji+1,jj  ))
+            zat_v  = ( at_i(ji,jj) * tmask(ji,jj) + at_i(ji  ,jj+1) * tmask(ji  ,jj+1) ) / MAX(1.0_wp,tmask(ji,jj)+tmask(ji  ,jj+1))
             !                                                   ! linearized quadratic drag formulation
             zutau_ice   = 0.5_wp * ( tmod_io(ji,jj) + tmod_io(ji+1,jj) ) * ( u_ice(ji,jj) - pu_oce(ji,jj) )
             zvtau_ice   = 0.5_wp * ( tmod_io(ji,jj) + tmod_io(ji,jj+1) ) * ( v_ice(ji,jj) - pv_oce(ji,jj) )
