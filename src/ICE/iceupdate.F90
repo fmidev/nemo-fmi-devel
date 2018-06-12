@@ -385,7 +385,8 @@ CONTAINS
       !!-------------------------------------------------------------------
       !!                  ***  ROUTINE ice_update_init  ***
       !!             
-      !! ** Purpose :   ???
+      !! ** Purpose :   allocate ice-ocean stress fields and read restarts
+      !!                containing the snow & ice mass
       !!
       !!-------------------------------------------------------------------
       INTEGER  ::   ji, jj, jk               ! dummy loop indices
@@ -393,7 +394,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) 'ice_update_init: ???? '
+      IF(lwp) WRITE(numout,*) 'ice_update_init: ice-ocean stress init'
       IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~~'
       !
       !                                      ! allocate ice_update array
