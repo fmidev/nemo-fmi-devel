@@ -39,6 +39,9 @@ MODULE nemogcm
 #if defined key_iomput
    USE xios           ! xIOserver
 #endif
+#if defined key_agrif && defined key_si3
+   USE agrif_ice_update ! ice update
+#endif
 
    IMPLICIT NONE
    PRIVATE
@@ -102,6 +105,11 @@ CONTAINS
 #if defined key_agrif
       !                                               !==  AGRIF time-stepping  ==!
       CALL Agrif_Regrid()
+      !
+#if defined key_si3
+      ! Recursive update from highest nested level to lowest:
+      CALL Agrif_step_child_adj(Agrif_update_ice)
+#endif
       !
       DO WHILE( istp <= nitend .AND. nstop == 0 )
          CALL stp

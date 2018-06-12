@@ -109,7 +109,7 @@ CONTAINS
 
       IF( Agrif_NbStepint() == 0 ) THEN               ! AGRIF Update from zoom N to zoom 1 then to Parent 
 #if defined key_si3
-                             CALL Agrif_Update_ice( kstp )   ! update sea-ice
+                             CALL Agrif_Update_ice( )   ! update sea-ice
 #endif
       ENDIF
 #endif
