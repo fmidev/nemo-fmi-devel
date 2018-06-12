@@ -41,19 +41,19 @@ MODULE agrif_ice_update
    !!----------------------------------------------------------------------
 CONTAINS
 
-   SUBROUTINE agrif_update_ice( kt )
+   SUBROUTINE agrif_update_ice( )
       !!----------------------------------------------------------------------
       !!                     *** ROUTINE agrif_update_ice ***
       !! ** Method  :   Call the hydrostaticupdate pressure at the boundary or the entire domain 
       !!
       !! ** Action : - Update (u_ice,v_ice) and ice tracers
       !!----------------------------------------------------------------------
-      INTEGER, INTENT(in) :: kt
-      !!----------------------------------------------------------------------
       !
       IF( Agrif_Root() .OR. nn_ice == 0 ) RETURN   ! do not update if inside Parent Grid or if child domain does not have ice
       !
-      IF( ( MOD( (kt-nit000)/nn_fsbc + 1, Agrif_irhot() * Agrif_Parent(nn_fsbc)/nn_fsbc ) /=0 ) .AND. (kt /= 0) ) RETURN   ! update only at the parent ice time step
+      IF (lwp.AND.lk_agrif_debug) Write(*,*) 'Update sea ice from grid Number',Agrif_Fixed()
+      !
+!      IF( ( MOD( (kt-nit000)/nn_fsbc + 1, Agrif_irhot() * Agrif_Parent(nn_fsbc)/nn_fsbc ) /=0 ) .AND. (kt /= 0) ) RETURN   ! update only at the parent ice time step
       !
       Agrif_SpecialValueFineGrid    = -9999.
       Agrif_UseSpecialValueInUpdate = .TRUE.

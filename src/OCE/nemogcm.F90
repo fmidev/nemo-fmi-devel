@@ -88,6 +88,9 @@ MODULE nemogcm
 #if defined key_iomput
    USE xios           ! xIOserver
 #endif
+#if defined key_agrif
+   USE agrif_all_update   ! Master Agrif update
+#endif
 
    IMPLICIT NONE
    PRIVATE
@@ -159,6 +162,9 @@ CONTAINS
 # if defined key_agrif
       !                                               !==  AGRIF time-stepping  ==!
       CALL Agrif_Regrid()
+      !
+      ! Recursive update from highest nested level to lowest:
+      CALL Agrif_step_child_adj(Agrif_Update_All)
       !
       DO WHILE( istp <= nitend .AND. nstop == 0 )
          CALL stp

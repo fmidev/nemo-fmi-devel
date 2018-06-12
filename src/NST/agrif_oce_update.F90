@@ -143,11 +143,16 @@ CONTAINS
       !
       Agrif_UseSpecialValueInUpdate = .FALSE.
       !
-#  if defined DECAL_FEEDBACK && defined VOL_REFLUX
+#  if defined VOL_REFLUX
       IF ( ln_dynspg_ts.AND.ln_bt_fw ) THEN
          ! Refluxing on ssh:
+#  if defined DECAL_FEEDBACK
          CALL Agrif_Update_Variable(ub2b_update_id,locupdate1=(/0, 0/),locupdate2=(/1, 1/),procname = reflux_sshu)
          CALL Agrif_Update_Variable(vb2b_update_id,locupdate1=(/1, 1/),locupdate2=(/0, 0/),procname = reflux_sshv)
+#  else
+         CALL Agrif_Update_Variable(ub2b_update_id,locupdate1=(/-1,-1/),locupdate2=(/ 0, 0/),procname = reflux_sshu)
+         CALL Agrif_Update_Variable(vb2b_update_id,locupdate1=(/ 0, 0/),locupdate2=(/-1,-1/),procname = reflux_sshv)
+#  endif
       END IF
 #  endif
       !
@@ -156,16 +161,14 @@ CONTAINS
    END SUBROUTINE Agrif_Update_ssh
 
 
-   SUBROUTINE Agrif_Update_Tke( kt )
+   SUBROUTINE Agrif_Update_Tke( )
       !!---------------------------------------------
       !!   *** ROUTINE Agrif_Update_Tke ***
       !!---------------------------------------------
       !!
-      INTEGER, INTENT(in) :: kt 
       ! 
       IF (Agrif_Root()) RETURN
       !       
-      IF( ( Agrif_NbStepint() .NE. 0 ) .AND. (kt /= 0) ) RETURN
 #  if defined TWO_WAY
 
       Agrif_UseSpecialValueInUpdate = .TRUE.

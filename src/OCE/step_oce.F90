@@ -103,13 +103,7 @@ MODULE step_oce
 #endif
 #if defined key_agrif
    USE agrif_oce_sponge ! Momemtum and tracers sponges
-   USE agrif_oce_update ! Update (2-way nesting)
-#if defined key_si3
-   USE agrif_ice_update
-#endif
-#if defined key_top
-   USE agrif_top_update ! passive tracers update (2-way nesting)
-#endif
+   USE agrif_all_update ! Main update driver
 #endif
 #if defined key_top
    USE trcstp           ! passive tracer time-stepping      (trc_stp routine)

@@ -293,19 +293,7 @@ CONTAINS
       !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<      
                          CALL Agrif_Integrate_ChildGrids( stp )  ! allows to finish all the Child Grids before updating
 
-      IF( Agrif_NbStepint() == 0 ) THEN               ! AGRIF Update from zoom N to zoom 1 then to Parent 
-!!jc in fact update is useless at last time step, but do it for global diagnostics
-#if defined key_si3
-                              CALL Agrif_Update_ice( kstp )   ! update sea-ice
-#endif
-                              CALL Agrif_Update_ssh()          ! Update ssh
-         IF(.NOT.ln_linssh)   CALL Agrif_Update_vvl()          ! Update vertical scale factors  
-                              CALL Agrif_Update_Tra()          ! Update active tracers
-                              CALL Agrif_Update_Dyn()          ! Update momentum
-# if defined key_top
-                              CALL Agrif_Update_Trc()          ! Update passive tracers
-# endif
-      ENDIF
+                         IF( Agrif_NbStepint() == 0 ) CALL Agrif_update_all( ) ! Update all components
 #endif
       IF( ln_diaobs  )   CALL dia_obs      ( kstp )      ! obs-minus-model (assimilation) diagnostics (call after dynamics update)
 

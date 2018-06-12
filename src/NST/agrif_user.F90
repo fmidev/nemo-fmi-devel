@@ -63,11 +63,7 @@ SUBROUTINE Agrif_InitValues
 # if defined key_si3
    CALL Agrif_InitValues_cont_ice
 # endif
-   !
-   IF ( Agrif_Level().EQ.Agrif_MaxLevel() ) CALL agrif_Update_ini()
-
-   Agrif_UseSpecialValueInUpdate = .FALSE.     
-
+   !    
 END SUBROUTINE Agrif_initvalues
 
 
@@ -294,46 +290,6 @@ SUBROUTINE Agrif_InitValues_cont
    ENDIF
    ! 
 END SUBROUTINE Agrif_InitValues_cont
-
-RECURSIVE SUBROUTINE Agrif_Update_ini( )
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE agrif_Update_ini ***
-   !!
-   !! ** Purpose :: Recursive update done at initialization
-   !!----------------------------------------------------------------------
-   USE dom_oce
-   USE agrif_oce_update
-#if defined key_top
-   USE agrif_top_update
-#endif
-#if defined key_si3
-   USE agrif_ice_update
-#endif
-   !
-   IMPLICIT NONE
-   !!----------------------------------------------------------------------
-   !
-   IF (Agrif_Root()) RETURN
-   !
-   CALL Agrif_Update_ssh()
-   IF (.NOT.ln_linssh) CALL Agrif_Update_vvl()
-   CALL Agrif_Update_tra()
-#if defined key_top
-   CALL Agrif_Update_Trc()
-#endif
-   CALL Agrif_Update_dyn()
-! JC remove update because this precludes from perfect restartability
-!!   CALL Agrif_Update_tke(0)
-
-#if defined key_si3
-   CALL agrif_update_ice(0)
-#endif
-   
-   CALL Agrif_ChildGrid_To_ParentGrid()
-   CALL Agrif_Update_ini()
-   CALL Agrif_ParentGrid_To_ChildGrid()
-
-END SUBROUTINE agrif_update_ini
 
 SUBROUTINE agrif_declare_var
    !!----------------------------------------------------------------------
