@@ -112,7 +112,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj,jpk) ::   zdit, zdjt, zftu, zftv, ztfw 
       !!----------------------------------------------------------------------
       !
-      IF( kt == kit000 )  THEN
+      IF( kpass == 1 .AND. kt == kit000 )  THEN
          IF(lwp) WRITE(numout,*)
          IF(lwp) WRITE(numout,*) 'tra_ldf_iso : rotated laplacian diffusion operator on ', cdtype
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~'
