@@ -330,7 +330,7 @@
 &namdyn_spg    !   surface pressure gradient                            (default: NO selection)
 !-----------------------------------------------------------------------
    ln_dynspg_ts  = .true.  !  split-explicit free surface
-!!clem      ln_bt_fw      = .false.     ! Forward integration of barotropic Eqs.
+      ln_bt_fw      = .false.     ! Forward integration of barotropic Eqs.
 /
 !-----------------------------------------------------------------------
 &namdyn_ldf    !   lateral diffusion on momentum                        (default: NO selection)
