@@ -15,8 +15,8 @@ MODULE usrdef_hgr
    USE dom_oce         ! ocean space and time domain
    USE par_oce         ! ocean space and time domain
    USE phycst          ! physical constants
-   USE usrdef_nam, ONLY: rn_dx, rn_dy, rn_ppgphi0   ! horizontal resolution in meters
-   !                                                  and reference latitude
+   USE usrdef_nam, ONLY: rn_dx, rn_dy, ln_corio, rn_ppgphi0   ! horizontal resolution in meters
+   !                                                            coriolis and reference latitude
    USE in_out_manager  ! I/O manager
    USE lib_mpp         ! MPP library
    
@@ -146,10 +146,15 @@ CONTAINS
       !                       !==  Coriolis parameter  ==!
       kff = 1                       !  indicate not to compute Coriolis parameter afterward
       !
-      zbeta = 2._wp * omega * COS( rad * rn_ppgphi0 ) / ra
-      zf0   = 2._wp * omega * SIN( rad * rn_ppgphi0 )
-      pff_f(:,:) = zf0 + zbeta * pphif(:,:) * 1.e+3
-      pff_t(:,:) = zf0 + zbeta * pphit(:,:) * 1.e+3
+      IF( ln_corio ) THEN
+         zbeta = 2._wp * omega * COS( rad * rn_ppgphi0 ) / ra
+         zf0   = 2._wp * omega * SIN( rad * rn_ppgphi0 )
+         pff_f(:,:) = zf0 + zbeta * pphif(:,:) * 1.e+3
+         pff_t(:,:) = zf0 + zbeta * pphit(:,:) * 1.e+3
+      ELSE
+         pff_f(:,:) = 0.
+         pff_t(:,:) = 0.
+      ENDIF
       !
    END SUBROUTINE usr_def_hgr
 

@@ -21,7 +21,8 @@
 !-----------------------------------------------------------------------
    rn_dx       =    3000.   ! horizontal resolution in meters
    rn_dy       =    3000.   ! horizontal resolution in meters
-   rn_ppgphi0  =     70.    ! Reference latitude [degrees]
+   ln_corio    =    .false. ! set coriolis=0 (false) or not (true)
+      rn_ppgphi0  =  70.    ! Reference latitude [degrees]
 /
 !-----------------------------------------------------------------------
 &namrun        !   parameters of the run

@@ -30,6 +30,7 @@ MODULE usrdef_nam
    REAL(wp), PUBLIC ::   rn_dx      ! resolution in meters defining the horizontal domain size
    REAL(wp), PUBLIC ::   rn_dy      ! resolution in meters defining the horizontal domain size
    REAL(wp), PUBLIC ::   rn_ppgphi0 ! reference latitude for beta-plane 
+   LOGICAL , PUBLIC ::   ln_corio   ! set coriolis at 0 (ln_corio=F) or not 
 
    !!----------------------------------------------------------------------
    !! NEMO/OPA 4.0 , NEMO Consortium (2016)
@@ -59,7 +60,7 @@ CONTAINS
       INTEGER ::   ios, ii   ! Local integer
       REAL(wp)::   zlx, zly  ! Local scalars
       !!
-      NAMELIST/namusr_def/ ln_zco, rn_dx, rn_dy, rn_ppgphi0
+      NAMELIST/namusr_def/ ln_zco, rn_dx, rn_dy, ln_corio, rn_ppgphi0
       !!----------------------------------------------------------------------
       !
       ii = 1
@@ -110,6 +111,7 @@ CONTAINS
       WRITE(ldtxt(ii),*) '         resulting global domain size :        jpiglo = ', kpi                ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '                                               jpjglo = ', kpj                ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '                                               jpkglo = ', kpk                ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '         Coriolis:', ln_corio                                                 ;   ii = ii + 1
       !
       !                             ! Set the lateral boundary condition of the global domain
       kperio = 7                    ! ICEDYN configuration : bi-periodic basin
