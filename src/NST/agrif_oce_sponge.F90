@@ -124,7 +124,7 @@ CONTAINS
             ind2 = nlci - (1+nbghostcells)
             DO jj = 1, jpj
                DO ji = ind1, ind2
-                  ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( ji - ind2 ) * z1_spongearea * umask(ind2-1,jj,1) )
+                  ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( ji - ind1 ) * z1_spongearea * umask(ind2-1,jj,1) )
                ENDDO
             ENDDO
          ENDIF
@@ -146,7 +146,7 @@ CONTAINS
             ind2 = nlcj - (1+nbghostcells)
             DO jj = ind1, ind2
                DO ji = 1, jpi
-                  ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( jj - ind2 ) * z1_spongearea * vmask(ji,ind2-1,1) )
+                  ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( jj - ind1 ) * z1_spongearea * vmask(ji,ind2-1,1) )
                END DO
             ENDDO
          ENDIF
