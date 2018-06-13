@@ -51,9 +51,13 @@ CONTAINS
       !
       IF( Agrif_Root() .OR. nn_ice == 0 ) RETURN   ! do not update if inside Parent Grid or if child domain does not have ice
       !
-      IF (lwp.AND.lk_agrif_debug) Write(*,*) 'Update sea ice from grid Number',Agrif_Fixed()
-      !
 !      IF( ( MOD( (kt-nit000)/nn_fsbc + 1, Agrif_irhot() * Agrif_Parent(nn_fsbc)/nn_fsbc ) /=0 ) .AND. (kt /= 0) ) RETURN   ! update only at the parent ice time step
+      IF ( MOD(Agrif_parent_nb_step(), Agrif_Parent(nn_fsbc)) /=0 ) RETURN   ! Update only at the parent ice time step
+                                                                             ! It is assumed that at such a time, there is a child ice step which is true
+                                                                             ! as long as MOD( Agrif_irhot() * Agrif_Parent(nn_fsbc), nn_fsbc )==0. 
+                                                                             ! (This condition is checked in agrif_user, Agrif_InitValues_cont_ice subroutine)
+      IF (lwp.AND.lk_agrif_debug) Write(*,*) 'Update sea ice from grid Number',Agrif_Fixed(), agrif_nb_step()
+      !
       !
       Agrif_SpecialValueFineGrid    = -9999.
       Agrif_UseSpecialValueInUpdate = .TRUE.
