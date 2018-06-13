@@ -2,7 +2,7 @@ MODULE usrdef_nam
    !!======================================================================
    !!                       ***  MODULE  usrdef_nam  ***
    !!
-   !!                     ===  SAS_BIPER configuration  ===
+   !!                      ===  ICEDYN configuration  ===
    !!
    !! User defined : set the domain characteristics of a user configuration
    !!======================================================================
@@ -46,7 +46,7 @@ CONTAINS
       !!
       !! ** Method  :   read in namusr_def containing all the user specific namelist parameter
       !!
-      !!                Here SAS_BIPER configuration
+      !!                Here ICEDYN configuration
       !!
       !! ** input   : - namusr_def namelist found in namelist_cfg
       !!----------------------------------------------------------------------
@@ -79,10 +79,10 @@ CONTAINS
       !
       WRITE( ldnam(:), namusr_def )
       !
-      cd_cfg = 'SAS_BIPER'           ! name & resolution (not used)
+      cd_cfg = 'ICEDYN'           ! name & resolution (not used)
       kk_cfg = INT( rn_dx )
       !
-      ! Global Domain size:  SAS_BIPER domain is  300 km x 300 Km x 10 m
+      ! Global Domain size:  ICEDYN domain is  300 km x 300 Km x 10 m
       kpi = INT( 300.e3 / rn_dx ) -1
       kpj = INT( 300.e3 / rn_dy ) -1
 #if defined key_agrif
@@ -101,10 +101,10 @@ CONTAINS
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) 'usr_def_nam  : read the user defined namelist (namusr_def) in namelist_cfg'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '~~~~~~~~~~~ '                                                                 ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '   Namelist namusr_def : SAS_BIPER test case'                                 ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '   Namelist namusr_def : ICEDYN test case'                                    ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dx  = ', rn_dx, ' meters'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dy  = ', rn_dy, ' meters'   ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      SAS_BIPER domain = 300 km x 300Km x 1 grid-point '                      ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '      ICEDYN domain = 300 km x 300Km x 1 grid-point '                         ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         LX [km]: ', zlx                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         LY [km]: ', zly                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         resulting global domain size :        jpiglo = ', kpi                ;   ii = ii + 1
@@ -112,7 +112,7 @@ CONTAINS
       WRITE(ldtxt(ii),*) '                                               jpkglo = ', kpk                ;   ii = ii + 1
       !
       !                             ! Set the lateral boundary condition of the global domain
-      kperio = 7                    ! SAS_BIPER configuration : bi-periodic basin
+      kperio = 7                    ! ICEDYN configuration : bi-periodic basin
 #if defined key_agrif
       IF( .NOT. Agrif_Root() ) THEN
       kperio = 0
@@ -121,7 +121,7 @@ CONTAINS
       !
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '   Lateral boundary condition of the global domain'                           ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      SAS_BIPER : bi-periodic basin            jperio = ', kperio             ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '      ICEDYN : bi-periodic basin               jperio = ', kperio             ;   ii = ii + 1
       !
    END SUBROUTINE usr_def_nam
 

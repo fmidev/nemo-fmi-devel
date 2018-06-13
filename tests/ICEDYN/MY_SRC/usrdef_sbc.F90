@@ -2,7 +2,7 @@ MODULE usrdef_sbc
    !!======================================================================
    !!                       ***  MODULE  usrdef_sbc  ***
    !! 
-   !!                     ===  SAS_BIPER configuration  ===
+   !!                      ===  ICEDYN configuration  ===
    !!
    !! User defined :   surface forcing of a user configuration
    !!======================================================================
@@ -10,7 +10,7 @@ MODULE usrdef_sbc
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
-   !!   usr_def_sbc    : user defined surface bounday conditions in SAS_BIPER case
+   !!   usr_def_sbc    : user defined surface bounday conditions in ICEDYN case
    !!----------------------------------------------------------------------
    USE oce             ! ocean dynamics and tracers
    USE dom_oce         ! ocean space and time domain
@@ -48,7 +48,7 @@ CONTAINS
       !! ** Purpose :   provide at each time-step the surface boundary
       !!              condition, i.e. the momentum, heat and freshwater fluxes.
       !!
-      !! ** Method  :   all 0 fields, for SAS_BIPER case
+      !! ** Method  :   all 0 fields, for ICEDYN case
       !!                CAUTION : never mask the surface stress field !
       !!
       !! ** Action  : - set to ZERO all the ocean surface boundary condition, i.e.   
@@ -60,7 +60,7 @@ CONTAINS
       !
       IF( kt == nit000 ) THEN
          !
-         IF(lwp)   WRITE(numout,*)' usrdef_sbc_oce : SAS_BIPER case: NO surface forcing'
+         IF(lwp)   WRITE(numout,*)' usrdef_sbc_oce : ICEDYN case: NO surface forcing'
          ! --- oce variables --- !
          utau(:,:) = 0._wp 
          vtau(:,:) = 0._wp
@@ -90,7 +90,7 @@ CONTAINS
       !!---------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! ocean time step
       !!---------------------------------------------------------------------
-      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : SAS_BIPER case: constant stress forcing'
+      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : ICEDYN case: constant stress forcing'
       !
       utau_ice(:,:) = 1.3_wp   ! <=> 0.5 m/s
       vtau_ice(:,:) = 0._wp
@@ -111,7 +111,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zsnw   ! snw distribution after wind blowing
       !!---------------------------------------------------------------------
       !
-      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : SAS_BIPER case: NO flux forcing'
+      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : ICEDYN case: NO flux forcing'
       !
       ! ocean variables (renaming)
       emp_oce (:,:)   = 0._wp   ! uniform value for freshwater budget (E-P)

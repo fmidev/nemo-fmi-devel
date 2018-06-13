@@ -2,7 +2,7 @@ MODULE usrdef_hgr
    !!======================================================================
    !!                       ***  MODULE  usrdef_hgr  ***
    !!
-   !!                     ===  SAS_BIPER configuration  ===
+   !!                      ===  ICEDYN configuration  ===
    !!
    !! User defined :   mesh and Coriolis parameter of a user configuration
    !!======================================================================
@@ -10,7 +10,7 @@ MODULE usrdef_hgr
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
-   !!   usr_def_hgr    : initialize the horizontal mesh for SAS_BIPER configuration
+   !!   usr_def_hgr    : initialize the horizontal mesh for ICEDYN configuration
    !!----------------------------------------------------------------------
    USE dom_oce         ! ocean space and time domain
    USE par_oce         ! ocean space and time domain
@@ -44,7 +44,7 @@ CONTAINS
       !! ** Purpose :   user defined mesh and Coriolis parameter
       !!
       !! ** Method  :   set all intent(out) argument to a proper value
-      !!                SAS_BIPER configuration : uniform grid spacing (rn_dx)
+      !!                ICEDYN configuration : uniform grid spacing (rn_dx)
       !!                without Coriolis force (f=0)
       !!
       !! ** Action  : - define longitude & latitude of t-, u-, v- and f-points (in degrees) 
@@ -67,7 +67,7 @@ CONTAINS
       !!-------------------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) 'usr_def_hgr : SAS_BIPER configuration bassin'
+      IF(lwp) WRITE(numout,*) 'usr_def_hgr : ICEDYN configuration bassin'
       IF(lwp) WRITE(numout,*)
       IF(lwp) WRITE(numout,*) '          f-plane with irregular grid-spacing (+- 10%)'
       IF(lwp) WRITE(numout,*) '          the max is given by rn_dx and rn_dy' 

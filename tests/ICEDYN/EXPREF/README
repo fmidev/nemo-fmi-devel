@@ -18,23 +18,22 @@ Two experiments can be configured:
 a) A simple channel at 3km horizontal resolution (slightly variable => +- 10%)
               ==> remove key_agrif in cpp keys
 
-b) Same as a) but with an Agrif zoom in the center 1:3, and 3 ghost cells (defined in par_oce.F90)
+b) Same as a) but with an Agrif zoom in the center 1:3, and 3 ghost cells
               ==> add key_agrif in cpp keys
 
 ----------
 How to run
 ----------
-Be careful, the model can only run on 1 processor in the N-S dimension
 
 a) Compile and run the model once to get a mesh_mask.nc file with the following command:
-../../../makenemo -a TEST_CASES -n SAS_BIPER -m X64_ADA -j 4
+../../../makenemo -a TEST_CASES -n ICEDYN -m X64_ADA -j 4
 poe ./opa -procs 1
 
 b) Create the initial condition file for sea-ice (initice.nc) by running this python script: 
 python ./make_INITICE.py
 
 c) Run the model a second time
-poe ./opa -procs 1
+poe ./opa -procs 4
 
 ---------------
 What to look at
