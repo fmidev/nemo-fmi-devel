@@ -42,7 +42,7 @@ MODULE par_oce
 
    ! global domain size for AGRIF     !!! * total AGRIF computational domain *
    INTEGER, PUBLIC            ::   nbug_in_agrif_conv_do_not_remove_or_modify = 1 - 1
-   INTEGER, PUBLIC, PARAMETER ::   nbghostcells = 1                             !: number of ghost cells
+   INTEGER, PUBLIC, PARAMETER ::   nbghostcells = 3                             !: number of ghost cells
    INTEGER, PUBLIC            ::   nbcellsx   ! = jpiglo - 2 - 2*nbghostcells   !: number of cells in i-direction
    INTEGER, PUBLIC            ::   nbcellsy   ! = jpjglo - 2 - 2*nbghostcells   !: number of cells in j-direction
 
