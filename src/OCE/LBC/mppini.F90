@@ -514,8 +514,8 @@ CONTAINS
          ibonjt(jproc) = ibondj(ii,ij)
          nimppt(jproc) = iimppt(ii,ij)  
          njmppt(jproc) = ijmppt(ii,ij) 
-         nfilcit(ii,ij) = ilci(ii,ij)
       END DO
+      nfilcit(:,:) = ilci(:,:)
 
       ! Save processor layout in ascii file
       IF (lwp) THEN
