@@ -623,7 +623,6 @@ SUBROUTINE Agrif_InitValues_cont_top
          nitend =  Agrif_Parent(nitend)   *Agrif_IRhot()
       ENDIF
 
-      ENDIF
       ! Check passive tracer cell
       IF( nn_dttrc .NE. 1 ) THEN
          WRITE(*,*) 'nn_dttrc should be equal to 1'

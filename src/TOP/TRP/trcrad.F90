@@ -12,6 +12,7 @@ MODULE trcrad
    !!----------------------------------------------------------------------
    !!   trc_rad    : correction of negative concentrations
    !!----------------------------------------------------------------------
+   USE par_trc             ! need jptra, number of passive tracers 
    USE oce_trc             ! ocean dynamics and tracers variables
    USE trc                 ! ocean passive tracers variables
    USE trd_oce
