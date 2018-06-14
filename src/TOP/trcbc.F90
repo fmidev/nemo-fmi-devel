@@ -38,7 +38,11 @@ MODULE trcbc
    REAL(wp) , SAVE, PUBLIC, ALLOCATABLE, DIMENSION(:)  :: rf_trcfac    ! multiplicative factor for CBC tracer values
    TYPE(FLD), SAVE, PUBLIC, ALLOCATABLE, DIMENSION(:)  :: sf_trccbc    ! structure of data input CBC (file informations, fields read)
    REAL(wp) , SAVE, PUBLIC, ALLOCATABLE, DIMENSION(:)  :: rf_trofac    ! multiplicative factor for OBCtracer values
+#if defined key_agrif
    TYPE(FLD), SAVE, PUBLIC, ALLOCATABLE, DIMENSION(:)  :: sf_trcobc    ! structure of data input OBC (file informations, fields read)
+#else
+   TYPE(FLD), SAVE, PUBLIC, ALLOCATABLE, DIMENSION(:), TARGET  :: sf_trcobc
+#endif
    TYPE(MAP_POINTER), ALLOCATABLE, DIMENSION(:) :: nbmap_ptr   ! array of pointers to nbmap
 
    !! * Substitutions
