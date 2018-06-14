@@ -108,62 +108,6 @@ CONTAINS
    !!----------------------------------------------------------------------
 CONTAINS
 
-# if defined key_c1d
-   !!======================================================================
-   !!   'key_c1d'                                          1D configuration
-   !!======================================================================
-   !!     central point value replicated over the 8 surrounding points
-   !!----------------------------------------------------------------------
-
-   SUBROUTINE lbc_lnk_3d( pt3d, cd_type, psgn, cd_mpp, pval )
-      !!---------------------------------------------------------------------
-      !!                  ***  ROUTINE lbc_lnk_3d  ***
-      !!
-      !! ** Purpose :   set lateral boundary conditions on a 3D array (C1D case)
-      !!
-      !! ** Method  :   1D case, the central water column is set everywhere
-      !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(:,:,:), INTENT(inout)           ::   pt3d      ! 3D array on which the lbc is applied
-      CHARACTER(len=1)          , INTENT(in   )           ::   cd_type   ! nature of pt3d grid-points
-      REAL(wp)                  , INTENT(in   )           ::   psgn      ! sign used across north fold 
-      CHARACTER(len=3)          , INTENT(in   ), OPTIONAL ::   cd_mpp    ! MPP only (here do nothing)
-      REAL(wp)                  , INTENT(in   ), OPTIONAL ::   pval      ! background value (for closed boundaries)
-      !
-      INTEGER  ::   jk     ! dummy loop index
-      REAL(wp) ::   ztab   ! local scalar
-      !!----------------------------------------------------------------------
-      !
-      DO jk = 1, SIZE( pt3d, 3 )
-         ztab = pt3d(2,2,jk)
-         pt3d(:,:,jk) = ztab
-      END DO
-      !
-   END SUBROUTINE lbc_lnk_3d
-
-
-   SUBROUTINE lbc_lnk_2d( pt2d, cd_type, psgn, cd_mpp, pval )
-      !!---------------------------------------------------------------------
-      !!                 ***  ROUTINE lbc_lnk_2d  ***
-      !!
-      !! ** Purpose :   set lateral boundary conditions on a 2D array (non mpp case)
-      !!
-      !! ** Method  :   1D case, the central water column is set everywhere
-      !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(jpi,jpj), INTENT(inout)           ::   pt2d      ! 2D array on which the lbc is applied
-      CHARACTER(len=1)            , INTENT(in   )           ::   cd_type   ! nature of pt3d grid-points
-      REAL(wp)                    , INTENT(in   )           ::   psgn      ! sign used across north fold 
-      CHARACTER(len=3)            , INTENT(in   ), OPTIONAL ::   cd_mpp    ! MPP only (here do nothing)
-      REAL(wp)                    , INTENT(in   ), OPTIONAL ::   pval      ! background value (for closed boundaries)
-      !
-      REAL(wp) ::   ztab   ! local scalar
-      !!----------------------------------------------------------------------
-      !
-      ztab = pt2d(2,2)
-      pt2d(:,:) = ztab
-      !
-   END SUBROUTINE lbc_lnk_2d
-   
-#else
    !!======================================================================
    !!   Default option                           3D shared memory computing
    !!======================================================================
@@ -223,8 +167,6 @@ CONTAINS
 #     undef MULTI
 #  undef DIM_4d
    
-#endif
-
    !!======================================================================
    !!   identical routines in both C1D and shared memory computing
    !!======================================================================

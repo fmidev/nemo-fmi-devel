@@ -61,7 +61,7 @@ CONTAINS
       jpjmax = jpjglo
       jpi    = jpiglo
       jpj    = jpjglo
-      jpk    = jpjglo
+      jpk    = jpkglo
       jpim1  = jpi-1                                            ! inner domain indices
       jpjm1  = jpj-1                                            !   "           "
       jpkm1  = MAX( 1, jpk-1 )                                  !   "           "
