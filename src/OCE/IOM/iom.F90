@@ -79,10 +79,14 @@ MODULE iom
    INTERFACE iom_rstput
       MODULE PROCEDURE iom_rp0d, iom_rp1d, iom_rp2d, iom_rp3d
    END INTERFACE
-  INTERFACE iom_put
-     MODULE PROCEDURE iom_p0d, iom_p1d, iom_p2d, iom_p3d
-  END INTERFACE
-
+   INTERFACE iom_put
+      MODULE PROCEDURE iom_p0d, iom_p1d, iom_p2d, iom_p3d
+   END INTERFACE iom_put
+   
+   LOGICAL, PARAMETER ::   ltmppatch = .TRUE.     !: seb: patch before we remove periodicity
+   INTEGER            ::   nldi_save, nlei_save   !:      and close boundaries in output files
+   INTEGER            ::   nldj_save, nlej_save   !:
+  
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
@@ -109,6 +113,16 @@ CONTAINS
       !
       REAL(wp), ALLOCATABLE, DIMENSION(:,:) :: zt_bnds, zw_bnds
       !!----------------------------------------------------------------------
+      !
+      ! seb: patch before we remove periodicity and close boundaries in output files
+      IF ( ltmppatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+         IF( nimpp           ==      1 ) nldi = 1
+         IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+         IF( njmpp           ==      1 ) nldj = 1
+         IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+      ENDIF
       !
       ALLOCATE( zt_bnds(2,jpk), zw_bnds(2,jpk) )
       !
@@ -231,6 +245,10 @@ CONTAINS
       !
       DEALLOCATE( zt_bnds, zw_bnds )
       !
+      IF ( ltmppatch ) THEN
+         nldi = nldi_save   ;   nlei = nlei_save
+         nldj = nldj_save   ;   nlej = nlej_save
+      ENDIF
 #endif
       !
    END SUBROUTINE iom_init
@@ -1736,7 +1754,7 @@ CONTAINS
 
 #if defined key_iomput
    !!----------------------------------------------------------------------
-   !!   'key_iomput'                                         IOM  interface
+   !!   'key_iomput'                                         XIOS interface
    !!----------------------------------------------------------------------
 
    SUBROUTINE iom_set_domain_attr( cdid, ni_glo, nj_glo, ibegin, jbegin, ni, nj, zoom_ibegin, zoom_jbegin, zoom_ni, zoom_nj,   &
@@ -1905,6 +1923,16 @@ CONTAINS
       LOGICAL, INTENT(IN) :: ldxios
       !!----------------------------------------------------------------------
       !
+      ! seb: patch before we remove periodicity and close boundaries in output files
+      IF ( ltmppatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+         IF( nimpp           ==      1 ) nldi = 1
+         IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+         IF( njmpp           ==      1 ) nldj = 1
+         IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+      ENDIF
+      !
       ni = nlei-nldi+1
       nj = nlej-nldj+1
       !
@@ -1924,6 +1952,11 @@ CONTAINS
          !
          CALL iom_set_domain_attr( "grid_"//cdgrd       , mask = RESHAPE(zmask(nldi:nlei,nldj:nlej,1),(/ni*nj    /)) /= 0. )
          CALL iom_set_grid_attr  ( "grid_"//cdgrd//"_3D", mask = RESHAPE(zmask(nldi:nlei,nldj:nlej,:),(/ni,nj,jpk/)) /= 0. )
+      ENDIF
+      !
+      IF ( ltmppatch ) THEN
+         nldi = nldi_save   ;   nlei = nlei_save
+         nldj = nldj_save   ;   nlej = nlej_save
       ENDIF
       !
    END SUBROUTINE set_grid
@@ -1947,6 +1980,16 @@ CONTAINS
       REAL(wp), ALLOCATABLE, DIMENSION(:,:)     :: z_fld       ! Working array to determine where to rotate cells
       REAL(wp), ALLOCATABLE, DIMENSION(:,:)     :: z_rot       ! Lat/lon working array for rotation of cells
       !!----------------------------------------------------------------------
+      !
+      ! seb: patch before we remove periodicity and close boundaries in output files
+      IF ( ltmppatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+         IF( nimpp           ==      1 ) nldi = 1
+         IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+         IF( njmpp           ==      1 ) nldj = 1
+         IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+      ENDIF
       !
       ALLOCATE( z_bnds(4,jpi,jpj,2), z_fld(jpi,jpj), z_rot(4,2)  )
       !
@@ -2031,6 +2074,11 @@ CONTAINS
       !
       DEALLOCATE( z_bnds, z_fld, z_rot ) 
       !
+      IF ( ltmppatch ) THEN
+         nldi = nldi_save   ;   nlei = nlei_save
+         nldj = nldj_save   ;   nlej = nlej_save
+      ENDIF
+      !
    END SUBROUTINE set_grid_bounds
 
 
@@ -2047,6 +2095,16 @@ CONTAINS
       REAL(wp), DIMENSION(:), ALLOCATABLE  ::   zlon
       !!----------------------------------------------------------------------
       !
+      ! seb: patch before we remove periodicity and close boundaries in output files
+      IF ( ltmppatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+         IF( nimpp           ==      1 ) nldi = 1
+         IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+         IF( njmpp           ==      1 ) nldj = 1
+         IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+      ENDIF
+      !
       ni=nlei-nldi+1       ! define zonal mean domain (jpj*jpk)
       nj=nlej-nldj+1
       ALLOCATE( zlon(ni*nj) )       ;       zlon(:) = 0._wp
@@ -2060,6 +2118,11 @@ CONTAINS
       CALL iom_set_zoom_domain_attr ("ptr", ibegin=ix-1, jbegin=0, ni=1, nj=jpjglo)
       !
       CALL iom_update_file_name('ptr')
+      !
+      IF ( ltmppatch ) THEN
+         nldi = nldi_save   ;   nlei = nlei_save
+         nldj = nldj_save   ;   nlej = nlej_save
+      ENDIF
       !
    END SUBROUTINE set_grid_znl
 
