@@ -102,17 +102,17 @@ CONTAINS
          ! Define ramp from boundaries towards domain interior at T-points
          ! Store it in ztabramp
 
-         ispongearea  = 2 + nn_sponge_len * Agrif_irhox()
-         z1_spongearea = 1._wp / REAL( ispongearea - 1 )
+         ispongearea  = 1 + nn_sponge_len * Agrif_irhox()
+         z1_spongearea = 1._wp / REAL( ispongearea )
          
          ztabramp(:,:) = 0._wp
 
          ! --- West --- !
          IF( (nbondi == -1) .OR. (nbondi == 2) ) THEN
             ind1 = 1+nbghostcells
-            ind2 = 1+nbghostcells + (ispongearea-1)
+            ind2 = 1+nbghostcells + ispongearea 
             DO jj = 1, jpj
-               DO ji = ind1, ind2                  
+               DO ji = ind1, ind2                
                   ztabramp(ji,jj) = REAL( ind2 - ji ) * z1_spongearea * umask(ind1,jj,1)
                END DO
             ENDDO
@@ -120,8 +120,8 @@ CONTAINS
 
          ! --- East --- !
          IF( (nbondi == 1) .OR. (nbondi == 2) ) THEN
-            ind1 = nlci - (1+nbghostcells) - (ispongearea-1)
-            ind2 = nlci - (1+nbghostcells)
+            ind1 = nlci - nbghostcells - ispongearea
+            ind2 = nlci - nbghostcells
             DO jj = 1, jpj
                DO ji = ind1, ind2
                   ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( ji - ind1 ) * z1_spongearea * umask(ind2-1,jj,1) )
@@ -132,8 +132,8 @@ CONTAINS
          ! --- South --- !
          IF( (nbondj == -1) .OR. (nbondj == 2) ) THEN
             ind1 = 1+nbghostcells
-            ind2 = 1+nbghostcells + (ispongearea-1)
-            DO jj = ind1, ind2
+            ind2 = 1+nbghostcells + ispongearea
+            DO jj = ind1, ind2 
                DO ji = 1, jpi
                   ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( ind2 - jj ) * z1_spongearea * vmask(ji,ind1,1) )
                END DO
@@ -142,8 +142,8 @@ CONTAINS
 
          ! --- North --- !
          IF( (nbondj == 1) .OR. (nbondj == 2) ) THEN
-            ind1 = nlcj - (1+nbghostcells) - (ispongearea-1)
-            ind2 = nlcj - (1+nbghostcells)
+            ind1 = nlcj - nbghostcells - ispongearea
+            ind2 = nlcj - nbghostcells
             DO jj = ind1, ind2
                DO ji = 1, jpi
                   ztabramp(ji,jj) = MAX( ztabramp(ji,jj), REAL( jj - ind1 ) * z1_spongearea * vmask(ji,ind2-1,1) )
@@ -176,8 +176,8 @@ CONTAINS
          DO jj = 2, jpjm1
             DO ji = 2, jpim1   ! vector opt.
                fsahm_spt(ji,jj) = visc_dyn * ztabramp(ji,jj)
-               fsahm_spf(ji,jj) = 0.25_wp * visc_dyn * ( ztabramp(ji,jj) + ztabramp(ji  ,jj+1) &
-                                                     &  +ztabramp(ji,jj) + ztabramp(ji+1,jj  ) )
+               fsahm_spf(ji,jj) = 0.25_wp * visc_dyn * ( ztabramp(ji  ,jj  ) + ztabramp(ji  ,jj+1) &
+                                                     &  +ztabramp(ji+1,jj+1) + ztabramp(ji+1,jj  ) )
             END DO
          END DO
          CALL lbc_lnk( fsahm_spt, 'T', 1. )   ! Lateral boundary conditions
@@ -277,18 +277,24 @@ CONTAINS
 
          DO jn = 1, jpts            
             DO jk = 1, jpkm1
-               DO jj = j1,j2-1
+               ztu(i1:i2,j1:j2,jk) = 0._wp
+               DO jj = j1,j2
                   DO ji = i1,i2-1
                      zabe1 = fsaht_spu(ji,jj) * umask(ji,jj,jk) * e2_e1u(ji,jj) * e3u_n(ji,jj,jk)
-                     zabe2 = fsaht_spv(ji,jj) * vmask(ji,jj,jk) * e1_e2v(ji,jj) * e3v_n(ji,jj,jk)
                      ztu(ji,jj,jk) = zabe1 * ( tsbdiff(ji+1,jj  ,jk,jn) - tsbdiff(ji,jj,jk,jn) ) 
+                  END DO
+               END DO
+               ztv(i1:i2,j1:j2,jk) = 0._wp
+               DO ji = i1,i2
+                  DO jj = j1,j2-1
+                     zabe2 = fsaht_spv(ji,jj) * vmask(ji,jj,jk) * e1_e2v(ji,jj) * e3v_n(ji,jj,jk)
                      ztv(ji,jj,jk) = zabe2 * ( tsbdiff(ji  ,jj+1,jk,jn) - tsbdiff(ji,jj,jk,jn) )
                   END DO
                END DO
                !
                IF( ln_zps ) THEN      ! set gradient at partial step level
-                  DO jj = j1,j2-1
-                     DO ji = i1,i2-1
+                  DO jj = j1,j2
+                     DO ji = i1,i2
                         ! last level
                         iku = mbku(ji,jj)
                         ikv = mbkv(ji,jj)

@@ -58,7 +58,7 @@ CONTAINS
       !
       INTEGER  ::   ji, jj, jk, jn, iref, jref, ibdy, jbdy   ! dummy loop indices
       INTEGER  ::   imin, imax, jmin, jmax, N_in, N_out
-      REAL(wp) ::   zrhox, z1, z2, z3, z4, z5, z6, z7
+      REAL(wp) ::   zrho, z1, z2, z3, z4, z5, z6, z7
       LOGICAL :: western_side, eastern_side,northern_side,southern_side
       ! vertical interpolation:
       REAL(wp), DIMENSION(i1:i2,j1:j2,1:jpk,n1:n2) :: ptab_child
@@ -131,29 +131,26 @@ CONTAINS
 
          IF ( .NOT.lk_agrif_clp ) THEN 
             !
-            zrhox = Agrif_Rhox()
-            z1 = ( zrhox - 1. ) * 0.5
-            z3 = ( zrhox - 1. ) / ( zrhox + 1. )
-            z6 = 2. * ( zrhox - 1. ) / ( zrhox + 1. )
-            z7 =    - ( zrhox - 1. ) / ( zrhox + 3. )
-            !
-            z2 = 1. - z1
-            z4 = 1. - z3
-            z5 = 1. - z6 - z7
-            !
             imin = i1 ; imax = i2
             jmin = j1 ; jmax = j2
             ! 
             ! Remove CORNERS
             IF((nbondj == -1).OR.(nbondj == 2)) jmin = 2 + nbghostcells
             IF((nbondj == +1).OR.(nbondj == 2)) jmax = nlcj - nbghostcells - 1
-            IF((nbondi == -1).OR.(nbondi == 2)) imin = 1 + nbghostcells
+            IF((nbondi == -1).OR.(nbondi == 2)) imin = 2 + nbghostcells
             IF((nbondi == +1).OR.(nbondi == 2)) imax = nlci - nbghostcells - 1      
             !
             IF( eastern_side ) THEN
+               zrho = Agrif_Rhox()
+               z1 = ( zrho - 1._wp ) * 0.5_wp                    
+               z3 = ( zrho - 1._wp ) / ( zrho + 1._wp )         
+               z6 = 2._wp * ( zrho - 1._wp ) / ( zrho + 1._wp )
+               z7 =       - ( zrho - 1._wp ) / ( zrho + 3._wp )
+               z2 = 1._wp - z1 ; z4 = 1._wp - z3 ; z5 = 1._wp - z6 - z7
+               !
                ibdy = nlci-nbghostcells
                DO jn = 1, jptra
-                  tra(ibdy+1,jmin:jmax,k1:k2,jn) = z1 * ptab_child(ibdy+1,jmin:jmax,k1:k2,jn) + z2 * ptab_child(ibdy,jmin:jmax,k1:k2,jn)
+                  tra(ibdy+1,jmin:jmax,1:jpkm1,jn) = z1 * ptab_child(ibdy+1,jmin:jmax,1:jpkm1,jn) + z2 * ptab_child(ibdy,jmin:jmax,1:jpkm1,jn)
                   DO jk = 1, jpkm1
                      DO jj = jmin,jmax
                         IF( umask(ibdy-1,jj,jk) == 0._wp ) THEN
@@ -168,14 +165,21 @@ CONTAINS
                      END DO
                   END DO
                   ! Restore ghost points:
-                  tra(ibdy+1,jmin:jmax,k1:k2,jn) = ptab_child(ibdy+1,jmin:jmax,k1:k2,jn) * tmask(ibdy+1,jmin:jmax,k1:k2)
+                  tra(ibdy+1,jmin:jmax,1:jpkm1,jn) = ptab_child(ibdy+1,jmin:jmax,1:jpkm1,jn) * tmask(ibdy+1,jmin:jmax,1:jpkm1)
                END DO
             ENDIF
             ! 
             IF( northern_side ) THEN
+               zrho = Agrif_Rhoy()
+               z1 = ( zrho - 1._wp ) * 0.5_wp                    
+               z3 = ( zrho - 1._wp ) / ( zrho + 1._wp )         
+               z6 = 2._wp * ( zrho - 1._wp ) / ( zrho + 1._wp )
+               z7 =       - ( zrho - 1._wp ) / ( zrho + 3._wp )
+               z2 = 1._wp - z1 ; z4 = 1._wp - z3 ; z5 = 1._wp - z6 - z7
+               !
                jbdy = nlcj-nbghostcells         
                DO jn = 1, jptra
-                  tra(imin:imax,jbdy+1,k1:k2,jn) = z1 * ptab_child(imin:imax,jbdy+1,k1:k2,jn) + z2 * ptab_child(imin:imax,jbdy,k1:k2,jn)
+                  tra(imin:imax,jbdy+1,1:jpkm1,jn) = z1 * ptab_child(imin:imax,jbdy+1,1:jpkm1,jn) + z2 * ptab_child(imin:imax,jbdy,1:jpkm1,jn)
                   DO jk = 1, jpkm1
                      DO ji = imin,imax
                         IF( vmask(ji,jbdy-1,jk) == 0._wp ) THEN
@@ -190,14 +194,21 @@ CONTAINS
                      END DO
                   END DO
                   ! Restore ghost points:
-                  tra(imin:imax,jbdy+1,k1:k2,jn) = ptab_child(imin:imax,jbdy+1,k1:k2,jn) * tmask(imin:imax,jbdy+1,k1:k2)
+                  tra(imin:imax,jbdy+1,1:jpkm1,jn) = ptab_child(imin:imax,jbdy+1,1:jpkm1,jn) * tmask(imin:imax,jbdy+1,1:jpkm1)
                END DO
             ENDIF
             !
-            IF( western_side ) THEN    
+            IF( western_side ) THEN
+               zrho = Agrif_Rhox()
+               z1 = ( zrho - 1._wp ) * 0.5_wp                    
+               z3 = ( zrho - 1._wp ) / ( zrho + 1._wp )         
+               z6 = 2._wp * ( zrho - 1._wp ) / ( zrho + 1._wp )
+               z7 =       - ( zrho - 1._wp ) / ( zrho + 3._wp )
+               z2 = 1._wp - z1 ; z4 = 1._wp - z3 ; z5 = 1._wp - z6 - z7
+               !    
                ibdy = 1+nbghostcells       
                DO jn = 1, jptra
-                  tra(ibdy-1,jmin:jmax,k1:k2,jn) = z1 * ptab_child(ibdy-1,jmin:jmax,k1:k2,jn) + z2 * ptab_child(ibdy,jmin:jmax,k1:k2,jn)
+                  tra(ibdy-1,jmin:jmax,1:jpkm1,jn) = z1 * ptab_child(ibdy-1,jmin:jmax,1:jpkm1,jn) + z2 * ptab_child(ibdy,jmin:jmax,1:jpkm1,jn)
                   DO jk = 1, jpkm1
                      DO jj = jmin,jmax
                         IF( umask(ibdy,jj,jk) == 0._wp ) THEN
@@ -205,38 +216,48 @@ CONTAINS
                         ELSE
                            tra(ibdy,jj,jk,jn)=(z4*tra(ibdy-1,jj,jk,jn)+z3*tra(ibdy+1,jj,jk,jn))*tmask(ibdy,jj,jk)        
                            IF( un(ibdy,jj,jk) < 0._wp ) THEN
-                              tra(ibdy,jj,jk,jn)=(z6*tra(ibdy+1,jj,jk,jn)+z5*tra(ibdy-1,jj,jk,jn)+z7*tra(ibdy+2,jj,jk,jn))*tmask(ibdy,jj,jk)
+                              tra(ibdy,jj,jk,jn)=( z6*tra(ibdy+1,jj,jk,jn)+z5*tra(ibdy-1,jj,jk,jn) &
+                                                 + z7*tra(ibdy+2,jj,jk,jn) ) * tmask(ibdy,jj,jk)
                            ENDIF
                         ENDIF
                      END DO
                   END DO
                   ! Restore ghost points:
-                  tra(ibdy-1,jmin:jmax,k1:k2,jn) = ptab_child(ibdy-1,jmin:jmax,k1:k2,jn) * tmask(ibdy-1,jmin:jmax,k1:k2)
+                  tra(ibdy-1,jmin:jmax,1:jpkm1,jn) = ptab_child(ibdy-1,jmin:jmax,1:jpkm1,jn) * tmask(ibdy-1,jmin:jmax,1:jpkm1)
                END DO
             ENDIF
             !
-            IF( southern_side ) THEN  
+            IF( southern_side ) THEN
+               zrho = Agrif_Rhoy()
+               z1 = ( zrho - 1._wp ) * 0.5_wp                    
+               z3 = ( zrho - 1._wp ) / ( zrho + 1._wp )         
+               z6 = 2._wp * ( zrho - 1._wp ) / ( zrho + 1._wp )
+               z7 =       - ( zrho - 1._wp ) / ( zrho + 3._wp )
+               z2 = 1._wp - z1 ; z4 = 1._wp - z3 ; z5 = 1._wp - z6 - z7
+               !  
                jbdy=1+nbghostcells        
                DO jn = 1, jptra
-                  tra(imin:imax,jbdy-1,k1:k2,jn) = z1 * ptab_child(imin:imax,jbdy-1,k1:k2,jn) + z2 * ptab_child(imin:imax,jbdy,k1:k2,jn)
-                  DO jk = 1, jpk      
-                     DO ji=imin,imax
+                  tra(imin:imax,jbdy-1,1:jpkm1,jn) = z1 * ptab_child(imin:imax,jbdy-1,1:jpkm1,jn) + z2 * ptab_child(imin:imax,jbdy,1:jpkm1,jn)
+                  DO jk = 1, jpkm1      
+                     DO ji = imin,imax
                         IF( vmask(ji,jbdy,jk) == 0._wp ) THEN
                            tra(ji,jbdy,jk,jn)=tra(ji,jbdy-1,jk,jn) * tmask(ji,jbdy,jk)
                         ELSE
                            tra(ji,jbdy,jk,jn)=(z4*tra(ji,jbdy-1,jk,jn)+z3*tra(ji,jbdy+1,jk,jn))*tmask(ji,jbdy,jk)
                            IF( vn(ji,jbdy,jk) < 0._wp ) THEN
-                              tra(ji,jbdy,jk,jn)=(z6*tra(ji,jbdy+1,jk,jn)+z5*tra(ji,jbdy-1,jk,jn)+z7*tra(ji,jbdy+2,jk,jn))*tmask(ji,jbdy,jk)
+                              tra(ji,jbdy,jk,jn)=( z6*tra(ji,jbdy+1,jk,jn)+z5*tra(ji,jbdy-1,jk,jn) & 
+                                                 + z7*tra(ji,jbdy+2,jk,jn) ) * tmask(ji,jbdy,jk)
                            ENDIF
                         ENDIF
                      END DO
                   END DO
                   ! Restore ghost points:
-                  tra(imin:imax,jbdy-1,k1:k2,jn) = tra(imin:imax,jbdy-1,k1:k2,jn) * tmask(imin:imax,jbdy-1,k1:k2)
+                  tra(imin:imax,jbdy-1,1:jpkm1,jn) = ptab_child(imin:imax,jbdy-1,1:jpkm1,jn) * tmask(imin:imax,jbdy-1,1:jpkm1)
                END DO
             ENDIF
             !
          ENDIF
+
       ENDIF
       !
    END SUBROUTINE interptrn
