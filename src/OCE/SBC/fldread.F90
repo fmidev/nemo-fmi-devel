@@ -246,43 +246,43 @@ CONTAINS
                      sd(jf)%rotn(1)   = sd(jf)%rotn(2)             ! update before rotate informations
                      sd(jf)%nrec_a(1) = sd(jf)%nrec_a(1) + 1       ! move back to after record
                   ENDIF
+               ENDIF ! temporal interpolation?
 
-                  ! do we have to change the year/month/week/day of the forcing field?? 
-                  ! if we do time interpolation we will need to open next year/month/week/day file before the end of the current
-                  ! one. If so, we are still before the end of the year/month/week/day when calling fld_rec so sd(jf)%nrec_a(1)
-                  ! will be larger than the record number that should be read for current year/month/week/day
-                  ! do we need next file data?
-                  IF( sd(jf)%nrec_a(1) > sd(jf)%nreclast ) THEN
-                     
-                     sd(jf)%nrec_a(1) = sd(jf)%nrec_a(1) - sd(jf)%nreclast   ! 
-                     
-                     IF( .NOT. ( sd(jf)%ln_clim .AND. sd(jf)%cltype == 'yearly' ) ) THEN   ! close/open the current/new file
-                        
-                        llnxtmth = sd(jf)%cltype == 'monthly' .OR. nday == nmonth_len(nmonth)      ! open next month file?
-                        llnxtyr  = sd(jf)%cltype == 'yearly'  .OR. (nmonth == 12 .AND. llnxtmth)   ! open next year  file?
-
-                        ! if the run finishes at the end of the current year/month/week/day, we will allow next
-                        ! year/month/week/day file to be not present. If the run continue further than the current
-                        ! year/month/week/day, next year/month/week/day file must exist
-                        isecend = nsec_year + nsec1jan000 + (nitend - kt) * NINT(rdt)   ! second at the end of the run
-                        llstop = isecend > sd(jf)%nrec_a(2)                                   ! read more than 1 record of next year
-                        ! we suppose that the date of next file is next day (should be ok even for weekly files...)
-                        CALL fld_clopn( sd(jf), nyear  + COUNT((/llnxtyr /))                                           ,         &
-                           &                    nmonth + COUNT((/llnxtmth/)) - 12                 * COUNT((/llnxtyr /)),         &
-                           &                    nday   + 1                   - nmonth_len(nmonth) * COUNT((/llnxtmth/)), llstop )
-
-                        IF( sd(jf)%num <= 0 .AND. .NOT. llstop ) THEN    ! next year file does not exist
-                           CALL ctl_warn('next year/month/week/day file: '//TRIM(sd(jf)%clname)//     &
-                              &     ' not present -> back to current year/month/day')
-                           CALL fld_clopn( sd(jf) )       ! back to the current year/month/day
-                           sd(jf)%nrec_a(1) = sd(jf)%nreclast     ! force to read the last record in the current year file
-                        ENDIF
-                        
-                     ENDIF
-                  ENDIF   ! open need next file?
+               ! do we have to change the year/month/week/day of the forcing field?? 
+               ! if we do time interpolation we will need to open next year/month/week/day file before the end of the current
+               ! one. If so, we are still before the end of the year/month/week/day when calling fld_rec so sd(jf)%nrec_a(1)
+               ! will be larger than the record number that should be read for current year/month/week/day
+               ! do we need next file data?
+               ! This applies to both cases with or without time interpolation
+               IF( sd(jf)%nrec_a(1) > sd(jf)%nreclast ) THEN
                   
-               ENDIF   ! temporal interpolation?
+                  sd(jf)%nrec_a(1) = sd(jf)%nrec_a(1) - sd(jf)%nreclast   ! 
+                  
+                  IF( .NOT. ( sd(jf)%ln_clim .AND. sd(jf)%cltype == 'yearly' ) ) THEN   ! close/open the current/new file
+                     
+                     llnxtmth = sd(jf)%cltype == 'monthly' .OR. nday == nmonth_len(nmonth)      ! open next month file?
+                     llnxtyr  = sd(jf)%cltype == 'yearly'  .OR. (nmonth == 12 .AND. llnxtmth)   ! open next year  file?
 
+                     ! if the run finishes at the end of the current year/month/week/day, we will allow next
+                     ! year/month/week/day file to be not present. If the run continue further than the current
+                     ! year/month/week/day, next year/month/week/day file must exist
+                     isecend = nsec_year + nsec1jan000 + (nitend - kt) * NINT(rdt)   ! second at the end of the run
+                     llstop = isecend > sd(jf)%nrec_a(2)                                   ! read more than 1 record of next year
+                     ! we suppose that the date of next file is next day (should be ok even for weekly files...)
+                     CALL fld_clopn( sd(jf), nyear  + COUNT((/llnxtyr /))                                           ,         &
+                        &                    nmonth + COUNT((/llnxtmth/)) - 12                 * COUNT((/llnxtyr /)),         &
+                        &                    nday   + 1                   - nmonth_len(nmonth) * COUNT((/llnxtmth/)), llstop )
+
+                     IF( sd(jf)%num <= 0 .AND. .NOT. llstop ) THEN    ! next year file does not exist
+                        CALL ctl_warn('next year/month/week/day file: '//TRIM(sd(jf)%clname)//     &
+                           &     ' not present -> back to current year/month/day')
+                        CALL fld_clopn( sd(jf) )       ! back to the current year/month/day
+                        sd(jf)%nrec_a(1) = sd(jf)%nreclast     ! force to read the last record in the current year file
+                     ENDIF
+                     
+                  ENDIF
+               ENDIF   ! open need next file?
+                  
                ! read after data
                IF( PRESENT(jpk_bdy) ) THEN
                   CALL fld_get( sd(jf), imap, jpk_bdy, fvl)

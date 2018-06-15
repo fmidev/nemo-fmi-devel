@@ -1159,6 +1159,7 @@ CONTAINS
 
       ! For the flagu/flagv calculation below we require a version of fmask without
       ! the land boundary condition (shlat) included:
+      zfmask(:,:) = 0
       DO ij = 2, jpjm1
          DO ii = 2, jpim1
             zfmask(ii,ij) = tmask(ii,ij  ,1) * tmask(ii+1,ij  ,1)   &
