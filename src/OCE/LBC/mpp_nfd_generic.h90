@@ -94,9 +94,6 @@
          ALLOCATE( zfoldwk(jpimax,4,ipk,ipl,ipf) )
          ALLOCATE( ztabl(jpimax   ,4,ipk,ipl,ipf) , ztabr(jpimax*jpmaxngh,4,ipk,ipl,ipf) ) 
          !
-         ztabr(:,:,:,:,:) = 0._wp
-         ztabl(:,:,:,:,:) = 0._wp
-         !
          DO jf = 1, ipf
             DO jl = 1, ipl
                DO jk = 1, ipk
@@ -118,8 +115,11 @@
          DO jr = 1,nsndto
             iproc = nfipproc(isendto(jr),jpnj)
             IF(iproc /= -1) THEN
-               ilei = nleit (iproc+1)
+               iilb = nimppt(iproc+1)
                ildi = nldit (iproc+1)
+               ilei = nleit (iproc+1)
+               IF( iilb           ==      1 )   ildi = 1     ! e-w boundary already done -> force to take 1st column
+               IF( iilb + jpi - 1 == jpiglo )   ilei = jpi   ! e-w boundary already done -> force to take last column
                iilb = nfiimpp(isendto(jr),jpnj) - nfiimpp(isendto(1),jpnj)
             ENDIF
             IF( iproc /= narea-1 .AND. iproc /= -1 ) THEN
@@ -181,12 +181,13 @@
          CALL MPI_ALLGATHER( znorthloc  , itaille, MPI_DOUBLE_PRECISION,                &
             &                znorthgloio, itaille, MPI_DOUBLE_PRECISION, ncomm_north, ierr )
          !
-         ztab(:,:,:,:,:) = 0._wp
          DO jr = 1, ndim_rank_north         ! recover the global north array
             iproc = nrank_north(jr) + 1
+            iilb  = nimppt(iproc)
             ildi  = nldit (iproc)
             ilei  = nleit (iproc)
-            iilb  = nimppt(iproc)
+            IF( iilb           ==      1 )   ildi = 1     ! e-w boundary already done -> force to take 1st column
+            IF( iilb + jpi - 1 == jpiglo )   ilei = jpi   ! e-w boundary already done -> force to take last column
             DO jf = 1, ipf
                DO jl = 1, ipl
                   DO jk = 1, ipk
