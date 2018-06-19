@@ -53,6 +53,7 @@ MODULE bdydta
 #if defined key_si3
    INTEGER ::   nice_cat                      ! number of categories in the input file
    INTEGER ::   jfld_hti, jfld_hts, jfld_ai   ! indices of ice thickness, snow thickness and concentration in bf structure
+   INTEGER, DIMENSION(jp_bdy) :: jfld_htit, jfld_htst, jfld_ait
 #endif
 
    !!----------------------------------------------------------------------
@@ -350,6 +351,9 @@ CONTAINS
                ENDIF
 #if defined key_si3
                IF( cn_ice(jbdy) /= 'none' .AND. nn_ice_dta(jbdy) == 1 ) THEN
+                  jfld_hti = jfld_htit(jbdy)
+                  jfld_hts = jfld_htst(jbdy)
+                  jfld_ai  = jfld_ait(jbdy)
                   IF( nice_cat == 1 ) THEN ! case input cat = 1
                      CALL ice_var_itd ( bf(jfld_hti)%fnow(:,1,1), bf(jfld_hts)%fnow(:,1,1), bf(jfld_ai)%fnow(:,1,1), &
                         &               dta_bdy(jbdy)%h_i     , dta_bdy(jbdy)%h_s     , dta_bdy(jbdy)%a_i    )
@@ -811,9 +815,9 @@ CONTAINS
                   jfld = jfld + 1
                   dta_bdy(jbdy)%h_s => bf(jfld)%fnow(:,1,:)
                ELSE                        ! case input cat = 1 OR (/=1 and /=jpl)
-                  jfld_ai  = jfld + 1
-                  jfld_hti = jfld + 2
-                  jfld_hts = jfld + 3
+                  jfld_ait(jbdy)  = jfld + 1
+                  jfld_htit(jbdy) = jfld + 2
+                  jfld_htst(jbdy) = jfld + 3
                   jfld     = jfld + 3
                   ALLOCATE( dta_bdy(jbdy)%a_i(nblen(1),jpl) )
                   ALLOCATE( dta_bdy(jbdy)%h_i(nblen(1),jpl) )
