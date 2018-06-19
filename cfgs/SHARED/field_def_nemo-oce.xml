@@ -361,6 +361,10 @@
          <!-- ahu_bbl : available with ln_trabbl=T and nn_bbl_ldf=1 -->
          <field id="ahu_bbl"      long_name="BBL diffusive flux along i-axis"   unit="m3/s" />
 
+         <!-- variables available with WAVE (ln_wave=T) -->
+         <field id="ustokes"      long_name="Stokes Drift Velocity i-axis"      standard_name="StokesDrift_x_velocity"      unit="m/s"        grid_ref="grid_U_3D" />
+         <field id="ustokes_e3u"  long_name="Stokes Drift Velocity i-axis  (thickness weighted)"                            unit="m/s"        grid_ref="grid_U_3D"  > ustokes * e3u </field>
+
          <!-- variable for ice shelves -->
          <field id="utbl"         long_name="zonal current in the Losh tbl"     unit="m/s" />
 
@@ -411,6 +415,10 @@
          <!-- ahu_bbl : available with ln_trabbl=T and nn_bbl_ldf=1 -->
          <field id="ahv_bbl"      long_name="BBL diffusive flux along j-axis"   unit="m3/s" />
 
+         <!-- variables available with WAVE (ln_wave=T) -->
+         <field id="vstokes"      long_name="Stokes Drift Velocity j-axis"      standard_name="StokesDrift_y_velocity"      unit="m/s"        grid_ref="grid_V_3D" />
+         <field id="vstokes_e3v"  long_name="Stokes Drift Velocity j-axis  (thickness weighted)"                            unit="m/s"        grid_ref="grid_V_3D"  > vstokes * e3v </field>
+
          <!-- variable for ice shelves -->
          <field id="vtbl"         long_name="meridional current in the Losh tbl"   unit="m/s" />
 
@@ -456,6 +464,9 @@
          <field id="bflx_iwm"     long_name="internal wave-induced buoyancy flux"            standard_name="buoyancy_flux_due_to_internal_waves"                             unit="W/kg" />
          <field id="pcmap_iwm"    long_name="power consumed by wave-driven mixing"           standard_name="vertically_integrated_power_consumption_by_wave_driven_mixing"   unit="W/m2"      grid_ref="grid_W_2D" />
          <field id="emix_iwm"     long_name="power density available for mixing"             standard_name="power_available_for_mixing_from_breaking_internal_waves"         unit="W/kg" />
+
+         <!-- variables available with WAVE (ln_wave=T) -->
+         <field id="wstokes"      long_name="Stokes Drift vertical velocity"      standard_name="upward_StokesDrift_velocity"   unit="m/s" />
 
          <!-- variables available with diaar5 -->   
          <field id="w_masstr"     long_name="vertical mass transport"             standard_name="upward_ocean_mass_transport"             unit="kg/s"   />
