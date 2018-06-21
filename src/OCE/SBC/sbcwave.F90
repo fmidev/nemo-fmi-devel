@@ -320,35 +320,35 @@ CONTAINS
       !
       IF( ln_cdgw .AND. .NOT. cpl_wdrag ) THEN     !==  Neutral drag coefficient  ==!
          CALL fld_read( kt, nn_fsbc, sf_cd )             ! read from external forcing
-         cdn_wave(:,:) = sf_cd(1)%fnow(:,:,1)
+         cdn_wave(:,:) = sf_cd(1)%fnow(:,:,1) * tmask(:,:,1)
       ENDIF
 
       IF( ln_tauwoc .AND. .NOT. cpl_tauwoc ) THEN  !==  Wave induced stress  ==!
          CALL fld_read( kt, nn_fsbc, sf_tauwoc )         ! read wave norm stress from external forcing
-         tauoc_wave(:,:) = sf_tauwoc(1)%fnow(:,:,1)
+         tauoc_wave(:,:) = sf_tauwoc(1)%fnow(:,:,1) * tmask(:,:,1)
       ENDIF
 
       IF( ln_tauw .AND. .NOT. cpl_tauw ) THEN      !==  Wave induced stress  ==!
          CALL fld_read( kt, nn_fsbc, sf_tauw )           ! read ocean stress components from external forcing (T grid)
-         tauw_x(:,:) = sf_tauw(1)%fnow(:,:,1)
-         tauw_y(:,:) = sf_tauw(2)%fnow(:,:,1)
+         tauw_x(:,:) = sf_tauw(1)%fnow(:,:,1) * tmask(:,:,1)
+         tauw_y(:,:) = sf_tauw(2)%fnow(:,:,1) * tmask(:,:,1)
       ENDIF
 
       IF( ln_sdw )  THEN                           !==  Computation of the 3d Stokes Drift  ==! 
          !
          IF( jpfld > 0 ) THEN                            ! Read from file only if the field is not coupled
             CALL fld_read( kt, nn_fsbc, sf_sd )          ! read wave parameters from external forcing
-            IF( jp_hsw > 0 )   hsw  (:,:) = sf_sd(jp_hsw)%fnow(:,:,1)   ! significant wave height
-            IF( jp_wmp > 0 )   wmp  (:,:) = sf_sd(jp_wmp)%fnow(:,:,1)   ! wave mean period
-            IF( jp_wfr > 0 )   wfreq(:,:) = sf_sd(jp_wfr)%fnow(:,:,1)   ! Peak wave frequency
-            IF( jp_usd > 0 )   ut0sd(:,:) = sf_sd(jp_usd)%fnow(:,:,1)   ! 2D zonal Stokes Drift at T point
-            IF( jp_vsd > 0 )   vt0sd(:,:) = sf_sd(jp_vsd)%fnow(:,:,1)   ! 2D meridional Stokes Drift at T point
+            IF( jp_hsw > 0 )   hsw  (:,:) = sf_sd(jp_hsw)%fnow(:,:,1) * tmask(:,:,1)  ! significant wave height
+            IF( jp_wmp > 0 )   wmp  (:,:) = sf_sd(jp_wmp)%fnow(:,:,1) * tmask(:,:,1)  ! wave mean period
+            IF( jp_wfr > 0 )   wfreq(:,:) = sf_sd(jp_wfr)%fnow(:,:,1) * tmask(:,:,1)  ! Peak wave frequency
+            IF( jp_usd > 0 )   ut0sd(:,:) = sf_sd(jp_usd)%fnow(:,:,1) * tmask(:,:,1)  ! 2D zonal Stokes Drift at T point
+            IF( jp_vsd > 0 )   vt0sd(:,:) = sf_sd(jp_vsd)%fnow(:,:,1) * tmask(:,:,1)  ! 2D meridional Stokes Drift at T point
          ENDIF
          !
          ! Read also wave number if needed, so that it is available in coupling routines
          IF( ln_zdfswm .AND. .NOT.cpl_wnum ) THEN
             CALL fld_read( kt, nn_fsbc, sf_wn )          ! read wave parameters from external forcing
-            wnum(:,:) = sf_wn(1)%fnow(:,:,1)
+            wnum(:,:) = sf_wn(1)%fnow(:,:,1) * tmask(:,:,1)
          ENDIF
            
          ! Calculate only if required fields have been read
