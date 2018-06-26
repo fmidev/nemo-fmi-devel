@@ -800,21 +800,25 @@ CONTAINS
             IF((nbondi == -1).OR.(nbondi == 2)) THEN
                DO jj = 1, jpj
                   zwx(2:nbghostcells+1,jj) = ubdy_w(1:nbghostcells,jj) * e2u(2:nbghostcells+1,jj)
+                  zwy(2:nbghostcells+1,jj) = vbdy_w(1:nbghostcells,jj) * e1v(2:nbghostcells+1,jj)
                END DO
             ENDIF
             IF((nbondi ==  1).OR.(nbondi == 2)) THEN
                DO jj=1,jpj
                   zwx(nlci-nbghostcells-1:nlci-2,jj) = ubdy_e(1:nbghostcells,jj) * e2u(nlci-nbghostcells-1:nlci-2,jj)
+                  zwy(nlci-nbghostcells  :nlci-1,jj) = vbdy_e(1:nbghostcells,jj) * e1v(nlci-nbghostcells  :nlci-1,jj)
                END DO
             ENDIF
             IF((nbondj == -1).OR.(nbondj == 2)) THEN
                DO ji=1,jpi
                   zwy(ji,2:nbghostcells+1) = vbdy_s(ji,1:nbghostcells) * e1v(ji,2:nbghostcells+1)
+                  zwx(ji,2:nbghostcells+1) = ubdy_s(ji,1:nbghostcells) * e2u(ji,2:nbghostcells+1)
                END DO
             ENDIF
             IF((nbondj ==  1).OR.(nbondj == 2)) THEN
                DO ji=1,jpi
                   zwy(ji,nlcj-nbghostcells-1:nlcj-2) = vbdy_n(ji,1:nbghostcells) * e1v(ji,nlcj-nbghostcells-1:nlcj-2)
+                  zwx(ji,nlcj-nbghostcells  :nlcj-1) = ubdy_n(ji,1:nbghostcells) * e2u(ji,nlcj-nbghostcells  :nlcj-1)
                END DO
             ENDIF
          ENDIF
