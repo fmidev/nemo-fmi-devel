@@ -442,9 +442,8 @@ CONTAINS
             IF ( ik > 1 ) THEN
                ! 1. -----------the average temperature between 200m and 600m ---------------------
                DO jk = misfkt(ji,jj),misfkb(ji,jj)
-                  ! freezing point temperature  at ice shelf base BG eq. 2 (JMM sign pb ??? +7.64e-4 !!!)
-                  ! after verif with UNESCO, wrong sign in BG eq. 2
                   ! Calculate freezing temperature
+                  zpress = grav*rau0*gdept_n(ji,jj,ik)*1.e-04
                   CALL eos_fzp(stbl(ji,jj), zt_frz, zpress) 
                   zt_sum = zt_sum + (tsn(ji,jj,jk,jp_tem)-zt_frz) * e3t_n(ji,jj,jk) * tmask(ji,jj,jk)  ! sum temp
                END DO
