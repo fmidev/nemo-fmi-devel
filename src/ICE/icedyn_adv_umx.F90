@@ -230,7 +230,7 @@ CONTAINS
          DO ji = fs_2, fs_jpim1   ! vector opt.  
             ztra       = ztrd(ji,jj)  - (  zfu_ho(ji,jj) - zfu_ho(ji-1,jj  )   &
                &                         + zfv_ho(ji,jj) - zfv_ho(ji  ,jj-1) ) * r1_e1e2t(ji,jj)  
-            ptc(ji,jj) = ptc(ji,jj) + pdt * ztra
+            ptc(ji,jj) = ( ptc(ji,jj) + pdt * ztra ) * tmask(ji,jj,1)
          END DO
       END DO
       CALL lbc_lnk( ptc, 'T',  1. )
