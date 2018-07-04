@@ -15,7 +15,7 @@ MODULE agrif_ice
    PRIVATE 
 
    INTEGER, PUBLIC ::  u_ice_id, v_ice_id, tra_ice_id
-   INTEGER, PUBLIC ::  lim_nbstep = 0    ! child time position in sea-ice model
+   INTEGER, PUBLIC ::  nbstep_ice = 0    ! child time position in sea-ice model
 
    !!----------------------------------------------------------------------
    !! NEMO/NST 4.0 , NEMO Consortium (2018)

@@ -1351,13 +1351,13 @@ CONTAINS
       !                                                      ! ================== !
       IF( srcv(jpr_ocx1)%laction ) THEN                      ! received by sas in case of opa <-> sas coupling
          ssu_m(:,:) = frcv(jpr_ocx1)%z3(:,:,1)
-         ub (:,:,1) = ssu_m(:,:)                             ! will be used in icestp in the call of lim_sbc_tau
+         ub (:,:,1) = ssu_m(:,:)                             ! will be used in icestp in the call of ice_forcing_tau
          un (:,:,1) = ssu_m(:,:)                             ! will be used in sbc_cpl_snd if atmosphere coupling
          CALL iom_put( 'ssu_m', ssu_m )
       ENDIF
       IF( srcv(jpr_ocy1)%laction ) THEN
          ssv_m(:,:) = frcv(jpr_ocy1)%z3(:,:,1)
-         vb (:,:,1) = ssv_m(:,:)                             ! will be used in icestp in the call of lim_sbc_tau
+         vb (:,:,1) = ssv_m(:,:)                             ! will be used in icestp in the call of ice_forcing_tau
          vn (:,:,1) = ssv_m(:,:)                             ! will be used in sbc_cpl_snd if atmosphere coupling
          CALL iom_put( 'ssv_m', ssv_m )
       ENDIF

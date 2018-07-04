@@ -56,13 +56,13 @@ CONTAINS
       SELECT CASE( cd_type )
       CASE('U','V')
          IF( PRESENT( kiter ) ) THEN  ! interpolation at the child ice sub-time step (only for ice rheology)
-            zbeta = ( REAL(lim_nbstep) - REAL(kitermax - kiter) / REAL(kitermax) ) /  &
+            zbeta = ( REAL(nbstep_ice) - REAL(kitermax - kiter) / REAL(kitermax) ) /  &
                &    ( Agrif_Rhot() * REAL(Agrif_Parent(nn_fsbc)) / REAL(nn_fsbc) )
          ELSE                         ! interpolation at the child ice time step
-            zbeta = REAL(lim_nbstep) / ( Agrif_Rhot() * REAL(Agrif_Parent(nn_fsbc)) / REAL(nn_fsbc) )
+            zbeta = REAL(nbstep_ice) / ( Agrif_Rhot() * REAL(Agrif_Parent(nn_fsbc)) / REAL(nn_fsbc) )
          ENDIF
       CASE('T')
-            zbeta = REAL(lim_nbstep) / ( Agrif_Rhot() * REAL(Agrif_Parent(nn_fsbc)) / REAL(nn_fsbc) )
+            zbeta = REAL(nbstep_ice) / ( Agrif_Rhot() * REAL(Agrif_Parent(nn_fsbc)) / REAL(nn_fsbc) )
       END SELECT
       !
       Agrif_SpecialValue    = -9999.

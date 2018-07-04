@@ -136,8 +136,8 @@ CONTAINS
          !
          !                          !==  AGRIF Parent to Child  ==!
 #if defined key_agrif
-         !                              ! lim_nbstep ranges from 1 to the nb of child ocean steps inside one parent ice step
-         IF( .NOT. Agrif_Root() )       lim_nbstep = MOD( lim_nbstep, Agrif_irhot() * Agrif_Parent(nn_fsbc) / nn_fsbc ) + 1
+         !                              ! nbstep_ice ranges from 1 to the nb of child ocean steps inside one parent ice step
+         IF( .NOT. Agrif_Root() )       nbstep_ice = MOD( nbstep_ice, Agrif_irhot() * Agrif_Parent(nn_fsbc) / nn_fsbc ) + 1
          !                              ! these calls must remain here for restartability purposes
                                         CALL agrif_interp_ice( 'T' ) 
                                         CALL agrif_interp_ice( 'U' )

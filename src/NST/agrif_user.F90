@@ -482,13 +482,13 @@ SUBROUTINE Agrif_InitValues_cont_ice
    IF( MOD( Agrif_irhot() * Agrif_Parent(nn_fsbc), nn_fsbc ) /= 0 )  THEN
       CALL ctl_stop('rhot * nn_fsbc(parent) /= N * nn_fsbc(child), therefore nn_fsbc(child) should be set to 1 or nn_fsbc(parent)')
    ENDIF
-   ! First Interpolations (using "after" ice subtime step => lim_nbstep=1)
+   ! First Interpolations (using "after" ice subtime step => nbstep_ice=1)
    !----------------------------------------------------------------------
-   lim_nbstep = ( Agrif_irhot() * Agrif_Parent(nn_fsbc) / nn_fsbc ) ! clem: to have calledweight=1 in interp (otherwise the western border of the zoom is wrong)
+   nbstep_ice = ( Agrif_irhot() * Agrif_Parent(nn_fsbc) / nn_fsbc ) ! clem: to have calledweight=1 in interp (otherwise the western border of the zoom is wrong)
    CALL agrif_interp_ice('U') ! interpolation of ice velocities
    CALL agrif_interp_ice('V') ! interpolation of ice velocities
    CALL agrif_interp_ice('T') ! interpolation of ice tracers 
-   lim_nbstep = 0
+   nbstep_ice = 0
    
    !
 END SUBROUTINE Agrif_InitValues_cont_ice
