@@ -204,7 +204,7 @@ CONTAINS
       !!        entrainment) should be zero, at machine accuracy. Note that in the case
       !!        of time-averaged mixed-layer fields, this residual WILL NOT BE ZERO
       !!        over the first two analysis windows (except if restart).
-      !!        N.B. For ORCA2_LIM, use e.g. ntrc_trc=5, rn_ucf_trc=1., nctls_trc=8
+      !!        N.B. For ORCA2_ICE, use e.g. ntrc_trc=5, rn_ucf_trc=1., nctls_trc=8
       !!             for checking residuals.
       !!             On a NEC-SX5 computer, this typically leads to:
       !!                   O(1.e-20) temp. residuals (tml_res) when ln_trdmxl_trc_instant=.false.
