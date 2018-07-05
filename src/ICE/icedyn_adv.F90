@@ -98,7 +98,7 @@ CONTAINS
       ! Debug the advection schemes
       !----------------------------
       ! clem: The 2 advection schemes above are not strictly positive.
-      !       In Prather, advected fields are bounded by 0 in the routine with a MAX(0,field) ==> likely conservation issues
+      !       In Prather, advected fields are bounded by 0 (not anymore?) in the routine with a MAX(0,field) ==> likely conservation issues
       !       In UMx    , advected fields are not bounded and negative values can appear.
       !                   These values are usually very small but in some occasions they can also be non-negligible
       !                   Therefore one needs to bound the advected fields by 0 (though this is not a clean fix)

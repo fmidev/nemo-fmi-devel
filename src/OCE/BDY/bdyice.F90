@@ -73,8 +73,8 @@ CONTAINS
       END DO
       !
       CALL ice_cor( kt , 0 )      ! -- In case categories are out of bounds, do a remapping
-      !                           !    i.e. inputs have not the same ice thickness distribution 
-      !                           !    (set by rn_himean) than the regional simulation
+      !                           !    i.e. inputs have not the same ice thickness distribution (set by rn_himean)
+      !                           !         than the regional simulation
       CALL ice_var_agg(1)
       !
       IF( ln_icectl )   CALL ice_prt( kt, iiceprt, jiceprt, 1, ' - ice thermo bdy - ' )
@@ -188,6 +188,10 @@ CONTAINS
                   sz_i(ji,jj,jk,jl) = rswitch * rn_ice_sal(ib_bdy) + ( 1.0 - rswitch ) * rn_simin
                END DO
                !
+               ! Ice ponds
+               a_ip(ji,jj,jl) = 0._wp
+               v_ip(ji,jj,jl) = 0._wp
+               !
             CASE( 1 )   ! velocity is outward
                !
                ! Ice salinity, age, temperature
@@ -201,6 +205,10 @@ CONTAINS
                   t_i (ji,jj,jk,jl) = rswitch * t_i (ii,ij,jk,jl) + ( 1.0 - rswitch ) * rt0
                   sz_i(ji,jj,jk,jl) = rswitch * sz_i(ii,ij,jk,jl) + ( 1.0 - rswitch ) * rn_simin
                END DO
+               !
+               ! Ice ponds
+               a_ip(ji,jj,jl) = rswitch * a_ip(ii,ij,jl)
+               v_ip(ji,jj,jl) = rswitch * v_ip(ii,ij,jl)
                !
             END SELECT
             !
@@ -249,12 +257,10 @@ CONTAINS
             CALL lbc_bdy_lnk(e_i(:,:,jk,jl), 'T', 1., ib_bdy )
          END DO
          !
+         CALL lbc_bdy_lnk( a_ip(:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( v_ip(:,:,jl), 'T', 1., ib_bdy )
+         !
       END DO !jl
-      !
-!!      ! --- In case categories are out of bounds, do a remapping --- !
-!!      !     i.e. inputs have not the same ice thickness distribution 
-!!      !          (set by rn_himean) than the regional simulation
-!!      IF( jpl > 1 )   CALL ice_itd_reb( kt )
       !      
    END SUBROUTINE bdy_ice_frs
 
