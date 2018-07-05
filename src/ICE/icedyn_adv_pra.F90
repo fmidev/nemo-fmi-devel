@@ -240,22 +240,22 @@ CONTAINS
       !-------------------------------------------
       ! Recover the properties from their contents
       !-------------------------------------------
-      pato_i(:,:) = z0opw(:,:,1) * r1_e1e2t(:,:)
+      pato_i(:,:) = z0opw(:,:,1) * r1_e1e2t(:,:) * tmask(:,:,1)
       DO jl = 1, jpl
-         pv_i (:,:,  jl) = z0ice(:,:,jl) * r1_e1e2t(:,:)
-         pv_s (:,:,  jl) = z0snw(:,:,jl) * r1_e1e2t(:,:)
-         psv_i(:,:,  jl) = z0smi(:,:,jl) * r1_e1e2t(:,:)
-         poa_i(:,:,  jl) = z0oi (:,:,jl) * r1_e1e2t(:,:)
-         pa_i (:,:,  jl) = z0ai (:,:,jl) * r1_e1e2t(:,:)
+         pv_i (:,:,  jl) = z0ice(:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
+         pv_s (:,:,  jl) = z0snw(:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
+         psv_i(:,:,  jl) = z0smi(:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
+         poa_i(:,:,  jl) = z0oi (:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
+         pa_i (:,:,  jl) = z0ai (:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
          DO jk = 1, nlay_s
-            pe_s(:,:,jk,jl) = z0es(:,:,jk,jl) * r1_e1e2t(:,:)
+            pe_s(:,:,jk,jl) = z0es(:,:,jk,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
          END DO
          DO jk = 1, nlay_i
-            pe_i(:,:,jk,jl) = z0ei(:,:,jk,jl) * r1_e1e2t(:,:)
+            pe_i(:,:,jk,jl) = z0ei(:,:,jk,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
          END DO
          IF ( ln_pnd_H12 ) THEN
-            pa_ip  (:,:,jl) = z0ap (:,:,jl) * r1_e1e2t(:,:)
-            pv_ip  (:,:,jl) = z0vp (:,:,jl) * r1_e1e2t(:,:)
+            pa_ip  (:,:,jl) = z0ap (:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
+            pv_ip  (:,:,jl) = z0vp (:,:,jl) * r1_e1e2t(:,:) * tmask(:,:,1)
          ENDIF
       END DO
       !
