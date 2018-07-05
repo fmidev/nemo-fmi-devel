@@ -94,6 +94,22 @@ CONTAINS
             &                  ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
       END SELECT
 
+      !----------------------------
+      ! Debug the advection schemes
+      !----------------------------
+      ! clem: The 2 advection schemes above are not strictly positive.
+      !       In Prather, advected fields are bounded by 0 in the routine with a MAX(0,field) ==> likely conservation issues
+      !       In UMx    , advected fields are not bounded and negative values can appear.
+      !                   These values are usually very small but in some occasions they can also be non-negligible
+      !                   Therefore one needs to bound the advected fields by 0 (though this is not a clean fix)
+      ! ==> 1) remove negative ice areas and volumes (conservation is ensure)
+      CALL ice_var_zapsmall 
+      ! ==> 2) remove remaining negative advected fields (conservation is not preserved)
+      WHERE( v_s (:,:,:)   < 0._wp )   v_s (:,:,:)   = 0._wp
+      WHERE( sv_i(:,:,:)   < 0._wp )   sv_i(:,:,:)   = 0._wp
+      WHERE( e_i (:,:,:,:) < 0._wp )   e_i (:,:,:,:) = 0._wp
+      WHERE( e_s (:,:,:,:) < 0._wp )   e_s (:,:,:,:) = 0._wp
+
       !------------
       ! diagnostics
       !------------

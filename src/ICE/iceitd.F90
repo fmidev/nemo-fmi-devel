@@ -94,7 +94,7 @@ CONTAINS
       DO jj = 1, jpj
          DO ji = 1, jpi
             IF ( at_i(ji,jj) > epsi10 ) THEN
-               npti         = npti + 1
+               npti = npti + 1
                nptidx( npti ) = (jj - 1) * jpi + ji
             ENDIF
          END DO
@@ -110,13 +110,13 @@ CONTAINS
          !
          CALL tab_3d_2d( npti, nptidx(1:npti), h_i_2d (1:npti,1:jpl), h_i   )
          CALL tab_3d_2d( npti, nptidx(1:npti), h_ib_2d(1:npti,1:jpl), h_i_b )
-         CALL tab_3d_2d( npti, nptidx(1:npti), a_i_2d  (1:npti,1:jpl), a_i    )
-         CALL tab_3d_2d( npti, nptidx(1:npti), a_ib_2d (1:npti,1:jpl), a_i_b  )
+         CALL tab_3d_2d( npti, nptidx(1:npti), a_i_2d (1:npti,1:jpl), a_i   )
+         CALL tab_3d_2d( npti, nptidx(1:npti), a_ib_2d(1:npti,1:jpl), a_i_b )
          !
          DO jl = 1, jpl
             ! Compute thickness change in each ice category
             DO ji = 1, npti
-               IF( a_i_2d(ji,jl) > epsi10 )   zdhice(ji,jl) = h_i_2d(ji,jl) - h_ib_2d(ji,jl)   ! clem: if statement is necessary for repro
+               IF( a_i_2d(ji,jl) > epsi10 )   zdhice(ji,jl) = h_i_2d(ji,jl) - h_ib_2d(ji,jl)
             END DO
          END DO
          !
@@ -129,7 +129,7 @@ CONTAINS
                !     Fn*dt = ( fn + (fn+1 - fn)/(hn+1 - hn) * (Hn - hn) ) * dt = zdhice + zslope * (Hmax - h_i_b)
                !
                IF    ( a_ib_2d(ji,jl) >  epsi10 .AND. a_ib_2d(ji,jl+1) >  epsi10 ) THEN   ! a(jl+1) & a(jl) /= 0
-                  zslope           = ( zdhice(ji,jl+1) - zdhice(ji,jl) ) / ( h_ib_2d(ji,jl+1) - h_ib_2d(ji,jl) )
+                  zslope        = ( zdhice(ji,jl+1) - zdhice(ji,jl) ) / ( h_ib_2d(ji,jl+1) - h_ib_2d(ji,jl) )
                   zhbnew(ji,jl) = hi_max(jl) + zdhice(ji,jl) + zslope * ( hi_max(jl) - h_ib_2d(ji,jl) )
                ELSEIF( a_ib_2d(ji,jl) >  epsi10 .AND. a_ib_2d(ji,jl+1) <= epsi10 ) THEN   ! a(jl+1)=0 => Hn* = Hn + fn*dt
                   zhbnew(ji,jl) = hi_max(jl) + zdhice(ji,jl)
@@ -197,15 +197,15 @@ CONTAINS
          DO jl = 1, jpl
             !
             CALL tab_2d_1d( npti, nptidx(1:npti), h_ib_1d(1:npti), h_i_b(:,:,jl) )
-            CALL tab_2d_1d( npti, nptidx(1:npti), h_i_1d (1:npti), h_i(:,:,jl)   )
-            CALL tab_2d_1d( npti, nptidx(1:npti), a_i_1d  (1:npti), a_i(:,:,jl)    )
-            CALL tab_2d_1d( npti, nptidx(1:npti), v_i_1d  (1:npti), v_i(:,:,jl)    )
+            CALL tab_2d_1d( npti, nptidx(1:npti), h_i_1d (1:npti), h_i  (:,:,jl) )
+            CALL tab_2d_1d( npti, nptidx(1:npti), a_i_1d (1:npti), a_i  (:,:,jl) )
+            CALL tab_2d_1d( npti, nptidx(1:npti), v_i_1d (1:npti), v_i  (:,:,jl) )
             !
             IF( jl == 1 ) THEN
                !  
                ! --- g(h) for category 1 --- !
                CALL itd_glinear( zhb0(1:npti)  , zhb1(1:npti)  , h_ib_1d(1:npti)  , a_i_1d(1:npti)  ,  &   ! in
-                  &              g0  (1:npti,1), g1  (1:npti,1), hL      (1:npti,1), hR    (1:npti,1)   )   ! out
+                  &              g0  (1:npti,1), g1  (1:npti,1), hL     (1:npti,1), hR    (1:npti,1)   )   ! out
                   !
                ! Area lost due to melting of thin ice
                DO ji = 1, npti
@@ -227,8 +227,8 @@ CONTAINS
                            !     of thin ice (zdamax > 0)
                            ! Remove area, conserving volume
                            h_i_1d(ji) = h_i_1d(ji) * a_i_1d(ji) / ( a_i_1d(ji) - zda0 )
-                           a_i_1d(ji)  = a_i_1d(ji) - zda0
-                           v_i_1d(ji)  = a_i_1d(ji) * h_i_1d(ji) ! useless ?
+                           a_i_1d(ji) = a_i_1d(ji) - zda0
+                           v_i_1d(ji) = a_i_1d(ji) * h_i_1d(ji) ! useless ?
                         ENDIF
                         !
                      ELSE ! if ice accretion zdh0 > 0
@@ -240,15 +240,15 @@ CONTAINS
                   !
                END DO
                !
-               CALL tab_1d_2d( npti, nptidx(1:npti), h_i_1d (1:npti), h_i(:,:,jl)   )
-               CALL tab_1d_2d( npti, nptidx(1:npti), a_i_1d  (1:npti), a_i(:,:,jl)    )
-               CALL tab_1d_2d( npti, nptidx(1:npti), v_i_1d  (1:npti), v_i(:,:,jl)    )
+               CALL tab_1d_2d( npti, nptidx(1:npti), h_i_1d(1:npti), h_i(:,:,jl) )
+               CALL tab_1d_2d( npti, nptidx(1:npti), a_i_1d(1:npti), a_i(:,:,jl) )
+               CALL tab_1d_2d( npti, nptidx(1:npti), v_i_1d(1:npti), v_i(:,:,jl) )
                !
             ENDIF ! jl=1
             !
             ! --- g(h) for each thickness category --- !  
             CALL itd_glinear( zhbnew(1:npti,jl-1), zhbnew(1:npti,jl), h_i_1d(1:npti)   , a_i_1d(1:npti)   ,  &   ! in
-               &              g0    (1:npti,jl  ), g1    (1:npti,jl), hL     (1:npti,jl), hR    (1:npti,jl)   )   ! out
+               &              g0    (1:npti,jl  ), g1    (1:npti,jl), hL     (1:npti,jl), hR   (1:npti,jl)   )   ! out
             !
          END DO
          
@@ -299,7 +299,7 @@ CONTAINS
          !
          DO ji = 1, npti
             IF ( a_i_1d(ji) > epsi10 .AND. h_i_1d(ji) < rn_himin ) THEN
-               a_i_1d (ji) = a_i_1d(ji) * h_i_1d(ji) / rn_himin 
+               a_i_1d(ji) = a_i_1d(ji) * h_i_1d(ji) / rn_himin 
                IF( ln_pnd_H12 )   a_ip_1d(ji) = a_ip_1d(ji) * h_i_1d(ji) / rn_himin
                h_i_1d(ji) = rn_himin
             ENDIF
@@ -435,6 +435,10 @@ CONTAINS
                ELSE                                  ;   zworka(ji) = 0._wp
                ENDIF
                !
+               ! clem: The transfer between one category to another can lead to very small negative values (-1.e-20)
+               !       because of truncation error ( i.e. 1. - 1. /= 0 )
+               !       I do not think it should be a concern since small areas and volumes are erased (in ice_var_zapsmall.F90)
+               !
                a_i_2d(ji,jl1) = a_i_2d(ji,jl1) - pdaice(ji,jl)       ! Ice areas
                a_i_2d(ji,jl2) = a_i_2d(ji,jl2) + pdaice(ji,jl)
                !
@@ -444,9 +448,8 @@ CONTAINS
                ztrans         = v_s_2d(ji,jl1) * zworkv(ji)          ! Snow volumes
                v_s_2d(ji,jl1) = v_s_2d(ji,jl1) - ztrans
                v_s_2d(ji,jl2) = v_s_2d(ji,jl2) + ztrans 
-               !          
-               !                                                     ! Ice age 
-               ztrans          = oa_i_2d(ji,jl1) * zworka(ji)
+               !
+               ztrans          = oa_i_2d(ji,jl1) * zworka(ji)        ! Ice age
                oa_i_2d(ji,jl1) = oa_i_2d(ji,jl1) - ztrans
                oa_i_2d(ji,jl2) = oa_i_2d(ji,jl2) + ztrans
                !
@@ -454,18 +457,16 @@ CONTAINS
                sv_i_2d(ji,jl1) = sv_i_2d(ji,jl1) - ztrans
                sv_i_2d(ji,jl2) = sv_i_2d(ji,jl2) + ztrans
                !
-               !                                                     ! Surface temperature
-               ztrans          = zaTsfn(ji,jl1) * zworka(ji)
+               ztrans          = zaTsfn(ji,jl1) * zworka(ji)         ! Surface temperature
                zaTsfn(ji,jl1)  = zaTsfn(ji,jl1) - ztrans
                zaTsfn(ji,jl2)  = zaTsfn(ji,jl2) + ztrans
                !  
                IF ( ln_pnd_H12 ) THEN
-                  !                                                  ! Pond fraction
-                  ztrans          = a_ip_2d(ji,jl1) * zworka(ji)
+                  ztrans          = a_ip_2d(ji,jl1) * zworka(ji)     ! Pond fraction
                   a_ip_2d(ji,jl1) = a_ip_2d(ji,jl1) - ztrans
                   a_ip_2d(ji,jl2) = a_ip_2d(ji,jl2) + ztrans
-                  !                                                  ! Pond volume (also proportional to da/a)
-                  ztrans          = v_ip_2d(ji,jl1) * zworka(ji)
+                  !                                              
+                  ztrans          = v_ip_2d(ji,jl1) * zworka(ji)     ! Pond volume (also proportional to da/a)
                   v_ip_2d(ji,jl1) = v_ip_2d(ji,jl1) - ztrans
                   v_ip_2d(ji,jl2) = v_ip_2d(ji,jl2) + ztrans
                ENDIF
@@ -518,10 +519,10 @@ CONTAINS
       ! 3) Update ice thickness and temperature
       !-------------------------------------------------------------------------------
       WHERE( a_i_2d(1:npti,:) >= epsi20 )
-         h_i_2d(1:npti,:)  =  v_i_2d(1:npti,:) / a_i_2d(1:npti,:) 
+         h_i_2d (1:npti,:)  =  v_i_2d(1:npti,:) / a_i_2d(1:npti,:) 
          t_su_2d(1:npti,:)  =  zaTsfn(1:npti,:) / a_i_2d(1:npti,:) 
       ELSEWHERE
-         h_i_2d(1:npti,:)  = 0._wp
+         h_i_2d (1:npti,:)  = 0._wp
          t_su_2d(1:npti,:)  = rt0
       END WHERE
       !
@@ -567,26 +568,26 @@ CONTAINS
          npti = 0   ;   nptidx(:) = 0
          DO jj = 1, jpj
             DO ji = 1, jpi
-               IF( a_i(ji,jj,jl) > epsi10 .AND. v_i(ji,jj,jl) > (a_i(ji,jj,jl) * hi_max(jl)) ) THEN
+               IF( a_i(ji,jj,jl) > 0._wp .AND. v_i(ji,jj,jl) > (a_i(ji,jj,jl) * hi_max(jl)) ) THEN
                   npti = npti + 1
                   nptidx( npti ) = (jj - 1) * jpi + ji                  
                ENDIF
             END DO
          END DO
          !
-!!clem   CALL tab_2d_1d( npti, nptidx(1:npti), h_i_1d (1:npti), h_i(:,:,jl)   )
-         CALL tab_2d_1d( npti, nptidx(1:npti), a_i_1d  (1:npti), a_i(:,:,jl)    )
-         CALL tab_2d_1d( npti, nptidx(1:npti), v_i_1d  (1:npti), v_i(:,:,jl)    )
+!!clem   CALL tab_2d_1d( npti, nptidx(1:npti), h_i_1d(1:npti), h_i(:,:,jl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), a_i_1d(1:npti), a_i(:,:,jl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), v_i_1d(1:npti), v_i(:,:,jl) )
          !
          DO ji = 1, npti
             jdonor(ji,jl)  = jl 
             ! how much of a_i you send in cat sup is somewhat arbitrary
-!!clem: these do not work properly after a restart (I do not know why)
+!!clem: these do not work properly after a restart (I do not know why) => not sure it is still true
 !!          zdaice(ji,jl)  = a_i_1d(ji) * ( h_i_1d(ji) - hi_max(jl) + epsi10 ) / h_i_1d(ji)  
 !!          zdvice(ji,jl)  = v_i_1d(ji) - ( a_i_1d(ji) - zdaice(ji,jl) ) * ( hi_max(jl) - epsi10 )
-!!clem: these do not work properly after a restart (I do not know why)
-!!            zdaice(ji,jl)  = a_i_1d(ji)
-!!            zdvice(ji,jl)  = v_i_1d(ji)
+!!clem: these do not work properly after a restart (I do not know why) => not sure it is still true
+!!          zdaice(ji,jl)  = a_i_1d(ji)
+!!          zdvice(ji,jl)  = v_i_1d(ji)
 !!clem: these are from UCL and work ok
             zdaice(ji,jl)  = a_i_1d(ji) * 0.5_wp
             zdvice(ji,jl)  = v_i_1d(ji) - zdaice(ji,jl) * ( hi_max(jl) + hi_max(jl-1) ) * 0.5_wp
@@ -608,15 +609,15 @@ CONTAINS
          npti = 0 ; nptidx(:) = 0
          DO jj = 1, jpj
             DO ji = 1, jpi
-               IF( a_i(ji,jj,jl+1) > epsi10 .AND. v_i(ji,jj,jl+1) <= (a_i(ji,jj,jl+1) * hi_max(jl)) ) THEN
+               IF( a_i(ji,jj,jl+1) > 0._wp .AND. v_i(ji,jj,jl+1) <= (a_i(ji,jj,jl+1) * hi_max(jl)) ) THEN
                   npti = npti + 1
                   nptidx( npti ) = (jj - 1) * jpi + ji                  
                ENDIF
             END DO
          END DO
          !
-         CALL tab_2d_1d( npti, nptidx(1:npti), a_i_1d  (1:npti), a_i(:,:,jl+1)    ) ! jl+1 is ok
-         CALL tab_2d_1d( npti, nptidx(1:npti), v_i_1d  (1:npti), v_i(:,:,jl+1)    ) ! jl+1 is ok
+         CALL tab_2d_1d( npti, nptidx(1:npti), a_i_1d(1:npti), a_i(:,:,jl+1) ) ! jl+1 is ok
+         CALL tab_2d_1d( npti, nptidx(1:npti), v_i_1d(1:npti), v_i(:,:,jl+1) ) ! jl+1 is ok
          DO ji = 1, npti
             jdonor(ji,jl) = jl + 1
             zdaice(ji,jl) = a_i_1d(ji) 

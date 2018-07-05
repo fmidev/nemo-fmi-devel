@@ -142,6 +142,10 @@ CONTAINS
       !
       INTEGER, PARAMETER ::   jp_itermax = 20    
       !!-------------------------------------------------------------------
+      ! clem: The redistribution of ice between categories can lead to small negative values (as for the remapping in ice_itd_rem)
+      !       likely due to truncation error ( i.e. 1. - 1. /= 0 )
+      !       I do not think it should be a concern since small areas and volumes are erased (in ice_var_zapsmall.F90)
+      
       ! controls
       IF( ln_timing    )   CALL timing_start('icedyn_rdgrft')                                                             ! timing
       IF( ln_icediachk )   CALL ice_cons_hsm(0, 'icedyn_rdgrft', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation

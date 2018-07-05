@@ -17,7 +17,7 @@ MODULE bdyice
    USE oce             ! ocean dynamics and tracers variables
    USE ice             ! sea-ice: variables
    USE icevar          ! sea-ice: operations
-   USE iceitd          ! sea-ice: rebining
+   USE icecor          ! sea-ice: corrections
    USE icectl          ! sea-ice: control prints
    USE phycst          ! physical constant
    USE eosbn2          ! equation of state
@@ -72,7 +72,9 @@ CONTAINS
          !
       END DO
       !
-      CALL ice_var_zapsmall
+      CALL ice_cor( kt , 0 )      ! -- In case categories are out of bounds, do a remapping
+      !                           !    i.e. inputs have not the same ice thickness distribution 
+      !                           !    (set by rn_himean) than the regional simulation
       CALL ice_var_agg(1)
       !
       IF( ln_icectl )   CALL ice_prt( kt, iiceprt, jiceprt, 1, ' - ice thermo bdy - ' )
@@ -249,10 +251,10 @@ CONTAINS
          !
       END DO !jl
       !
-      ! --- In case categories are out of bounds, do a remapping --- !
-      !     i.e. inputs have not the same ice thickness distribution 
-      !          (set by rn_himean) than the regional simulation
-      IF( jpl > 1 )   CALL ice_itd_reb( kt )
+!!      ! --- In case categories are out of bounds, do a remapping --- !
+!!      !     i.e. inputs have not the same ice thickness distribution 
+!!      !          (set by rn_himean) than the regional simulation
+!!      IF( jpl > 1 )   CALL ice_itd_reb( kt )
       !      
    END SUBROUTINE bdy_ice_frs
 
