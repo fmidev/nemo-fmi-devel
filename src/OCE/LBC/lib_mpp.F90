@@ -87,7 +87,7 @@ MODULE lib_mpp
    PUBLIC   mpp_ini_ice, mpp_ini_znl
    PUBLIC   mppsize
    PUBLIC   mppsend, mpprecv                          ! needed by TAM and ICB routines
-   PUBLIC   mpp_lnk_bdy_2d, mpp_lnk_bdy_3d
+   PUBLIC   mpp_lnk_bdy_2d, mpp_lnk_bdy_3d, mpp_lnk_bdy_4d
    PUBLIC   mpprank
    
    !! * Interfaces
@@ -455,11 +455,11 @@ CONTAINS
    !
    !                       !==  4D array and array of 4D pointer  ==!
    !
-!!#  define DIM_4d
-!!#     define ROUTINE_BDY           mpp_lnk_bdy_4d
-!!#     include "mpp_bdy_generic.h90"
-!!#     undef ROUTINE_BDY
-!!#  undef DIM_4d
+#  define DIM_4d
+#     define ROUTINE_BDY           mpp_lnk_bdy_4d
+#     include "mpp_bdy_generic.h90"
+#     undef ROUTINE_BDY
+#  undef DIM_4d
 
    !!----------------------------------------------------------------------
    !!

@@ -37,7 +37,7 @@ MODULE lbclnk
    END INTERFACE
    !
    INTERFACE lbc_bdy_lnk
-      MODULE PROCEDURE mpp_lnk_bdy_2d, mpp_lnk_bdy_3d
+      MODULE PROCEDURE mpp_lnk_bdy_2d, mpp_lnk_bdy_3d, mpp_lnk_bdy_4d
    END INTERFACE
    !
    INTERFACE lbc_lnk_icb

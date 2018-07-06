@@ -49,23 +49,23 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!                  ***  SUBROUTINE bdy_ice  ***
       !!
-      !! ** Purpose : - Apply open boundary conditions for ice (SI3)
+      !! ** Purpose : Apply open boundary conditions for sea ice
       !!
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! Main time step counter
       !
-      INTEGER ::   ib_bdy   ! Loop index
+      INTEGER ::   jbdy   ! BDY set index
       !!----------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('bdy_ice')
       !
       CALL ice_var_glo2eqv
       !
-      DO ib_bdy = 1, nb_bdy
+      DO jbdy = 1, nb_bdy
          !
-         SELECT CASE( cn_ice(ib_bdy) )
+         SELECT CASE( cn_ice(jbdy) )
          CASE('none')   ;   CYCLE
-         CASE('frs' )   ;   CALL bdy_ice_frs( idx_bdy(ib_bdy), dta_bdy(ib_bdy), kt, ib_bdy )
+         CASE('frs' )   ;   CALL bdy_ice_frs( idx_bdy(jbdy), dta_bdy(jbdy), kt, jbdy )
          CASE DEFAULT
             CALL ctl_stop( 'bdy_ice : unrecognised option for open boundaries for ice fields' )
          END SELECT
@@ -83,12 +83,11 @@ CONTAINS
    END SUBROUTINE bdy_ice
 
 
-   SUBROUTINE bdy_ice_frs( idx, dta, kt, ib_bdy )
+   SUBROUTINE bdy_ice_frs( idx, dta, kt, jbdy )
       !!------------------------------------------------------------------------------
       !!                 ***  SUBROUTINE bdy_ice_frs  ***
       !!                    
-      !! ** Purpose : Apply the Flow Relaxation Scheme for sea-ice fields in the case 
-      !!              of unstructured open boundaries.
+      !! ** Purpose : Apply the Flow Relaxation Scheme for sea-ice fields
       !! 
       !! Reference : Engedahl H., 1995: Use of the flow relaxation scheme in a three-
       !!             dimensional baroclinic ocean model with realistic topography. Tellus, 365-382.
@@ -96,12 +95,12 @@ CONTAINS
       TYPE(OBC_INDEX), INTENT(in) ::   idx     ! OBC indices
       TYPE(OBC_DATA),  INTENT(in) ::   dta     ! OBC external data
       INTEGER,         INTENT(in) ::   kt      ! main time-step counter
-      INTEGER,         INTENT(in) ::   ib_bdy  ! BDY set index
+      INTEGER,         INTENT(in) ::   jbdy    ! BDY set index
       !
       INTEGER  ::   jpbound            ! 0 = incoming ice
       !                                ! 1 = outgoing ice
-      INTEGER  ::   jb, jk, jgrd, jl   ! dummy loop indices
-      INTEGER  ::   ji, jj, ii, ij     ! local scalar
+      INTEGER  ::   i_bdy, jgrd        ! dummy loop indices
+      INTEGER  ::   ji, jj, jk, jl, ib, jb
       REAL(wp) ::   zwgt, zwgt1        ! local scalar
       REAL(wp) ::   ztmelts, zdh
       !!------------------------------------------------------------------------------
@@ -109,14 +108,14 @@ CONTAINS
       jgrd = 1      ! Everything is at T-points here
       !
       DO jl = 1, jpl
-         DO jb = 1, idx%nblenrim(jgrd)
-            ji    = idx%nbi(jb,jgrd)
-            jj    = idx%nbj(jb,jgrd)
-            zwgt  = idx%nbw(jb,jgrd)
-            zwgt1 = 1.e0 - idx%nbw(jb,jgrd)
-            a_i(ji,jj,jl) = ( a_i(ji,jj,jl) * zwgt1 + dta%a_i(jb,jl) * zwgt ) * tmask(ji,jj,1)  ! Leads fraction 
-            h_i(ji,jj,jl) = ( h_i(ji,jj,jl) * zwgt1 + dta%h_i(jb,jl) * zwgt ) * tmask(ji,jj,1)  ! Ice depth 
-            h_s(ji,jj,jl) = ( h_s(ji,jj,jl) * zwgt1 + dta%h_s(jb,jl) * zwgt ) * tmask(ji,jj,1)  ! Snow depth
+         DO i_bdy = 1, idx%nblenrim(jgrd)
+            ji    = idx%nbi(i_bdy,jgrd)
+            jj    = idx%nbj(i_bdy,jgrd)
+            zwgt  = idx%nbw(i_bdy,jgrd)
+            zwgt1 = 1.e0 - idx%nbw(i_bdy,jgrd)
+            a_i(ji,jj,jl) = ( a_i(ji,jj,jl) * zwgt1 + dta%a_i(i_bdy,jl) * zwgt ) * tmask(ji,jj,1)  ! Leads fraction 
+            h_i(ji,jj,jl) = ( h_i(ji,jj,jl) * zwgt1 + dta%h_i(i_bdy,jl) * zwgt ) * tmask(ji,jj,1)  ! Ice depth 
+            h_s(ji,jj,jl) = ( h_s(ji,jj,jl) * zwgt1 + dta%h_s(i_bdy,jl) * zwgt ) * tmask(ji,jj,1)  ! Snow depth
 
             ! -----------------
             ! Pathological case
@@ -134,57 +133,57 @@ CONTAINS
             h_s(ji,jj,jl) = MAX( 0._wp, h_s(ji,jj,jl) - zdh * rhoic / rhosn ) 
 
          ENDDO
-         CALL lbc_bdy_lnk( a_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( h_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( h_s(:,:,jl), 'T', 1., ib_bdy )
       ENDDO
+      CALL lbc_bdy_lnk( a_i(:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( h_i(:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( h_s(:,:,:), 'T', 1., jbdy )
 
       DO jl = 1, jpl
-         DO jb = 1, idx%nblenrim(jgrd)
-            ji    = idx%nbi(jb,jgrd)
-            jj    = idx%nbj(jb,jgrd)
+         DO i_bdy = 1, idx%nblenrim(jgrd)
+            ji = idx%nbi(i_bdy,jgrd)
+            jj = idx%nbj(i_bdy,jgrd)
 
             ! condition on ice thickness depends on the ice velocity
             ! if velocity is outward (strictly), then ice thickness, volume... must be equal to adjacent values
-            jpbound = 0   ;   ii = ji   ;   ij = jj
+            jpbound = 0   ;   ib = ji   ;   jb = jj
             !
-            IF( u_ice(ji+1,jj  ) < 0. .AND. umask(ji-1,jj  ,1) == 0. ) jpbound = 1; ii = ji+1; ij = jj
-            IF( u_ice(ji-1,jj  ) > 0. .AND. umask(ji+1,jj  ,1) == 0. ) jpbound = 1; ii = ji-1; ij = jj
-            IF( v_ice(ji  ,jj+1) < 0. .AND. vmask(ji  ,jj-1,1) == 0. ) jpbound = 1; ii = ji  ; ij = jj+1
-            IF( v_ice(ji  ,jj-1) > 0. .AND. vmask(ji  ,jj+1,1) == 0. ) jpbound = 1; ii = ji  ; ij = jj-1
+            IF( u_ice(ji+1,jj  ) < 0. .AND. umask(ji-1,jj  ,1) == 0. )   jpbound = 1 ; ib = ji+1 ; jb = jj
+            IF( u_ice(ji-1,jj  ) > 0. .AND. umask(ji+1,jj  ,1) == 0. )   jpbound = 1 ; ib = ji-1 ; jb = jj
+            IF( v_ice(ji  ,jj+1) < 0. .AND. vmask(ji  ,jj-1,1) == 0. )   jpbound = 1 ; ib = ji   ; jb = jj+1
+            IF( v_ice(ji  ,jj-1) > 0. .AND. vmask(ji  ,jj+1,1) == 0. )   jpbound = 1 ; ib = ji   ; jb = jj-1
             !
-            IF( nn_ice_dta(ib_bdy) == 0 ) jpbound = 0; ii = ji; ij = jj   ! case ice boundaries = initial conditions
-            !                                                             !      do not make state variables dependent on velocity
+            IF( nn_ice_dta(jbdy) == 0 )   jpbound = 0 ; ib = ji ; jb = jj   ! case ice boundaries = initial conditions
+            !                                                               !      do not make state variables dependent on velocity
             !
-            IF( a_i(ii,ij,jl) > 0._wp ) THEN   ! there is ice at the boundary
+            IF( a_i(ib,jb,jl) > 0._wp ) THEN   ! there is ice at the boundary
                !
-               a_i(ji,jj,jl) = a_i(ii,ij,jl) ! concentration
-               h_i(ji,jj,jl) = h_i(ii,ij,jl) ! thickness ice
-               h_s(ji,jj,jl) = h_s(ii,ij,jl) ! thickness snw
+               a_i(ji,jj,jl) = a_i(ib,jb,jl) ! concentration
+               h_i(ji,jj,jl) = h_i(ib,jb,jl) ! thickness ice
+               h_s(ji,jj,jl) = h_s(ib,jb,jl) ! thickness snw
                !
                SELECT CASE( jpbound )
                   !
                CASE( 0 )   ! velocity is inward
                   !
-                  oa_i(ji,jj,  jl) = rn_ice_age(ib_bdy) * a_i(ji,jj,jl) ! age
-                  a_ip(ji,jj,  jl) = 0._wp                              ! pond concentration
-                  v_ip(ji,jj,  jl) = 0._wp                              ! pond volume
-                  t_su(ji,jj,  jl) = rn_ice_tem(ib_bdy)                 ! temperature surface
-                  t_s (ji,jj,:,jl) = rn_ice_tem(ib_bdy)                 ! temperature snw
-                  t_i (ji,jj,:,jl) = rn_ice_tem(ib_bdy)                 ! temperature ice
-                  s_i (ji,jj,  jl) = rn_ice_sal(ib_bdy)                 ! salinity
-                  sz_i(ji,jj,:,jl) = rn_ice_sal(ib_bdy)                 ! salinity profile
+                  oa_i(ji,jj,  jl) = rn_ice_age(jbdy) * a_i(ji,jj,jl) ! age
+                  a_ip(ji,jj,  jl) = 0._wp                            ! pond concentration
+                  v_ip(ji,jj,  jl) = 0._wp                            ! pond volume
+                  t_su(ji,jj,  jl) = rn_ice_tem(jbdy)                 ! temperature surface
+                  t_s (ji,jj,:,jl) = rn_ice_tem(jbdy)                 ! temperature snw
+                  t_i (ji,jj,:,jl) = rn_ice_tem(jbdy)                 ! temperature ice
+                  s_i (ji,jj,  jl) = rn_ice_sal(jbdy)                 ! salinity
+                  sz_i(ji,jj,:,jl) = rn_ice_sal(jbdy)                 ! salinity profile
                   !
                CASE( 1 )   ! velocity is outward
                   !
-                  oa_i(ji,jj,  jl) = oa_i(ii,ij,  jl) ! age
-                  a_ip(ji,jj,  jl) = a_ip(ii,ij,  jl) ! pond concentration
-                  v_ip(ji,jj,  jl) = v_ip(ii,ij,  jl) ! pond volume
-                  t_su(ji,jj,  jl) = t_su(ii,ij,  jl) ! temperature surface
-                  t_s (ji,jj,:,jl) = t_s (ii,ij,:,jl) ! temperature snw
-                  t_i (ji,jj,:,jl) = t_i (ii,ij,:,jl) ! temperature ice
-                  s_i (ji,jj,  jl) = s_i (ii,ij,  jl) ! salinity
-                  sz_i(ji,jj,:,jl) = sz_i(ii,ij,:,jl) ! salinity profile
+                  oa_i(ji,jj,  jl) = oa_i(ib,jb,  jl) ! age
+                  a_ip(ji,jj,  jl) = a_ip(ib,jb,  jl) ! pond concentration
+                  v_ip(ji,jj,  jl) = v_ip(ib,jb,  jl) ! pond volume
+                  t_su(ji,jj,  jl) = t_su(ib,jb,  jl) ! temperature surface
+                  t_s (ji,jj,:,jl) = t_s (ib,jb,:,jl) ! temperature snw
+                  t_i (ji,jj,:,jl) = t_i (ib,jb,:,jl) ! temperature ice
+                  s_i (ji,jj,  jl) = s_i (ib,jb,  jl) ! salinity
+                  sz_i(ji,jj,:,jl) = sz_i(ib,jb,:,jl) ! salinity profile
                   !
                END SELECT
                !
@@ -242,27 +241,23 @@ CONTAINS
                         
          END DO
          !
-         CALL lbc_bdy_lnk( a_i (:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( h_i (:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( h_s (:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( oa_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( a_ip(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( v_ip(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( s_i (:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( t_su(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( v_i (:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( v_s (:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( sv_i(:,:,jl), 'T', 1., ib_bdy )
-          DO jk = 1, nlay_s
-            CALL lbc_bdy_lnk(t_s(:,:,jk,jl), 'T', 1., ib_bdy )
-            CALL lbc_bdy_lnk(e_s(:,:,jk,jl), 'T', 1., ib_bdy )
-         END DO
-         DO jk = 1, nlay_i
-            CALL lbc_bdy_lnk(t_i(:,:,jk,jl), 'T', 1., ib_bdy )
-            CALL lbc_bdy_lnk(e_i(:,:,jk,jl), 'T', 1., ib_bdy )
-         END DO
-         !
       END DO ! jl
+
+      CALL lbc_bdy_lnk( a_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( h_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( h_s (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( oa_i(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( a_ip(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( v_ip(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( s_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( t_su(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( v_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( v_s (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( sv_i(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( t_s (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( e_s (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( t_i (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( e_i (:,:,:,:), 'T', 1., jbdy )
       !      
    END SUBROUTINE bdy_ice_frs
 
@@ -271,39 +266,40 @@ CONTAINS
       !!------------------------------------------------------------------------------
       !!                 ***  SUBROUTINE bdy_ice_dyn  ***
       !!                    
-      !! ** Purpose : Apply dynamics boundary conditions for sea-ice in the cas of unstructured open boundaries.
-      !!              u_ice and v_ice are equal to the value of the adjacent grid point if this latter is not ice free
-      !!              if adjacent grid point is ice free, then u_ice and v_ice are equal to ocean velocities
+      !! ** Purpose : Apply dynamics boundary conditions for sea-ice.
       !!
-      !! 2013-06 : C. Rousset
+      !! ** Method :  if this adjacent grid point is not ice free, then u_ice and v_ice take its value
+      !!              if                          is     ice free, then u_ice and v_ice are unchanged by BDY
+      !!                                                           they keep values calculated in rheology
+      !!
       !!------------------------------------------------------------------------------
       CHARACTER(len=1), INTENT(in)  ::   cd_type   ! nature of velocity grid-points
       !
-      INTEGER  ::   jb, jgrd           ! dummy loop indices
-      INTEGER  ::   ji, jj             ! local scalar
-      INTEGER  ::   ib_bdy             ! Loop index
+      INTEGER  ::   i_bdy, jgrd      ! dummy loop indices
+      INTEGER  ::   ji, jj           ! local scalar
+      INTEGER  ::   jbdy             ! BDY set index
       REAL(wp) ::   zmsk1, zmsk2, zflag
       !!------------------------------------------------------------------------------
       !
-      DO ib_bdy=1, nb_bdy
+      DO jbdy=1, nb_bdy
          !
-         SELECT CASE( cn_ice(ib_bdy) )
+         SELECT CASE( cn_ice(jbdy) )
          !
          CASE('none')
             CYCLE
             !
          CASE('frs')
             !
-            IF( nn_ice_dta(ib_bdy) == 0 ) CYCLE            ! case ice boundaries = initial conditions 
-            !                                              !      do not change ice velocity (it is only computed by rheology)
+            IF( nn_ice_dta(jbdy) == 0 ) CYCLE            ! case ice boundaries = initial conditions 
+            !                                            !      do not change ice velocity (it is only computed by rheology)
             SELECT CASE ( cd_type )
             !     
             CASE ( 'U' )  
                jgrd = 2      ! u velocity
-               DO jb = 1, idx_bdy(ib_bdy)%nblenrim(jgrd)
-                  ji    = idx_bdy(ib_bdy)%nbi(jb,jgrd)
-                  jj    = idx_bdy(ib_bdy)%nbj(jb,jgrd)
-                  zflag = idx_bdy(ib_bdy)%flagu(jb,jgrd)
+               DO i_bdy = 1, idx_bdy(jbdy)%nblenrim(jgrd)
+                  ji    = idx_bdy(jbdy)%nbi(i_bdy,jgrd)
+                  jj    = idx_bdy(jbdy)%nbj(i_bdy,jgrd)
+                  zflag = idx_bdy(jbdy)%flagu(i_bdy,jgrd)
                   !
                   IF ( ABS( zflag ) == 1. ) THEN  ! eastern and western boundaries
                      ! one of the two zmsk is always 0 (because of zflag)
@@ -319,14 +315,14 @@ CONTAINS
                   ENDIF
                   !
                END DO
-               CALL lbc_bdy_lnk( u_ice(:,:), 'U', -1., ib_bdy )
+               CALL lbc_bdy_lnk( u_ice(:,:), 'U', -1., jbdy )
                !
             CASE ( 'V' )
                jgrd = 3      ! v velocity
-               DO jb = 1, idx_bdy(ib_bdy)%nblenrim(jgrd)
-                  ji    = idx_bdy(ib_bdy)%nbi(jb,jgrd)
-                  jj    = idx_bdy(ib_bdy)%nbj(jb,jgrd)
-                  zflag = idx_bdy(ib_bdy)%flagv(jb,jgrd)
+               DO i_bdy = 1, idx_bdy(jbdy)%nblenrim(jgrd)
+                  ji    = idx_bdy(jbdy)%nbi(i_bdy,jgrd)
+                  jj    = idx_bdy(jbdy)%nbj(i_bdy,jgrd)
+                  zflag = idx_bdy(jbdy)%flagv(i_bdy,jgrd)
                   !
                   IF ( ABS( zflag ) == 1. ) THEN  ! northern and southern boundaries
                      ! one of the two zmsk is always 0 (because of zflag)
@@ -342,7 +338,7 @@ CONTAINS
                   ENDIF
                   !
                END DO
-               CALL lbc_bdy_lnk( v_ice(:,:), 'V', -1., ib_bdy )
+               CALL lbc_bdy_lnk( v_ice(:,:), 'V', -1., jbdy )
                !
             END SELECT
             !
