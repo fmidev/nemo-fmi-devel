@@ -104,7 +104,7 @@ CONTAINS
       !                   Therefore one needs to bound the advected fields by 0 (though this is not a clean fix)
       ! ==> 1) remove negative ice areas and volumes (conservation is ensure)
       CALL ice_var_zapsmall 
-      ! ==> 2) remove remaining negative advected fields (conservation is not preserved)
+      ! ==> 2) remove remaining negative advected fields (conservation is not preserved) => conservation issue
       WHERE( v_s (:,:,:)   < 0._wp )   v_s (:,:,:)   = 0._wp
       WHERE( sv_i(:,:,:)   < 0._wp )   sv_i(:,:,:)   = 0._wp
       WHERE( e_i (:,:,:,:) < 0._wp )   e_i (:,:,:,:) = 0._wp

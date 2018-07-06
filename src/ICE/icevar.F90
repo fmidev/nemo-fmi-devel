@@ -852,7 +852,7 @@ CONTAINS
       DO jk = 1, nlay_i             ! Sea ice energy of melting
          DO ji = 1, npti
             ztmelts      = - tmut  * sz_i_1d(ji,jk)
-            t_i_1d(ji,jk) = MIN( t_i_1d(ji,jk), ztmelts + rt0 ) ! Force t_i_1d to be lower than melting point
+            t_i_1d(ji,jk) = MIN( t_i_1d(ji,jk), ztmelts + rt0 ) ! Force t_i_1d to be lower than melting point => likely conservation issue
                                                                 !   (sometimes zdf scheme produces abnormally high temperatures)   
             e_i_1d(ji,jk) = rhoic * ( cpic * ( ztmelts - ( t_i_1d(ji,jk) - rt0 ) )           &
                &                    + lfus * ( 1._wp - ztmelts / ( t_i_1d(ji,jk) - rt0 ) )   &

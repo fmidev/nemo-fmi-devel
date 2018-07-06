@@ -138,11 +138,6 @@ CONTAINS
          CALL lbc_bdy_lnk( h_i(:,:,jl), 'T', 1., ib_bdy )
          CALL lbc_bdy_lnk( h_s(:,:,jl), 'T', 1., ib_bdy )
       ENDDO
-      ! retrieve at_i
-      at_i(:,:) = 0._wp
-      DO jl = 1, jpl
-         at_i(:,:) = a_i(:,:,jl) + at_i(:,:)
-      END DO
 
       DO jl = 1, jpl
          DO jb = 1, idx%nblenrim(jgrd)
@@ -161,94 +156,104 @@ CONTAINS
             IF( nn_ice_dta(ib_bdy) == 0 ) jpbound = 0; ii = ji; ij = jj   ! case ice boundaries = initial conditions
             !                                                             !      do not make state variables dependent on velocity
             !
-            rswitch = MAX( 0.0_wp , SIGN ( 1.0_wp , at_i(ii,ij) - 0.01 ) ) ! 0 if no ice
-            !
-            ! concentration and thickness
-            a_i(ji,jj,jl) = a_i(ii,ij,jl) * rswitch
-            h_i(ji,jj,jl) = h_i(ii,ij,jl) * rswitch
-            h_s(ji,jj,jl) = h_s(ii,ij,jl) * rswitch
-            !
-            ! Ice and snow volumes
-            v_i(ji,jj,jl) = h_i(ji,jj,jl) * a_i(ji,jj,jl)
-            v_s(ji,jj,jl) = h_s(ji,jj,jl) * a_i(ji,jj,jl)
-            !
-            SELECT CASE( jpbound )
-            !
-            CASE( 0 )   ! velocity is inward
+            IF( a_i(ii,ij,jl) > 0._wp ) THEN   ! there is ice at the boundary
                !
-               ! Ice salinity, age, temperature
-               s_i (ji,jj,jl)   = rswitch * rn_ice_sal(ib_bdy)  + ( 1.0 - rswitch ) * rn_simin
-               oa_i(ji,jj,jl)   = rswitch * rn_ice_age(ib_bdy) * a_i(ji,jj,jl)
-               t_su(ji,jj,jl)   = rswitch * rn_ice_tem(ib_bdy)  + ( 1.0 - rswitch ) * rn_ice_tem(ib_bdy)
+               a_i(ji,jj,jl) = a_i(ii,ij,jl) ! concentration
+               h_i(ji,jj,jl) = h_i(ii,ij,jl) ! thickness ice
+               h_s(ji,jj,jl) = h_s(ii,ij,jl) ! thickness snw
+               !
+               SELECT CASE( jpbound )
+                  !
+               CASE( 0 )   ! velocity is inward
+                  !
+                  oa_i(ji,jj,  jl) = rn_ice_age(ib_bdy) * a_i(ji,jj,jl) ! age
+                  a_ip(ji,jj,  jl) = 0._wp                              ! pond concentration
+                  v_ip(ji,jj,  jl) = 0._wp                              ! pond volume
+                  t_su(ji,jj,  jl) = rn_ice_tem(ib_bdy)                 ! temperature surface
+                  t_s (ji,jj,:,jl) = rn_ice_tem(ib_bdy)                 ! temperature snw
+                  t_i (ji,jj,:,jl) = rn_ice_tem(ib_bdy)                 ! temperature ice
+                  s_i (ji,jj,  jl) = rn_ice_sal(ib_bdy)                 ! salinity
+                  sz_i(ji,jj,:,jl) = rn_ice_sal(ib_bdy)                 ! salinity profile
+                  !
+               CASE( 1 )   ! velocity is outward
+                  !
+                  oa_i(ji,jj,  jl) = oa_i(ii,ij,  jl) ! age
+                  a_ip(ji,jj,  jl) = a_ip(ii,ij,  jl) ! pond concentration
+                  v_ip(ji,jj,  jl) = v_ip(ii,ij,  jl) ! pond volume
+                  t_su(ji,jj,  jl) = t_su(ii,ij,  jl) ! temperature surface
+                  t_s (ji,jj,:,jl) = t_s (ii,ij,:,jl) ! temperature snw
+                  t_i (ji,jj,:,jl) = t_i (ii,ij,:,jl) ! temperature ice
+                  s_i (ji,jj,  jl) = s_i (ii,ij,  jl) ! salinity
+                  sz_i(ji,jj,:,jl) = sz_i(ii,ij,:,jl) ! salinity profile
+                  !
+               END SELECT
+               !
+               IF( nn_icesal == 1 ) THEN     ! if constant salinity
+                  s_i (ji,jj  ,jl) = rn_icesal
+                  sz_i(ji,jj,:,jl) = rn_icesal
+               ENDIF
+               !
+               ! global fields
+               v_i (ji,jj,jl) = h_i(ji,jj,jl) * a_i(ji,jj,jl)                       ! volume ice
+               v_s (ji,jj,jl) = h_s(ji,jj,jl) * a_i(ji,jj,jl)                       ! volume snw
+               sv_i(ji,jj,jl) = MIN( s_i(ji,jj,jl) , sss_m(ji,jj) ) * v_i(ji,jj,jl) ! salt content
                DO jk = 1, nlay_s
-                  t_s(ji,jj,jk,jl) = rswitch * rn_ice_tem(ib_bdy) + ( 1.0 - rswitch ) * rt0
-               END DO
+                  e_s(ji,jj,jk,jl) = rhosn * ( cpic * ( rt0 - t_s(ji,jj,jk,jl) ) + lfus )   ! enthalpy in J/m3
+                  e_s(ji,jj,jk,jl) = e_s(ji,jj,jk,jl) * v_s(ji,jj,jl) * r1_nlay_s           ! enthalpy in J/m2
+               END DO               
                DO jk = 1, nlay_i
-                  t_i (ji,jj,jk,jl) = rswitch * rn_ice_tem(ib_bdy) + ( 1.0 - rswitch ) * rt0 
-                  sz_i(ji,jj,jk,jl) = rswitch * rn_ice_sal(ib_bdy) + ( 1.0 - rswitch ) * rn_simin
+                  ztmelts          = - tmut  * sz_i(ji,jj,jk,jl)              ! Melting temperature in C
+                  t_i(ji,jj,jk,jl) = MIN( t_i(ji,jj,jk,jl), ztmelts + rt0 )   ! Force t_i to be lower than melting point => likely conservation issue
+                  !
+                  e_i(ji,jj,jk,jl) = rhoic * ( cpic * ( ztmelts - ( t_i(ji,jj,jk,jl) - rt0 ) )           &   ! enthalpy in J/m3
+                     &                       + lfus * ( 1._wp - ztmelts / ( t_i(ji,jj,jk,jl) - rt0 ) )   &
+                     &                       - rcp  *   ztmelts )                  
+                  e_i(ji,jj,jk,jl) = e_i(ji,jj,jk,jl) * v_i(ji,jj,jl) * r1_nlay_i                            ! enthalpy in J/m2
                END DO
                !
-               ! Ice ponds
-               a_ip(ji,jj,jl) = 0._wp
-               v_ip(ji,jj,jl) = 0._wp
+            ELSE   ! no ice at the boundary
                !
-            CASE( 1 )   ! velocity is outward
+               a_i (ji,jj,  jl) = 0._wp
+               h_i (ji,jj,  jl) = 0._wp
+               h_s (ji,jj,  jl) = 0._wp
+               oa_i(ji,jj,  jl) = 0._wp
+               a_ip(ji,jj,  jl) = 0._wp
+               v_ip(ji,jj,  jl) = 0._wp
+               t_su(ji,jj,  jl) = rt0
+               t_s (ji,jj,:,jl) = rt0
+               t_i (ji,jj,:,jl) = rt0 
+               
+               IF( nn_icesal == 1 ) THEN     ! if constant salinity
+                  s_i (ji,jj  ,jl) = rn_icesal
+                  sz_i(ji,jj,:,jl) = rn_icesal
+               ELSE                          ! if variable salinity
+                  s_i (ji,jj,jl)   = rn_simin
+                  sz_i(ji,jj,:,jl) = rn_simin
+               ENDIF
                !
-               ! Ice salinity, age, temperature
-               s_i (ji,jj,jl)   = rswitch * s_i (ii,ij,jl)  + ( 1.0 - rswitch ) * rn_simin
-               oa_i(ji,jj,jl)   = rswitch * oa_i(ii,ij,jl)
-               t_su(ji,jj,jl)   = rswitch * t_su(ii,ij,jl)  + ( 1.0 - rswitch ) * rt0
-               DO jk = 1, nlay_s
-                  t_s(ji,jj,jk,jl) = rswitch * t_s(ii,ij,jk,jl) + ( 1.0 - rswitch ) * rt0
-               END DO
-               DO jk = 1, nlay_i
-                  t_i (ji,jj,jk,jl) = rswitch * t_i (ii,ij,jk,jl) + ( 1.0 - rswitch ) * rt0
-                  sz_i(ji,jj,jk,jl) = rswitch * sz_i(ii,ij,jk,jl) + ( 1.0 - rswitch ) * rn_simin
-               END DO
-               !
-               ! Ice ponds
-               a_ip(ji,jj,jl) = rswitch * a_ip(ii,ij,jl)
-               v_ip(ji,jj,jl) = rswitch * v_ip(ii,ij,jl)
-               !
-            END SELECT
-            !
-            IF( nn_icesal == 1 ) THEN     ! constant salinity : overwrite rn_icesal
-               s_i (ji,jj  ,jl) = rn_icesal
-               sz_i(ji,jj,:,jl) = rn_icesal
+               ! global fields
+               v_i (ji,jj,  jl) = 0._wp
+               v_s (ji,jj,  jl) = 0._wp
+               sv_i(ji,jj,  jl) = 0._wp
+               e_s (ji,jj,:,jl) = 0._wp
+               e_i (ji,jj,:,jl) = 0._wp
+
             ENDIF
-            !
-            ! contents
-            sv_i(ji,jj,jl)  = MIN( s_i(ji,jj,jl) , sss_m(ji,jj) ) * v_i(ji,jj,jl)
-            DO jk = 1, nlay_s
-               ! Snow energy of melting
-               e_s(ji,jj,jk,jl) = rswitch * rhosn * ( cpic * ( rt0 - t_s(ji,jj,jk,jl) ) + lfus )
-               ! Multiply by volume, so that heat content in J/m2
-               e_s(ji,jj,jk,jl) = e_s(ji,jj,jk,jl) * v_s(ji,jj,jl) * r1_nlay_s
-            END DO
-            DO jk = 1, nlay_i
-               ztmelts          = - tmut * sz_i(ji,jj,jk,jl) + rt0 !Melting temperature in K                  
-               ! heat content per unit volume
-               e_i(ji,jj,jk,jl) = rswitch * rhoic * &
-                  (   cpic    * ( ztmelts - t_i(ji,jj,jk,jl) ) &
-                  +   lfus    * ( 1.0 - (ztmelts-rt0) / MIN((t_i(ji,jj,jk,jl)-rt0),-epsi20) ) &
-                  - rcp      * ( ztmelts - rt0 ) )
-               ! Mutliply by ice volume, and divide by number of layers to get heat content in J/m2
-               e_i(ji,jj,jk,jl) = e_i(ji,jj,jk,jl) * a_i(ji,jj,jl) * h_i(ji,jj,jl) * r1_nlay_i
-            END DO
-            !
+                        
          END DO
          !
-         CALL lbc_bdy_lnk( a_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( h_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( h_s(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( v_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( v_s(:,:,jl), 'T', 1., ib_bdy )
-         !
-         CALL lbc_bdy_lnk( sv_i(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk(  s_i(:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( a_i (:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( h_i (:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( h_s (:,:,jl), 'T', 1., ib_bdy )
          CALL lbc_bdy_lnk( oa_i(:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( a_ip(:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( v_ip(:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( s_i (:,:,jl), 'T', 1., ib_bdy )
          CALL lbc_bdy_lnk( t_su(:,:,jl), 'T', 1., ib_bdy )
-         DO jk = 1, nlay_s
+         CALL lbc_bdy_lnk( v_i (:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( v_s (:,:,jl), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( sv_i(:,:,jl), 'T', 1., ib_bdy )
+          DO jk = 1, nlay_s
             CALL lbc_bdy_lnk(t_s(:,:,jk,jl), 'T', 1., ib_bdy )
             CALL lbc_bdy_lnk(e_s(:,:,jk,jl), 'T', 1., ib_bdy )
          END DO
@@ -257,10 +262,7 @@ CONTAINS
             CALL lbc_bdy_lnk(e_i(:,:,jk,jl), 'T', 1., ib_bdy )
          END DO
          !
-         CALL lbc_bdy_lnk( a_ip(:,:,jl), 'T', 1., ib_bdy )
-         CALL lbc_bdy_lnk( v_ip(:,:,jl), 'T', 1., ib_bdy )
-         !
-      END DO !jl
+      END DO ! jl
       !      
    END SUBROUTINE bdy_ice_frs
 
@@ -308,17 +310,13 @@ CONTAINS
                      zmsk1 = 1._wp - MAX( 0.0_wp, SIGN ( 1.0_wp , - vt_i(ji+1,jj) ) ) ! 0 if no ice
                      zmsk2 = 1._wp - MAX( 0.0_wp, SIGN ( 1.0_wp , - vt_i(ji-1,jj) ) ) ! 0 if no ice
                      !  
-                     ! u_ice = u_ice of the adjacent grid point except if this grid point is ice-free (then u_ice = u_oce)
+                     ! u_ice = u_ice of the adjacent grid point except if this grid point is ice-free (then do not change u_ice)
                      u_ice (ji,jj) = u_ice(ji+1,jj) * 0.5_wp * ABS( zflag + 1._wp ) * zmsk1 + &
                         &            u_ice(ji-1,jj) * 0.5_wp * ABS( zflag - 1._wp ) * zmsk2 + &
-                        &            u_oce(ji  ,jj) * ( 1._wp - MIN( 1._wp, zmsk1 + zmsk2 ) )
+                        &            u_ice(ji  ,jj) * ( 1._wp - MIN( 1._wp, zmsk1 + zmsk2 ) )
                   ELSE                             ! everywhere else
-                     !u_ice(ji,jj) = u_oce(ji,jj)
                      u_ice(ji,jj) = 0._wp
                   ENDIF
-                  ! mask ice velocities
-                  rswitch = MAX( 0.0_wp , SIGN ( 1.0_wp , at_i(ji,jj) - 0.01_wp ) ) ! 0 if no ice
-                  u_ice(ji,jj) = rswitch * u_ice(ji,jj)
                   !
                END DO
                CALL lbc_bdy_lnk( u_ice(:,:), 'U', -1., ib_bdy )
@@ -335,17 +333,13 @@ CONTAINS
                      zmsk1 = 1._wp - MAX( 0.0_wp, SIGN ( 1.0_wp , - vt_i(ji,jj+1) ) ) ! 0 if no ice
                      zmsk2 = 1._wp - MAX( 0.0_wp, SIGN ( 1.0_wp , - vt_i(ji,jj-1) ) ) ! 0 if no ice
                      !  
-                     ! u_ice = u_ice of the adjacent grid point except if this grid point is ice-free (then u_ice = u_oce)
+                     ! v_ice = v_ice of the adjacent grid point except if this grid point is ice-free (then do not change v_ice)
                      v_ice (ji,jj) = v_ice(ji,jj+1) * 0.5_wp * ABS( zflag + 1._wp ) * zmsk1 + &
                         &            v_ice(ji,jj-1) * 0.5_wp * ABS( zflag - 1._wp ) * zmsk2 + &
-                        &            v_oce(ji,jj  ) * ( 1._wp - MIN( 1._wp, zmsk1 + zmsk2 ) )
+                        &            v_ice(ji,jj  ) * ( 1._wp - MIN( 1._wp, zmsk1 + zmsk2 ) )
                   ELSE                             ! everywhere else
-                     !v_ice(ji,jj) = v_oce(ji,jj)
                      v_ice(ji,jj) = 0._wp
                   ENDIF
-                  ! mask ice velocities
-                  rswitch = MAX( 0.0_wp , SIGN ( 1.0_wp , at_i(ji,jj) - 0.01 ) ) ! 0 if no ice
-                  v_ice(ji,jj) = rswitch * v_ice(ji,jj)
                   !
                END DO
                CALL lbc_bdy_lnk( v_ice(:,:), 'V', -1., ib_bdy )
