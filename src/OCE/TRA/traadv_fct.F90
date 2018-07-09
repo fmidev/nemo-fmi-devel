@@ -547,6 +547,10 @@ CONTAINS
 !      END SELECT
 !!gm  
       !
+      IF ( ln_isfcav ) THEN            ! set level two values which may not be set in ISF case
+         zwd(:,:,2) = 1._wp  ;  zwi(:,:,2) = 0._wp  ;  zws(:,:,2) = 0._wp  ;  zwrm(:,:,2) = 0._wp
+      END IF
+      !
       DO jj = 2, jpjm1                 ! 2nd order centered at top & bottom
          DO ji = fs_2, fs_jpim1
             ikt = mikt(ji,jj) + 1            ! w-point below the 1st  wet point
@@ -555,12 +559,12 @@ CONTAINS
             zwd (ji,jj,ikt) = 1._wp          ! top
             zwi (ji,jj,ikt) = 0._wp
             zws (ji,jj,ikt) = 0._wp
-            zwrm(ji,jj,ikt) = 0.5_wp * ( pt_in(ji,jj,jk-1) + pt_in(ji,jj,jk) )
+            zwrm(ji,jj,ikt) = 0.5_wp * ( pt_in(ji,jj,ikt-1) + pt_in(ji,jj,ikt) )
             !
             zwd (ji,jj,ikb) = 1._wp          ! bottom
             zwi (ji,jj,ikb) = 0._wp
             zws (ji,jj,ikb) = 0._wp
-            zwrm(ji,jj,ikb) = 0.5_wp * ( pt_in(ji,jj,jk-1) + pt_in(ji,jj,jk) )            
+            zwrm(ji,jj,ikb) = 0.5_wp * ( pt_in(ji,jj,ikb-1) + pt_in(ji,jj,ikb) )            
          END DO
       END DO   
       !
