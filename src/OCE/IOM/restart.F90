@@ -117,7 +117,7 @@ CONTAINS
                ELSE
                   clpname = TRIM(Agrif_CFixed())//"_"//clname   
                ENDIF
-               CALL iom_init( cwxios_context, TRIM(clpath)//TRIM(clpname))
+               CALL iom_init( cwxios_context, TRIM(clpath)//TRIM(clpname), .false. )
                CALL xios_update_calendar(nitrst)
                CALL iom_swap(      cxios_context          )
 #else
@@ -227,12 +227,12 @@ CONTAINS
              crxios_context = 'nemo_rst'
              IF( .NOT.lxios_set ) THEN
                  IF(lwp) WRITE(numout,*) 'Enable restart reading by XIOS'
-                 CALL iom_init( crxios_context )
+                 CALL iom_init( crxios_context, ld_tmppatch = .false. )
                  lxios_set = .TRUE.
              ENDIF
          ENDIF
          IF( TRIM(Agrif_CFixed()) /= '0' .AND. lrxios) THEN
-             CALL iom_init( crxios_context )
+             CALL iom_init( crxios_context, ld_tmppatch = .false. )
              IF(lwp) WRITE(numout,*) 'Enable restart reading by XIOS for AGRIF'
              lxios_set = .TRUE.
          ENDIF 
