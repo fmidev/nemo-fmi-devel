@@ -350,14 +350,15 @@ CONTAINS
 
                ENDIF
 #if defined key_si3
+               ! convert N-cat fields (input) into jpl-cat (output)
                IF( cn_ice(jbdy) /= 'none' .AND. nn_ice_dta(jbdy) == 1 ) THEN
                   jfld_hti = jfld_htit(jbdy)
                   jfld_hts = jfld_htst(jbdy)
                   jfld_ai  = jfld_ait(jbdy)
-                  IF( nice_cat == 1 ) THEN ! case input cat = 1
+                  IF    ( jpl /= 1 .AND. nice_cat == 1 ) THEN                       ! case input cat = 1
                      CALL ice_var_itd ( bf(jfld_hti)%fnow(:,1,1), bf(jfld_hts)%fnow(:,1,1), bf(jfld_ai)%fnow(:,1,1), &
                         &               dta_bdy(jbdy)%h_i     , dta_bdy(jbdy)%h_s     , dta_bdy(jbdy)%a_i    )
-                  ELSEIF( nice_cat /= 1 .AND. nice_cat /= jpl ) THEN ! case input cat /=1 and /=jpl
+                  ELSEIF( jpl /= 1 .AND. nice_cat /= 1 .AND. nice_cat /= jpl ) THEN ! case input cat /=1 and /=jpl
                      CALL ice_var_itd2( bf(jfld_hti)%fnow(:,1,:), bf(jfld_hts)%fnow(:,1,:), bf(jfld_ai)%fnow(:,1,:), &
                         &               dta_bdy(jbdy)%h_i     , dta_bdy(jbdy)%h_s     , dta_bdy(jbdy)%a_i    )
                   ENDIF

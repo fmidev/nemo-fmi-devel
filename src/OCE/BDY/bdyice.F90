@@ -57,7 +57,7 @@ CONTAINS
       INTEGER ::   jbdy   ! BDY set index
       !!----------------------------------------------------------------------
       !
-      IF( ln_timing )   CALL timing_start('bdy_ice')
+      IF( ln_timing )   CALL timing_start('bdy_ice_thd')
       !
       CALL ice_var_glo2eqv
       !
@@ -78,7 +78,7 @@ CONTAINS
       CALL ice_var_agg(1)
       !
       IF( ln_icectl )   CALL ice_prt( kt, iiceprt, jiceprt, 1, ' - ice thermo bdy - ' )
-      IF( ln_timing )   CALL timing_stop('bdy_ice')
+      IF( ln_timing )   CALL timing_stop('bdy_ice_thd')
       !
    END SUBROUTINE bdy_ice
 
@@ -280,6 +280,7 @@ CONTAINS
       INTEGER  ::   jbdy             ! BDY set index
       REAL(wp) ::   zmsk1, zmsk2, zflag
       !!------------------------------------------------------------------------------
+      IF( ln_timing )   CALL timing_start('bdy_ice_dyn')
       !
       DO jbdy=1, nb_bdy
          !
@@ -347,6 +348,8 @@ CONTAINS
          END SELECT
          !
       END DO
+      !
+      IF( ln_timing )   CALL timing_stop('bdy_ice_dyn')
       !
     END SUBROUTINE bdy_ice_dyn
 
