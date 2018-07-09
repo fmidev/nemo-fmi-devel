@@ -85,7 +85,7 @@
 !------------------------------------------------------------------------------
 &namini         !   Ice initialization
 !------------------------------------------------------------------------------
-   ln_iceini        = .false.         !  activate ice initialization (T) or not (F)
+   ln_iceini        = .true.         !  activate ice initialization (T) or not (F)
    rn_thres_sst     =   0.5           !  max delta temp. above Tfreeze with initial ice = (sst - tfreeze)
    rn_hts_ini_n     =   0.1           !  initial real snow thickness (m), North
    rn_hti_ini_n     =   1.0           !  initial real ice thickness  (m), North
