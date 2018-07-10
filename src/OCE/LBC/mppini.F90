@@ -535,7 +535,6 @@ CONTAINS
                &                                ii_nowe(jproc), ii_noea(jproc),   &
                &                                ibonit (jproc), ibonjt (jproc) 
          END DO
-         CLOSE(inum)   
       END IF
 
       !                          ! north fold parameter
@@ -576,13 +575,36 @@ CONTAINS
       !                          ! Prepare mpp north fold
       IF( jperio >= 3 .AND. jperio <= 6 .AND. jpni > 1 ) THEN
          CALL mpp_ini_north
-         IF(lwp) WRITE(numout,*)
-         IF(lwp) WRITE(numout,*) '   ==>>>   North fold boundary prepared for jpni >1'
+         IF (lwp) THEN
+            WRITE(numout,*)
+            WRITE(numout,*) '   ==>>>   North fold boundary prepared for jpni >1'
+            ! additional prints in layout.dat
+            WRITE(inum,*)
+            WRITE(inum,*)
+            WRITE(inum,*) 'number of subdomains located along the north fold : ', ndim_rank_north
+            WRITE(inum,*) 'Rank of the subdomains located along the north fold : ', ndim_rank_north
+            DO jproc = 1, ndim_rank_north, 5
+               WRITE(inum,*) nrank_north( jproc:MINVAL( (/jproc+4,ndim_rank_north/) ) )
+            END DO
+         ENDIF
       ENDIF
       !
       CALL mpp_init_ioipsl       ! Prepare NetCDF output file (if necessary)
       !
-      IF( ln_nnogather )   CALL mpp_init_nfdcom     ! northfold neighbour lists
+      IF( ln_nnogather ) THEN
+         CALL mpp_init_nfdcom     ! northfold neighbour lists
+         IF (lwp) THEN
+            WRITE(inum,*)
+            WRITE(inum,*)
+            WRITE(inum,*) 'north fold exchanges with explicit point-to-point messaging :'
+            WRITE(inum,*) 'nfsloop : ', nfsloop
+            WRITE(inum,*) 'nfeloop : ', nfeloop
+            WRITE(inum,*) 'nsndto : ', nsndto
+            WRITE(inum,*) 'isendto : ', isendto
+         ENDIF
+      ENDIF
+      !
+      IF (lwp) CLOSE(inum)   
       !
       DEALLOCATE(iin, ijn, ii_nono, ii_noea, ii_noso, ii_nowe,    &
          &       iimppt, ijmppt, ibondi, ibondj, ipproc, ipolj,   &
