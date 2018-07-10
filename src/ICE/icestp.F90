@@ -188,7 +188,6 @@ CONTAINS
          !----------------------------!
          IF( ln_icethd )                CALL ice_thd( kt )            ! -- Ice thermodynamics      
          !
-         !
          IF( ln_icethd )                CALL ice_cor( kt , 2 )        ! -- Corrections
          !
                                         CALL ice_var_glo2eqv          ! necessary calls (at least for coupling)
@@ -430,7 +429,8 @@ CONTAINS
       t_si       (:,:,:) = rt0   ! temp at the ice-snow interface
 
       tau_icebfr(:,:)   = 0._wp   ! landfast ice param only (clem: important to keep the init here)
-      cnd_ice   (:,:,:) = 0._wp   ! initialisation of the effective conductivity at the top of ice/snow (Jules coupling)
+      cnd_ice   (:,:,:) = 0._wp   ! initialisation: effective conductivity at the top of ice/snow (Jules coupling)
+      qtr_ice_bot(:,:,:) = 0._wp  ! initialization: part of solar radiation transmitted through the ice needed at least for outputs
       !
       ! for control checks (ln_icediachk)
       diag_trp_vi(:,:) = 0._wp   ;   diag_trp_vs(:,:) = 0._wp

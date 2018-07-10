@@ -127,8 +127,6 @@ CONTAINS
       ENDIF
       CALL lbc_lnk( zfric, 'T',  1. )
       !
-      qtr_ice_bot(:,:,:) = 0._wp  ! initialization (part of solar radiation transmitted through the ice)
-
       !--------------------------------------------------------------------!
       ! Partial computation of forcing for the thermodynamic sea ice model
       !--------------------------------------------------------------------!
@@ -142,20 +140,17 @@ CONTAINS
             !           !  net downward heat flux from the ice to the ocean, expressed as a function of ocean 
             !           !  temperature and turbulent mixing (McPhee, 1992)
             !
-            ! --- Energy received in the lead, zqld is defined everywhere (J.m-2) --- !
+            ! --- Energy received in the lead from atm-oce exchanges, zqld is defined everywhere (J.m-2) --- !
             zqld =  tmask(ji,jj,1) * rdt_ice *  &
                &    ( ( 1._wp - at_i_b(ji,jj) ) * qsr_oce(ji,jj) * frq_m(ji,jj) +  &
                &      ( 1._wp - at_i_b(ji,jj) ) * qns_oce(ji,jj) + qemp_oce(ji,jj) )
 
-            ! --- Energy needed to bring ocean surface layer until its freezing (<0, J.m-2) --- !
-            ! includes supercooling potential energy (>0) or "above-freezing" energy (<0)
-            zqfr = tmask(ji,jj,1) * rau0 * rcp * e3t_m(ji,jj) * ( t_bo(ji,jj) - ( sst_m(ji,jj) + rt0 ) )
+            ! --- Energy needed to bring ocean surface layer until its freezing (mostly<0 but >0 if supercooling, J.m-2) --- !
+            zqfr     = rau0 * rcp * e3t_m(ji,jj) * ( t_bo(ji,jj) - ( sst_m(ji,jj) + rt0 ) ) * tmask(ji,jj,1)  ! both < 0 (t_bo < sst) and > 0 (t_bo > sst)
+            zqfr_neg = MIN( zqfr , 0._wp )                                                                    ! only < 0
 
-            ! --- Above-freezing sensible heat content (J/m2 grid)
-            zqfr_neg = tmask(ji,jj,1) * rau0 * rcp * e3t_m(ji,jj) * MIN( ( t_bo(ji,jj) - ( sst_m(ji,jj) + rt0 ) ), 0._wp )
-
-            ! --- Sensible ocean-to-ice heat flux (W/m2)
-            zfric_u      = MAX( SQRT( zfric(ji,jj) ), zfric_umin ) 
+            ! --- Sensible ocean-to-ice heat flux (mostly>0 but <0 if supercooling, W/m2)
+            zfric_u            = MAX( SQRT( zfric(ji,jj) ), zfric_umin ) 
             qsb_ice_bot(ji,jj) = rswitch * rau0 * rcp * zch  * zfric_u * ( ( sst_m(ji,jj) + rt0 ) - t_bo(ji,jj) ) ! W.m-2
 
             qsb_ice_bot(ji,jj) = rswitch * MIN( qsb_ice_bot(ji,jj), - zqfr_neg * r1_rdtice / MAX( at_i(ji,jj), epsi10 ) )
@@ -379,7 +374,6 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), qprec_ice_1d  (1:npti), qprec_ice            )
          CALL tab_2d_1d( npti, nptidx(1:npti), qsr_ice_1d    (1:npti), qsr_ice (:,:,kl)     )
          CALL tab_2d_1d( npti, nptidx(1:npti), qns_ice_1d    (1:npti), qns_ice (:,:,kl)     )
-         CALL tab_2d_1d( npti, nptidx(1:npti), qtr_ice_bot_1d(1:npti), qtr_ice_bot (:,:,kl) )
          CALL tab_2d_1d( npti, nptidx(1:npti), evap_ice_1d   (1:npti), evap_ice(:,:,kl)     )
          CALL tab_2d_1d( npti, nptidx(1:npti), dqns_ice_1d   (1:npti), dqns_ice(:,:,kl)     )
          CALL tab_2d_1d( npti, nptidx(1:npti), t_bo_1d       (1:npti), t_bo                 )

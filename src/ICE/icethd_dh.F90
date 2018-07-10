@@ -84,8 +84,8 @@ CONTAINS
       REAL(wp) ::   zfmdt        ! exchange mass flux x time step (J/m2), >0 towards the ocean
 
       REAL(wp), DIMENSION(jpij) ::   zqprec      ! energy of fallen snow                       (J.m-3)
-      REAL(wp), DIMENSION(jpij) ::   zq_su       ! heat for surface ablation                   (J.m-2)
-      REAL(wp), DIMENSION(jpij) ::   zq_bo       ! heat for bottom ablation                    (J.m-2)
+      REAL(wp), DIMENSION(jpij) ::   zq_top      ! heat for surface ablation                   (J.m-2)
+      REAL(wp), DIMENSION(jpij) ::   zq_bot      ! heat for bottom ablation                    (J.m-2)
       REAL(wp), DIMENSION(jpij) ::   zq_rema     ! remaining heat at the end of the routine    (J.m-2)
       REAL(wp), DIMENSION(jpij) ::   zf_tt       ! Heat budget to determine melting or freezing(W.m-2)
       REAL(wp), DIMENSION(jpij) ::   zevap_rema  ! remaining mass flux from sublimation        (kg.m-2)
@@ -130,30 +130,22 @@ CONTAINS
       CASE( np_jules_ACTIVE )
          !
          DO ji = 1, npti
-            zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
+            zq_top(ji)     = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
          !
-      CASE( np_jules_EMULE )
+      CASE( np_jules_OFF , np_jules_EMULE )
          !
          DO ji = 1, npti
             zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - qcn_ice_top_1d(ji)
             qml_ice_1d(ji) = zdum * MAX( 0._wp , SIGN( 1._wp, t_su_1d(ji) - rt0 ) )
-            zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
-         END DO
-         !
-      CASE( np_jules_OFF ) 
-         !
-         DO ji = 1, npti
-            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - qcn_ice_top_1d(ji) 
-            qml_ice_1d(ji) = zdum * MAX( 0._wp , SIGN( 1._wp, t_su_1d(ji) - rt0 ) )
-            zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
+            zq_top(ji)     = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
          !
       END SELECT
       !
       DO ji = 1, npti
          zf_tt(ji)         = qcn_ice_bot_1d(ji) + qsb_ice_bot_1d(ji) + fhld_1d(ji) 
-         zq_bo(ji)         = MAX( 0._wp, zf_tt(ji) * rdt_ice )
+         zq_bot(ji)        = MAX( 0._wp, zf_tt(ji) * rdt_ice )
       END DO
 
       ! Ice and snow layer thicknesses
@@ -209,14 +201,14 @@ CONTAINS
             
             ! --- melt of falling snow ---
             rswitch              = MAX( 0._wp , SIGN( 1._wp , zqprec(ji) - epsi20 ) )
-            zdeltah       (ji,1) = - rswitch * zq_su(ji) / MAX( zqprec(ji) , epsi20 )   ! thickness change
-            zdeltah       (ji,1) = MAX( - zdh_s_pre(ji), zdeltah(ji,1) )                ! bound melting 
+            zdeltah       (ji,1) = - rswitch * zq_top(ji) / MAX( zqprec(ji) , epsi20 )   ! thickness change
+            zdeltah       (ji,1) = MAX( - zdh_s_pre(ji), zdeltah(ji,1) )                 ! bound melting 
             hfx_snw_1d    (ji)   = hfx_snw_1d    (ji) - zdeltah(ji,1) * a_i_1d(ji) * zqprec(ji)    * r1_rdtice   ! heat used to melt snow (W.m-2, >0)
             wfx_snw_sum_1d(ji)   = wfx_snw_sum_1d(ji) - rhosn         * a_i_1d(ji) * zdeltah(ji,1) * r1_rdtice   ! snow melting only = water into the ocean (then without snow precip), >0
             
             ! updates available heat + precipitations after melting
             dh_s_mlt (ji) = dh_s_mlt(ji) + zdeltah(ji,1)
-            zq_su    (ji) = MAX( 0._wp , zq_su (ji) + zdeltah(ji,1) * zqprec(ji) )      
+            zq_top   (ji) = MAX( 0._wp , zq_top (ji) + zdeltah(ji,1) * zqprec(ji) )      
             zdh_s_pre(ji) = zdh_s_pre(ji) + zdeltah(ji,1)
             
             ! update thickness
@@ -239,16 +231,16 @@ CONTAINS
 
       ! Snow melting
       ! ------------
-      ! If heat still available (zq_su > 0), then melt more snow
+      ! If heat still available (zq_top > 0), then melt more snow
       zdeltah(1:npti,:) = 0._wp
       zdh_s_mel(1:npti) = 0._wp
       DO jk = 1, nlay_s
          DO ji = 1, npti
-            IF( zh_s(ji,jk) > 0._wp .AND. zq_su(ji) > 0._wp ) THEN
+            IF( zh_s(ji,jk) > 0._wp .AND. zq_top(ji) > 0._wp ) THEN
                !
                rswitch          = MAX( 0._wp, SIGN( 1._wp, e_s_1d(ji,jk) - epsi20 ) )
-               zdeltah  (ji,jk) = - rswitch * zq_su(ji) / MAX( e_s_1d(ji,jk), epsi20 )   ! thickness change
-               zdeltah  (ji,jk) = MAX( zdeltah(ji,jk) , - zh_s(ji,jk) )                  ! bound melting
+               zdeltah  (ji,jk) = - rswitch * zq_top(ji) / MAX( e_s_1d(ji,jk), epsi20 )   ! thickness change
+               zdeltah  (ji,jk) = MAX( zdeltah(ji,jk) , - zh_s(ji,jk) )                   ! bound melting
                zdh_s_mel(ji)    = zdh_s_mel(ji) + zdeltah(ji,jk)
                
                hfx_snw_1d(ji)     = hfx_snw_1d(ji)     - zdeltah(ji,jk) * a_i_1d(ji) * e_s_1d (ji,jk) * r1_rdtice   ! heat used to melt snow(W.m-2, >0)
@@ -256,7 +248,7 @@ CONTAINS
                
                ! updates available heat + thickness
                dh_s_mlt(ji)    = dh_s_mlt(ji) + zdeltah(ji,jk)
-               zq_su   (ji)    = MAX( 0._wp , zq_su (ji) + zdeltah(ji,jk) * e_s_1d(ji,jk) )
+               zq_top  (ji)    = MAX( 0._wp , zq_top(ji) + zdeltah(ji,jk) * e_s_1d(ji,jk) )
                h_s_1d  (ji)    = MAX( 0._wp , h_s_1d(ji) + zdeltah(ji,jk) )
                zh_s    (ji,jk) = MAX( 0._wp , zh_s(ji,jk) + zdeltah(ji,jk) )
                !
@@ -348,13 +340,13 @@ CONTAINS
                zEw            =    rcp * ztmelts                      ! Specific enthalpy of resulting meltwater [J/kg, <0]
                zdE            =    zEi - zEw                          ! Specific enthalpy difference < 0
                
-               zfmdt          = - zq_su(ji) / zdE                     ! Mass flux to the ocean [kg/m2, >0]
+               zfmdt          = - zq_top(ji) / zdE                    ! Mass flux to the ocean [kg/m2, >0]
                
                zdeltah(ji,jk) = - zfmdt * r1_rhoic                    ! Melt of layer jk [m, <0]
                
                zdeltah(ji,jk) = MIN( 0._wp , MAX( zdeltah(ji,jk) , - zh_i(ji,jk) ) )    ! Melt of layer jk cannot exceed the layer thickness [m, <0]
                
-               zq_su(ji)      = MAX( 0._wp , zq_su(ji) - zdeltah(ji,jk) * rhoic * zdE ) ! update available heat
+               zq_top(ji)      = MAX( 0._wp , zq_top(ji) - zdeltah(ji,jk) * rhoic * zdE ) ! update available heat
                
                dh_i_sum(ji)   = dh_i_sum(ji) + zdeltah(ji,jk)         ! Cumulate surface melt
                
@@ -514,15 +506,15 @@ CONTAINS
                   zEw             = rcp * ztmelts                                             ! Specific enthalpy of meltwater (J/kg, <0)
                   zdE             = zEi - zEw                                                 ! Specific enthalpy difference   (J/kg, <0)
 
-                  zfmdt           = - zq_bo(ji) / zdE                                         ! Mass flux x time step (kg/m2, >0)
+                  zfmdt           = - zq_bot(ji) / zdE                                        ! Mass flux x time step (kg/m2, >0)
 
                   zdeltah(ji,jk)  = - zfmdt * r1_rhoic                                        ! Gross thickness change
 
                   zdeltah(ji,jk)  = MIN( 0._wp , MAX( zdeltah(ji,jk), - zh_i(ji,jk) ) )       ! bound thickness change
                   
-                  zq_bo(ji)       = MAX( 0._wp , zq_bo(ji) - zdeltah(ji,jk) * rhoic * zdE )   ! update available heat. MAX is necessary for roundup errors
+                  zq_bot(ji)      = MAX( 0._wp , zq_bot(ji) - zdeltah(ji,jk) * rhoic * zdE )  ! update available heat. MAX is necessary for roundup errors
 
-                  dh_i_bom(ji)    = dh_i_bom(ji) + zdeltah(ji,jk)                            ! Update basal melt
+                  dh_i_bom(ji)    = dh_i_bom(ji) + zdeltah(ji,jk)                             ! Update basal melt
 
                   zfmdt           = - zdeltah(ji,jk) * rhoic                                  ! Mass flux x time step > 0
 
@@ -555,7 +547,7 @@ CONTAINS
       !-------------------------------------------
       zdeltah(1:npti,:) = 0._wp ! important
       DO ji = 1, npti
-         zq_rema (ji)   = zq_su(ji) + zq_bo(ji) 
+         zq_rema (ji)   = zq_top(ji) + zq_bot(ji) 
          rswitch        = 1._wp - MAX( 0._wp, SIGN( 1._wp, - h_s_1d(ji) ) )   ! =1 if snow
          rswitch        = rswitch * MAX( 0._wp, SIGN( 1._wp, e_s_1d(ji,1) - epsi20 ) )
          zdeltah (ji,1) = - rswitch * zq_rema(ji) / MAX( e_s_1d(ji,1), epsi20 )

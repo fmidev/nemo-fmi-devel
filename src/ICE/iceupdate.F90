@@ -108,7 +108,6 @@ CONTAINS
       IF( .NOT. ln_icethd ) THEN   ! we suppose ice is impermeable => ocean is isolated from atmosphere
          qt_atm_oi  (:,:)   = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
          qt_oce_ai  (:,:)   = ( 1._wp - at_i_b(:,:) ) *   qns_oce(:,:)                  + qemp_oce(:,:)
-         qtr_ice_bot(:,:,:) = 0._wp
          emp_ice    (:,:)   = 0._wp
          qemp_ice   (:,:)   = 0._wp
          qevap_ice  (:,:,:) = 0._wp
