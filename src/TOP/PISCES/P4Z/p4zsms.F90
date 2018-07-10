@@ -299,8 +299,8 @@ CONTAINS
          !
          IF( ln_p5z ) THEN
             IF( iom_varid( numrtr, 'sized', ldstop = .FALSE. ) > 0 ) THEN
-               CALL iom_get( numrtr, jpdom_autoglo, 'sizep' , sized(:,:,:)  )
-               CALL iom_get( numrtr, jpdom_autoglo, 'sizen' , sized(:,:,:)  )
+               CALL iom_get( numrtr, jpdom_autoglo, 'sizep' , sizep(:,:,:)  )
+               CALL iom_get( numrtr, jpdom_autoglo, 'sizen' , sizen(:,:,:)  )
                CALL iom_get( numrtr, jpdom_autoglo, 'sized' , sized(:,:,:)  )
             ELSE
                sizep(:,:,:) = 1.
@@ -320,8 +320,8 @@ CONTAINS
          CALL iom_rstput( kt, nitrst, numrtw, 'Silicamax', xksimax(:,:) )
          CALL iom_rstput( kt, nitrst, numrtw, 'tcflxcum', t_oce_co2_flx_cum )
          IF( ln_p5z ) THEN
-            CALL iom_rstput( kt, nitrst, numrtw, 'sizep', sized(:,:,:) )
-            CALL iom_rstput( kt, nitrst, numrtw, 'sizen', sized(:,:,:) )
+            CALL iom_rstput( kt, nitrst, numrtw, 'sizep', sizep(:,:,:) )
+            CALL iom_rstput( kt, nitrst, numrtw, 'sizen', sizen(:,:,:) )
             CALL iom_rstput( kt, nitrst, numrtw, 'sized', sized(:,:,:) )
          ENDIF
       ENDIF
