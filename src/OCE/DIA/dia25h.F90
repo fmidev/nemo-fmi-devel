@@ -138,8 +138,8 @@ CONTAINS
       ! 0. Initialisation
       ! -----------------
       ! Define frequency of summing to create 25 h mean
-      IF( MOD( 3600,INT(rdt) ) == 0 ) THEN
-         i_steps = 3600/INT(rdt)
+      IF( MOD( 3600,NINT(rdt) ) == 0 ) THEN
+         i_steps = 3600/NINT(rdt)
       ELSE
          CALL ctl_stop('STOP', 'dia_wri_tide: timestep must give MOD(3600,rdt) = 0 otherwise no hourly values are possible')
       ENDIF

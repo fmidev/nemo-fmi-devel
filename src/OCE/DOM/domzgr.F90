@@ -252,9 +252,9 @@ CONTAINS
       !
       !                          !* ocean top and bottom level
       CALL iom_get( inum, jpdom_data, 'top_level'    , z2d  , lrowattr=ln_use_jattr )   ! 1st wet T-points (ISF)
-      k_top(:,:) = INT( z2d(:,:) )
+      k_top(:,:) = NINT( z2d(:,:) )
       CALL iom_get( inum, jpdom_data, 'bottom_level' , z2d  , lrowattr=ln_use_jattr )   ! last wet T-points
-      k_bot(:,:) = INT( z2d(:,:) )
+      k_bot(:,:) = NINT( z2d(:,:) )
       !
       ! reference depth for negative bathy (wetting and drying only)
       IF( ll_wd )  CALL iom_get( inum,  'rn_wd_ref_depth' , ssh_ref   )
@@ -306,12 +306,12 @@ CONTAINS
          END DO
       END DO
       ! converte into REAL to use lbc_lnk ; impose a min value of 1 as a zero can be set in lbclnk 
-      zk(:,:) = REAL( miku(:,:), wp )   ;   CALL lbc_lnk( zk, 'U', 1. )   ;   miku(:,:) = MAX( INT( zk(:,:) ), 1 )
-      zk(:,:) = REAL( mikv(:,:), wp )   ;   CALL lbc_lnk( zk, 'V', 1. )   ;   mikv(:,:) = MAX( INT( zk(:,:) ), 1 )
-      zk(:,:) = REAL( mikf(:,:), wp )   ;   CALL lbc_lnk( zk, 'F', 1. )   ;   mikf(:,:) = MAX( INT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( miku(:,:), wp )   ;   CALL lbc_lnk( zk, 'U', 1. )   ;   miku(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mikv(:,:), wp )   ;   CALL lbc_lnk( zk, 'V', 1. )   ;   mikv(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mikf(:,:), wp )   ;   CALL lbc_lnk( zk, 'F', 1. )   ;   mikf(:,:) = MAX( NINT( zk(:,:) ), 1 )
       !
-      zk(:,:) = REAL( mbku(:,:), wp )   ;   CALL lbc_lnk( zk, 'U', 1. )   ;   mbku(:,:) = MAX( INT( zk(:,:) ), 1 )
-      zk(:,:) = REAL( mbkv(:,:), wp )   ;   CALL lbc_lnk( zk, 'V', 1. )   ;   mbkv(:,:) = MAX( INT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mbku(:,:), wp )   ;   CALL lbc_lnk( zk, 'U', 1. )   ;   mbku(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mbkv(:,:), wp )   ;   CALL lbc_lnk( zk, 'V', 1. )   ;   mbkv(:,:) = MAX( NINT( zk(:,:) ), 1 )
       !
    END SUBROUTINE zgr_top_bot
 

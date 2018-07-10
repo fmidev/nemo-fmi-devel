@@ -113,7 +113,7 @@ CONTAINS
       IF( lk_mpp ) THEN
          CALL mpp_max_multiple( zmax(:), 5 )    ! max over the global domain
          !
-         nstop = INT( zmax(5) )                 ! nstop indicator sheared among all local domains
+         nstop = NINT( zmax(5) )                 ! nstop indicator sheared among all local domains
       ENDIF
       !
       IF( MOD( kt, nwrite ) == 1 .AND. lwp ) THEN

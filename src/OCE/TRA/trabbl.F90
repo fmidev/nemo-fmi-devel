@@ -525,7 +525,7 @@ CONTAINS
       ! converte into REAL to use lbc_lnk ; impose a min value of 1 as a zero can be set in lbclnk
       zmbku(:,:) = REAL( mbku_d(:,:), wp )   ;     zmbkv(:,:) = REAL( mbkv_d(:,:), wp )  
       CALL lbc_lnk_multi( zmbku,'U',1., zmbkv,'V',1.) 
-      mbku_d(:,:) = MAX( INT( zmbku(:,:) ), 1 ) ;  mbkv_d(:,:) = MAX( INT( zmbkv(:,:) ), 1 )
+      mbku_d(:,:) = MAX( INT( zmbku(:,:) ), 1 ) ;  mbkv_d(:,:) = MAX( NINT( zmbkv(:,:) ), 1 )
       !
       !                             !* sign of grad(H) at u- and v-points; zero if grad(H) = 0
       mgrhu(:,:) = 0   ;   mgrhv(:,:) = 0

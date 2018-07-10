@@ -541,7 +541,7 @@ CONTAINS
          & iom_varid( inum, 'ORCA_index' , ldstop = .FALSE. ) > 0    ) THEN
          !
          cd_cfg = 'ORCA'
-         CALL iom_get( inum, 'ORCA_index', zorca_res )   ;   kk_cfg = INT( zorca_res )
+         CALL iom_get( inum, 'ORCA_index', zorca_res )   ;   kk_cfg = NINT( zorca_res )
          !
          WRITE(ldtxt(ii),*) '   .'                                                     ;   ii = ii+1
          WRITE(ldtxt(ii),*) '   ==>>>   ORCA configuration '                           ;   ii = ii+1
@@ -561,10 +561,10 @@ CONTAINS
          !
       ENDIF
       !
-      CALL iom_get( inum, 'jpiglo', ziglo  )   ;   kpi = INT( ziglo )
-      CALL iom_get( inum, 'jpjglo', zjglo  )   ;   kpj = INT( zjglo )
-      CALL iom_get( inum, 'jpkglo', zkglo  )   ;   kpk = INT( zkglo )
-      CALL iom_get( inum, 'jperio', zperio )   ;   kperio = INT( zperio )
+      CALL iom_get( inum, 'jpiglo', ziglo  )   ;   kpi = NINT( ziglo )
+      CALL iom_get( inum, 'jpjglo', zjglo  )   ;   kpj = NINT( zjglo )
+      CALL iom_get( inum, 'jpkglo', zkglo  )   ;   kpk = NINT( zkglo )
+      CALL iom_get( inum, 'jperio', zperio )   ;   kperio = NINT( zperio )
       CALL iom_close( inum )
       !
       WRITE(ldtxt(ii),*) '      cn_cfg = ', TRIM(cd_cfg), '   nn_cfg = ', kk_cfg             ;   ii = ii+1

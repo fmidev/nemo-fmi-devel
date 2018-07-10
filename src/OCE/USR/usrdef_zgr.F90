@@ -203,7 +203,7 @@ CONTAINS
       !
       CALL lbc_lnk( z2d, 'T', 1. )           ! set surrounding land to zero (here jperio=0 ==>> closed)
       !
-      k_bot(:,:) = INT( z2d(:,:) )           ! =jpkm1 over the ocean point, =0 elsewhere
+      k_bot(:,:) = NINT( z2d(:,:) )           ! =jpkm1 over the ocean point, =0 elsewhere
       !
       k_top(:,:) = MIN( 1 , k_bot(:,:) )     ! = 1    over the ocean point, =0 elsewhere
       !

@@ -2245,7 +2245,7 @@ CONTAINS
       ENDDO
      
       zmbk(:,:) = 0.0
-      zmbk(:,:) = REAL( mbathy_crs(:,:), wp ) ;   CALL crs_lbc_lnk(zmbk,'T',1.0)   ;   mbathy_crs(:,:) = INT( zmbk(:,:) )
+      zmbk(:,:) = REAL( mbathy_crs(:,:), wp ) ;   CALL crs_lbc_lnk(zmbk,'T',1.0)   ;   mbathy_crs(:,:) = NINT( zmbk(:,:) )
 
 
       !
@@ -2265,8 +2265,8 @@ CONTAINS
 
       ! convert into REAL to use lbc_lnk ; impose a min value of 1 as a zero can be set in lbclnk
       zmbk(:,:) = 1.e0;    
-      zmbk(:,:) = REAL( mbku_crs(:,:), wp )   ;   CALL crs_lbc_lnk(zmbk,'U',1.0) ; mbku_crs  (:,:) = MAX( INT( zmbk(:,:) ), 1 ) 
-      zmbk(:,:) = REAL( mbkv_crs(:,:), wp )   ;   CALL crs_lbc_lnk(zmbk,'V',1.0) ; mbkv_crs  (:,:) = MAX( INT( zmbk(:,:) ), 1 ) 
+      zmbk(:,:) = REAL( mbku_crs(:,:), wp )   ;   CALL crs_lbc_lnk(zmbk,'U',1.0) ; mbku_crs  (:,:) = MAX( NINT( zmbk(:,:) ), 1 ) 
+      zmbk(:,:) = REAL( mbkv_crs(:,:), wp )   ;   CALL crs_lbc_lnk(zmbk,'V',1.0) ; mbkv_crs  (:,:) = MAX( NINT( zmbk(:,:) ), 1 ) 
       !
    END SUBROUTINE crs_dom_bat
 
