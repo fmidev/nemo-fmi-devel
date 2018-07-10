@@ -1998,8 +1998,8 @@ CONTAINS
       SELECT CASE( TRIM( sn_rcv_iceflx%cldes ) )             !  ice topmelt and botmelt  !
       !                                                      ! ========================= !
       CASE ('coupled')
-         qml_ice(:,:,:) = frcv(jpr_topm)%z3(:,:,:) * a_i(:,:,:)
-         qcn_ice(:,:,:) = frcv(jpr_botm)%z3(:,:,:) * a_i(:,:,:)
+         qml_ice(:,:,:) = frcv(jpr_topm)%z3(:,:,:)
+         qcn_ice(:,:,:) = frcv(jpr_botm)%z3(:,:,:)
       END SELECT
       !
       !                                                      ! ========================= !
