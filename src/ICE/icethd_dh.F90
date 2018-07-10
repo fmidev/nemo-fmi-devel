@@ -136,7 +136,7 @@ CONTAINS
       CASE( np_jules_EMULE )
          !
          DO ji = 1, npti
-            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qsr_ice_tr_1d(ji) - fc_su(ji)
+            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - fc_su(ji)
             qml_ice_1d(ji) = zdum * MAX( 0._wp , SIGN( 1._wp, t_su_1d(ji) - rt0 ) )
             zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
@@ -144,7 +144,7 @@ CONTAINS
       CASE( np_jules_OFF ) 
          !
          DO ji = 1, npti
-            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qsr_ice_tr_1d(ji) - fc_su(ji) 
+            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - fc_su(ji) 
             qml_ice_1d(ji) = zdum * MAX( 0._wp , SIGN( 1._wp, t_su_1d(ji) - rt0 ) )
             zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO

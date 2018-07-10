@@ -19,7 +19,7 @@ MODULE icethd
 !!gm list trop longue ==>>> why not passage en argument d'appel ?
    USE sbc_oce , ONLY : sss_m, sst_m, e3t_m, utau, vtau, ssu_m, ssv_m, frq_m, qns_tot, qsr_tot, sprecip, ln_cpl
    USE sbc_ice , ONLY : qsr_oce, qns_oce, qemp_oce, qsr_ice, qns_ice, dqns_ice, evap_ice, qprec_ice, qevap_ice, &
-      &                 qml_ice, qcn_ice, qsr_ice_tr
+      &                 qml_ice, qcn_ice, qtr_ice_top
    USE ice1D          ! sea-ice: thermodynamics variables
    USE icethd_zdf     ! sea-ice: vertical heat diffusion
    USE icethd_dh      ! sea-ice: ice-snow growth and melt
@@ -127,7 +127,7 @@ CONTAINS
       ENDIF
       CALL lbc_lnk( zfric, 'T',  1. )
       !
-      ftr_ice(:,:,:) = 0._wp  ! initialization (part of solar radiation transmitted through the ice)
+      qtr_ice_bot(:,:,:) = 0._wp  ! initialization (part of solar radiation transmitted through the ice)
 
       !--------------------------------------------------------------------!
       ! Partial computation of forcing for the thermodynamic sea ice model
@@ -376,20 +376,20 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), h_ip_1d     (1:npti), h_ip     (:,:,kl) )
          CALL tab_2d_1d( npti, nptidx(1:npti), a_ip_frac_1d(1:npti), a_ip_frac(:,:,kl) )
          !
-         CALL tab_2d_1d( npti, nptidx(1:npti), qprec_ice_1d(1:npti), qprec_ice        )
-         CALL tab_2d_1d( npti, nptidx(1:npti), qsr_ice_1d  (1:npti), qsr_ice (:,:,kl) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), qns_ice_1d  (1:npti), qns_ice (:,:,kl) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), ftr_ice_1d  (1:npti), ftr_ice (:,:,kl) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), evap_ice_1d (1:npti), evap_ice(:,:,kl) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), dqns_ice_1d (1:npti), dqns_ice(:,:,kl) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), t_bo_1d     (1:npti), t_bo             )
-         CALL tab_2d_1d( npti, nptidx(1:npti), sprecip_1d  (1:npti), sprecip          ) 
-         CALL tab_2d_1d( npti, nptidx(1:npti), fhtur_1d    (1:npti), fhtur            )
-         CALL tab_2d_1d( npti, nptidx(1:npti), fhld_1d     (1:npti), fhld             )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qprec_ice_1d  (1:npti), qprec_ice            )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qsr_ice_1d    (1:npti), qsr_ice (:,:,kl)     )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qns_ice_1d    (1:npti), qns_ice (:,:,kl)     )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qtr_ice_bot_1d(1:npti), qtr_ice_bot (:,:,kl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), evap_ice_1d   (1:npti), evap_ice(:,:,kl)     )
+         CALL tab_2d_1d( npti, nptidx(1:npti), dqns_ice_1d   (1:npti), dqns_ice(:,:,kl)     )
+         CALL tab_2d_1d( npti, nptidx(1:npti), t_bo_1d       (1:npti), t_bo                 )
+         CALL tab_2d_1d( npti, nptidx(1:npti), sprecip_1d    (1:npti), sprecip              ) 
+         CALL tab_2d_1d( npti, nptidx(1:npti), fhtur_1d      (1:npti), fhtur                )
+         CALL tab_2d_1d( npti, nptidx(1:npti), fhld_1d       (1:npti), fhld                 )
          
-         CALL tab_2d_1d( npti, nptidx(1:npti), qml_ice_1d   (1:npti), qml_ice      (:,:,kl)  )
-         CALL tab_2d_1d( npti, nptidx(1:npti), qcn_ice_1d   (1:npti), qcn_ice      (:,:,kl) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), qsr_ice_tr_1d(1:npti), qsr_ice_tr   (:,:,kl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qml_ice_1d    (1:npti), qml_ice    (:,:,kl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qcn_ice_1d    (1:npti), qcn_ice    (:,:,kl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qtr_ice_top_1d(1:npti), qtr_ice_top(:,:,kl) )
          !
          CALL tab_2d_1d( npti, nptidx(1:npti), wfx_snw_sni_1d(1:npti), wfx_snw_sni   )
          CALL tab_2d_1d( npti, nptidx(1:npti), wfx_snw_sum_1d(1:npti), wfx_snw_sum   )
@@ -416,23 +416,23 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), sfx_sub_1d (1:npti), sfx_sub          )
          CALL tab_2d_1d( npti, nptidx(1:npti), sfx_lam_1d (1:npti), sfx_lam          )
          !
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_thd_1d (1:npti), hfx_thd          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_spr_1d (1:npti), hfx_spr          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_sum_1d (1:npti), hfx_sum          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_bom_1d (1:npti), hfx_bom          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_bog_1d (1:npti), hfx_bog          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_dif_1d (1:npti), hfx_dif          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_opw_1d (1:npti), hfx_opw          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_snw_1d (1:npti), hfx_snw          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_sub_1d (1:npti), hfx_sub          )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_res_1d (1:npti), hfx_res          )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_thd_1d    (1:npti), hfx_thd       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_spr_1d    (1:npti), hfx_spr       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_sum_1d    (1:npti), hfx_sum       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_bom_1d    (1:npti), hfx_bom       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_bog_1d    (1:npti), hfx_bog       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_dif_1d    (1:npti), hfx_dif       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_opw_1d    (1:npti), hfx_opw       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_snw_1d    (1:npti), hfx_snw       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_sub_1d    (1:npti), hfx_sub       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_res_1d    (1:npti), hfx_res       )
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_err_dif_1d(1:npti), hfx_err_dif   )
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_err_rem_1d(1:npti), hfx_err_rem   )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_out_1d (1:npti), hfx_out          )
+         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_out_1d    (1:npti), hfx_out       )
          !
          ! SIMIP diagnostics
-         CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_bo_1d(1:npti), diag_fc_bo   )
-         CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_su_1d(1:npti), diag_fc_su   )
+         CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_bo_1d(1:npti), diag_fc_bo )
+         CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_su_1d(1:npti), diag_fc_su )
          ! ocean surface fields
          CALL tab_2d_1d( npti, nptidx(1:npti), sst_1d(1:npti), sst_m )
          CALL tab_2d_1d( npti, nptidx(1:npti), sss_1d(1:npti), sss_m )
@@ -520,8 +520,8 @@ CONTAINS
          CALL tab_1d_2d( npti, nptidx(1:npti), hfx_err_rem_1d(1:npti), hfx_err_rem )
          CALL tab_1d_2d( npti, nptidx(1:npti), hfx_out_1d (1:npti), hfx_out        )
          !
-         CALL tab_1d_2d( npti, nptidx(1:npti), qns_ice_1d(1:npti), qns_ice(:,:,kl) )
-         CALL tab_1d_2d( npti, nptidx(1:npti), ftr_ice_1d(1:npti), ftr_ice(:,:,kl) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qns_ice_1d    (1:npti), qns_ice    (:,:,kl) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qtr_ice_bot_1d(1:npti), qtr_ice_bot(:,:,kl) )
          ! effective conductivity and 1st layer temperature (for Jules coupling)
          CALL tab_1d_2d( npti, nptidx(1:npti), cnd_ice_1d(1:npti), cnd_ice(:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), t1_ice_1d (1:npti), t1_ice (:,:,kl) )

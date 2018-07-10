@@ -31,7 +31,7 @@ MODULE ice1D
    INTEGER , PUBLIC                                  ::   npti   !  number of selected points
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qlead_1d     
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ftr_ice_1d   
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qtr_ice_bot_1d   
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qsr_ice_1d  
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qns_ice_1d  
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t_bo_1d     
@@ -39,7 +39,7 @@ MODULE ice1D
    
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qml_ice_1d     !: heat available for snow / ice surface melting [W/m2] 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qcn_ice_1d     !: heat available for snow / ice surface sublimation [W/m2] 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qsr_ice_tr_1d  !: solar flux transmitted below the ice surface [W/m2] 
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qtr_ice_top_1d !: solar flux transmitted below the ice surface [W/m2] 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t1_ice_1d      !: temperature of the 1st layer (Jules coupling) [K]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   cnd_ice_1d     !: conductivity at the top of ice/snow (Jules coupling) [W/K/m2]
 
@@ -181,14 +181,14 @@ CONTAINS
 
       ii = 1
       ALLOCATE( nptidx    (jpij) ,   &
-         &      qlead_1d  (jpij) , ftr_ice_1d(jpij) , qsr_ice_1d(jpij) ,   &
-         &      qns_ice_1d(jpij) , qml_ice_1d(jpij) , qcn_ice_1d(jpij) , qsr_ice_tr_1d(jpij) , &
-         &      cnd_ice_1d(jpij) , t1_ice_1d (jpij) , t_bo_1d   (jpij) ,   &
-         &      hfx_sum_1d(jpij) , hfx_bom_1d(jpij) , hfx_bog_1d(jpij) ,   & 
-         &      hfx_dif_1d(jpij) , hfx_opw_1d(jpij) , hfx_dyn_1d(jpij) ,   &
-         &      rn_amax_1d(jpij) ,                                         &
-         &      hfx_thd_1d(jpij) , hfx_spr_1d(jpij) ,                      &
-         &      hfx_snw_1d(jpij) , hfx_sub_1d(jpij) ,                      &
+         &      qlead_1d  (jpij) , qtr_ice_bot_1d(jpij) , qsr_ice_1d(jpij) ,   &
+         &      qns_ice_1d(jpij) , qml_ice_1d    (jpij) , qcn_ice_1d(jpij) , qtr_ice_top_1d(jpij) , &
+         &      cnd_ice_1d(jpij) , t1_ice_1d     (jpij) , t_bo_1d   (jpij) ,   &
+         &      hfx_sum_1d(jpij) , hfx_bom_1d    (jpij) , hfx_bog_1d(jpij) ,   & 
+         &      hfx_dif_1d(jpij) , hfx_opw_1d    (jpij) , hfx_dyn_1d(jpij) ,   &
+         &      rn_amax_1d(jpij) ,                                             &
+         &      hfx_thd_1d(jpij) , hfx_spr_1d    (jpij) ,                      &
+         &      hfx_snw_1d(jpij) , hfx_sub_1d    (jpij) ,                      &
          &      hfx_res_1d(jpij) , hfx_err_rem_1d(jpij) , hfx_err_dif_1d(jpij) , hfx_out_1d(jpij), STAT=ierr(ii) )
       !
       ii = ii + 1

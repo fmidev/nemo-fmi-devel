@@ -177,7 +177,7 @@ CONTAINS
       ! 2) Radiation
       !-------------
       ! --- Transmission/absorption of solar radiation in the ice --- !
-      zradtr_s(1:npti,0) = qsr_ice_tr_1d(1:npti)
+      zradtr_s(1:npti,0) = qtr_ice_top_1d(1:npti)
       DO jk = 1, nlay_s
          DO ji = 1, npti
             !                             ! radiation transmitted below the layer-th snow layer
@@ -187,7 +187,7 @@ CONTAINS
          END DO
       END DO
       !
-      zradtr_i(1:npti,0) = zradtr_s(1:npti,nlay_s) * isnow(1:npti) + qsr_ice_tr_1d(1:npti) * ( 1._wp - isnow(1:npti) )
+      zradtr_i(1:npti,0) = zradtr_s(1:npti,nlay_s) * isnow(1:npti) + qtr_ice_top_1d(1:npti) * ( 1._wp - isnow(1:npti) )
       DO jk = 1, nlay_i 
          DO ji = 1, npti
             !                             ! radiation transmitted below the layer-th ice layer
@@ -197,7 +197,7 @@ CONTAINS
          END DO
       END DO
       !
-      ftr_ice_1d(1:npti) = zradtr_i(1:npti,nlay_i)   ! record radiation transmitted below the ice
+      qtr_ice_bot_1d(1:npti) = zradtr_i(1:npti,nlay_i)   ! record radiation transmitted below the ice
       !
       iconv    = 0          ! number of iterations
       zdti_max = 1000._wp   ! maximal value of error on all points
@@ -329,7 +329,7 @@ CONTAINS
             END DO
 
             DO ji = 1, npti
-               zfnet(ji) = qsr_ice_1d(ji) - qsr_ice_tr_1d(ji) + qns_ice_1d(ji) ! net heat flux = net - transmitted solar + non solar
+               zfnet(ji) = qsr_ice_1d(ji) - qtr_ice_top_1d(ji) + qns_ice_1d(ji) ! net heat flux = net - transmitted solar + non solar
             END DO
             !
             !----------------------------
@@ -769,14 +769,14 @@ CONTAINS
             IF( k_jules == np_jules_OFF ) THEN
                
                IF( t_su_1d(ji) < rt0 ) THEN  ! case T_su < 0degC
-                  zhfx_err = ( qns_ice_1d(ji) + qsr_ice_1d(ji)    - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice )*a_i_1d(ji)
+                  zhfx_err = (qns_ice_1d(ji) + qsr_ice_1d(ji)     - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice)*a_i_1d(ji)
                ELSE                          ! case T_su = 0degC
-                  zhfx_err = ( fc_su(ji)      + qsr_ice_tr_1d(ji) - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice )*a_i_1d(ji)
+                  zhfx_err = (fc_su(ji)      + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice)*a_i_1d(ji)
                ENDIF
                
             ELSEIF( k_jules == np_jules_ACTIVE ) THEN
             
-               zhfx_err = ( fc_su(ji) + qsr_ice_tr_1d(ji) - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice ) * a_i_1d(ji)
+               zhfx_err = ( fc_su(ji) + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice ) * a_i_1d(ji)
             
             ENDIF
             !

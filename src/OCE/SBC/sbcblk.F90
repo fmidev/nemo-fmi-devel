@@ -906,11 +906,11 @@ CONTAINS
       zfr2 = ( 0.82 * ( 1.0 - cldf_ice ) + 0.65 * cldf_ice )            ! zfr2 such that zfr1 + zfr2 to equal 1
       !
       WHERE    ( phs(:,:,:) <= 0._wp .AND. phi(:,:,:) <  0.1_wp )       ! linear decrease from hi=0 to 10cm  
-         qsr_ice_tr(:,:,:) = qsr_ice(:,:,:) * ( zfr1 + zfr2 * ( 1._wp - phi(:,:,:) * 10._wp ) )
+         qtr_ice_top(:,:,:) = qsr_ice(:,:,:) * ( zfr1 + zfr2 * ( 1._wp - phi(:,:,:) * 10._wp ) )
       ELSEWHERE( phs(:,:,:) <= 0._wp .AND. phi(:,:,:) >= 0.1_wp )       ! constant (zfr1) when hi>10cm
-         qsr_ice_tr(:,:,:) = qsr_ice(:,:,:) * zfr1
+         qtr_ice_top(:,:,:) = qsr_ice(:,:,:) * zfr1
       ELSEWHERE                                                         ! zero when hs>0
-         qsr_ice_tr(:,:,:) = 0._wp 
+         qtr_ice_top(:,:,:) = 0._wp 
       END WHERE
       !
       IF(ln_ctl) THEN
@@ -999,7 +999,7 @@ CONTAINS
                   &      ( rcdic * phs(ji,jj,jl) + rn_cnd_s * MAX( 0.01, phi(ji,jj,jl) ) )
                ztsu    = ptsu(ji,jj,jl)                                                ! Store current iteration temperature
                ztsu0   = ptsu(ji,jj,jl)                                                ! Store initial surface temperature
-               zqa0    = qsr_ice(ji,jj,jl) - qsr_ice_tr(ji,jj,jl) + qns_ice(ji,jj,jl)  ! Net initial atmospheric heat flux
+               zqa0    = qsr_ice(ji,jj,jl) - qtr_ice_top(ji,jj,jl) + qns_ice(ji,jj,jl) ! Net initial atmospheric heat flux
                !
                DO iter = 1, nit     ! --- Iterative loop
                   zqc   = zkeff_h * ( ztsu - ptb(ji,jj) )                              ! Conduction heat flux through snow-ice system (>0 downwards)
@@ -1010,7 +1010,7 @@ CONTAINS
                ptsu   (ji,jj,jl) = MIN( rt0, ztsu )
                qcn_ice(ji,jj,jl) = zkeff_h * ( ptsu(ji,jj,jl) - ptb(ji,jj) )
                qns_ice(ji,jj,jl) = qns_ice(ji,jj,jl) + dqns_ice(ji,jj,jl) * ( ptsu(ji,jj,jl) - ztsu0 )
-               qml_ice(ji,jj,jl) = ( qsr_ice(ji,jj,jl) - qsr_ice_tr(ji,jj,jl) + qns_ice(ji,jj,jl) - qcn_ice(ji,jj,jl) )   &
+               qml_ice(ji,jj,jl) = ( qsr_ice(ji,jj,jl) - qtr_ice_top(ji,jj,jl) + qns_ice(ji,jj,jl) - qcn_ice(ji,jj,jl) )  &
                              &   * MAX( 0._wp , SIGN( 1._wp, ptsu(ji,jj,jl) - rt0 ) )
 
             END DO

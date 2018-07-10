@@ -2011,15 +2011,15 @@ CONTAINS
          !                    ! ===> used prescribed cloud fraction representative for polar oceans in summer (0.81)
          ztri = 0.18 * ( 1.0 - cldf_ice ) + 0.35 * cldf_ice    ! surface transmission parameter (Grenfell Maykut 77)
          !
-         qsr_ice_tr(:,:,:) = ztri * qsr_ice(:,:,:)
-         WHERE( phs(:,:,:) >= 0.0_wp )   qsr_ice_tr(:,:,:) = 0._wp            ! snow fully opaque
-         WHERE( phi(:,:,:) <= 0.1_wp )   qsr_ice_tr(:,:,:) = qsr_ice(:,:,:)   ! thin ice transmits all solar radiation
+         qtr_ice_top(:,:,:) = ztri * qsr_ice(:,:,:)
+         WHERE( phs(:,:,:) >= 0.0_wp )   qtr_ice_top(:,:,:) = 0._wp            ! snow fully opaque
+         WHERE( phi(:,:,:) <= 0.1_wp )   qtr_ice_top(:,:,:) = qsr_ice(:,:,:)   ! thin ice transmits all solar radiation
          !     
       CASE( np_jules_ACTIVE )       !==  Jules coupler is active  ==!
          !
-         !                    ! ===> here we must receive the qsr_ice_tr array from the coupler
+         !                    ! ===> here we must receive the qtr_ice_top array from the coupler
          !                           for now just assume zero (fully opaque ice)
-         qsr_ice_tr(:,:,:) = 0._wp
+         qtr_ice_top(:,:,:) = 0._wp
          !
       END SELECT
       !

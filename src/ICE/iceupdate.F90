@@ -106,12 +106,12 @@ CONTAINS
 
       ! --- case we bypass ice thermodynamics --- !
       IF( .NOT. ln_icethd ) THEN   ! we suppose ice is impermeable => ocean is isolated from atmosphere
-         hfx_in   (:,:)   = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
-         hfx_out  (:,:)   = ( 1._wp - at_i_b(:,:) ) *   qns_oce(:,:)                  + qemp_oce(:,:)
-         ftr_ice  (:,:,:) = 0._wp
-         emp_ice  (:,:)   = 0._wp
-         qemp_ice (:,:)   = 0._wp
-         qevap_ice(:,:,:) = 0._wp
+         hfx_in     (:,:)   = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
+         hfx_out    (:,:)   = ( 1._wp - at_i_b(:,:) ) *   qns_oce(:,:)                  + qemp_oce(:,:)
+         qtr_ice_bot(:,:,:) = 0._wp
+         emp_ice    (:,:)   = 0._wp
+         qemp_ice   (:,:)   = 0._wp
+         qevap_ice  (:,:,:) = 0._wp
       ENDIF
       
       DO jj = 1, jpj
@@ -119,7 +119,7 @@ CONTAINS
 
             ! Solar heat flux reaching the ocean = zqsr (W.m-2) 
             !---------------------------------------------------
-            zqsr = qsr_tot(ji,jj) - SUM( a_i_b(ji,jj,:) * ( qsr_ice(ji,jj,:) - ftr_ice(ji,jj,:) ) )
+            zqsr = qsr_tot(ji,jj) - SUM( a_i_b(ji,jj,:) * ( qsr_ice(ji,jj,:) - qtr_ice_bot(ji,jj,:) ) )
 
             ! Total heat flux reaching the ocean = hfx_out (W.m-2) 
             !---------------------------------------------------
@@ -249,8 +249,8 @@ CONTAINS
       IF( iom_use('qns_oce'    ) )   CALL iom_put( "qns_oce"    , qns_oce * ( 1._wp - at_i_b ) + qemp_oce                    )   ! non-solar flux at ocean surface
       IF( iom_use('qsr_ice'    ) )   CALL iom_put( "qsr_ice"    , SUM( qsr_ice * a_i_b, dim=3 )                              )   !     solar flux at ice surface
       IF( iom_use('qns_ice'    ) )   CALL iom_put( "qns_ice"    , SUM( qns_ice * a_i_b, dim=3 ) + qemp_ice                   )   ! non-solar flux at ice surface
-      IF( iom_use('qtr_ice_bot') )   CALL iom_put( "qtr_ice_bot", SUM( ftr_ice * a_i_b, dim=3 )                              )   !     solar flux transmitted thru ice
-      IF( iom_use('qtr_ice_top') )   CALL iom_put( "qtr_ice_top", SUM( qsr_ice_tr * a_i_b, dim=3 )                           )   !     solar flux transmitted thru ice surface
+      IF( iom_use('qtr_ice_bot') )   CALL iom_put( "qtr_ice_bot", SUM( qtr_ice_bot * a_i_b, dim=3 )                          )   !     solar flux transmitted thru ice
+      IF( iom_use('qtr_ice_top') )   CALL iom_put( "qtr_ice_top", SUM( qtr_ice_top * a_i_b, dim=3 )                          )   !     solar flux transmitted thru ice surface
       IF( iom_use('qt_oce'     ) )   CALL iom_put( "qt_oce"     ,      ( qsr_oce + qns_oce ) * ( 1._wp - at_i_b ) + qemp_oce )
       IF( iom_use('qt_ice'     ) )   CALL iom_put( "qt_ice"     , SUM( ( qns_ice + qsr_ice ) * a_i_b, dim=3 )     + qemp_ice )
       IF( iom_use('qt_oce_ai'  ) )   CALL iom_put( "qt_oce_ai"  , hfx_out * tmask(:,:,1)                                     )   ! total heat flux at the ocean   surface: interface oce-(ice+atm) 

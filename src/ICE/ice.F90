@@ -269,7 +269,7 @@ MODULE ice
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_res     !: residual heat flux due to correction of ice thickness [W.m-2]
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   rn_amax_2d     !: maximum ice concentration 2d array
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ftr_ice        !: transmitted solar radiation under ice
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qtr_ice_bot    !: transmitted solar radiation under ice
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   t1_ice         !: temperature of the first layer (Jules coupling) [K]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   cnd_ice        !: effective conductivity at the top of ice/snow (Jules coupling) [W.m-2.K-1]
 
@@ -404,11 +404,11 @@ CONTAINS
 
       ! * Ice global state variables
       ii = ii + 1
-      ALLOCATE( ftr_ice(jpi,jpj,jpl) , cnd_ice(jpi,jpj,jpl) , t1_ice(jpi,jpj,jpl) ,  &
-         &      h_i    (jpi,jpj,jpl) , a_i    (jpi,jpj,jpl) , v_i   (jpi,jpj,jpl) ,  &
-         &      v_s    (jpi,jpj,jpl) , h_s    (jpi,jpj,jpl) , t_su  (jpi,jpj,jpl) ,  &
-         &      s_i    (jpi,jpj,jpl) , sv_i   (jpi,jpj,jpl) , o_i   (jpi,jpj,jpl) ,  &
-         &      oa_i   (jpi,jpj,jpl) , bv_i   (jpi,jpj,jpl) , STAT=ierr(ii) )
+      ALLOCATE( qtr_ice_bot(jpi,jpj,jpl) , cnd_ice(jpi,jpj,jpl) , t1_ice(jpi,jpj,jpl) ,  &
+         &      h_i        (jpi,jpj,jpl) , a_i    (jpi,jpj,jpl) , v_i   (jpi,jpj,jpl) ,  &
+         &      v_s        (jpi,jpj,jpl) , h_s    (jpi,jpj,jpl) , t_su  (jpi,jpj,jpl) ,  &
+         &      s_i        (jpi,jpj,jpl) , sv_i   (jpi,jpj,jpl) , o_i   (jpi,jpj,jpl) ,  &
+         &      oa_i       (jpi,jpj,jpl) , bv_i   (jpi,jpj,jpl) , STAT=ierr(ii) )
 
       ii = ii + 1
       ALLOCATE( u_ice(jpi,jpj) , v_ice(jpi,jpj) ,                                   &

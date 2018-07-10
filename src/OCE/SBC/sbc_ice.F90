@@ -48,7 +48,7 @@ MODULE sbc_ice
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qml_ice        !: heat available for snow / ice surface melting     [W/m2] 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qcn_ice        !: heat conduction flux in the layer below surface   [W/m2] 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qsr_ice_tr     !: solar flux transmitted below the ice surface      [W/m2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qtr_ice_top    !: solar flux transmitted below the ice surface      [W/m2]
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   utau_ice       !: atmos-ice u-stress. VP: I-pt ; EVP: U,V-pts   [N/m2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   vtau_ice       !: atmos-ice v-stress. VP: I-pt ; EVP: U,V-pts   [N/m2]
@@ -125,13 +125,13 @@ CONTAINS
 #if defined key_si3
       ALLOCATE( qns_ice (jpi,jpj,jpl) , qsr_ice  (jpi,jpj,jpl) ,     &
          &      qla_ice (jpi,jpj,jpl) , dqla_ice (jpi,jpj,jpl) ,     &
-         &      dqns_ice(jpi,jpj,jpl) , tn_ice   (jpi,jpj,jpl) , alb_ice   (jpi,jpj,jpl) ,   &
-         &      qml_ice (jpi,jpj,jpl) , qcn_ice  (jpi,jpj,jpl) , qsr_ice_tr(jpi,jpj,jpl) ,   &
-         &      utau_ice(jpi,jpj)     , vtau_ice (jpi,jpj)     , wndm_ice  (jpi,jpj)     ,   &
-         &      evap_ice(jpi,jpj,jpl) , devap_ice(jpi,jpj,jpl) , qprec_ice (jpi,jpj)     ,   &
-         &      qemp_ice(jpi,jpj)     , qevap_ice(jpi,jpj,jpl) , qemp_oce  (jpi,jpj)     ,   &
-         &      qns_oce (jpi,jpj)     , qsr_oce  (jpi,jpj)     , emp_oce   (jpi,jpj)     ,   &
-         &      emp_ice (jpi,jpj)     , tsfc_ice (jpi,jpj,jpl) , sstfrz    (jpi,jpj)     , STAT= ierr(2) )
+         &      dqns_ice(jpi,jpj,jpl) , tn_ice   (jpi,jpj,jpl) , alb_ice    (jpi,jpj,jpl) ,   &
+         &      qml_ice (jpi,jpj,jpl) , qcn_ice  (jpi,jpj,jpl) , qtr_ice_top(jpi,jpj,jpl) ,   &
+         &      utau_ice(jpi,jpj)     , vtau_ice (jpi,jpj)     , wndm_ice   (jpi,jpj)     ,   &
+         &      evap_ice(jpi,jpj,jpl) , devap_ice(jpi,jpj,jpl) , qprec_ice  (jpi,jpj)     ,   &
+         &      qemp_ice(jpi,jpj)     , qevap_ice(jpi,jpj,jpl) , qemp_oce   (jpi,jpj)     ,   &
+         &      qns_oce (jpi,jpj)     , qsr_oce  (jpi,jpj)     , emp_oce    (jpi,jpj)     ,   &
+         &      emp_ice (jpi,jpj)     , tsfc_ice (jpi,jpj,jpl) , sstfrz     (jpi,jpj)     , STAT= ierr(2) )
 #endif
 
 #if defined key_cice

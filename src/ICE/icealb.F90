@@ -15,6 +15,7 @@ MODULE icealb
    !!----------------------------------------------------------------------
    USE ice, ONLY: jpl ! sea-ice: number of categories
    USE phycst         ! physical constants
+   USE dom_oce        ! domain: ocean
    !
    USE in_out_manager ! I/O manager
    USE lib_mpp        ! MPP library
@@ -159,13 +160,16 @@ CONTAINS
                   zalb_pnd = rn_alb_dpnd
                ENDIF
                !                       !--- Surface albedo is weighted mean of snow, ponds and bare ice contributions
-               palb_os(ji,jj,jl) = zafrac_snw * zalb_snw + zafrac_pnd * zalb_pnd + zafrac_ice * zalb_ice
+               palb_os(ji,jj,jl) = ( zafrac_snw * zalb_snw + zafrac_pnd * zalb_pnd + zafrac_ice * zalb_ice ) * tmask(ji,jj,1)
+               !
+               palb_cs(ji,jj,jl) = palb_os(ji,jj,jl)  &
+                  &                - ( - 0.1010 * palb_os(ji,jj,jl) * palb_os(ji,jj,jl)  &
+                  &                    + 0.1933 * palb_os(ji,jj,jl) - 0.0148 ) * tmask(ji,jj,1)
                !
             END DO
          END DO
       END DO
       !
-      palb_cs(:,:,:) = palb_os(:,:,:) - ( - 0.1010 * palb_os(:,:,:) * palb_os(:,:,:) + 0.1933 * palb_os(:,:,:) - 0.0148 )
       !
       IF( ln_timing )   CALL timing_stop('icealb')
       !
