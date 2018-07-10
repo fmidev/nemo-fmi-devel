@@ -108,8 +108,6 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_i_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_ib_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_s_1d
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fc_su         !: Surface Conduction flux 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fc_bo_i       !: Bottom  Conduction flux 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_s_tot      !: Snow accretion/ablation        [m]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_sum      !: Ice surface ablation [m]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_i_itm      !: Ice internal ablation [m]
@@ -205,7 +203,7 @@ CONTAINS
       !
       ii = ii + 1
       ALLOCATE( t_su_1d (jpij) , t_si_1d (jpij) , a_i_1d    (jpij) , a_ib_1d (jpij) ,                   &
-         &      h_i_1d  (jpij) , h_ib_1d (jpij) , h_s_1d    (jpij) , fc_su   (jpij) , fc_bo_i (jpij) ,  &    
+         &      h_i_1d  (jpij) , h_ib_1d (jpij) , h_s_1d    (jpij) ,                                    &    
          &      dh_s_tot(jpij) , dh_i_sum(jpij) , dh_i_itm  (jpij) , dh_i_bom(jpij) , dh_i_bog(jpij) ,  &    
          &      dh_i_sub(jpij) , dh_s_mlt(jpij) , dh_snowice(jpij) , s_i_1d  (jpij) , s_i_new (jpij) ,  &
          &      a_ip_1d (jpij) , v_ip_1d (jpij) , v_i_1d    (jpij) , v_s_1d  (jpij) ,                   &

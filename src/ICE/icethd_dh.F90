@@ -136,7 +136,7 @@ CONTAINS
       CASE( np_jules_EMULE )
          !
          DO ji = 1, npti
-            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - fc_su(ji)
+            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - qcn_ice_top_1d(ji)
             qml_ice_1d(ji) = zdum * MAX( 0._wp , SIGN( 1._wp, t_su_1d(ji) - rt0 ) )
             zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
@@ -144,7 +144,7 @@ CONTAINS
       CASE( np_jules_OFF ) 
          !
          DO ji = 1, npti
-            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - fc_su(ji) 
+            zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - qcn_ice_top_1d(ji) 
             qml_ice_1d(ji) = zdum * MAX( 0._wp , SIGN( 1._wp, t_su_1d(ji) - rt0 ) )
             zq_su(ji)      = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
@@ -152,7 +152,7 @@ CONTAINS
       END SELECT
       !
       DO ji = 1, npti
-         zf_tt(ji)         = fc_bo_i(ji) + qsb_ice_bot_1d(ji) + fhld_1d(ji) 
+         zf_tt(ji)         = qcn_ice_bot_1d(ji) + qsb_ice_bot_1d(ji) + fhld_1d(ji) 
          zq_bo(ji)         = MAX( 0._wp, zf_tt(ji) * rdt_ice )
       END DO
 
@@ -415,9 +415,9 @@ CONTAINS
       ! Ice Basal growth 
       !------------------
       ! Basal growth is driven by heat imbalance at the ice-ocean interface,
-      ! between the inner conductive flux  (fc_bo_i), from the open water heat flux 
+      ! between the inner conductive flux  (qcn_ice_bot), from the open water heat flux 
       ! (fhld) and the sensible ice-ocean flux (qsb_ice_bot). 
-      ! fc_bo_i is positive downwards. qsb_ice_bot and fhld are positive to the ice 
+      ! qcn_ice_bot is positive downwards. qsb_ice_bot and fhld are positive to the ice 
 
       ! If salinity varies in time, an iterative procedure is required, because
       ! the involved quantities are inter-dependent.

@@ -727,14 +727,14 @@ CONTAINS
       ! 10) Fluxes at the interfaces
       !-----------------------------
       !
-      ! --- update conduction fluxes
-      !
+      ! --- calculate conduction fluxes (positive downward)
+
       DO ji = 1, npti
          !                                ! surface ice conduction flux
-         fc_su(ji)   =  -           isnow(ji)   * zkappa_s(ji,0) * zg1s * ( t_s_1d(ji,1) - t_su_1d(ji) )  &
-            &           - ( 1._wp - isnow(ji) ) * zkappa_i(ji,0) * zg1  * ( t_i_1d(ji,1) - t_su_1d(ji) )
+         qcn_ice_top_1d(ji) =  -           isnow(ji)   * zkappa_s(ji,0)      * zg1s * ( t_s_1d(ji,1) - t_su_1d(ji) )  &
+            &                  - ( 1._wp - isnow(ji) ) * zkappa_i(ji,0)      * zg1  * ( t_i_1d(ji,1) - t_su_1d(ji) )
          !                                ! bottom ice conduction flux
-         fc_bo_i(ji) =  - zkappa_i(ji,nlay_i) * zg1 * ( t_bo_1d(ji) - t_i_1d(ji,nlay_i) )
+         qcn_ice_bot_1d(ji) =                          - zkappa_i(ji,nlay_i) * zg1  * ( t_bo_1d(ji ) - t_i_1d (ji,nlay_i) )
       END DO
       
       !
@@ -749,7 +749,7 @@ CONTAINS
       ELSEIF( k_jules == np_jules_ACTIVE ) THEN
          !
          DO ji = 1, npti
-            hfx_err_dif_1d(ji) = hfx_err_dif_1d(ji) - ( fc_su(ji)      - qcn_ice_1d(ji) ) * a_i_1d(ji) 
+            hfx_err_dif_1d(ji) = hfx_err_dif_1d(ji) - ( qcn_ice_top_1d(ji) - qcn_ice_1d(ji) ) * a_i_1d(ji) 
          END DO
          !
       ENDIF
@@ -769,14 +769,17 @@ CONTAINS
             IF( k_jules == np_jules_OFF ) THEN
                
                IF( t_su_1d(ji) < rt0 ) THEN  ! case T_su < 0degC
-                  zhfx_err = (qns_ice_1d(ji) + qsr_ice_1d(ji)     - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice)*a_i_1d(ji)
+                  zhfx_err = ( qns_ice_1d(ji)     + qsr_ice_1d(ji)     - zradtr_i(ji,nlay_i) - qcn_ice_bot_1d(ji)  &
+                     &       + zdq * r1_rdtice ) * a_i_1d(ji)
                ELSE                          ! case T_su = 0degC
-                  zhfx_err = (fc_su(ji)      + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice)*a_i_1d(ji)
+                  zhfx_err = ( qcn_ice_top_1d(ji) + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - qcn_ice_bot_1d(ji)  &
+                     &       + zdq * r1_rdtice ) * a_i_1d(ji)
                ENDIF
                
             ELSEIF( k_jules == np_jules_ACTIVE ) THEN
             
-               zhfx_err = ( fc_su(ji) + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - fc_bo_i(ji) + zdq * r1_rdtice ) * a_i_1d(ji)
+               zhfx_err    = ( qcn_ice_top_1d(ji) + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - qcn_ice_bot_1d(ji)  &
+                  &          + zdq * r1_rdtice ) * a_i_1d(ji)
             
             ENDIF
             !
@@ -786,23 +789,6 @@ CONTAINS
             ! hfx_dif = Heat flux diagnostic of sensible heat used to warm/cool ice in W.m-2   
             hfx_dif_1d(ji) = hfx_dif_1d(ji) - zdq * r1_rdtice * a_i_1d(ji)
             !
-         END DO
-         !
-         ! --- SIMIP diagnostics
-         !
-         DO ji = 1, npti
-            !--- Conduction fluxes (positive downward)
-            qcn_ice_bot_1d(ji) = qcn_ice_bot_1d(ji) + fc_bo_i(ji) * a_i_1d(ji) / at_i_1d(ji)
-            qcn_ice_top_1d(ji) = qcn_ice_top_1d(ji) + fc_su  (ji) * a_i_1d(ji) / at_i_1d(ji)
-   
-            !--- Snow-ice interfacial temperature (diagnostic SIMIP)
-            zfac = rn_cnd_s * zh_i(ji) + ztcond_i(ji,1) * zh_s(ji)
-            IF( h_s_1d(ji) >= zhs_min ) THEN
-               t_si_1d(ji) = ( rn_cnd_s       * zh_i(ji) * t_s_1d(ji,1) +   &
-                  &            ztcond_i(ji,1) * zh_s(ji) * t_i_1d(ji,1) ) / MAX( epsi10, zfac )
-            ELSE
-               t_si_1d(ji) = t_su_1d(ji)
-            ENDIF
          END DO
          !
       ENDIF
@@ -826,13 +812,25 @@ CONTAINS
       !
       IF( k_jules == np_jules_EMULE ) THEN
          ! Restore temperatures to their initial values
-         t_s_1d    (1:npti,:) = ztsold(1:npti,:)
-         t_i_1d    (1:npti,:) = ztiold(1:npti,:)
-         qcn_ice_1d(1:npti)   = fc_su (1:npti)
+         t_s_1d    (1:npti,:) = ztsold        (1:npti,:)
+         t_i_1d    (1:npti,:) = ztiold        (1:npti,:)
+         qcn_ice_1d(1:npti)   = qcn_ice_top_1d(1:npti)
       ENDIF
       !
+      ! --- SIMIP diagnostics
+      !
+      DO ji = 1, npti         
+         !--- Snow-ice interfacial temperature (diagnostic SIMIP)
+         zfac = rn_cnd_s * zh_i(ji) + ztcond_i(ji,1) * zh_s(ji)
+         IF( h_s_1d(ji) >= zhs_min ) THEN
+            t_si_1d(ji) = ( rn_cnd_s       * zh_i(ji) * t_s_1d(ji,1) +   &
+               &            ztcond_i(ji,1) * zh_s(ji) * t_i_1d(ji,1) ) / MAX( epsi10, zfac )
+         ELSE
+            t_si_1d(ji) = t_su_1d(ji)
+         ENDIF
+      END DO
+      !
    END SUBROUTINE ice_thd_zdf_BL99
-
 
 #else
    !!----------------------------------------------------------------------

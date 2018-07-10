@@ -359,8 +359,8 @@ MODULE ice
    ! Extra sea ice diagnostics to address the data request
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   t_si          !: Temperature at Snow-ice interface (K) 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   tm_si         !: mean temperature at the snow-ice interface (K) 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   qcn_ice_bot   !: Bottom  conduction flux (W/m2)
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   qcn_ice_top   !: Surface conduction flux (W/m2)
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qcn_ice_bot   !: Bottom  conduction flux (W/m2)
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qcn_ice_top   !: Surface conduction flux (W/m2)
 
    !
    !!----------------------------------------------------------------------
@@ -450,7 +450,7 @@ CONTAINS
 
       ! * SIMIP diagnostics
       ii = ii + 1
-      ALLOCATE( t_si (jpi,jpj,jpl) , tm_si(jpi,jpj) , qcn_ice_bot(jpi,jpj) , qcn_ice_top(jpi,jpj) , STAT = ierr(ii) )
+      ALLOCATE( t_si(jpi,jpj,jpl) , tm_si(jpi,jpj) , qcn_ice_bot(jpi,jpj,jpl) , qcn_ice_top(jpi,jpj,jpl) , STAT = ierr(ii) )
 
       ice_alloc = MAXVAL( ierr(:) )
       IF( ice_alloc /= 0 )   CALL ctl_warn('ice_alloc: failed to allocate arrays.')

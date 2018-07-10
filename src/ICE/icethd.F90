@@ -430,9 +430,6 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_err_rem_1d(1:npti), hfx_err_rem   )
          CALL tab_2d_1d( npti, nptidx(1:npti), qt_oce_ai_1d  (1:npti), qt_oce_ai     )
          !
-         ! SIMIP diagnostics
-         CALL tab_2d_1d( npti, nptidx(1:npti), qcn_ice_bot_1d(1:npti), qcn_ice_bot )
-         CALL tab_2d_1d( npti, nptidx(1:npti), qcn_ice_top_1d(1:npti), qcn_ice_top )
          ! ocean surface fields
          CALL tab_2d_1d( npti, nptidx(1:npti), sst_1d(1:npti), sst_m )
          CALL tab_2d_1d( npti, nptidx(1:npti), sss_1d(1:npti), sss_m )
@@ -526,9 +523,9 @@ CONTAINS
          CALL tab_1d_2d( npti, nptidx(1:npti), cnd_ice_1d(1:npti), cnd_ice(:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), t1_ice_1d (1:npti), t1_ice (:,:,kl) )
          ! SIMIP diagnostics         
-         CALL tab_1d_2d( npti, nptidx(1:npti), t_si_1d       (1:npti), t_si(:,:,kl) )
-         CALL tab_1d_2d( npti, nptidx(1:npti), qcn_ice_bot_1d(1:npti), qcn_ice_bot  )
-         CALL tab_1d_2d( npti, nptidx(1:npti), qcn_ice_top_1d(1:npti), qcn_ice_top  )
+         CALL tab_1d_2d( npti, nptidx(1:npti), t_si_1d       (1:npti), t_si       (:,:,kl) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qcn_ice_bot_1d(1:npti), qcn_ice_bot(:,:,kl) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qcn_ice_top_1d(1:npti), qcn_ice_top(:,:,kl) )
          ! extensive variables
          CALL tab_1d_2d( npti, nptidx(1:npti), v_i_1d (1:npti), v_i (:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), v_s_1d (1:npti), v_s (:,:,kl) )
