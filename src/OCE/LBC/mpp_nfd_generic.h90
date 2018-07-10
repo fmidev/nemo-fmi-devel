@@ -55,7 +55,7 @@
       INTEGER  ::   ji,  jj,  jk,  jl, jh, jf, jr   ! dummy loop indices
       INTEGER  ::   ipi, ipj, ipk, ipl, ipf         ! dimension of the input array
       INTEGER  ::   imigr, iihom, ijhom             ! local integers
-      INTEGER  ::   ierr, itaille, ildi, ilei, iilb
+      INTEGER  ::   ierr, itaille, ilci, ildi, ilei, iilb
       INTEGER  ::   ij, iproc
       INTEGER, DIMENSION (jpmaxngh)       ::   ml_req_nf   ! for mpi_isend when avoiding mpi_allgather
       INTEGER                             ::   ml_err      ! for mpi_isend when avoiding mpi_allgather
@@ -116,10 +116,11 @@
             iproc = nfipproc(isendto(jr),jpnj)
             IF(iproc /= -1) THEN
                iilb = nimppt(iproc+1)
+               ilci = nlcit (iproc+1)
                ildi = nldit (iproc+1)
                ilei = nleit (iproc+1)
-               IF( iilb           ==      1 )   ildi = 1     ! e-w boundary already done -> force to take 1st column
-               IF( iilb + jpi - 1 == jpiglo )   ilei = jpi   ! e-w boundary already done -> force to take last column
+               IF( iilb            ==      1 )   ildi = 1      ! e-w boundary already done -> force to take 1st column
+               IF( iilb + ilci - 1 == jpiglo )   ilei = ilci   ! e-w boundary already done -> force to take last column
                iilb = nfiimpp(isendto(jr),jpnj) - nfiimpp(isendto(1),jpnj)
             ENDIF
             IF( iproc /= narea-1 .AND. iproc /= -1 ) THEN
@@ -184,10 +185,11 @@
          DO jr = 1, ndim_rank_north         ! recover the global north array
             iproc = nrank_north(jr) + 1
             iilb  = nimppt(iproc)
+            ilci  = nlcit (iproc)
             ildi  = nldit (iproc)
             ilei  = nleit (iproc)
-            IF( iilb           ==      1 )   ildi = 1     ! e-w boundary already done -> force to take 1st column
-            IF( iilb + jpi - 1 == jpiglo )   ilei = jpi   ! e-w boundary already done -> force to take last column
+            IF( iilb            ==      1 )   ildi = 1      ! e-w boundary already done -> force to take 1st column
+            IF( iilb + ilci - 1 == jpiglo )   ilei = ilci   ! e-w boundary already done -> force to take last column
             DO jf = 1, ipf
                DO jl = 1, ipl
                   DO jk = 1, ipk
