@@ -106,8 +106,8 @@ CONTAINS
 
       ! --- case we bypass ice thermodynamics --- !
       IF( .NOT. ln_icethd ) THEN   ! we suppose ice is impermeable => ocean is isolated from atmosphere
-         hfx_in     (:,:)   = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
-         hfx_out    (:,:)   = ( 1._wp - at_i_b(:,:) ) *   qns_oce(:,:)                  + qemp_oce(:,:)
+         qt_atm_oi  (:,:)   = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
+         qt_oce_ai  (:,:)   = ( 1._wp - at_i_b(:,:) ) *   qns_oce(:,:)                  + qemp_oce(:,:)
          qtr_ice_bot(:,:,:) = 0._wp
          emp_ice    (:,:)   = 0._wp
          qemp_ice   (:,:)   = 0._wp
@@ -121,20 +121,20 @@ CONTAINS
             !---------------------------------------------------
             zqsr = qsr_tot(ji,jj) - SUM( a_i_b(ji,jj,:) * ( qsr_ice(ji,jj,:) - qtr_ice_bot(ji,jj,:) ) )
 
-            ! Total heat flux reaching the ocean = hfx_out (W.m-2) 
+            ! Total heat flux reaching the ocean = qt_oce_ai (W.m-2) 
             !---------------------------------------------------
-            zqmass         = hfx_thd(ji,jj) + hfx_dyn(ji,jj) + hfx_res(ji,jj) ! heat flux from snow is 0 (T=0 degC)
-            hfx_out(ji,jj) = hfx_out(ji,jj) + zqmass + zqsr
+            zqmass           = hfx_thd(ji,jj) + hfx_dyn(ji,jj) + hfx_res(ji,jj) ! heat flux from snow is 0 (T=0 degC)
+            qt_oce_ai(ji,jj) = qt_oce_ai(ji,jj) + zqmass + zqsr
 
             ! Add the residual from heat diffusion equation and sublimation (W.m-2)
             !----------------------------------------------------------------------
-            hfx_out(ji,jj) = hfx_out(ji,jj) + hfx_err_dif(ji,jj) +   &
-               &           ( hfx_sub(ji,jj) - SUM( qevap_ice(ji,jj,:) * a_i_b(ji,jj,:) ) )
+            qt_oce_ai(ji,jj) = qt_oce_ai(ji,jj) + hfx_err_dif(ji,jj) +   &
+               &             ( hfx_sub(ji,jj) - SUM( qevap_ice(ji,jj,:) * a_i_b(ji,jj,:) ) )
 
             ! New qsr and qns used to compute the oceanic heat flux at the next time step
             !----------------------------------------------------------------------------
             qsr(ji,jj) = zqsr                                      
-            qns(ji,jj) = hfx_out(ji,jj) - zqsr              
+            qns(ji,jj) = qt_oce_ai(ji,jj) - zqsr              
 
             ! Mass flux at the atm. surface       
             !-----------------------------------
@@ -253,8 +253,8 @@ CONTAINS
       IF( iom_use('qtr_ice_top') )   CALL iom_put( "qtr_ice_top", SUM( qtr_ice_top * a_i_b, dim=3 )                          )   !     solar flux transmitted thru ice surface
       IF( iom_use('qt_oce'     ) )   CALL iom_put( "qt_oce"     ,      ( qsr_oce + qns_oce ) * ( 1._wp - at_i_b ) + qemp_oce )
       IF( iom_use('qt_ice'     ) )   CALL iom_put( "qt_ice"     , SUM( ( qns_ice + qsr_ice ) * a_i_b, dim=3 )     + qemp_ice )
-      IF( iom_use('qt_oce_ai'  ) )   CALL iom_put( "qt_oce_ai"  , hfx_out * tmask(:,:,1)                                     )   ! total heat flux at the ocean   surface: interface oce-(ice+atm) 
-      IF( iom_use('qt_atm_oi'  ) )   CALL iom_put( "qt_atm_oi"  , hfx_in * tmask(:,:,1)                                      )   ! total heat flux at the oce-ice surface: interface atm-(ice+oce) 
+      IF( iom_use('qt_oce_ai'  ) )   CALL iom_put( "qt_oce_ai"  , qt_oce_ai * tmask(:,:,1)                                   )   ! total heat flux at the ocean   surface: interface oce-(ice+atm) 
+      IF( iom_use('qt_atm_oi'  ) )   CALL iom_put( "qt_atm_oi"  , qt_atm_oi * tmask(:,:,1)                                   )   ! total heat flux at the oce-ice surface: interface atm-(ice+oce) 
       IF( iom_use('qemp_oce'   ) )   CALL iom_put( "qemp_oce"   , qemp_oce                                                   )   ! Downward Heat Flux from E-P over ocean
       IF( iom_use('qemp_ice'   ) )   CALL iom_put( "qemp_ice"   , qemp_ice                                                   )   ! Downward Heat Flux from E-P over ice
 
@@ -266,7 +266,7 @@ CONTAINS
       IF( iom_use('hfxopw'     ) )   CALL iom_put ("hfxopw"     , hfx_opw             )   ! heat flux used for ice formation in open water
       IF( iom_use('hfxdif'     ) )   CALL iom_put ("hfxdif"     , hfx_dif             )   ! heat flux used for ice temperature change
       IF( iom_use('hfxsnw'     ) )   CALL iom_put ("hfxsnw"     , hfx_snw             )   ! heat flux used for snow melt 
-      IF( iom_use('hfxerr'     ) )   CALL iom_put ("hfxerr"     , hfx_err_dif         )   ! heat flux error after heat diffusion (included in hfx_out)
+      IF( iom_use('hfxerr'     ) )   CALL iom_put ("hfxerr"     , hfx_err_dif         )   ! heat flux error after heat diffusion (included in qt_oce_ai)
 
       ! heat fluxes associated with mass exchange (freeze/melt/precip...)
       IF( iom_use('hfxthd'     ) )   CALL iom_put ("hfxthd"     , hfx_thd             )   !  

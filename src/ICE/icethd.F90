@@ -176,7 +176,7 @@ CONTAINS
             !
             ! Net heat flux on top of the ice-ocean [W.m-2]
             ! ---------------------------------------------
-            hfx_in(ji,jj) = qns_tot(ji,jj) + qsr_tot(ji,jj) 
+            qt_atm_oi(ji,jj) = qns_tot(ji,jj) + qsr_tot(ji,jj) 
          END DO
       END DO
       
@@ -184,9 +184,9 @@ CONTAINS
       IF( .NOT. ln_icedO )  qlead(:,:) = 0._wp
       ! In case we bypass growing/melting from top and bottom: we suppose ice is impermeable => ocean is isolated from atmosphere
       IF( .NOT. ln_icedH ) THEN
-         hfx_in(:,:) = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
-         fhtur (:,:) = 0._wp
-         fhld  (:,:) = 0._wp
+         qt_atm_oi(:,:) = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
+         fhtur    (:,:) = 0._wp
+         fhld     (:,:) = 0._wp
       ENDIF
 
       ! ---------------------------------------------------------------------
@@ -195,11 +195,11 @@ CONTAINS
       !     First  step here              :  non solar + precip - qlead - qturb
       !     Second step in icethd_dh      :  heat remaining if total melt (zq_rema) 
       !     Third  step in iceupdate.F90  :  heat from ice-ocean mass exchange (zf_mass) + solar
-      hfx_out(:,:) = ( 1._wp - at_i_b(:,:) ) * qns_oce(:,:) + qemp_oce(:,:)  &  ! Non solar heat flux received by the ocean               
-         &           - qlead(:,:) * r1_rdtice                                &  ! heat flux taken from the ocean where there is open water ice formation
-         &           - at_i (:,:) * fhtur(:,:)                               &  ! heat flux taken by turbulence
-         &           - at_i (:,:) *  fhld(:,:)                                  ! heat flux taken during bottom growth/melt 
-                                                                                !    (fhld should be 0 while bott growth)
+      qt_oce_ai(:,:) = ( 1._wp - at_i_b(:,:) ) * qns_oce(:,:) + qemp_oce(:,:)  &  ! Non solar heat flux received by the ocean               
+         &             - qlead(:,:) * r1_rdtice                                &  ! heat flux taken from the ocean where there is open water ice formation
+         &             - at_i (:,:) * fhtur(:,:)                               &  ! heat flux taken by turbulence
+         &             - at_i (:,:) *  fhld(:,:)                                  ! heat flux taken during bottom growth/melt 
+      !                                                                            !    (fhld should be 0 while bott growth)
       !-------------------------------------------------------------------------------------------!
       ! Thermodynamic computation (only on grid points covered by ice) => loop over ice categories
       !-------------------------------------------------------------------------------------------!
@@ -428,7 +428,7 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_res_1d    (1:npti), hfx_res       )
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_err_dif_1d(1:npti), hfx_err_dif   )
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_err_rem_1d(1:npti), hfx_err_rem   )
-         CALL tab_2d_1d( npti, nptidx(1:npti), hfx_out_1d    (1:npti), hfx_out       )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qt_oce_ai_1d  (1:npti), qt_oce_ai     )
          !
          ! SIMIP diagnostics
          CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_bo_1d(1:npti), diag_fc_bo )
@@ -506,19 +506,19 @@ CONTAINS
          CALL tab_1d_2d( npti, nptidx(1:npti), sfx_sub_1d (1:npti), sfx_sub        )
          CALL tab_1d_2d( npti, nptidx(1:npti), sfx_lam_1d (1:npti), sfx_lam        )
          !
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_thd_1d (1:npti), hfx_thd        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_spr_1d (1:npti), hfx_spr        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_sum_1d (1:npti), hfx_sum        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_bom_1d (1:npti), hfx_bom        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_bog_1d (1:npti), hfx_bog        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_dif_1d (1:npti), hfx_dif        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_opw_1d (1:npti), hfx_opw        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_snw_1d (1:npti), hfx_snw        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_sub_1d (1:npti), hfx_sub        )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_res_1d (1:npti), hfx_res        )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_thd_1d    (1:npti), hfx_thd     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_spr_1d    (1:npti), hfx_spr     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_sum_1d    (1:npti), hfx_sum     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_bom_1d    (1:npti), hfx_bom     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_bog_1d    (1:npti), hfx_bog     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_dif_1d    (1:npti), hfx_dif     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_opw_1d    (1:npti), hfx_opw     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_snw_1d    (1:npti), hfx_snw     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_sub_1d    (1:npti), hfx_sub     )
+         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_res_1d    (1:npti), hfx_res     )
          CALL tab_1d_2d( npti, nptidx(1:npti), hfx_err_dif_1d(1:npti), hfx_err_dif )
          CALL tab_1d_2d( npti, nptidx(1:npti), hfx_err_rem_1d(1:npti), hfx_err_rem )
-         CALL tab_1d_2d( npti, nptidx(1:npti), hfx_out_1d (1:npti), hfx_out        )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qt_oce_ai_1d  (1:npti), qt_oce_ai   )
          !
          CALL tab_1d_2d( npti, nptidx(1:npti), qns_ice_1d    (1:npti), qns_ice    (:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), qtr_ice_bot_1d(1:npti), qtr_ice_bot(:,:,kl) )

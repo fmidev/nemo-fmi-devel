@@ -188,7 +188,7 @@ CONTAINS
       zsfx  = glob_sum( ( sfx + diag_sice ) * e1e2t ) * zconv * rday
 
       ! heat flux
-      zhfx  = glob_sum( ( hfx_in - hfx_out - diag_heat - diag_trp_ei - diag_trp_es   &
+      zhfx  = glob_sum( ( qt_atm_oi - qt_oce_ai - diag_heat - diag_trp_ei - diag_trp_es   &
       !  &              - SUM( qevap_ice * a_i_b, dim=3 )                           & !!clem: I think this line must be commented (but need check)
          &              ) * e1e2t ) * zconv
 
@@ -571,8 +571,8 @@ CONTAINS
                WRITE(numout,*) ' qns       : ', qns(ji,jj)
                WRITE(numout,*)
                WRITE(numout,*) ' hfx_mass     : ', hfx_thd(ji,jj) + hfx_dyn(ji,jj) + hfx_snw(ji,jj) + hfx_res(ji,jj)
-               WRITE(numout,*) ' hfx_in       : ', hfx_in(ji,jj)
-               WRITE(numout,*) ' hfx_out      : ', hfx_out(ji,jj)
+               WRITE(numout,*) ' qt_atm_oi    : ', qt_atm_oi(ji,jj)
+               WRITE(numout,*) ' qt_oce_ai    : ', qt_oce_ai(ji,jj)
                WRITE(numout,*) ' dhc          : ', diag_heat(ji,jj)              
                WRITE(numout,*)
                WRITE(numout,*) ' hfx_dyn      : ', hfx_dyn(ji,jj)

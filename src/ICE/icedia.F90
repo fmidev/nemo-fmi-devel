@@ -94,11 +94,11 @@ CONTAINS
       ! ---------------------------!
       ! 2 - Trends due to forcing  !
       ! ---------------------------!
-      z_frc_volbot = r1_rau0 * glob_sum( - ( wfx_ice(:,:) + wfx_snw(:,:) + wfx_err_sub(:,:) ) * e1e2t(:,:) ) * 1.e-9  ! freshwater flux ice/snow-ocean 
-      z_frc_voltop = r1_rau0 * glob_sum( - ( wfx_sub(:,:) + wfx_spr(:,:) ) * e1e2t(:,:) ) * 1.e-9                     ! freshwater flux ice/snow-atm
-      z_frc_sal    = r1_rau0 * glob_sum(   - sfx(:,:) * e1e2t(:,:) ) * 1.e-9                                          ! salt fluxes ice/snow-ocean
-      z_frc_tembot =           glob_sum( hfx_out(:,:) * e1e2t(:,:) ) * 1.e-20                                         ! heat on top of ocean (and below ice)
-      z_frc_temtop =           glob_sum( hfx_in (:,:) * e1e2t(:,:) ) * 1.e-20                                         ! heat on top of ice-coean
+      z_frc_volbot = r1_rau0 * glob_sum( - ( wfx_ice(:,:) + wfx_snw(:,:) + wfx_err_sub(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! freshwater flux ice/snow-ocean 
+      z_frc_voltop = r1_rau0 * glob_sum( - ( wfx_sub(:,:) + wfx_spr(:,:) )                    * e1e2t(:,:) ) * 1.e-9   ! freshwater flux ice/snow-atm
+      z_frc_sal    = r1_rau0 * glob_sum( -       sfx(:,:)                                     * e1e2t(:,:) ) * 1.e-9   ! salt fluxes ice/snow-ocean
+      z_frc_tembot =           glob_sum(   qt_oce_ai(:,:)                                     * e1e2t(:,:) ) * 1.e-20  ! heat on top of ocean (and below ice)
+      z_frc_temtop =           glob_sum(   qt_atm_oi(:,:)                                     * e1e2t(:,:) ) * 1.e-20  ! heat on top of ice-coean
       !
       frc_voltop  = frc_voltop  + z_frc_voltop  * rdt_ice ! km3
       frc_volbot  = frc_volbot  + z_frc_volbot  * rdt_ice ! km3
@@ -109,9 +109,9 @@ CONTAINS
       ! ----------------------- !
       ! 3 -  Content variations !
       ! ----------------------- !
-      zdiff_vol = r1_rau0 * glob_sum( ( rhoic*vt_i(:,:) + rhosn*vt_s(:,:) - vol_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9 ! freshwater trend (km3) 
-      zdiff_sal = r1_rau0 * glob_sum( ( rhoic* SUM( sv_i(:,:,:), dim=3 ) - sal_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9 ! salt content trend (km3*pss)
-      zdiff_tem =           glob_sum( ( et_i(:,:) + et_s(:,:)             - tem_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-20 ! heat content trend (1.e20 J)
+      zdiff_vol = r1_rau0 * glob_sum( ( rhoic*vt_i(:,:) + rhosn*vt_s(:,:) - vol_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! freshwater trend (km3) 
+      zdiff_sal = r1_rau0 * glob_sum( ( rhoic* SUM( sv_i(:,:,:), dim=3 )  - sal_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! salt content trend (km3*pss)
+      zdiff_tem =           glob_sum( ( et_i(:,:) + et_s(:,:)             - tem_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-20  ! heat content trend (1.e20 J)
       !                               + SUM( qevap_ice * a_i_b, dim=3 )       !! clem: I think this term should not be there (but needs a check)
 
       ! ----------------------- !

@@ -52,7 +52,7 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_dyn_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_err_rem_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_err_dif_1d
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_out_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qt_oce_ai_1d
 
    ! heat flux associated with ice-atmosphere mass exchange
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_sub_1d
@@ -189,7 +189,7 @@ CONTAINS
          &      rn_amax_1d(jpij) ,                                             &
          &      hfx_thd_1d(jpij) , hfx_spr_1d    (jpij) ,                      &
          &      hfx_snw_1d(jpij) , hfx_sub_1d    (jpij) ,                      &
-         &      hfx_res_1d(jpij) , hfx_err_rem_1d(jpij) , hfx_err_dif_1d(jpij) , hfx_out_1d(jpij), STAT=ierr(ii) )
+         &      hfx_res_1d(jpij) , hfx_err_rem_1d(jpij) , hfx_err_dif_1d(jpij) , qt_oce_ai_1d(jpij), STAT=ierr(ii) )
       !
       ii = ii + 1
       ALLOCATE( sprecip_1d    (jpij) , at_i_1d       (jpij) , ato_i_1d      (jpij) ,                         &

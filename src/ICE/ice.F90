@@ -255,8 +255,8 @@ MODULE ice
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_snw     !: heat flux for snow melt                             [W.m-2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_err_dif !: heat flux remaining due to change in non-solar flux [W.m-2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_err_rem !: heat flux error after heat remapping                [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_in      !: heat flux available for thermo transformations      [W.m-2]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hfx_out     !: heat flux remaining at the end of thermo transformations  [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   qt_atm_oi      !: heat flux available for thermo transformations      [W.m-2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   qt_oce_ai   !: heat flux remaining at the end of thermo transformations  [W.m-2]
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_err_sub !: mass flux error after sublimation                   [kg.m-2.s-1]
    
    ! heat flux associated with ice-atmosphere mass exchange
@@ -386,21 +386,21 @@ CONTAINS
          &      delta_i  (jpi,jpj) , divu_i   (jpi,jpj) , shear_i   (jpi,jpj) , STAT=ierr(ii) )
 
       ii = ii + 1
-      ALLOCATE( t_bo   (jpi,jpj) , wfx_snw_sni(jpi,jpj) ,                                                &
-         &      wfx_snw(jpi,jpj) , wfx_snw_dyn(jpi,jpj) , wfx_snw_sum(jpi,jpj) , wfx_snw_sub(jpi,jpj) ,  &
-         &      wfx_ice(jpi,jpj) , wfx_sub    (jpi,jpj) , wfx_ice_sub(jpi,jpj) , wfx_lam    (jpi,jpj) ,  &
-         &      wfx_pnd(jpi,jpj) ,                                                                       &
-         &      wfx_bog(jpi,jpj) , wfx_dyn(jpi,jpj) , wfx_bom(jpi,jpj) , wfx_sum(jpi,jpj) ,              &
-         &      wfx_res(jpi,jpj) , wfx_sni(jpi,jpj) , wfx_opw(jpi,jpj) , wfx_spr(jpi,jpj) ,              &
-         &      afx_tot(jpi,jpj) , rn_amax_2d(jpi,jpj),                                                  &
-         &      fhtur  (jpi,jpj) , qlead  (jpi,jpj) ,                                                    &
-         &      sfx_res(jpi,jpj) , sfx_bri(jpi,jpj) , sfx_dyn(jpi,jpj) , sfx_sub(jpi,jpj) , sfx_lam(jpi,jpj) ,  &
-         &      sfx_bog(jpi,jpj) , sfx_bom(jpi,jpj) , sfx_sum(jpi,jpj) , sfx_sni(jpi,jpj) , sfx_opw(jpi,jpj) ,  &
-         &      hfx_res(jpi,jpj) , hfx_snw(jpi,jpj) , hfx_sub(jpi,jpj) ,                        & 
-         &      hfx_in (jpi,jpj) , hfx_out(jpi,jpj) , fhld   (jpi,jpj) ,                        &
-         &      hfx_sum(jpi,jpj) , hfx_bom(jpi,jpj) , hfx_bog(jpi,jpj) , hfx_dif(jpi,jpj) ,     &
-         &      hfx_opw(jpi,jpj) , hfx_thd(jpi,jpj) , hfx_dyn(jpi,jpj) , hfx_spr(jpi,jpj) ,     &
-         &      hfx_err_dif(jpi,jpj) , hfx_err_rem(jpi,jpj) , wfx_err_sub(jpi,jpj)        ,  STAT=ierr(ii) )
+      ALLOCATE( t_bo     (jpi,jpj) , wfx_snw_sni(jpi,jpj) ,                                                &
+         &      wfx_snw  (jpi,jpj) , wfx_snw_dyn(jpi,jpj) , wfx_snw_sum(jpi,jpj) , wfx_snw_sub(jpi,jpj) ,  &
+         &      wfx_ice  (jpi,jpj) , wfx_sub    (jpi,jpj) , wfx_ice_sub(jpi,jpj) , wfx_lam    (jpi,jpj) ,  &
+         &      wfx_pnd  (jpi,jpj) ,                                                                       &
+         &      wfx_bog  (jpi,jpj) , wfx_dyn   (jpi,jpj) , wfx_bom(jpi,jpj) , wfx_sum(jpi,jpj) ,           &
+         &      wfx_res  (jpi,jpj) , wfx_sni   (jpi,jpj) , wfx_opw(jpi,jpj) , wfx_spr(jpi,jpj) ,           &
+         &      afx_tot  (jpi,jpj) , rn_amax_2d(jpi,jpj),                                                  &
+         &      fhtur    (jpi,jpj) , qlead     (jpi,jpj) ,                                                 &
+         &      sfx_res  (jpi,jpj) , sfx_bri   (jpi,jpj) , sfx_dyn(jpi,jpj) , sfx_sub(jpi,jpj) , sfx_lam(jpi,jpj) ,  &
+         &      sfx_bog  (jpi,jpj) , sfx_bom   (jpi,jpj) , sfx_sum(jpi,jpj) , sfx_sni(jpi,jpj) , sfx_opw(jpi,jpj) ,  &
+         &      hfx_res  (jpi,jpj) , hfx_snw   (jpi,jpj) , hfx_sub(jpi,jpj) ,                        & 
+         &      qt_atm_oi(jpi,jpj) , qt_oce_ai (jpi,jpj) , fhld   (jpi,jpj) ,                        &
+         &      hfx_sum  (jpi,jpj) , hfx_bom   (jpi,jpj) , hfx_bog(jpi,jpj) , hfx_dif(jpi,jpj) ,     &
+         &      hfx_opw  (jpi,jpj) , hfx_thd   (jpi,jpj) , hfx_dyn(jpi,jpj) , hfx_spr(jpi,jpj) ,     &
+         &      hfx_err_dif(jpi,jpj) , hfx_err_rem(jpi,jpj) , wfx_err_sub(jpi,jpj)             ,  STAT=ierr(ii) )
 
       ! * Ice global state variables
       ii = ii + 1
