@@ -152,7 +152,7 @@ CONTAINS
       END SELECT
       !
       DO ji = 1, npti
-         zf_tt(ji)         = fc_bo_i(ji) + fhtur_1d(ji) + fhld_1d(ji) 
+         zf_tt(ji)         = fc_bo_i(ji) + qsb_ice_bot_1d(ji) + fhld_1d(ji) 
          zq_bo(ji)         = MAX( 0._wp, zf_tt(ji) * rdt_ice )
       END DO
 
@@ -416,8 +416,8 @@ CONTAINS
       !------------------
       ! Basal growth is driven by heat imbalance at the ice-ocean interface,
       ! between the inner conductive flux  (fc_bo_i), from the open water heat flux 
-      ! (fhld) and the turbulent ocean flux (fhtur). 
-      ! fc_bo_i is positive downwards. fhtur and fhld are positive to the ice 
+      ! (fhld) and the sensible ice-ocean flux (qsb_ice_bot). 
+      ! fc_bo_i is positive downwards. qsb_ice_bot and fhld are positive to the ice 
 
       ! If salinity varies in time, an iterative procedure is required, because
       ! the involved quantities are inter-dependent.

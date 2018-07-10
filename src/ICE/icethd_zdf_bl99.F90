@@ -791,9 +791,9 @@ CONTAINS
          ! --- SIMIP diagnostics
          !
          DO ji = 1, npti
-            !--- Conduction fluxes (positive downwards)
-            diag_fc_bo_1d(ji) = diag_fc_bo_1d(ji) + fc_bo_i(ji) * a_i_1d(ji) / at_i_1d(ji)
-            diag_fc_su_1d(ji) = diag_fc_su_1d(ji) + fc_su  (ji) * a_i_1d(ji) / at_i_1d(ji)
+            !--- Conduction fluxes (positive downward)
+            qcn_ice_bot_1d(ji) = qcn_ice_bot_1d(ji) + fc_bo_i(ji) * a_i_1d(ji) / at_i_1d(ji)
+            qcn_ice_top_1d(ji) = qcn_ice_top_1d(ji) + fc_su  (ji) * a_i_1d(ji) / at_i_1d(ji)
    
             !--- Snow-ice interfacial temperature (diagnostic SIMIP)
             zfac = rn_cnd_s * zh_i(ji) + ztcond_i(ji,1) * zh_s(ji)

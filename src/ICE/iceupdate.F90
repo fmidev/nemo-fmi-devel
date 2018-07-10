@@ -276,9 +276,9 @@ CONTAINS
       IF( iom_use('hfxspr'     ) )   CALL iom_put ("hfxspr"     , hfx_spr             )   ! Heat flux from snow precip heat content 
 
       ! other heat fluxes
-      IF( iom_use('hfxsensib'  ) )   CALL iom_put( "hfxsensib"  , -fhtur     * at_i_b )   ! Sensible oceanic heat flux
-      IF( iom_use('hfxcndbot'  ) )   CALL iom_put( "hfxcndbot"  , diag_fc_bo * at_i_b )   ! Bottom conduction flux
-      IF( iom_use('hfxcndtop'  ) )   CALL iom_put( "hfxcndtop"  , diag_fc_su * at_i_b )   ! Surface conduction flux
+      IF( iom_use('hfxsensib'  ) )   CALL iom_put( "hfxsensib"  , -qsb_ice_bot * at_i_b )   ! Sensible oceanic heat flux
+      IF( iom_use('hfxcndbot'  ) )   CALL iom_put( "hfxcndbot"  , qcn_ice_bot  * at_i_b )   ! Bottom conduction flux
+      IF( iom_use('hfxcndtop'  ) )   CALL iom_put( "hfxcndtop"  , qcn_ice_top  * at_i_b )   ! Surface conduction flux
 
       ! diags
       IF( iom_use('hfxdhc'     ) )   CALL iom_put ("hfxdhc"     , diag_heat           )   ! Heat content variation in snow and ice 

@@ -426,7 +426,7 @@ CONTAINS
       diag_vice(:,:) = 0._wp ;   diag_vsnw(:,:) = 0._wp
 
       ! SIMIP diagnostics
-      diag_fc_bo(:,:) = 0._wp ; diag_fc_su(:,:) = 0._wp
+      qcn_ice_bot(:,:) = 0._wp ; qcn_ice_top(:,:) = 0._wp
       t_si(:,:,:) = rt0       ! temp at the ice-snow interface
 
       tau_icebfr(:,:)   = 0._wp   ! landfast ice param only (clem: important to keep the init here)

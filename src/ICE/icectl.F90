@@ -578,7 +578,7 @@ CONTAINS
                WRITE(numout,*) ' hfx_dyn      : ', hfx_dyn(ji,jj)
                WRITE(numout,*) ' hfx_thd      : ', hfx_thd(ji,jj)
                WRITE(numout,*) ' hfx_res      : ', hfx_res(ji,jj)
-               WRITE(numout,*) ' fhtur        : ', fhtur(ji,jj) 
+               WRITE(numout,*) ' qsb_ice_bot  : ', qsb_ice_bot(ji,jj) 
                WRITE(numout,*) ' qlead        : ', qlead(ji,jj) * r1_rdtice
                WRITE(numout,*)
                WRITE(numout,*) ' - Salt fluxes at bottom interface ***'

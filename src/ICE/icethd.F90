@@ -156,15 +156,15 @@ CONTAINS
 
             ! --- Sensible ocean-to-ice heat flux (W/m2)
             zfric_u      = MAX( SQRT( zfric(ji,jj) ), zfric_umin ) 
-            fhtur(ji,jj) = rswitch * rau0 * rcp * zch  * zfric_u * ( ( sst_m(ji,jj) + rt0 ) - t_bo(ji,jj) ) ! W.m-2
+            qsb_ice_bot(ji,jj) = rswitch * rau0 * rcp * zch  * zfric_u * ( ( sst_m(ji,jj) + rt0 ) - t_bo(ji,jj) ) ! W.m-2
 
-            fhtur(ji,jj) = rswitch * MIN( fhtur(ji,jj), - zqfr_neg * r1_rdtice / MAX( at_i(ji,jj), epsi10 ) )
-            ! upper bound for fhtur: the heat retrieved from the ocean must be smaller than the heat necessary to reach 
-            !                        the freezing point, so that we do not have SST < T_freeze
-            !                        This implies: - ( fhtur(ji,jj) * at_i(ji,jj) * rtdice ) - zqfr >= 0
+            qsb_ice_bot(ji,jj) = rswitch * MIN( qsb_ice_bot(ji,jj), - zqfr_neg * r1_rdtice / MAX( at_i(ji,jj), epsi10 ) )
+            ! upper bound for qsb_ice_bot: the heat retrieved from the ocean must be smaller than the heat necessary to reach 
+            !                              the freezing point, so that we do not have SST < T_freeze
+            !                              This implies: - ( qsb_ice_bot(ji,jj) * at_i(ji,jj) * rtdice ) - zqfr >= 0
 
-            !-- Energy Budget of the leads (J.m-2), source of lateral accretion. Must be < 0 to form ice
-            qlead(ji,jj) = MIN( 0._wp , zqld - ( fhtur(ji,jj) * at_i(ji,jj) * rdt_ice ) - zqfr )
+            !-- Energy Budget of the leads (J.m-2), source of ice growth in open water. Must be < 0 to form ice
+            qlead(ji,jj) = MIN( 0._wp , zqld - ( qsb_ice_bot(ji,jj) * at_i(ji,jj) * rdt_ice ) - zqfr )
 
             ! If there is ice and leads are warming, then transfer energy from the lead budget and use it for bottom melting 
             IF( zqld > 0._wp ) THEN
@@ -184,22 +184,22 @@ CONTAINS
       IF( .NOT. ln_icedO )  qlead(:,:) = 0._wp
       ! In case we bypass growing/melting from top and bottom: we suppose ice is impermeable => ocean is isolated from atmosphere
       IF( .NOT. ln_icedH ) THEN
-         qt_atm_oi(:,:) = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
-         fhtur    (:,:) = 0._wp
-         fhld     (:,:) = 0._wp
+         qt_atm_oi  (:,:) = ( 1._wp - at_i_b(:,:) ) * ( qns_oce(:,:) + qsr_oce(:,:) ) + qemp_oce(:,:)
+         qsb_ice_bot(:,:) = 0._wp
+         fhld       (:,:) = 0._wp
       ENDIF
 
       ! ---------------------------------------------------------------------
       ! Net heat flux on top of the ocean after ice thermo (1st step) [W.m-2]
       ! ---------------------------------------------------------------------
-      !     First  step here              :  non solar + precip - qlead - qturb
+      !     First  step here              :  non solar + precip - qlead - qsensible
       !     Second step in icethd_dh      :  heat remaining if total melt (zq_rema) 
       !     Third  step in iceupdate.F90  :  heat from ice-ocean mass exchange (zf_mass) + solar
       qt_oce_ai(:,:) = ( 1._wp - at_i_b(:,:) ) * qns_oce(:,:) + qemp_oce(:,:)  &  ! Non solar heat flux received by the ocean               
          &             - qlead(:,:) * r1_rdtice                                &  ! heat flux taken from the ocean where there is open water ice formation
-         &             - at_i (:,:) * fhtur(:,:)                               &  ! heat flux taken by turbulence
-         &             - at_i (:,:) *  fhld(:,:)                                  ! heat flux taken during bottom growth/melt 
-      !                                                                            !    (fhld should be 0 while bott growth)
+         &             - at_i (:,:) * qsb_ice_bot(:,:)                         &  ! heat flux taken by sensible flux
+         &             - at_i (:,:) * fhld       (:,:)                            ! heat flux taken during bottom growth/melt 
+      !                                                                           !    (fhld should be 0 while bott growth)
       !-------------------------------------------------------------------------------------------!
       ! Thermodynamic computation (only on grid points covered by ice) => loop over ice categories
       !-------------------------------------------------------------------------------------------!
@@ -384,7 +384,7 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), dqns_ice_1d   (1:npti), dqns_ice(:,:,kl)     )
          CALL tab_2d_1d( npti, nptidx(1:npti), t_bo_1d       (1:npti), t_bo                 )
          CALL tab_2d_1d( npti, nptidx(1:npti), sprecip_1d    (1:npti), sprecip              ) 
-         CALL tab_2d_1d( npti, nptidx(1:npti), fhtur_1d      (1:npti), fhtur                )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qsb_ice_bot_1d(1:npti), qsb_ice_bot          )
          CALL tab_2d_1d( npti, nptidx(1:npti), fhld_1d       (1:npti), fhld                 )
          
          CALL tab_2d_1d( npti, nptidx(1:npti), qml_ice_1d    (1:npti), qml_ice    (:,:,kl) )
@@ -431,8 +431,8 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), qt_oce_ai_1d  (1:npti), qt_oce_ai     )
          !
          ! SIMIP diagnostics
-         CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_bo_1d(1:npti), diag_fc_bo )
-         CALL tab_2d_1d( npti, nptidx(1:npti), diag_fc_su_1d(1:npti), diag_fc_su )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qcn_ice_bot_1d(1:npti), qcn_ice_bot )
+         CALL tab_2d_1d( npti, nptidx(1:npti), qcn_ice_top_1d(1:npti), qcn_ice_top )
          ! ocean surface fields
          CALL tab_2d_1d( npti, nptidx(1:npti), sst_1d(1:npti), sst_m )
          CALL tab_2d_1d( npti, nptidx(1:npti), sss_1d(1:npti), sss_m )
@@ -526,9 +526,9 @@ CONTAINS
          CALL tab_1d_2d( npti, nptidx(1:npti), cnd_ice_1d(1:npti), cnd_ice(:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), t1_ice_1d (1:npti), t1_ice (:,:,kl) )
          ! SIMIP diagnostics         
-         CALL tab_1d_2d( npti, nptidx(1:npti), t_si_1d      (1:npti), t_si(:,:,kl) )
-         CALL tab_1d_2d( npti, nptidx(1:npti), diag_fc_bo_1d(1:npti), diag_fc_bo   )
-         CALL tab_1d_2d( npti, nptidx(1:npti), diag_fc_su_1d(1:npti), diag_fc_su   )
+         CALL tab_1d_2d( npti, nptidx(1:npti), t_si_1d       (1:npti), t_si(:,:,kl) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qcn_ice_bot_1d(1:npti), qcn_ice_bot  )
+         CALL tab_1d_2d( npti, nptidx(1:npti), qcn_ice_top_1d(1:npti), qcn_ice_top  )
          ! extensive variables
          CALL tab_1d_2d( npti, nptidx(1:npti), v_i_1d (1:npti), v_i (:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), v_s_1d (1:npti), v_s (:,:,kl) )

@@ -209,7 +209,7 @@ MODULE ice
    !
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   t_bo        !: Sea-Ice bottom temperature [Kelvin]     
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   qlead       !: heat balance of the lead (or of the open ocean)
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   fhtur       !: net downward heat flux from the ice to the ocean
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   qsb_ice_bot !: net downward heat flux from the ice to the ocean
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   fhld        !: heat flux from the lead used for bottom melting
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   wfx_snw     !: snow-ocean mass exchange             [kg.m-2.s-1]
@@ -359,8 +359,8 @@ MODULE ice
    ! Extra sea ice diagnostics to address the data request
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   t_si          !: Temperature at Snow-ice interface (K) 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   tm_si         !: mean temperature at the snow-ice interface (K) 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   diag_fc_bo    !: Bottom conduction flux (W/m2)
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   diag_fc_su    !: Surface conduction flux (W/m2)
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   qcn_ice_bot   !: Bottom  conduction flux (W/m2)
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   qcn_ice_top   !: Surface conduction flux (W/m2)
 
    !
    !!----------------------------------------------------------------------
@@ -386,20 +386,20 @@ CONTAINS
          &      delta_i  (jpi,jpj) , divu_i   (jpi,jpj) , shear_i   (jpi,jpj) , STAT=ierr(ii) )
 
       ii = ii + 1
-      ALLOCATE( t_bo     (jpi,jpj) , wfx_snw_sni(jpi,jpj) ,                                                &
-         &      wfx_snw  (jpi,jpj) , wfx_snw_dyn(jpi,jpj) , wfx_snw_sum(jpi,jpj) , wfx_snw_sub(jpi,jpj) ,  &
-         &      wfx_ice  (jpi,jpj) , wfx_sub    (jpi,jpj) , wfx_ice_sub(jpi,jpj) , wfx_lam    (jpi,jpj) ,  &
-         &      wfx_pnd  (jpi,jpj) ,                                                                       &
-         &      wfx_bog  (jpi,jpj) , wfx_dyn   (jpi,jpj) , wfx_bom(jpi,jpj) , wfx_sum(jpi,jpj) ,           &
-         &      wfx_res  (jpi,jpj) , wfx_sni   (jpi,jpj) , wfx_opw(jpi,jpj) , wfx_spr(jpi,jpj) ,           &
-         &      afx_tot  (jpi,jpj) , rn_amax_2d(jpi,jpj),                                                  &
-         &      fhtur    (jpi,jpj) , qlead     (jpi,jpj) ,                                                 &
-         &      sfx_res  (jpi,jpj) , sfx_bri   (jpi,jpj) , sfx_dyn(jpi,jpj) , sfx_sub(jpi,jpj) , sfx_lam(jpi,jpj) ,  &
-         &      sfx_bog  (jpi,jpj) , sfx_bom   (jpi,jpj) , sfx_sum(jpi,jpj) , sfx_sni(jpi,jpj) , sfx_opw(jpi,jpj) ,  &
-         &      hfx_res  (jpi,jpj) , hfx_snw   (jpi,jpj) , hfx_sub(jpi,jpj) ,                        & 
-         &      qt_atm_oi(jpi,jpj) , qt_oce_ai (jpi,jpj) , fhld   (jpi,jpj) ,                        &
-         &      hfx_sum  (jpi,jpj) , hfx_bom   (jpi,jpj) , hfx_bog(jpi,jpj) , hfx_dif(jpi,jpj) ,     &
-         &      hfx_opw  (jpi,jpj) , hfx_thd   (jpi,jpj) , hfx_dyn(jpi,jpj) , hfx_spr(jpi,jpj) ,     &
+      ALLOCATE( t_bo       (jpi,jpj) , wfx_snw_sni(jpi,jpj) ,                                                &
+         &      wfx_snw    (jpi,jpj) , wfx_snw_dyn(jpi,jpj) , wfx_snw_sum(jpi,jpj) , wfx_snw_sub(jpi,jpj) ,  &
+         &      wfx_ice    (jpi,jpj) , wfx_sub    (jpi,jpj) , wfx_ice_sub(jpi,jpj) , wfx_lam    (jpi,jpj) ,  &
+         &      wfx_pnd    (jpi,jpj) ,                                                                       &
+         &      wfx_bog    (jpi,jpj) , wfx_dyn   (jpi,jpj) , wfx_bom(jpi,jpj) , wfx_sum(jpi,jpj) ,           &
+         &      wfx_res    (jpi,jpj) , wfx_sni   (jpi,jpj) , wfx_opw(jpi,jpj) , wfx_spr(jpi,jpj) ,           &
+         &      afx_tot    (jpi,jpj) , rn_amax_2d(jpi,jpj),                                                  &
+         &      qsb_ice_bot(jpi,jpj) , qlead     (jpi,jpj) ,                                                 &
+         &      sfx_res    (jpi,jpj) , sfx_bri   (jpi,jpj) , sfx_dyn(jpi,jpj) , sfx_sub(jpi,jpj) , sfx_lam(jpi,jpj) ,  &
+         &      sfx_bog    (jpi,jpj) , sfx_bom   (jpi,jpj) , sfx_sum(jpi,jpj) , sfx_sni(jpi,jpj) , sfx_opw(jpi,jpj) ,  &
+         &      hfx_res    (jpi,jpj) , hfx_snw   (jpi,jpj) , hfx_sub(jpi,jpj) ,                        & 
+         &      qt_atm_oi  (jpi,jpj) , qt_oce_ai (jpi,jpj) , fhld   (jpi,jpj) ,                        &
+         &      hfx_sum    (jpi,jpj) , hfx_bom   (jpi,jpj) , hfx_bog(jpi,jpj) , hfx_dif(jpi,jpj) ,     &
+         &      hfx_opw    (jpi,jpj) , hfx_thd   (jpi,jpj) , hfx_dyn(jpi,jpj) , hfx_spr(jpi,jpj) ,     &
          &      hfx_err_dif(jpi,jpj) , hfx_err_rem(jpi,jpj) , wfx_err_sub(jpi,jpj)             ,  STAT=ierr(ii) )
 
       ! * Ice global state variables
@@ -450,7 +450,7 @@ CONTAINS
 
       ! * SIMIP diagnostics
       ii = ii + 1
-      ALLOCATE( t_si (jpi,jpj,jpl) , tm_si(jpi,jpj) , diag_fc_bo(jpi,jpj) , diag_fc_su(jpi,jpj) , STAT = ierr(ii) )
+      ALLOCATE( t_si (jpi,jpj,jpl) , tm_si(jpi,jpj) , qcn_ice_bot(jpi,jpj) , qcn_ice_top(jpi,jpj) , STAT = ierr(ii) )
 
       ice_alloc = MAXVAL( ierr(:) )
       IF( ice_alloc /= 0 )   CALL ctl_warn('ice_alloc: failed to allocate arrays.')

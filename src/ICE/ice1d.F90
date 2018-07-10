@@ -92,22 +92,22 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   sfx_lam_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   sfx_dyn_1d
 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   sprecip_1d    !: <==> the 2D  sprecip
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   at_i_1d       !: <==> the 2D  at_i
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ato_i_1d      !: <==> the 2D  ato_i
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fhtur_1d      !: <==> the 2D  fhtur
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fhld_1d       !: <==> the 2D  fhld
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dqns_ice_1d   !: <==> the 2D  dqns_ice
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   evap_ice_1d   !: <==> the 2D  evap_ice
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qprec_ice_1d  !: <==> the 2D  qprec_ice
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   sprecip_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   at_i_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ato_i_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qsb_ice_bot_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fhld_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dqns_ice_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   evap_ice_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qprec_ice_1d
 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t_su_1d       !: <==> the 2D  t_su
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t_si_1d       !: <==> the 2D  t_si
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   a_i_1d        !: <==> the 2D  a_i
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   a_ib_1d       !: <==> the 2D  a_i_b
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_i_1d        !:
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_ib_1d       !:
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_s_1d        !:
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t_su_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t_si_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   a_i_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   a_ib_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_i_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_ib_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_s_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fc_su         !: Surface Conduction flux 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   fc_bo_i       !: Bottom  Conduction flux 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   dh_s_tot      !: Snow accretion/ablation        [m]
@@ -139,8 +139,8 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   h_i_old     !: ice thickness layer (m)
 
    ! Conduction flux diagnostics (SIMIP)
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   diag_fc_bo_1d      !: <==> the 2D  diag_fc_bo
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   diag_fc_su_1d      !: <==> the 2D  diag_fc_su
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qcn_ice_bot_1d
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qcn_ice_top_1d
 
    ! surface fields from the ocean
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   sst_1d
@@ -193,7 +193,7 @@ CONTAINS
       !
       ii = ii + 1
       ALLOCATE( sprecip_1d    (jpij) , at_i_1d       (jpij) , ato_i_1d      (jpij) ,                         &
-         &      fhtur_1d      (jpij) , wfx_snw_sni_1d(jpij) , wfx_spr_1d    (jpij) , wfx_snw_sum_1d(jpij) ,  &
+         &      qsb_ice_bot_1d(jpij) , wfx_snw_sni_1d(jpij) , wfx_spr_1d    (jpij) , wfx_snw_sum_1d(jpij) ,  &
          &      fhld_1d       (jpij) , wfx_sub_1d    (jpij) , wfx_bog_1d    (jpij) , wfx_bom_1d    (jpij) ,  &
          &      wfx_sum_1d    (jpij) , wfx_sni_1d    (jpij) , wfx_opw_1d    (jpij) , wfx_res_1d    (jpij) ,  &
          &      wfx_snw_sub_1d(jpij) , wfx_snw_dyn_1d(jpij) , wfx_ice_sub_1d(jpij) , wfx_err_sub_1d(jpij) ,  &
@@ -218,7 +218,7 @@ CONTAINS
          &      eh_i_old(jpij,0:nlay_i+1) , h_i_old(jpij,0:nlay_i+1) , STAT=ierr(ii) )
       !
       ii = ii + 1
-      ALLOCATE( diag_fc_bo_1d(jpij)      , diag_fc_su_1d(jpij)      , STAT=ierr(ii) )
+      ALLOCATE( qcn_ice_bot_1d(jpij) , qcn_ice_top_1d(jpij) , STAT=ierr(ii) )
       !
       ii = ii + 1
       ALLOCATE( sst_1d(jpij) , sss_1d(jpij) , STAT=ierr(ii) )
