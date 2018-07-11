@@ -6,7 +6,7 @@ MODULE usrdef_istate
    !!
    !! User defined : set the initial state of a user configuration
    !!======================================================================
-   !! History :  NEMO ! 2016-03  (S. Flavoni, G. Madec) Original code
+   !! History :  4.0 ! 2016-03  (S. Flavoni) Original code
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
@@ -23,12 +23,12 @@ MODULE usrdef_istate
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   usr_def_istate   ! called by istate.F90
+   PUBLIC   usr_def_istate   ! called in istate.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2016)
-   !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! $Id:$ 
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
   

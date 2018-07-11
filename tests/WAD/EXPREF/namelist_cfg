@@ -19,7 +19,7 @@
 !-----------------------------------------------------------------------
 &namusr_def    !    Wetting and Drying TEST CASE
 !-----------------------------------------------------------------------
-   rn_dx       = 1000.0    ! horizontal resolution
+   rn_dx       = 1500.0    ! horizontal resolution
    rn_dz       = 1.0       ! vertical   resolution
    nn_wad_test = 1         ! ???
 /
@@ -37,19 +37,19 @@
    nn_istate   =       0   !  output the initial state (1) or not (0)
 /
 !-----------------------------------------------------------------------
-&namcfg        !   parameters of the configuration                      (default: user defined GYRE)
-!-----------------------------------------------------------------------
-   ln_read_cfg = .false.   !  (=T) read the domain configuration file
-      !                    !  (=F) user defined configuration  ==>>>  see usrdef(_...) modules
-   ln_write_cfg= .true.    !  (=T) create the domain configuration file
-/
-!-----------------------------------------------------------------------
 &namdom        !   time and space domain
 !-----------------------------------------------------------------------
    ln_linssh   = .false.   !  =T  linear free surface  ==>>  model level are fixed in time
    !
    ln_meshmask = .true.    !  create (>0) a mesh file or not (=0)
    rn_rdt      =    18.    !  time step for the dynamics 
+/
+!-----------------------------------------------------------------------
+&namcfg        !   parameters of the configuration                      (default: user defined GYRE)
+!-----------------------------------------------------------------------
+   ln_read_cfg = .false.   !  (=T) read the domain configuration file
+      !                    !  (=F) user defined configuration  ==>>>  see usrdef(_...) modules
+   ln_write_cfg= .true.    !  (=T) create the domain configuration file
 /
 !-----------------------------------------------------------------------
 &namwad        !   Wetting and Drying (WaD)                             (default: OFF)
@@ -102,16 +102,16 @@
    nn_chldta   =      0    !  RGB : Chl data (=1) or cst value (=0)
 /
 !-----------------------------------------------------------------------
-&namsbc_rnf    !   runoffs namelist surface boundary condition          (ln_rnf =T)
-!-----------------------------------------------------------------------
-   ln_rnf_mouth = .false.   !  specific treatment at rivers mouths
-/
-!-----------------------------------------------------------------------
 &namsbc_ssr    !   surface boundary condition : sea surface restoring   (ln_ssr =T)
 !-----------------------------------------------------------------------
    nn_sssr     =     0     !  add a damping     term in the surface freshwater flux (=2)
    rn_deds     =   -27.7   !  magnitude of the damping on salinity   [mm/day]
    ln_sssr_bnd =   .false. !  flag to bound erp term (associated with nn_sssr=2)
+/
+!-----------------------------------------------------------------------
+&namsbc_rnf    !   runoffs namelist surface boundary condition          (ln_rnf =T)
+!-----------------------------------------------------------------------
+   ln_rnf_mouth = .false.   !  specific treatment at rivers mouths
 /
 !!======================================================================
 !!               ***  Lateral boundary condition  ***                 !!
@@ -205,6 +205,8 @@
 &namdrg        !   top/bottom drag coefficient                          (default: NO selection)
 !-----------------------------------------------------------------------
    ln_loglayer= .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
+   ln_lin      = .true.    !      linear  drag: Cd = Cd0 Uc0                   &   namdrg_top)
+   ln_non_lin  = .false.   !  non-linear  drag: Cd = Cd0 |U|
 /
 !-----------------------------------------------------------------------
 &namdrg_top    !   TOP friction                                         (ln_isfcav=T)

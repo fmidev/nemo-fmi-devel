@@ -43,11 +43,10 @@ MODULE bdyini
    INTEGER, DIMENSION(jp_nseg) ::   jpiwob, jpjwdt, jpjwft, npckgw   !
    INTEGER, DIMENSION(jp_nseg) ::   jpjnob, jpindt, jpinft, npckgn   !
    INTEGER, DIMENSION(jp_nseg) ::   jpjsob, jpisdt, jpisft, npckgs   !
-
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.7 , NEMO Consortium (2015)
-   !! $Id: bdyini.F90 7421 2016-12-01 17:10:41Z flavoni $ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! $Id: bdyini.F90 9807 2018-06-15 22:51:16Z lovato $ 
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -85,6 +84,8 @@ CONTAINS
 902   IF( ios >  0 )   CALL ctl_nam ( ios , 'nambdy in configuration namelist', lwp )
       IF(lwm) WRITE ( numond, nambdy )
 
+      IF( .NOT. Agrif_Root() ) ln_bdy = .FALSE.   ! forced for Agrif children
+      
       ! -----------------------------------------
       ! unstructured open boundaries use control
       ! -----------------------------------------
@@ -111,7 +112,7 @@ CONTAINS
       !
    END SUBROUTINE bdy_init
 
-   
+
    SUBROUTINE bdy_segs
       !!----------------------------------------------------------------------
       !!                 ***  ROUTINE bdy_init  ***
@@ -123,9 +124,6 @@ CONTAINS
       !!
       !! ** Input   :  bdy_init.nc, input file for unstructured open boundaries
       !!----------------------------------------------------------------------      
-
-      ! local variables
-      !-------------------
       INTEGER  ::   ib_bdy, ii, ij, ik, igrd, ib, ir, iseg ! dummy loop indices
       INTEGER  ::   icount, icountr, ibr_max, ilen1, ibm1  ! local integers
       INTEGER  ::   iwe, ies, iso, ino, inum, id_dummy     !   -       -
@@ -145,7 +143,7 @@ CONTAINS
       INTEGER :: com_east, com_west, com_south, com_north          ! Flags for boundaries sending
       INTEGER :: com_east_b, com_west_b, com_south_b, com_north_b  ! Flags for boundaries receiving
       INTEGER :: iw_b(4), ie_b(4), is_b(4), in_b(4)                ! Arrays for neighbours coordinates
-      REAL(wp), DIMENSION(jpi,jpj)       ::   zfmask  ! temporary fmask array excluding coastal boundary condition (shlat)
+      REAL(wp), TARGET, DIMENSION(jpi,jpj) ::   zfmask  ! temporary fmask array excluding coastal boundary condition (shlat)
       !!
       CHARACTER(LEN=1)                     ::   ctypebdy   !     -        - 
       INTEGER                              ::   nbdyind, nbdybeg, nbdyend
@@ -344,20 +342,20 @@ CONTAINS
         IF(lwp) WRITE(numout,*)
 
 #if defined key_si3
-        IF(lwp) WRITE(numout,*) 'Boundary conditions for sea ice:  '
-        SELECT CASE( cn_ice(ib_bdy) )                  
-          CASE('none')
+         IF(lwp) WRITE(numout,*) 'Boundary conditions for sea ice:  '
+         SELECT CASE( cn_ice(ib_bdy) )                  
+         CASE('none')
              IF(lwp) WRITE(numout,*) '      no open boundary condition'        
-             dta_bdy(ib_bdy)%ll_a_i  = .false.
-             dta_bdy(ib_bdy)%ll_ht_i = .false.
-             dta_bdy(ib_bdy)%ll_ht_s = .false.
-          CASE('frs')
+             dta_bdy(ib_bdy)%ll_a_i = .false.
+             dta_bdy(ib_bdy)%ll_h_i = .false.
+             dta_bdy(ib_bdy)%ll_h_s = .false.
+         CASE('frs')
              IF(lwp) WRITE(numout,*) '      Flow Relaxation Scheme'
-             dta_bdy(ib_bdy)%ll_a_i  = .true.
-             dta_bdy(ib_bdy)%ll_ht_i = .true.
-             dta_bdy(ib_bdy)%ll_ht_s = .true.
-          CASE DEFAULT   ;   CALL ctl_stop( 'unrecognised value for cn_ice' )
-        END SELECT
+             dta_bdy(ib_bdy)%ll_a_i = .true.
+             dta_bdy(ib_bdy)%ll_h_i = .true.
+             dta_bdy(ib_bdy)%ll_h_s = .true.
+         CASE DEFAULT   ;   CALL ctl_stop( 'unrecognised value for cn_ice' )
+         END SELECT
         IF( cn_ice(ib_bdy) /= 'none' ) THEN 
            SELECT CASE( nn_ice_dta(ib_bdy) )                   ! 
               CASE( 0 )      ;   IF(lwp) WRITE(numout,*) '      initial state used for bdy data'        
@@ -373,10 +371,10 @@ CONTAINS
 
         IF(lwp) WRITE(numout,*) '      Width of relaxation zone = ', nn_rimwidth(ib_bdy)
         IF(lwp) WRITE(numout,*)
+         !
+      END DO
 
-      ENDDO
-
-     IF (nb_bdy .gt. 0) THEN
+     IF( nb_bdy > 0 ) THEN
         IF( ln_vol ) THEN                     ! check volume conservation (nn_volctl value)
           IF(lwp) WRITE(numout,*) 'Volume correction applied at open boundaries'
           IF(lwp) WRITE(numout,*)
@@ -416,9 +414,9 @@ CONTAINS
       jpbdtau = 1 ! Maximum size of boundary data (unstructured case)
 
       DO ib_bdy = 1, nb_bdy
-         !
+
          IF( .NOT. ln_coords_file(ib_bdy) ) THEN ! Work out size of global arrays from namelist parameters
-            !
+ 
             icount = icount + 1
             ! No REWIND here because may need to read more than one nambdy_index namelist.
             ! Read only namelist_cfg to avoid unseccessfull overwrite 
@@ -493,8 +491,6 @@ CONTAINS
             CALL iom_open( cn_coords_file(ib_bdy), inum )
             DO igrd = 1, jpbgrd
                id_dummy = iom_varid( inum, 'nbi'//cgrid(igrd), kdimsz=kdimsz )  
-               !clem nblendta(igrd,ib_bdy) = kdimsz(1)
-               !clem jpbdtau = MAX(jpbdtau, kdimsz(1))
                nblendta(igrd,ib_bdy) = MAXVAL(kdimsz)
                jpbdtau = MAX(jpbdtau, MAXVAL(kdimsz))
             END DO
@@ -884,23 +880,23 @@ CONTAINS
                   !
                   IF( nbrdta(ib,igrd,ib_bdy) == 1 )   icountr = icountr+1
                ENDIF
-            ENDDO
+            END DO
             idx_bdy(ib_bdy)%nblenrim(igrd) = icountr !: length of rim boundary data on each proc
             idx_bdy(ib_bdy)%nblen   (igrd) = icount  !: length of boundary data on each proc        
-         ENDDO  ! igrd
+         END DO  ! igrd
 
          ! Allocate index arrays for this boundary set
          !--------------------------------------------
          ilen1 = MAXVAL( idx_bdy(ib_bdy)%nblen(:) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbi   (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbj   (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbr   (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbd   (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbdout(ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbmap (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%nbw   (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%flagu (ilen1,jpbgrd) )
-         ALLOCATE( idx_bdy(ib_bdy)%flagv (ilen1,jpbgrd) )
+         ALLOCATE( idx_bdy(ib_bdy)%nbi   (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%nbj   (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%nbr   (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%nbd   (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%nbdout(ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%nbmap (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%nbw   (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%flagu (ilen1,jpbgrd) ,   &
+            &      idx_bdy(ib_bdy)%flagv (ilen1,jpbgrd) )
 
          ! Dispatch mapping indices and discrete distances on each processor
          ! -----------------------------------------------------------------
@@ -1113,7 +1109,7 @@ CONTAINS
             END DO
          END DO 
 
-      ENDDO
+      END DO
 
       ! ------------------------------------------------------
       ! Initialise masks and find normal/tangential directions
@@ -1126,36 +1122,17 @@ CONTAINS
  
       bdytmask(:,:) = ssmask(:,:)
 
-      IF( ln_mask_file ) THEN
-         CALL iom_open( cn_mask_file, inum )
-         CALL iom_get ( inum, jpdom_data, 'bdy_msk', bdytmask(:,:) )
-         CALL iom_close( inum )
+      ! Derive mask on U and V grid from mask on T grid
 
-         ! Derive mask on U and V grid from mask on T grid
-         bdyumask(:,:) = 0._wp
-         bdyvmask(:,:) = 0._wp
-         DO ij=1, jpjm1
-            DO ii=1, jpim1
-               bdyumask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii+1, ij )
-               bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
-            END DO
+      bdyumask(:,:) = 0._wp
+      bdyvmask(:,:) = 0._wp
+      DO ij = 1, jpjm1
+         DO ii = 1, jpim1
+            bdyumask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii+1, ij )
+            bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
          END DO
-         CALL lbc_lnk( bdyumask(:,:), 'U', 1. )   ;   CALL lbc_lnk( bdyvmask(:,:), 'V', 1. )      ! Lateral boundary cond.
-
-      ENDIF ! ln_mask_file=.TRUE.
-      
-      IF( .NOT.ln_mask_file ) THEN
-         ! If .not. ln_mask_file then we need to derive mask on U and V grid from mask on T grid here.
-         bdyumask(:,:) = 0._wp
-         bdyvmask(:,:) = 0._wp
-         DO ij = 1, jpjm1
-            DO ii = 1, jpim1
-               bdyumask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii+1, ij )
-               bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
-            END DO
-         END DO
-         CALL lbc_lnk( bdyumask(:,:), 'U', 1. )   ;   CALL lbc_lnk( bdyvmask(:,:), 'V', 1. )      ! Lateral boundary cond.
-      ENDIF
+      END DO
+      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
 
       ! bdy masks are now set to zero on boundary points:
       !
@@ -1177,11 +1154,12 @@ CONTAINS
       DO ib_bdy = 1, nb_bdy
         DO ib = 1, idx_bdy(ib_bdy)%nblenrim(igrd)
           bdyvmask(idx_bdy(ib_bdy)%nbi(ib,igrd), idx_bdy(ib_bdy)%nbj(ib,igrd)) = 0._wp
-        ENDDO
-      ENDDO
+        END DO
+      END DO
 
       ! For the flagu/flagv calculation below we require a version of fmask without
       ! the land boundary condition (shlat) included:
+      zfmask(:,:) = 0
       DO ij = 2, jpjm1
          DO ii = 2, jpim1
             zfmask(ii,ij) = tmask(ii,ij  ,1) * tmask(ii+1,ij  ,1)   &
@@ -1190,10 +1168,8 @@ CONTAINS
       END DO
 
       ! Lateral boundary conditions
-      CALL lbc_lnk( zfmask       , 'F', 1. )
-      CALL lbc_lnk( fmask        , 'F', 1. )   ;   CALL lbc_lnk( bdytmask(:,:), 'T', 1. )
-      CALL lbc_lnk( bdyumask(:,:), 'U', 1. )   ;   CALL lbc_lnk( bdyvmask(:,:), 'V', 1. )
-
+      CALL lbc_lnk( zfmask, 'F', 1. ) 
+      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1., bdytmask, 'T', 1. )
       DO ib_bdy = 1, nb_bdy       ! Indices and directions of rim velocity components
 
          idx_bdy(ib_bdy)%flagu(:,:) = 0._wp
@@ -1205,7 +1181,7 @@ CONTAINS
          ! flagu =  0 : u is tangential
          ! flagu =  1 : u is normal to the boundary and is direction is inward
   
-         DO igrd = 1,jpbgrd 
+         DO igrd = 1, jpbgrd 
             SELECT CASE( igrd )
                CASE( 1 )   ;   pmask => umask   (:,:,1)   ;   i_offset = 0
                CASE( 2 )   ;   pmask => bdytmask(:,:)     ;   i_offset = 1
@@ -1309,7 +1285,6 @@ CONTAINS
       ! Tidy up
       !--------
       IF( nb_bdy>0 )   DEALLOCATE( nbidta, nbjdta, nbrdta )
-      !
       !
    END SUBROUTINE bdy_segs
 
@@ -1688,6 +1663,7 @@ CONTAINS
       ! Nudging layers that overlap with interior domain
       !
    END SUBROUTINE bdy_ctl_seg
+
 
    SUBROUTINE bdy_ctl_corn( ib1, ib2 )
       !!----------------------------------------------------------------------

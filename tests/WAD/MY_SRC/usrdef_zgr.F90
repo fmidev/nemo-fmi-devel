@@ -6,12 +6,12 @@ MODULE usrdef_zgr
    !!
    !! Ocean domain : user defined vertical coordinate system 
    !!======================================================================
-   !! History :  4.0  ! 2016-08  (G. Madec, S. Flavoni)  Original code
+   !! History :  4.0  ! 2016-06  (G. Madec)  Original code
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
    !!   usr_def_zgr   : user defined vertical coordinate system (required)
-   !!       zgr_z1d   : reference 1D z-coordinate 
+   !!       zgr_z     : reference 1D z-coordinate 
    !!---------------------------------------------------------------------
    USE oce            ! ocean variables
    USE dom_oce ,  ONLY: ht_0, mi0, mi1, nimpp, njmpp,  &
@@ -26,22 +26,22 @@ MODULE usrdef_zgr
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   usr_def_zgr   ! called by domzgr.F90
+   PUBLIC   usr_def_zgr        ! called by domzgr.F90
 
-  !! * Substitutions
+   !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2016)
-   !! $Id$
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! $Id:$
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS             
 
    SUBROUTINE usr_def_zgr( ld_zco  , ld_zps  , ld_sco  , ld_isfcav,    &   ! type of vertical coordinate
       &                    pdept_1d, pdepw_1d, pe3t_1d , pe3w_1d  ,    &   ! 1D reference vertical coordinate
       &                    pdept , pdepw ,                             &   ! 3D t & w-points depth
-      &                    pe3t  , pe3u  , pe3v , pe3f ,               &   ! vertical scale factors
-      &                    pe3w  , pe3uw , pe3vw,                      &   !     -      -      -
+      &                    pe3t  , pe3u  , pe3v   , pe3f ,             &   ! vertical scale factors
+      &                    pe3w  , pe3uw , pe3vw         ,             &   !     -      -      -
       &                    k_top  , k_bot    )                             ! top & bottom ocean level
       !!---------------------------------------------------------------------
       !!              ***  ROUTINE usr_def_zgr  ***
@@ -254,7 +254,7 @@ CONTAINS
          zhv(:,jj) = zht(:,jj)
       END DO
       !     
-      CALL zgr_z1d( pdept_1d, pdepw_1d, pe3t_1d , pe3w_1d )   ! Reference z-coordinate system
+      CALL zgr_z( pdept_1d, pdepw_1d, pe3t_1d , pe3w_1d )   ! Reference z-coordinate system
       !
       !
       !                       !==  top masked level bathymetry  ==!  (all coordinates)
@@ -333,9 +333,9 @@ CONTAINS
    END SUBROUTINE usr_def_zgr
 
 
-   SUBROUTINE zgr_z1d( pdept_1d, pdepw_1d, pe3t_1d , pe3w_1d )   ! 1D reference vertical coordinate
+   SUBROUTINE zgr_z( pdept_1d, pdepw_1d, pe3t_1d , pe3w_1d )   ! 1D reference vertical coordinate
       !!----------------------------------------------------------------------
-      !!                   ***  ROUTINE zgr_z1d  ***
+      !!                   ***  ROUTINE zgr_z  ***
       !!
       !! ** Purpose :   set the depth of model levels and the resulting 
       !!      vertical scale factors.
@@ -362,7 +362,7 @@ CONTAINS
       !
       IF(lwp) THEN                         ! Parameter print
          WRITE(numout,*)
-         WRITE(numout,*) '    zgr_z1d : Reference vertical z-coordinates: uniform dz = ', rn_dz
+         WRITE(numout,*) '    zgr_z : Reference vertical z-coordinates: uniform dz = ', rn_dz
          WRITE(numout,*) '    ~~~~~~~'
       ENDIF
       !
@@ -384,7 +384,7 @@ CONTAINS
          WRITE(numout, "(10x, i4, 4f9.2)" ) ( jk, pdept_1d(jk), pdepw_1d(jk), pe3t_1d(jk), pe3w_1d(jk), jk = 1, jpk )
       ENDIF
       !
-   END SUBROUTINE zgr_z1d
+   END SUBROUTINE zgr_z
    
    !!======================================================================
 END MODULE usrdef_zgr

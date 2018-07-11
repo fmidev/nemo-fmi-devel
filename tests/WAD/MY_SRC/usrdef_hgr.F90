@@ -6,7 +6,7 @@ MODULE usrdef_hgr
    !!
    !! User defined :   mesh and Coriolis parameter of a user configuration
    !!======================================================================
-   !! History :  NEMO  ! 2016-08  (S. Flavoni, G. Madec)  Original code
+   !! History :  4.0 ! 2016-03  (S. Flavoni) 
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
@@ -26,9 +26,9 @@ MODULE usrdef_hgr
    PUBLIC   usr_def_hgr   ! called by domhgr.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2016)
-   !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! $Id:$ 
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

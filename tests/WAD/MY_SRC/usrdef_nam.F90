@@ -6,7 +6,7 @@ MODULE usrdef_nam
    !!
    !! User defined : set the domain characteristics of a user configuration
    !!======================================================================
-   !! History :  NEMO ! 2016-03  (S. Flavoni, G. Madec)  Original code
+   !! History :  4.0  ! 2016-03  (S. Flavoni, G. Madec)  Original code
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
@@ -32,9 +32,9 @@ MODULE usrdef_nam
    INTEGER , PUBLIC :: nn_wad_test ! resolution in meters defining the vertical   domain size
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2016)
-   !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! $Id:$ 
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
