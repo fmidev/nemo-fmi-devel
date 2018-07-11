@@ -1760,7 +1760,7 @@ CONTAINS
    !!   'key_iomput'                                         XIOS interface
    !!----------------------------------------------------------------------
 
-   SUBROUTINE iom_set_domain_attr( cdid, ni_glo, nj_glo, ibegin, jbegin, ni, nj, zoom_ibegin, zoom_jbegin, zoom_ni, zoom_nj,   &
+   SUBROUTINE iom_set_domain_attr( cdid, ni_glo, nj_glo, ibegin, jbegin, ni, nj,                                               &
       &                                    data_dim, data_ibegin, data_ni, data_jbegin, data_nj, lonvalue, latvalue, mask,     &
       &                                    nvertex, bounds_lon, bounds_lat, area )
       !!----------------------------------------------------------------------
@@ -1768,7 +1768,7 @@ CONTAINS
       CHARACTER(LEN=*)                  , INTENT(in) ::   cdid
       INTEGER                 , OPTIONAL, INTENT(in) ::   ni_glo, nj_glo, ibegin, jbegin, ni, nj
       INTEGER                 , OPTIONAL, INTENT(in) ::   data_dim, data_ibegin, data_ni, data_jbegin, data_nj
-      INTEGER                 , OPTIONAL, INTENT(in) ::   zoom_ibegin, zoom_jbegin, zoom_ni, zoom_nj, nvertex
+      INTEGER                 , OPTIONAL, INTENT(in) ::   nvertex
       REAL(wp), DIMENSION(:)  , OPTIONAL, INTENT(in) ::   lonvalue, latvalue
       REAL(wp), DIMENSION(:,:), OPTIONAL, INTENT(in) ::   bounds_lon, bounds_lat, area
       LOGICAL , DIMENSION(:)  , OPTIONAL, INTENT(in) ::   mask
@@ -1795,10 +1795,33 @@ CONTAINS
    SUBROUTINE iom_set_zoom_domain_attr( cdid, ibegin, jbegin, ni, nj )
       !!----------------------------------------------------------------------
       !!----------------------------------------------------------------------
-      CHARACTER(LEN=*)          , INTENT(in) ::   cdid
-      INTEGER         , OPTIONAL, INTENT(in) ::   ibegin, jbegin, ni, nj
+      CHARACTER(LEN=*), INTENT(in) ::   cdid
+      INTEGER         , INTENT(in) ::   ibegin, jbegin, ni, nj
+      !
+      TYPE(xios_gridgroup) :: gridgroup_hdl
+      TYPE(xios_grid)      :: grid_hdl
+      TYPE(xios_domain)    :: domain_hdl 
+      TYPE(xios_axis)      :: axis_hdl 
+      CHARACTER(LEN=64)    :: cldomrefid   ! domain_ref name
+      CHARACTER(len=1)     :: cl1          ! last character of this name
       !!----------------------------------------------------------------------
-      IF( xios_is_valid_zoom_domain(cdid) )   CALL xios_set_zoom_domain_attr( cdid, ibegin=ibegin, jbegin=jbegin, ni=ni, nj=nj )
+      !
+      IF( xios_is_valid_zoom_domain(cdid) ) THEN
+         ! define the zoom_domain attributs
+         CALL xios_set_zoom_domain_attr( cdid, ibegin=ibegin, jbegin=jbegin, ni=ni, nj=nj )
+         ! define a new 2D grid with this new domain
+         CALL xios_get_handle("grid_definition", gridgroup_hdl )
+         CALL xios_add_child(gridgroup_hdl, grid_hdl, TRIM(cdid)//'_2D' )   ! add a new 2D grid to grid_definition
+         CALL xios_add_child(grid_hdl, domain_hdl, TRIM(cdid) )             ! add its domain
+         ! define a new 3D grid with this new domain
+         CALL xios_add_child(gridgroup_hdl, grid_hdl, TRIM(cdid)//'_3D' )   ! add a new 3D grid to grid_definition
+         CALL xios_add_child(grid_hdl, domain_hdl, TRIM(cdid) )             ! add its domain
+         ! vertical axis
+         cl1 = cdid(LEN_TRIM(cdid):)                                        ! last letter of cdid
+         cl1 = CHAR(ICHAR(cl1)+32)                                          ! from upper to lower case
+         CALL xios_add_child(grid_hdl, axis_hdl, 'depth'//cl1)              ! add its axis
+      ENDIF
+      !      
    END SUBROUTINE iom_set_zoom_domain_attr
 
 
@@ -2078,7 +2101,8 @@ CONTAINS
       CALL iom_set_domain_attr("gznl", data_dim=2, data_ibegin = 1-nldi, data_ni = jpi, data_jbegin = 1-nldj, data_nj = jpj)
       CALL iom_set_domain_attr("gznl", lonvalue = zlon,   &
          &                             latvalue = RESHAPE(plat(nldi:nlei, nldj:nlej),(/ ni*nj /)))  
-      CALL iom_set_zoom_domain_attr ("ptr", ibegin=ix-1, jbegin=0, ni=1, nj=jpjglo)
+      CALL iom_set_zoom_domain_attr("znl_T", ibegin=ix-1, jbegin=0, ni=1, nj=jpjglo)
+      CALL iom_set_zoom_domain_attr("znl_W", ibegin=ix-1, jbegin=0, ni=1, nj=jpjglo)
       !
       CALL iom_update_file_name('ptr')
       !
@@ -2156,7 +2180,7 @@ CONTAINS
          cl1 = clgrd(jg)
          ! Equatorial section (attributs: jbegin, ni, name_suffix)
          CALL dom_ngb( 0., 0., ix, iy, cl1 )
-         CALL iom_set_zoom_domain_attr ('Eq'//cl1, jbegin=iy-1, ni=jpiglo)
+         CALL iom_set_zoom_domain_attr('Eq'//cl1, ibegin=0, jbegin=iy-1, ni=jpiglo, nj=1 )
          CALL iom_get_file_attr   ('Eq'//cl1, name_suffix = clsuff             )
          CALL iom_set_file_attr   ('Eq'//cl1, name_suffix = TRIM(clsuff)//'_Eq')
          CALL iom_update_file_name('Eq'//cl1)
@@ -2235,7 +2259,7 @@ CONTAINS
                   ENDIF
                ENDIF
                clname = TRIM(ADJUSTL(clat))//TRIM(ADJUSTL(clon))
-               CALL iom_set_zoom_domain_attr  (TRIM(clname)//cl1, ibegin= ix-1, jbegin= iy-1)
+               CALL iom_set_zoom_domain_attr(TRIM(clname)//cl1, ibegin= ix-1, jbegin= iy-1, ni=1, nj=1)
 
                CALL iom_get_file_attr   (TRIM(clname)//cl1, name_suffix = clsuff                         )
                CALL iom_set_file_attr   (TRIM(clname)//cl1, name_suffix = TRIM(clsuff)//'_'//TRIM(clname))
