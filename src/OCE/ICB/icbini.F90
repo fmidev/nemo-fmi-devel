@@ -227,7 +227,7 @@ CONTAINS
       num_bergs(1) = narea - jpnij
 
       ! when not generating test icebergs we need to setup calving file
-      IF( nn_test_icebergs < 0 ) THEN
+      IF( nn_test_icebergs < 0 .OR. ln_use_calving ) THEN
          !
          ! maximum distribution class array does not change in time so read it once
          cl_sdist = TRIM( cn_dir )//TRIM( sn_icb%clname )
@@ -357,7 +357,7 @@ CONTAINS
          &              rn_rho_bergs   , rn_LoW_ratio   , nn_verbose_level    , ln_operator_splitting,   &
          &              rn_bits_erosion_fraction        , rn_sicn_shift       , ln_passive_mode      ,   &
          &              ln_time_average_weight          , nn_test_icebergs    , rn_test_box          ,   &
-         &              rn_speed_limit , cn_dir, sn_icb
+         &              ln_use_calving , rn_speed_limit , cn_dir, sn_icb
       !!----------------------------------------------------------------------
 
 #if defined key_agrif
@@ -400,6 +400,12 @@ CONTAINS
          nn_test_icebergs = nclasses
       ENDIF
       !
+      IF( nn_test_icebergs < 0 .AND. .NOT. ln_use_calving ) THEN
+         IF(lwp) WRITE(numout,*)
+         IF(lwp) WRITE(numout,*) '   ==>>>   Resetting ln_use_calving to .true. since we are not using test icebergs'
+         ln_use_calving = .true.
+      ENDIF
+      !
       IF(lwp) THEN                  ! control print
          WRITE(numout,*)
          WRITE(numout,*) 'icb_nam : iceberg initialization through namberg namelist read'
@@ -439,6 +445,7 @@ CONTAINS
          WRITE(numout,*) '   Time average the weight on the ocean   time_average_weight       = ', ln_time_average_weight
          WRITE(numout,*) '   Create icebergs in absence of a restart file   nn_test_icebergs  = ', nn_test_icebergs
          WRITE(numout,*) '                   in lon/lat box                                   = ', rn_test_box
+         WRITE(numout,*) '   Use calving data even if nn_test_icebergs > 0    ln_use_calving  = ', ln_use_calving
          WRITE(numout,*) '   CFL speed limit for a berg            speed_limit                = ', rn_speed_limit
          WRITE(numout,*) '   Writing Iceberg status information to icebergs.stat file        '
       ENDIF

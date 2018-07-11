@@ -70,7 +70,7 @@ CONTAINS
       !
       nktberg = kt
       !
-      IF( nn_test_icebergs < 0 ) THEN     !* read calving data
+      IF( nn_test_icebergs < 0 .OR. ln_use_calving ) THEN !* read calving data
          !
          CALL fld_read ( kt, 1, sf_icb )
          src_calving     (:,:) = sf_icb(1)%fnow(:,:,1)    ! calving in km^3/year (water equivalent)
@@ -98,7 +98,7 @@ CONTAINS
       !                              !
                                      CALL icb_clv_flx( kt )   ! Accumulate ice from calving
       !                              !
-                                     CALL icb_clv()           ! Calve excess stored ice into icebergs
+                                     CALL icb_clv( kt )       ! Calve excess stored ice into icebergs
       !                              !
       !
       !                       !==  For each berg, evolve  ==!

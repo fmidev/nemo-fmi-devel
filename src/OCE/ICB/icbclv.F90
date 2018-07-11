@@ -62,7 +62,7 @@ CONTAINS
       ! Heat in units of W/m2, and mask (just in case)
       berg_grid%calving_hflx(:,:) = src_calving_hflx(:,:) * tmask_i(:,:)
 
-      IF( ll_first_call .AND. .NOT. l_restarted_bergs) THEN      ! This is a hack to simplify initialization
+      IF( ll_first_call .AND. .NOT. l_restarted_bergs ) THEN      ! This is a hack to simplify initialization
          ll_first_call = .FALSE.
          !do jn=1, nclasses
          !  where (berg_grid%calving==0.) berg_grid%stored_ice(:,:,jn)=0.
@@ -99,7 +99,7 @@ CONTAINS
    END SUBROUTINE icb_clv_flx
 
 
-   SUBROUTINE icb_clv()
+   SUBROUTINE icb_clv( kt )
       !!----------------------------------------------------------------------
       !!                 ***  ROUTINE icb_clv  ***
       !!
@@ -113,6 +113,7 @@ CONTAINS
       !!                Note that only the non-overlapping part of the processor where icebergs are allowed
       !!                is considered
       !!----------------------------------------------------------------------
+      INTEGER, INTENT(in) ::   kt
       INTEGER       ::   ji, jj, jn   ! dummy loop indices
       INTEGER       ::   icnt, icntmax
       TYPE(iceberg) ::   newberg
