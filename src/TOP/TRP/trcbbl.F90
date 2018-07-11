@@ -45,6 +45,7 @@ CONTAINS
       !!
       !!----------------------------------------------------------------------  
       INTEGER, INTENT( in ) ::   kt   ! ocean time-step 
+      INTEGER :: jn                   ! loop index
       CHARACTER (len=22) :: charout
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:,:) ::   ztrtrd
       !!----------------------------------------------------------------------

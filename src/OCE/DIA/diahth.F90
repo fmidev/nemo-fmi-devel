@@ -342,6 +342,8 @@ CONTAINS
    LOGICAL , PUBLIC, PARAMETER ::   lk_diahth = .FALSE.  !: thermocline-20d depths flag
 CONTAINS
    SUBROUTINE dia_hth( kt )         ! Empty routine
+      IMPLICIT NONE
+      INTEGER, INTENT( in ) :: kt
       WRITE(*,*) 'dia_hth: You should not have seen this print! error?', kt
    END SUBROUTINE dia_hth
 #endif

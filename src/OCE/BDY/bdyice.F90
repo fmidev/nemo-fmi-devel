@@ -359,6 +359,8 @@ CONTAINS
    !!---------------------------------------------------------------------------------
 CONTAINS
    SUBROUTINE bdy_ice( kt )      ! Empty routine
+      IMPLICIT NONE
+      INTEGER, INTENT( in ) :: kt
       WRITE(*,*) 'bdy_ice: You should not have seen this print! error?', kt
    END SUBROUTINE bdy_ice
 #endif

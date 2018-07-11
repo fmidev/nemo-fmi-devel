@@ -1248,10 +1248,12 @@ CONTAINS
 CONTAINS
 
    SUBROUTINE dia_dct_init          ! Dummy routine
-      WRITE(*,*) 'dia_dct_init: You should not have seen this print! error?', kt
+      IMPLICIT NONE
+      WRITE(*,*) 'dia_dct_init: You should not have seen this print! error?'
    END SUBROUTINE dia_dct_init
 
    SUBROUTINE dia_dct( kt )         ! Dummy routine
+      IMPLICIT NONE
       INTEGER, INTENT( in ) :: kt   ! ocean time-step index
       WRITE(*,*) 'dia_dct: You should not have seen this print! error?', kt
    END SUBROUTINE dia_dct

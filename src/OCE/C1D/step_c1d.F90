@@ -146,6 +146,8 @@ CONTAINS
    !!----------------------------------------------------------------------
 CONTAINS
    SUBROUTINE stp_c1d ( kt )      ! dummy routine
+      IMPLICIT NONE
+      INTEGER, INTENT( in ) :: kt
       WRITE(*,*) 'stp_c1d: You should not have seen this print! error?', kt
    END SUBROUTINE stp_c1d
 #endif

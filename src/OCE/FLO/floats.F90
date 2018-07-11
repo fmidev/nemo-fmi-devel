@@ -141,9 +141,12 @@ CONTAINS
    !!----------------------------------------------------------------------
 CONTAINS
    SUBROUTINE flo_stp( kt )          ! Empty routine
+      IMPLICIT NONE
+      INTEGER, INTENT( in ) :: kt
       WRITE(*,*) 'flo_stp: You should not have seen this print! error?', kt
    END SUBROUTINE flo_stp
    SUBROUTINE flo_init          ! Empty routine
+      IMPLICIT NONE
    END SUBROUTINE flo_init
 #endif
 
