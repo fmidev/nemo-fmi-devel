@@ -804,7 +804,7 @@ CONTAINS
             IF( h_i_1d(ji) > 0.1_wp ) THEN
                cnd_ice_1d(ji) = 2._wp * zkappa_i(ji,0)
             ELSE
-               cnd_ice_1d(ji) = 2._wp * ztcond_i(ji,0) / 0.1_wp
+               cnd_ice_1d(ji) = 2._wp * ztcond_i(ji,0) * 10._wp
             ENDIF
          ENDIF
          t1_ice_1d(ji) = isnow(ji) * t_s_1d(ji,1) + ( 1._wp - isnow(ji) ) * t_i_1d(ji,1)

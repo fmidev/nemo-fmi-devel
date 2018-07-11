@@ -530,7 +530,7 @@ CONTAINS
          &     + ( sf(jp_prec)%fnow(:,:,1) - sf(jp_snow)%fnow(:,:,1) ) * rn_pfac  &   ! add liquid precip heat content at Tair
          &     * ( sf(jp_tair)%fnow(:,:,1) - rt0 ) * rcp                          &
          &     + sf(jp_snow)%fnow(:,:,1) * rn_pfac                                &   ! add solid  precip heat content at min(Tair,Tsnow)
-         &     * ( MIN( sf(jp_tair)%fnow(:,:,1), rt0_snow ) - rt0 ) * cpic
+         &     * ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic
       qns(:,:) = qns(:,:) * tmask(:,:,1)
       !
 #if defined key_si3
@@ -883,9 +883,9 @@ CONTAINS
       qemp_oce(:,:) = - ( 1._wp - at_i_b(:,:) ) * zevap(:,:) * sst_m(:,:) * rcp                  & ! evap at sst
          &          + ( tprecip(:,:) - sprecip(:,:) ) * ( sf(jp_tair)%fnow(:,:,1) - rt0 ) * rcp  & ! liquid precip at Tair
          &          +   sprecip(:,:) * ( 1._wp - zsnw ) *                                        & ! solid precip at min(Tair,Tsnow)
-         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0_snow ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
+         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
       qemp_ice(:,:) =   sprecip(:,:) * zsnw *                                                    & ! solid precip (only)
-         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0_snow ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
+         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
 
       ! --- total solar and non solar fluxes --- !
       qns_tot(:,:) = ( 1._wp - at_i_b(:,:) ) * qns_oce(:,:) + SUM( a_i_b(:,:,:) * qns_ice(:,:,:), dim=3 )  &
@@ -893,7 +893,7 @@ CONTAINS
       qsr_tot(:,:) = ( 1._wp - at_i_b(:,:) ) * qsr_oce(:,:) + SUM( a_i_b(:,:,:) * qsr_ice(:,:,:), dim=3 )
 
       ! --- heat content of precip over ice in J/m3 (to be used in 1D-thermo) --- !
-      qprec_ice(:,:) = rhosn * ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0_snow ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
+      qprec_ice(:,:) = rhosn * ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
 
       ! --- heat content of evap over ice in W/m2 (to be used in 1D-thermo) ---
       DO jl = 1, jpl

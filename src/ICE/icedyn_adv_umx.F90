@@ -135,6 +135,7 @@ CONTAINS
       DEALLOCATE( zudy, zvdx, zcu_box, zcv_box )
       !
    END SUBROUTINE ice_dyn_adv_umx
+
    
    SUBROUTINE adv_umx( k_order, kt, pdt, puc, pvc, pubox, pvbox, ptc )
       !!----------------------------------------------------------------------
@@ -158,8 +159,6 @@ CONTAINS
       !
       INTEGER  ::   ji, jj           ! dummy loop indices  
       REAL(wp) ::   ztra             ! local scalar
-      REAL(wp) ::   zfp_ui, zfp_vj   !   -      -
-      REAL(wp) ::   zfm_ui, zfm_vj   !   -      -
       REAL(wp), DIMENSION(jpi,jpj) ::   zfu_ups, zfu_ho, zt_u, zt_ups
       REAL(wp), DIMENSION(jpi,jpj) ::   zfv_ups, zfv_ho, zt_v, ztrd
       !!----------------------------------------------------------------------
@@ -168,12 +167,8 @@ CONTAINS
       ! --------------------------------------------------------------------
       DO jj = 1, jpjm1         ! upstream tracer flux in the i and j direction
          DO ji = 1, fs_jpim1   ! vector opt.
-            zfp_ui = puc(ji,jj) + ABS( puc(ji,jj) )
-            zfm_ui = puc(ji,jj) - ABS( puc(ji,jj) )
-            zfp_vj = pvc(ji,jj) + ABS( pvc(ji,jj) )
-            zfm_vj = pvc(ji,jj) - ABS( pvc(ji,jj) )
-            zfu_ups(ji,jj) = 0.5_wp * ( zfp_ui * ptc(ji,jj) + zfm_ui * ptc(ji+1,jj  ) )
-            zfv_ups(ji,jj) = 0.5_wp * ( zfp_vj * ptc(ji,jj) + zfm_vj * ptc(ji  ,jj+1) )
+            zfu_ups(ji,jj) = MAX( puc(ji,jj), 0._wp ) * ptc(ji,jj) + MIN( puc(ji,jj), 0._wp ) * ptc(ji+1,jj)
+            zfv_ups(ji,jj) = MAX( pvc(ji,jj), 0._wp ) * ptc(ji,jj) + MIN( pvc(ji,jj), 0._wp ) * ptc(ji,jj+1)
          END DO
       END DO
       

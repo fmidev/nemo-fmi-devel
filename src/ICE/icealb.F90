@@ -148,7 +148,7 @@ CONTAINS
                ENDIF
                !
                !                       !--- Snow-covered ice albedo (freezing, melting cases)
-               IF( pt_su(ji,jj,jl) < rt0_snow ) THEN
+               IF( pt_su(ji,jj,jl) < rt0 ) THEN
                   zalb_snw = rn_alb_sdry - ( rn_alb_sdry - zalb_ice ) * EXP( - ph_snw(ji,jj,jl) * z1_c3 )
                ELSE
                   zalb_snw = rn_alb_smlt - ( rn_alb_smlt - zalb_ice ) * EXP( - ph_snw(ji,jj,jl) * z1_c4 )
