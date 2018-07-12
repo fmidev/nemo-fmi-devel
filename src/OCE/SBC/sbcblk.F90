@@ -45,7 +45,7 @@ MODULE sbcblk
    USE sbc_ice        ! Surface boundary condition: ice fields
    USE lib_fortran    ! to use key_nosignedzero
 #if defined key_si3
-   USE ice     , ONLY :   u_ice, v_ice, jpl, a_i_b, at_i_b, tm_su, rn_cnd_s
+   USE ice     , ONLY :   u_ice, v_ice, jpl, a_i_b, at_i_b, tm_su, rn_cnd_s, hfx_err_dif
    USE icethd_dh      ! for CALL ice_thd_snwblow
 #endif
    USE sbcblk_algo_ncar     ! => turb_ncar     : NCAR - CORE (Large & Yeager, 2009) 
@@ -1012,6 +1012,9 @@ CONTAINS
                qns_ice(ji,jj,jl) = qns_ice(ji,jj,jl) + dqns_ice(ji,jj,jl) * ( ptsu(ji,jj,jl) - ztsu0 )
                qml_ice(ji,jj,jl) = ( qsr_ice(ji,jj,jl) - qtr_ice_top(ji,jj,jl) + qns_ice(ji,jj,jl) - qcn_ice(ji,jj,jl) )  &
                              &   * MAX( 0._wp , SIGN( 1._wp, ptsu(ji,jj,jl) - rt0 ) )
+
+               ! --- Diagnose the heat loss due to changing non-solar flux (as in icethd_zdf_bl99) --- !
+               hfx_err_dif(ji,jj) = hfx_err_dif(ji,jj) - ( dqns_ice(ji,jj,jl) * ( ptsu(ji,jj,jl) - ztsu0 ) ) * a_i_b(ji,jj,jl) 
 
             END DO
          END DO
