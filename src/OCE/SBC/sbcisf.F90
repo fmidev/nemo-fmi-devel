@@ -51,11 +51,11 @@ MODULE sbcisf
 
    LOGICAL, PUBLIC ::   l_isfcpl = .false.       !: isf recieved from oasis
 
-   REAL(wp), PUBLIC, SAVE ::   rcpi     = 2000.0_wp     !: specific heat of ice shelf             [J/kg/K]
+   REAL(wp), PUBLIC, SAVE ::   rcpisf   = 2000.0_wp     !: specific heat of ice shelf             [J/kg/K]
    REAL(wp), PUBLIC, SAVE ::   rkappa   = 1.54e-6_wp    !: heat diffusivity through the ice-shelf [m2/s]
    REAL(wp), PUBLIC, SAVE ::   rhoisf   = 920.0_wp      !: volumic mass of ice shelf              [kg/m3]
    REAL(wp), PUBLIC, SAVE ::   tsurf    = -20.0_wp      !: air temperature on top of ice shelf    [C]
-   REAL(wp), PUBLIC, SAVE ::   rlfusisf = 0.334e6_wp    !: latent heat of fusion of ice shelf     [J/kg]
+   REAL(wp), PUBLIC, SAVE ::   rLfusisf = 0.334e6_wp    !: latent heat of fusion of ice shelf     [J/kg]
 
 !: Variable used in fldread to read the forcing file (nn_isf == 4 .OR. nn_isf == 3)
    CHARACTER(len=100), PUBLIC           :: cn_dirisf  = './' !: Root directory for location of ssr files
@@ -113,7 +113,7 @@ CONTAINS
             ! compute fwf and heat flux
             ! compute fwf and heat flux
             IF( .NOT.l_isfcpl ) THEN    ;   CALL sbc_isf_cav (kt)
-            ELSE                        ;   qisf(:,:)  = fwfisf(:,:) * rlfusisf  ! heat        flux
+            ELSE                        ;   qisf(:,:)  = fwfisf(:,:) * rLfusisf  ! heat        flux
             ENDIF
             !
          CASE ( 2 )    ! Beckmann and Goosse parametrisation 
@@ -126,7 +126,7 @@ CONTAINS
                CALL fld_read ( kt, nn_fsbc, sf_rnfisf   )
                fwfisf(:,:) = - sf_rnfisf(1)%fnow(:,:,1)         ! fresh water flux from the isf (fwfisf <0 mean melting) 
             ENDIF
-            qisf(:,:)   = fwfisf(:,:) * rlfusisf             ! heat flux
+            qisf(:,:)   = fwfisf(:,:) * rLfusisf             ! heat flux
             stbl(:,:)   = soce
             !
          CASE ( 4 )    ! specified fwf and heat flux forcing beneath the ice shelf
@@ -136,7 +136,7 @@ CONTAINS
                !CALL fld_read ( kt, nn_fsbc, sf_qisf   )
                fwfisf(:,:) = -sf_fwfisf(1)%fnow(:,:,1)            ! fwf
             ENDIF
-            qisf(:,:)   = fwfisf(:,:) * rlfusisf               ! heat flux
+            qisf(:,:)   = fwfisf(:,:) * rLfusisf               ! heat flux
             stbl(:,:)   = soce
             !
          END SELECT
@@ -453,7 +453,7 @@ CONTAINS
                qisf(ji,jj) = - rau0 * rcp * rn_gammat0 * risfLeff(ji,jj) * e1t(ji,jj) * zt_ave  &
                            & * r1_e1e2t(ji,jj) * tmask(ji,jj,jk)
              
-               fwfisf(ji,jj) = qisf(ji,jj) / rlfusisf          !fresh water flux kg/(m2s)                  
+               fwfisf(ji,jj) = qisf(ji,jj) / rLfusisf          !fresh water flux kg/(m2s)                  
                fwfisf(ji,jj) = fwfisf(ji,jj) * ( soce / stbl(ji,jj) )
                !add to salinity trend
             ELSE
@@ -525,7 +525,7 @@ CONTAINS
             DO jj = 1, jpj
                DO ji = 1, jpi
                   zhtflx(ji,jj) =   zgammat(ji,jj)*rcp*rau0*(ttbl(ji,jj)-zfrz(ji,jj))
-                  zfwflx(ji,jj) = - zhtflx(ji,jj)/rlfusisf
+                  zfwflx(ji,jj) = - zhtflx(ji,jj)/rLfusisf
                END DO
             END DO
 
@@ -543,8 +543,8 @@ CONTAINS
                DO ji = 1, jpi
                   ! compute coeficient to solve the 2nd order equation
                   zeps1 = rcp*rau0*zgammat(ji,jj)
-                  zeps2 = rlfusisf*rau0*zgammas(ji,jj)
-                  zeps3 = rhoisf*rcpi*rkappa/MAX(risfdep(ji,jj),zeps)
+                  zeps2 = rLfusisf*rau0*zgammas(ji,jj)
+                  zeps3 = rhoisf*rcpisf*rkappa/MAX(risfdep(ji,jj),zeps)
                   zeps4 = zlamb2+zlamb3*risfdep(ji,jj)
                   zeps6 = zeps4-ttbl(ji,jj)
                   zeps7 = zeps4-tsurf

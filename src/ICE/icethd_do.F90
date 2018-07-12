@@ -139,7 +139,7 @@ CONTAINS
          !
          ! Physical constants
          zhicrit = 0.04                                          ! frazil ice thickness
-         ztwogp  = 2. * rau0 / ( grav * 0.3 * ( rau0 - rhoic ) ) ! reduced grav
+         ztwogp  = 2. * rau0 / ( grav * 0.3 * ( rau0 - rhoi ) )  ! reduced grav
          zsqcd   = 1.0 / SQRT( 1.3 * zcai )                      ! 1/SQRT(airdensity*drag)
          zgamafr = 0.03
          !
@@ -262,10 +262,10 @@ CONTAINS
          ! --- Heat content of new ice --- !
          ! We assume that new ice is formed at the seawater freezing point
          DO ji = 1, npti
-            ztmelts       = - tmut * zs_newice(ji)                  ! Melting point (C)
-            ze_newice(ji) =   rhoic * (  cpic * ( ztmelts - ( t_bo_1d(ji) - rt0 ) )                     &
-               &                       + lfus * ( 1.0 - ztmelts / MIN( t_bo_1d(ji) - rt0, -epsi10 ) )   &
-               &                       - rcp  *         ztmelts )
+            ztmelts       = - rTmlt * zs_newice(ji)                  ! Melting point (C)
+            ze_newice(ji) =   rhoi * (  rcpi  * ( ztmelts - ( t_bo_1d(ji) - rt0 ) )                     &
+               &                      + rLfus * ( 1.0 - ztmelts / MIN( t_bo_1d(ji) - rt0, -epsi10 ) )   &
+               &                      - rcp   *         ztmelts )
          END DO
 
          ! --- Age of new ice --- !
@@ -274,7 +274,7 @@ CONTAINS
          ! --- Volume of new ice --- !
          DO ji = 1, npti
 
-            zEi           = - ze_newice(ji) * r1_rhoic             ! specific enthalpy of forming ice [J/kg]
+            zEi           = - ze_newice(ji) * r1_rhoi              ! specific enthalpy of forming ice [J/kg]
 
             zEw           = rcp * ( t_bo_1d(ji) - rt0 )            ! specific enthalpy of seawater at t_bo_1d [J/kg]
                                                                    ! clem: we suppose we are already at the freezing point (condition qlead<0 is satisfyied) 
@@ -283,7 +283,7 @@ CONTAINS
                                               
             zfmdt         = - qlead_1d(ji) / zdE                   ! Fm.dt [kg/m2] (<0) 
                                                                    ! clem: we use qlead instead of zqld (icethd) because we suppose we are at the freezing point   
-            zv_newice(ji) = - zfmdt * r1_rhoic
+            zv_newice(ji) = - zfmdt * r1_rhoi
 
             zQm           = zfmdt * zEw                            ! heat to the ocean >0 associated with mass flux  
 
@@ -292,9 +292,9 @@ CONTAINS
             ! Total heat flux used in this process [W.m-2]  
             hfx_opw_1d(ji) = hfx_opw_1d(ji) - zfmdt * zdE * r1_rdtice
             ! mass flux
-            wfx_opw_1d(ji) = wfx_opw_1d(ji) - zv_newice(ji) * rhoic * r1_rdtice
+            wfx_opw_1d(ji) = wfx_opw_1d(ji) - zv_newice(ji) * rhoi * r1_rdtice
             ! salt flux
-            sfx_opw_1d(ji) = sfx_opw_1d(ji) - zv_newice(ji) * rhoic * zs_newice(ji) * r1_rdtice
+            sfx_opw_1d(ji) = sfx_opw_1d(ji) - zv_newice(ji) * rhoi * zs_newice(ji) * r1_rdtice
          END DO
          
          zv_frazb(1:npti) = 0._wp

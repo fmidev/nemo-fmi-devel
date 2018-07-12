@@ -127,7 +127,7 @@ CONTAINS
                rnf_tsc(:,:,jp_tem) = sst_m(:,:) * rnf(:,:) * r1_rau0
             END WHERE
             WHERE( sf_t_rnf(1)%fnow(:,:,1) == -222._wp )             ! where fwf comes from melting of ice shelves or iceberg
-               rnf_tsc(:,:,jp_tem) = ztfrz(:,:) * rnf(:,:) * r1_rau0 - rnf(:,:) * rlfusisf * r1_rau0_rcp
+               rnf_tsc(:,:,jp_tem) = ztfrz(:,:) * rnf(:,:) * r1_rau0 - rnf(:,:) * rLfusisf * r1_rau0_rcp
             END WHERE
          ELSE                                                        ! use SST as runoffs temperature
             !CEOD River is fresh water so must at least be 0 unless we consider ice

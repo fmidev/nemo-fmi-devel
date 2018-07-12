@@ -294,10 +294,10 @@ CONTAINS
                   ! This case below should not be used if (h_s/h_i) is ok in namelist
                   ! In case snow load is in excess that would lead to transformation from snow to ice
                   ! Then, transfer the snow excess into the ice (different from icethd_dh)
-                  zdh = MAX( 0._wp, ( rhosn * h_s(ji,jj,jl) + ( rhoic - rau0 ) * h_i(ji,jj,jl) ) * r1_rau0 ) 
+                  zdh = MAX( 0._wp, ( rhos * h_s(ji,jj,jl) + ( rhoi - rau0 ) * h_i(ji,jj,jl) ) * r1_rau0 ) 
                   ! recompute h_i, h_s avoiding out of bounds values
                   h_i(ji,jj,jl) = MIN( hi_max(jl), h_i(ji,jj,jl) + zdh )
-                  h_s(ji,jj,jl) = MAX( 0._wp, h_s(ji,jj,jl) - zdh * rhoic * r1_rhosn )
+                  h_s(ji,jj,jl) = MAX( 0._wp, h_s(ji,jj,jl) - zdh * rhoi * r1_rhos )
                   !
                   ! ice volume, salt content, age content
                   v_i (ji,jj,jl) = h_i(ji,jj,jl) * a_i(ji,jj,jl)              ! ice volume
@@ -320,7 +320,7 @@ CONTAINS
                   DO ji = 1, jpi
                      t_s(ji,jj,jk,jl) = zswitch(ji,jj) * ztm_i_ini(ji,jj) + ( 1._wp - zswitch(ji,jj) ) * rt0
                      ! Snow energy of melting
-                     e_s(ji,jj,jk,jl) = zswitch(ji,jj) * rhosn * ( cpic * ( rt0 - t_s(ji,jj,jk,jl) ) + lfus )
+                     e_s(ji,jj,jk,jl) = zswitch(ji,jj) * rhos * ( rcpi * ( rt0 - t_s(ji,jj,jk,jl) ) + rLfus )
                      !
                      ! Mutliply by volume, and divide by number of layers to get heat content in J/m2
                      e_s(ji,jj,jk,jl) = e_s(ji,jj,jk,jl) * v_s(ji,jj,jl) * r1_nlay_s
@@ -336,11 +336,11 @@ CONTAINS
                   DO ji = 1, jpi
                      t_i (ji,jj,jk,jl) = zswitch(ji,jj) * ztm_i_ini(ji,jj) + ( 1._wp - zswitch(ji,jj) ) * rt0 
                      sz_i(ji,jj,jk,jl) = zswitch(ji,jj) * zsm_i_ini(ji,jj) + ( 1._wp - zswitch(ji,jj) ) * rn_simin
-                     ztmelts          = - tmut * sz_i(ji,jj,jk,jl) + rt0 !Melting temperature in K
+                     ztmelts          = - rTmlt * sz_i(ji,jj,jk,jl) + rt0 !Melting temperature in K
                      !
                      ! heat content per unit volume
-                     e_i(ji,jj,jk,jl) = zswitch(ji,jj) * rhoic * (   cpic    * ( ztmelts - t_i(ji,jj,jk,jl) )         &
-                        &             + lfus * ( 1._wp - (ztmelts-rt0) / MIN( (t_i(ji,jj,jk,jl)-rt0) , -epsi20 )  )   &
+                     e_i(ji,jj,jk,jl) = zswitch(ji,jj) * rhoi * (   rcpi    * ( ztmelts - t_i(ji,jj,jk,jl) )           &
+                        &             + rLfus * ( 1._wp - (ztmelts-rt0) / MIN( (t_i(ji,jj,jk,jl)-rt0) , -epsi20 )  )   &
                         &             - rcp  * ( ztmelts - rt0 ) )
                      !
                      ! Mutliply by ice volume, and divide by number of layers to get heat content in J/m2
@@ -409,7 +409,7 @@ CONTAINS
       !----------------------------------------------
       ! 5) Snow-ice mass (case ice is fully embedded)
       !----------------------------------------------
-      snwice_mass  (:,:) = tmask(:,:,1) * SUM( rhosn * v_s(:,:,:) + rhoic * v_i(:,:,:), dim=3  )   ! snow+ice mass
+      snwice_mass  (:,:) = tmask(:,:,1) * SUM( rhos * v_s(:,:,:) + rhoi * v_i(:,:,:), dim=3  )   ! snow+ice mass
       snwice_mass_b(:,:) = snwice_mass(:,:)
       !
       IF( ln_ice_embd ) THEN            ! embedded sea-ice: deplete the initial ssh below sea-ice area

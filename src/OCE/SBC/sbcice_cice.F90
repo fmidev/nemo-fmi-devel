@@ -12,7 +12,7 @@ MODULE sbcice_cice
    USE oce             ! ocean dynamics and tracers
    USE dom_oce         ! ocean space and time domain
    USE domvvl
-   USE phycst, only : rcp, rau0, r1_rau0, rhosn, rhoic
+   USE phycst, only : rcp, rau0, r1_rau0, rhos, rhoi
    USE in_out_manager  ! I/O manager
    USE iom, ONLY : iom_put,iom_use              ! I/O manager library !!Joakim edit
    USE lib_mpp         ! distributed memory computing library
@@ -221,7 +221,7 @@ CONTAINS
       ! set the snow+ice mass
       CALL cice2nemo(vsno(:,:,:),ztmp1,'T', 1. )
       CALL cice2nemo(vice(:,:,:),ztmp2,'T', 1. )
-      snwice_mass  (:,:) = ( rhosn * ztmp1(:,:) + rhoic * ztmp2(:,:)  )
+      snwice_mass  (:,:) = ( rhos * ztmp1(:,:) + rhoi * ztmp2(:,:)  )
       snwice_mass_b(:,:) = snwice_mass(:,:)
 
       IF( .NOT.ln_rstart ) THEN
@@ -327,7 +327,7 @@ CONTAINS
             ENDDO
          ELSE
 ! emp_ice is set in sbc_cpl_ice_flx as sublimation-snow
-            qla_ice(:,:,1)= - ( emp_ice(:,:)+sprecip(:,:) ) * Lsub
+            qla_ice(:,:,1)= - ( emp_ice(:,:)+sprecip(:,:) ) * rLsub
 ! End of temporary code
             DO jj=1,jpj
                DO ji=1,jpi
@@ -643,7 +643,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
       ! set the snow+ice mass
       CALL cice2nemo(vsno(:,:,:),ztmp1,'T', 1. )
       CALL cice2nemo(vice(:,:,:),ztmp2,'T', 1. )
-      snwice_mass  (:,:) = ( rhosn * ztmp1(:,:) + rhoic * ztmp2(:,:)  )
+      snwice_mass  (:,:) = ( rhos * ztmp1(:,:) + rhoi * ztmp2(:,:)  )
       snwice_mass_b(:,:) = snwice_mass(:,:)
       snwice_fmass (:,:) = ( snwice_mass(:,:) - snwice_mass_b(:,:) ) / dt
       !
@@ -800,7 +800,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
       sprecip(:,:) = sf(jp_snow)%fnow(:,:,1)
       tprecip(:,:) = sf(jp_snow)%fnow(:,:,1)+sf(jp_rain)%fnow(:,:,1)
 ! May be better to do this conversion somewhere else
-      qla_ice(:,:,1) = -Lsub*sf(jp_sblm)%fnow(:,:,1)
+      qla_ice(:,:,1) = -rLsub*sf(jp_sblm)%fnow(:,:,1)
       topmelt(:,:,1) = sf(jp_top1)%fnow(:,:,1)
       topmelt(:,:,2) = sf(jp_top2)%fnow(:,:,1)
       topmelt(:,:,3) = sf(jp_top3)%fnow(:,:,1)

@@ -109,9 +109,9 @@ CONTAINS
       ! ----------------------- !
       ! 3 -  Content variations !
       ! ----------------------- !
-      zdiff_vol = r1_rau0 * glob_sum( ( rhoic*vt_i(:,:) + rhosn*vt_s(:,:) - vol_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! freshwater trend (km3) 
-      zdiff_sal = r1_rau0 * glob_sum( ( rhoic* SUM( sv_i(:,:,:), dim=3 )  - sal_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! salt content trend (km3*pss)
-      zdiff_tem =           glob_sum( ( et_i(:,:) + et_s(:,:)             - tem_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-20  ! heat content trend (1.e20 J)
+      zdiff_vol = r1_rau0 * glob_sum( ( rhoi*vt_i(:,:) + rhos*vt_s(:,:) - vol_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! freshwater trend (km3) 
+      zdiff_sal = r1_rau0 * glob_sum( ( rhoi* SUM( sv_i(:,:,:), dim=3 ) - sal_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-9   ! salt content trend (km3*pss)
+      zdiff_tem =           glob_sum( ( et_i(:,:) + et_s(:,:)           - tem_loc_ini(:,:) ) * e1e2t(:,:) ) * 1.e-20  ! heat content trend (1.e20 J)
       !                               + SUM( qevap_ice * a_i_b, dim=3 )       !! clem: I think this term should not be there (but needs a check)
 
       ! ----------------------- !
@@ -245,9 +245,9 @@ CONTAINS
             frc_tembot  = 0._wp                                                 
             frc_sal     = 0._wp                                                 
             ! record initial ice volume, salt and temp
-            vol_loc_ini(:,:) = rhoic * vt_i(:,:) + rhosn * vt_s(:,:)  ! ice/snow volume (kg/m2)
-            tem_loc_ini(:,:) = et_i(:,:) + et_s(:,:)                  ! ice/snow heat content (J)
-            sal_loc_ini(:,:) = rhoic * SUM( sv_i(:,:,:), dim=3 )      ! ice salt content (pss*kg/m2)
+            vol_loc_ini(:,:) = rhoi * vt_i(:,:) + rhos * vt_s(:,:)  ! ice/snow volume (kg/m2)
+            tem_loc_ini(:,:) = et_i(:,:) + et_s(:,:)                ! ice/snow heat content (J)
+            sal_loc_ini(:,:) = rhoi * SUM( sv_i(:,:,:), dim=3 )     ! ice salt content (pss*kg/m2)
          ENDIF
          !
       ELSEIF( TRIM(cdrw) == 'WRITE' ) THEN   ! Create restart file

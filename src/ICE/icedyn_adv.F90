@@ -118,11 +118,11 @@ CONTAINS
       diag_trp_sv(:,:) = SUM(     sv_i(:,:,:)          - sv_i_b(:,:,:)                  , dim=3 ) * r1_rdtice
       diag_trp_vi(:,:) = SUM(     v_i (:,:,:)          - v_i_b (:,:,:)                  , dim=3 ) * r1_rdtice
       diag_trp_vs(:,:) = SUM(     v_s (:,:,:)          - v_s_b (:,:,:)                  , dim=3 ) * r1_rdtice
-      IF( iom_use('icemtrp') )   CALL iom_put( "icemtrp" , diag_trp_vi * rhoic          )   ! ice mass transport
-      IF( iom_use('snwmtrp') )   CALL iom_put( "snwmtrp" , diag_trp_vs * rhosn          )   ! snw mass transport
-      IF( iom_use('salmtrp') )   CALL iom_put( "salmtrp" , diag_trp_sv * rhoic * 1.e-03 )   ! salt mass transport (kg/m2/s)
-      IF( iom_use('dihctrp') )   CALL iom_put( "dihctrp" , -diag_trp_ei                 )   ! advected ice heat content (W/m2)
-      IF( iom_use('dshctrp') )   CALL iom_put( "dshctrp" , -diag_trp_es                 )   ! advected snw heat content (W/m2)
+      IF( iom_use('icemtrp') )   CALL iom_put( "icemtrp" , diag_trp_vi * rhoi          )   ! ice mass transport
+      IF( iom_use('snwmtrp') )   CALL iom_put( "snwmtrp" , diag_trp_vs * rhos          )   ! snw mass transport
+      IF( iom_use('salmtrp') )   CALL iom_put( "salmtrp" , diag_trp_sv * rhoi * 1.e-03 )   ! salt mass transport (kg/m2/s)
+      IF( iom_use('dihctrp') )   CALL iom_put( "dihctrp" , -diag_trp_ei                )   ! advected ice heat content (W/m2)
+      IF( iom_use('dshctrp') )   CALL iom_put( "dshctrp" , -diag_trp_es                )   ! advected snw heat content (W/m2)
 
       ! controls
       IF( ln_icediachk )   CALL ice_cons_hsm(1, 'icedyn_adv', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation

@@ -92,7 +92,7 @@ CONTAINS
       REAL(wp) ::   ztsu_err  =  1.e-5_wp     ! range around which t_su is considered at 0C 
       REAL(wp) ::   zdti_bnd  =  1.e-4_wp     ! maximal authorized error on temperature 
       REAL(wp) ::   zhs_min   =  0.01_wp      ! minimum snow thickness for conductivity calculation 
-      REAL(wp) ::   ztmelt_i                  ! ice melting temperature
+      REAL(wp) ::   ztmelts                   ! ice melting temperature
       REAL(wp) ::   zdti_max                  ! current maximal error on temperature 
       REAL(wp) ::   zcpi                      ! Ice specific heat
       REAL(wp) ::   zhfx_err, zdq             ! diag errors on heat
@@ -216,29 +216,29 @@ CONTAINS
          IF( ln_cndi_U64 ) THEN         !-- Untersteiner (1964) formula: k = k0 + beta.S/T
             !
             DO ji = 1, npti
-               ztcond_i(ji,0)      = rcdic + zbeta * sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )
-               ztcond_i(ji,nlay_i) = rcdic + zbeta * sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )
+               ztcond_i(ji,0)      = rcnd_i + zbeta * sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )
+               ztcond_i(ji,nlay_i) = rcnd_i + zbeta * sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )
             END DO
             DO jk = 1, nlay_i-1
                DO ji = 1, npti
-                  ztcond_i(ji,jk) = rcdic + zbeta * 0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /  &
-                     &                      MIN( -epsi10, 0.5_wp * (t_i_1d(ji,jk) + t_i_1d(ji,jk+1)) - rt0 )
+                  ztcond_i(ji,jk) = rcnd_i + zbeta * 0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /  &
+                     &                       MIN( -epsi10, 0.5_wp * (t_i_1d(ji,jk) + t_i_1d(ji,jk+1)) - rt0 )
                END DO
             END DO
             !
          ELSEIF( ln_cndi_P07 ) THEN     !-- Pringle et al formula: k = k0 + beta1.S/T - beta2.T
             !
             DO ji = 1, npti
-               ztcond_i(ji,0)      = rcdic + 0.09_wp  *  sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )  &
-                  &                        - 0.011_wp * ( t_i_1d(ji,1) - rt0 )
-               ztcond_i(ji,nlay_i) = rcdic + 0.09_wp  *  sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )  &
-                  &                        - 0.011_wp * ( t_bo_1d(ji) - rt0 )
+               ztcond_i(ji,0)      = rcnd_i + 0.09_wp  *  sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )  &
+                  &                         - 0.011_wp * ( t_i_1d(ji,1) - rt0 )
+               ztcond_i(ji,nlay_i) = rcnd_i + 0.09_wp  *  sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )  &
+                  &                         - 0.011_wp * ( t_bo_1d(ji) - rt0 )
             END DO
             DO jk = 1, nlay_i-1
                DO ji = 1, npti
-                  ztcond_i(ji,jk) = rcdic + 0.09_wp  *   0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /        &
-                     &                     MIN( -epsi10, 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )  &
-                     &                    - 0.011_wp * ( 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )
+                  ztcond_i(ji,jk) = rcnd_i + 0.09_wp  *   0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /        &
+                     &                      MIN( -epsi10, 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )  &
+                     &                     - 0.011_wp * ( 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )
                END DO
             END DO
             !
@@ -298,14 +298,14 @@ CONTAINS
          !--------------------------------------
          DO jk = 1, nlay_i
             DO ji = 1, npti
-               zcpi = cpic + zgamma * sz_i_1d(ji,jk) / MAX( ( t_i_1d(ji,jk) - rt0 ) * ( ztiold(ji,jk) - rt0 ), epsi10 )
-               zeta_i(ji,jk) = rdt_ice * r1_rhoic * z1_h_i(ji) / MAX( epsi10, zcpi ) 
+               zcpi = rcpi + zgamma * sz_i_1d(ji,jk) / MAX( ( t_i_1d(ji,jk) - rt0 ) * ( ztiold(ji,jk) - rt0 ), epsi10 )
+               zeta_i(ji,jk) = rdt_ice * r1_rhoi * z1_h_i(ji) / MAX( epsi10, zcpi ) 
             END DO
          END DO
 
          DO jk = 1, nlay_s
             DO ji = 1, npti
-               zeta_s(ji,jk) = rdt_ice * r1_rhosn * r1_cpic * z1_h_s(ji)
+               zeta_s(ji,jk) = rdt_ice * r1_rhos * r1_rcpi * z1_h_s(ji)
             END DO
          END DO
          !
@@ -538,8 +538,8 @@ CONTAINS
 
             DO jk = 1, nlay_i
                DO ji = 1, npti
-                  ztmelt_i      = -tmut * sz_i_1d(ji,jk) + rt0 
-                  t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelt_i ), rt0 - 100._wp )
+                  ztmelts       = -rTmlt * sz_i_1d(ji,jk) + rt0 
+                  t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelts ), rt0 - 100._wp )
                   zdti_max      =  MAX( zdti_max, ABS( t_i_1d(ji,jk) - ztib(ji,jk) ) )
                END DO
             END DO
@@ -703,8 +703,8 @@ CONTAINS
             
             DO jk = 1, nlay_i
                DO ji = 1, npti
-                  ztmelt_i      = -tmut * sz_i_1d(ji,jk) + rt0 
-                  t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelt_i ), rt0 - 100._wp )
+                  ztmelts       = -rTmlt * sz_i_1d(ji,jk) + rt0 
+                  t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelts ), rt0 - 100._wp )
                   zdti_max      =  MAX( zdti_max, ABS( t_i_1d(ji,jk) - ztib(ji,jk) ) )
                END DO
             END DO

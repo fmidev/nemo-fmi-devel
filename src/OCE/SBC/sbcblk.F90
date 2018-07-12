@@ -525,12 +525,12 @@ CONTAINS
          &         - sf(jp_prec)%fnow(:,:,1) * rn_pfac  ) * tmask(:,:,1)
       !
       qns(:,:) = zqlw(:,:) - zqsb(:,:) - zqla(:,:)                                &   ! Downward Non Solar
-         &     - sf(jp_snow)%fnow(:,:,1) * rn_pfac * lfus                         &   ! remove latent melting heat for solid precip
+         &     - sf(jp_snow)%fnow(:,:,1) * rn_pfac * rLfus                        &   ! remove latent melting heat for solid precip
          &     - zevap(:,:) * pst(:,:) * rcp                                      &   ! remove evap heat content at SST
          &     + ( sf(jp_prec)%fnow(:,:,1) - sf(jp_snow)%fnow(:,:,1) ) * rn_pfac  &   ! add liquid precip heat content at Tair
          &     * ( sf(jp_tair)%fnow(:,:,1) - rt0 ) * rcp                          &
          &     + sf(jp_snow)%fnow(:,:,1) * rn_pfac                                &   ! add solid  precip heat content at min(Tair,Tsnow)
-         &     * ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic
+         &     * ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * rcpi
       qns(:,:) = qns(:,:) * tmask(:,:,1)
       !
 #if defined key_si3
@@ -658,7 +658,7 @@ CONTAINS
          DO ji = 1, jpi
             zrv = pqa(ji,jj) / (1. - pqa(ji,jj))
             ziRT = 1. / (R_dry*ptak(ji,jj))    ! 1/RT
-            gamma_moist(ji,jj) = grav * ( 1. + cevap*zrv*ziRT ) / ( Cp_dry + cevap*cevap*zrv*reps0*ziRT/ptak(ji,jj) )
+            gamma_moist(ji,jj) = grav * ( 1. + rLevap*zrv*ziRT ) / ( Cp_dry + rLevap*rLevap*zrv*reps0*ziRT/ptak(ji,jj) )
          END DO
       END DO
       !
@@ -791,7 +791,7 @@ CONTAINS
       INTEGER  ::   ji, jj, jl               ! dummy loop indices
       REAL(wp) ::   zst3                     ! local variable
       REAL(wp) ::   zcoef_dqlw, zcoef_dqla   !   -      -
-      REAL(wp) ::   zztmp, z1_lsub           !   -      -
+      REAL(wp) ::   zztmp, z1_rLsub           !   -      -
       REAL(wp) ::   zfr1, zfr2               ! local variables
       REAL(wp), DIMENSION(jpi,jpj,jpl) ::   z1_st         ! inverse of surface temperature
       REAL(wp), DIMENSION(jpi,jpj,jpl) ::   z_qlw         ! long wave heat flux over ice
@@ -867,10 +867,10 @@ CONTAINS
       CALL iom_put( 'precip' , tprecip )                    ! Total precipitation
 
       ! --- evaporation --- !
-      z1_lsub = 1._wp / Lsub
-      evap_ice (:,:,:) = rn_efac * qla_ice (:,:,:) * z1_lsub    ! sublimation
-      devap_ice(:,:,:) = rn_efac * dqla_ice(:,:,:) * z1_lsub    ! d(sublimation)/dT
-      zevap    (:,:)   = rn_efac * ( emp(:,:) + tprecip(:,:) )  ! evaporation over ocean
+      z1_rLsub = 1._wp / rLsub
+      evap_ice (:,:,:) = rn_efac * qla_ice (:,:,:) * z1_rLsub    ! sublimation
+      devap_ice(:,:,:) = rn_efac * dqla_ice(:,:,:) * z1_rLsub    ! d(sublimation)/dT
+      zevap    (:,:)   = rn_efac * ( emp(:,:) + tprecip(:,:) )   ! evaporation over ocean
 
       ! --- evaporation minus precipitation --- !
       zsnw(:,:) = 0._wp
@@ -883,9 +883,9 @@ CONTAINS
       qemp_oce(:,:) = - ( 1._wp - at_i_b(:,:) ) * zevap(:,:) * sst_m(:,:) * rcp                  & ! evap at sst
          &          + ( tprecip(:,:) - sprecip(:,:) ) * ( sf(jp_tair)%fnow(:,:,1) - rt0 ) * rcp  & ! liquid precip at Tair
          &          +   sprecip(:,:) * ( 1._wp - zsnw ) *                                        & ! solid precip at min(Tair,Tsnow)
-         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
+         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * rcpi * tmask(:,:,1) - rLfus )
       qemp_ice(:,:) =   sprecip(:,:) * zsnw *                                                    & ! solid precip (only)
-         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
+         &              ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * rcpi * tmask(:,:,1) - rLfus )
 
       ! --- total solar and non solar fluxes --- !
       qns_tot(:,:) = ( 1._wp - at_i_b(:,:) ) * qns_oce(:,:) + SUM( a_i_b(:,:,:) * qns_ice(:,:,:), dim=3 )  &
@@ -893,11 +893,11 @@ CONTAINS
       qsr_tot(:,:) = ( 1._wp - at_i_b(:,:) ) * qsr_oce(:,:) + SUM( a_i_b(:,:,:) * qsr_ice(:,:,:), dim=3 )
 
       ! --- heat content of precip over ice in J/m3 (to be used in 1D-thermo) --- !
-      qprec_ice(:,:) = rhosn * ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * cpic * tmask(:,:,1) - lfus )
+      qprec_ice(:,:) = rhos * ( ( MIN( sf(jp_tair)%fnow(:,:,1), rt0 ) - rt0 ) * rcpi * tmask(:,:,1) - rLfus )
 
       ! --- heat content of evap over ice in W/m2 (to be used in 1D-thermo) ---
       DO jl = 1, jpl
-         qevap_ice(:,:,jl) = 0._wp ! should be -evap_ice(:,:,jl)*( ( Tice - rt0 ) * cpic * tmask(:,:,1) )
+         qevap_ice(:,:,jl) = 0._wp ! should be -evap_ice(:,:,jl)*( ( Tice - rt0 ) * rcpi * tmask(:,:,1) )
          !                         ! But we do not have Tice => consider it at 0degC => evap=0 
       END DO
 
@@ -970,14 +970,14 @@ CONTAINS
       !
       CASE ( 1 , 2 )
          !
-         zfac  = 1._wp /  ( rn_cnd_s + rcdic )
+         zfac  = 1._wp /  ( rn_cnd_s + rcnd_i )
          zfac2 = EXP(1._wp) * 0.5_wp * zepsilon
          zfac3 = 2._wp / zepsilon
          !   
          DO jl = 1, jpl                
             DO jj = 1 , jpj
                DO ji = 1, jpi
-                  zhe = ( rn_cnd_s * phi(ji,jj,jl) + rcdic * phs(ji,jj,jl) ) * zfac                             ! Effective thickness
+                  zhe = ( rn_cnd_s * phi(ji,jj,jl) + rcnd_i * phs(ji,jj,jl) ) * zfac                            ! Effective thickness
                   IF( zhe >=  zfac2 )   zgfac(ji,jj,jl) = MIN( 2._wp, 0.5_wp * ( 1._wp + LOG( zhe * zfac3 ) ) ) ! Enhanced conduction factor
                END DO
             END DO
@@ -989,14 +989,14 @@ CONTAINS
       !      II   Surface temperature and conduction flux            !
       ! -------------------------------------------------------------!
       !
-      zfac = rcdic * rn_cnd_s
+      zfac = rcnd_i * rn_cnd_s
       !
       DO jl = 1, jpl
          DO jj = 1 , jpj
             DO ji = 1, jpi
                !                    
                zkeff_h = zfac * zgfac(ji,jj,jl) / &                                    ! Effective conductivity of the snow-ice system divided by thickness
-                  &      ( rcdic * phs(ji,jj,jl) + rn_cnd_s * MAX( 0.01, phi(ji,jj,jl) ) )
+                  &      ( rcnd_i * phs(ji,jj,jl) + rn_cnd_s * MAX( 0.01, phi(ji,jj,jl) ) )
                ztsu    = ptsu(ji,jj,jl)                                                ! Store current iteration temperature
                ztsu0   = ptsu(ji,jj,jl)                                                ! Store initial surface temperature
                zqa0    = qsr_ice(ji,jj,jl) - qtr_ice_top(ji,jj,jl) + qns_ice(ji,jj,jl) ! Net initial atmospheric heat flux

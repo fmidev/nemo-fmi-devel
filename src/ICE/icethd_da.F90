@@ -136,14 +136,14 @@ CONTAINS
             zda = MIN( a_i_1d(ji), zda_tot(ji) * a_i_1d(ji) / at_i_1d(ji) )
             
             ! Contribution to salt flux
-            sfx_lam_1d(ji) = sfx_lam_1d(ji) + rhoic *  h_i_1d(ji) * zda * s_i_1d(ji) * r1_rdtice
+            sfx_lam_1d(ji) = sfx_lam_1d(ji) + rhoi *  h_i_1d(ji) * zda * s_i_1d(ji) * r1_rdtice
             
             ! Contribution to heat flux into the ocean [W.m-2], (<0)  
             hfx_thd_1d(ji) = hfx_thd_1d(ji) - zda * r1_rdtice * ( h_i_1d(ji) * r1_nlay_i * SUM( e_i_1d(ji,1:nlay_i) )  &
                                                                 + h_s_1d(ji) * r1_nlay_s * SUM( e_s_1d(ji,1:nlay_s) ) ) 
             
             ! Contribution to mass flux
-            wfx_lam_1d(ji) =  wfx_lam_1d(ji) + zda * r1_rdtice * ( rhoic * h_i_1d(ji) + rhosn * h_s_1d(ji) )
+            wfx_lam_1d(ji) =  wfx_lam_1d(ji) + zda * r1_rdtice * ( rhoi * h_i_1d(ji) + rhos * h_s_1d(ji) )
             
             ! new concentration
             a_i_1d(ji) = a_i_1d(ji) - zda

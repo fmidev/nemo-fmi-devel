@@ -84,15 +84,15 @@ CONTAINS
       !-----------------
       ! Standard outputs
       !-----------------
-      zrho1 = ( rau0 - rhoic ) * r1_rau0; zrho2 = rhosn * r1_rau0
+      zrho1 = ( rau0 - rhoi ) * r1_rau0; zrho2 = rhos * r1_rau0
       ! masks
       IF( iom_use('icemask'  ) )   CALL iom_put( "icemask"  , zmsk00              )   ! ice mask 0%
       IF( iom_use('icemask05') )   CALL iom_put( "icemask05", zmsk05              )   ! ice mask 5%
       IF( iom_use('icemask15') )   CALL iom_put( "icemask15", zmsk15              )   ! ice mask 15%
       !
       ! general fields
-      IF( iom_use('icemass'  ) )   CALL iom_put( "icemass", rhoic * vt_i * zmsk00 )   ! Ice mass per cell area 
-      IF( iom_use('snwmass'  ) )   CALL iom_put( "snwmass", rhosn * vt_s * zmsksn )   ! Snow mass per cell area
+      IF( iom_use('icemass'  ) )   CALL iom_put( "icemass", rhoi * vt_i * zmsk00  )   ! Ice mass per cell area 
+      IF( iom_use('snwmass'  ) )   CALL iom_put( "snwmass", rhos * vt_s * zmsksn  )   ! Snow mass per cell area
       IF( iom_use('icepres'  ) )   CALL iom_put( "icepres", zmsk00                )   ! Ice presence (1 or 0) 
       IF( iom_use('iceconc'  ) )   CALL iom_put( "iceconc", at_i  * zmsk00        )   ! ice concentration
       IF( iom_use('icevolu'  ) )   CALL iom_put( "icevolu", vt_i  * zmsk00        )   ! ice volume = mean ice thickness over the cell
@@ -114,7 +114,7 @@ CONTAINS
       !
       ! salt
       IF( iom_use('icesalt'  ) )   CALL iom_put( "icesalt", sm_i  * zmsk00        )   ! mean ice salinity
-      IF( iom_use('icesalm'  ) )   CALL iom_put( "icesalm", SUM( sv_i, DIM = 3 ) * rhoic * 1.0e-3 * zmsk00 )   ! Mass of salt in sea ice per cell area
+      IF( iom_use('icesalm'  ) )   CALL iom_put( "icesalm", SUM( sv_i, DIM = 3 ) * rhoi * 1.0e-3 * zmsk00 )   ! Mass of salt in sea ice per cell area
 
       ! heat
       IF( iom_use('icetemp'  ) )   CALL iom_put( "icetemp", ( tm_i  - rt0 ) * zmsk00 )   ! ice mean temperature
@@ -163,7 +163,7 @@ CONTAINS
       !------------------
       ! trends
       IF( iom_use('dmithd') )   CALL iom_put( "dmithd", - wfx_bog - wfx_bom - wfx_sum - wfx_sni - wfx_opw - wfx_lam - wfx_res ) ! Sea-ice mass change from thermodynamics
-      IF( iom_use('dmidyn') )   CALL iom_put( "dmidyn", - wfx_dyn + rhoic * diag_trp_vi     )   ! Sea-ice mass change from dynamics(kg/m2/s)
+      IF( iom_use('dmidyn') )   CALL iom_put( "dmidyn", - wfx_dyn + rhoi * diag_trp_vi      )   ! Sea-ice mass change from dynamics(kg/m2/s)
       IF( iom_use('dmiopw') )   CALL iom_put( "dmiopw", - wfx_opw                           )   ! Sea-ice mass change through growth in open water
       IF( iom_use('dmibog') )   CALL iom_put( "dmibog", - wfx_bog                           )   ! Sea-ice mass change through basal growth
       IF( iom_use('dmisni') )   CALL iom_put( "dmisni", - wfx_sni                           )   ! Sea-ice mass change through snow-to-ice conversion
@@ -173,9 +173,9 @@ CONTAINS
       IF( iom_use('dmssub') )   CALL iom_put( "dmssub", - wfx_snw_sub                       )   ! Snow mass change through sublimation
       IF( iom_use('dmisub') )   CALL iom_put( "dmisub", - wfx_ice_sub                       )   ! Sea-ice mass change through sublimation
       IF( iom_use('dmsspr') )   CALL iom_put( "dmsspr", - wfx_spr                           )   ! Snow mass change through snow fall
-      IF( iom_use('dmsssi') )   CALL iom_put( "dmsssi",   wfx_sni*rhosn*r1_rhoic            )   ! Snow mass change through snow-to-ice conversion
+      IF( iom_use('dmsssi') )   CALL iom_put( "dmsssi",   wfx_sni*rhos*r1_rhoi              )   ! Snow mass change through snow-to-ice conversion
       IF( iom_use('dmsmel') )   CALL iom_put( "dmsmel", - wfx_snw_sum                       )   ! Snow mass change through melt
-      IF( iom_use('dmsdyn') )   CALL iom_put( "dmsdyn", - wfx_snw_dyn + rhosn * diag_trp_vs )   ! Snow mass change through dynamics(kg/m2/s)
+      IF( iom_use('dmsdyn') )   CALL iom_put( "dmsdyn", - wfx_snw_dyn + rhos * diag_trp_vs  )   ! Snow mass change through dynamics(kg/m2/s)
 
       ! Global ice diagnostics
       IF( iom_use('NH_icearea') .OR. iom_use('NH_icevolu') .OR. iom_use('NH_iceextt') )   THEN   ! NH diagnostics

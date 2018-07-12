@@ -92,9 +92,9 @@ CONTAINS
             &                  - hfx_thd(:,:) - hfx_dyn(:,:) - hfx_res(:,:) - hfx_sub(:,:) - hfx_spr(:,:)   &
             &                  ) *  e1e2t(:,:) ) * zconv
 
-         pdiag_v = glob_sum( SUM( v_i * rhoic + v_s * rhosn, dim=3 ) * e1e2t * zconv )
+         pdiag_v = glob_sum( SUM( v_i * rhoi + v_s * rhos, dim=3 ) * e1e2t * zconv )
 
-         pdiag_s = glob_sum( SUM( sv_i * rhoic             , dim=3 ) * e1e2t * zconv )
+         pdiag_s = glob_sum( SUM( sv_i * rhoi            , dim=3 ) * e1e2t * zconv )
 
          pdiag_t = glob_sum( (  SUM( SUM( e_i(:,:,1:nlay_i,:), dim=4 ), dim=3 )     &
             &                 + SUM( SUM( e_s(:,:,1:nlay_s,:), dim=4 ), dim=3 ) ) * e1e2t ) * zconv
@@ -119,10 +119,10 @@ CONTAINS
             &              ) * e1e2t(:,:) ) * zconv - pdiag_ft
  
          ! outputs
-         zv = ( ( glob_sum( SUM( v_i * rhoic + v_s * rhosn, dim=3 ) * e1e2t ) * zconv  &
+         zv = ( ( glob_sum( SUM( v_i * rhoi + v_s * rhos, dim=3 ) * e1e2t ) * zconv  &
             &     - pdiag_v ) * r1_rdtice - zfv ) * rday
 
-         zs = ( ( glob_sum( SUM( sv_i * rhoic             , dim=3 ) * e1e2t ) * zconv  &
+         zs = ( ( glob_sum( SUM( sv_i * rhoi            , dim=3 ) * e1e2t ) * zconv  &
             &     - pdiag_s ) * r1_rdtice + zfs ) * rday
 
          zt = ( glob_sum( (  SUM( SUM( e_i(:,:,1:nlay_i,:), dim=4 ), dim=3 )   &
@@ -130,8 +130,8 @@ CONTAINS
             &   - pdiag_t ) * r1_rdtice + zft
 
          ! zvtrp and zetrp must be close to 0 if the advection scheme is conservative
-         zvtrp = glob_sum( ( diag_trp_vi * rhoic + diag_trp_vs * rhosn ) * e1e2t  ) * zconv * rday 
-         zetrp = glob_sum( ( diag_trp_ei         + diag_trp_es         ) * e1e2t  ) * zconv
+         zvtrp = glob_sum( ( diag_trp_vi * rhoi + diag_trp_vs * rhos ) * e1e2t  ) * zconv * rday 
+         zetrp = glob_sum( ( diag_trp_ei        + diag_trp_es        ) * e1e2t  ) * zconv
 
          zvmin = glob_min( v_i )
          zamax = glob_max( SUM( a_i, dim=3 ) )
@@ -381,7 +381,7 @@ CONTAINS
          DO jk = 1, nlay_i
             DO jj = 1, jpj
                DO ji = 1, jpi
-                  ztmelts    =  -tmut * sz_i(ji,jj,jk,jl) + rt0
+                  ztmelts    =  -rTmlt * sz_i(ji,jj,jk,jl) + rt0
                   IF( t_i(ji,jj,jk,jl) >= ztmelts  .AND.  v_i(ji,jj,jl) > 1.e-10   &
                      &                             .AND.  a_i(ji,jj,jl) > 0._wp   ) THEN
                      !WRITE(numout,*) ' ALERTE 10 :   Very warm ice'

@@ -284,9 +284,9 @@ CONTAINS
             zaV(ji,jj) = 0.5_wp * ( at_i(ji,jj) * e1e2t(ji,jj) + at_i(ji,jj+1) * e1e2t(ji,jj+1) ) * r1_e1e2v(ji,jj) * vmask(ji,jj,1)
 
             ! Ice/snow mass at U-V points
-            zm1 = ( rhosn * vt_s(ji  ,jj  ) + rhoic * vt_i(ji  ,jj  ) )
-            zm2 = ( rhosn * vt_s(ji+1,jj  ) + rhoic * vt_i(ji+1,jj  ) )
-            zm3 = ( rhosn * vt_s(ji  ,jj+1) + rhoic * vt_i(ji  ,jj+1) )
+            zm1 = ( rhos * vt_s(ji  ,jj  ) + rhoi * vt_i(ji  ,jj  ) )
+            zm2 = ( rhos * vt_s(ji+1,jj  ) + rhoi * vt_i(ji+1,jj  ) )
+            zm3 = ( rhos * vt_s(ji  ,jj+1) + rhoi * vt_i(ji  ,jj+1) )
             zmassU = 0.5_wp * ( zm1 * e1e2t(ji,jj) + zm2 * e1e2t(ji+1,jj) ) * r1_e1e2u(ji,jj) * umask(ji,jj,1)
             zmassV = 0.5_wp * ( zm1 * e1e2t(ji,jj) + zm3 * e1e2t(ji,jj+1) ) * r1_e1e2v(ji,jj) * vmask(ji,jj,1)
 
@@ -794,14 +794,14 @@ CONTAINS
                zfac_x = 0.5 * u_ice(ji,jj) * e2u(ji,jj) * rswitch
                zfac_y = 0.5 * v_ice(ji,jj) * e1v(ji,jj) * rswitch
                
-               zdiag_xmtrp_ice(ji,jj) = rhoic * zfac_x * ( vt_i(ji+1,jj) + vt_i(ji,jj) ) ! ice mass transport, X-component
-               zdiag_ymtrp_ice(ji,jj) = rhoic * zfac_y * ( vt_i(ji,jj+1) + vt_i(ji,jj) ) !        ''           Y-   ''
+               zdiag_xmtrp_ice(ji,jj) = rhoi * zfac_x * ( vt_i(ji+1,jj) + vt_i(ji,jj) ) ! ice mass transport, X-component
+               zdiag_ymtrp_ice(ji,jj) = rhoi * zfac_y * ( vt_i(ji,jj+1) + vt_i(ji,jj) ) !        ''           Y-   ''
                
-               zdiag_xmtrp_snw(ji,jj) = rhosn * zfac_x * ( vt_s(ji+1,jj) + vt_s(ji,jj) ) ! snow mass transport, X-component
-               zdiag_ymtrp_snw(ji,jj) = rhosn * zfac_y * ( vt_s(ji,jj+1) + vt_s(ji,jj) ) !          ''          Y-   ''
+               zdiag_xmtrp_snw(ji,jj) = rhos * zfac_x * ( vt_s(ji+1,jj) + vt_s(ji,jj) ) ! snow mass transport, X-component
+               zdiag_ymtrp_snw(ji,jj) = rhos * zfac_y * ( vt_s(ji,jj+1) + vt_s(ji,jj) ) !          ''          Y-   ''
                
-               zdiag_xatrp(ji,jj)     = zfac_x * ( at_i(ji+1,jj) + at_i(ji,jj) )         ! area transport,      X-component
-               zdiag_yatrp(ji,jj)     = zfac_y * ( at_i(ji,jj+1) + at_i(ji,jj) )         !        ''            Y-   ''
+               zdiag_xatrp(ji,jj)     = zfac_x * ( at_i(ji+1,jj) + at_i(ji,jj) )        ! area transport,      X-component
+               zdiag_yatrp(ji,jj)     = zfac_y * ( at_i(ji,jj+1) + at_i(ji,jj) )        !        ''            Y-   ''
                
             END DO
          END DO

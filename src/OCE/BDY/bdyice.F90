@@ -124,13 +124,13 @@ CONTAINS
             ! very large transformation from snow to ice (see icethd_dh.F90)
 
             ! Then, a) transfer the snow excess into the ice (different from icethd_dh)
-            zdh = MAX( 0._wp, ( rhosn * h_s(ji,jj,jl) + ( rhoic - rau0 ) * h_i(ji,jj,jl) ) * r1_rau0 )
+            zdh = MAX( 0._wp, ( rhos * h_s(ji,jj,jl) + ( rhoi - rau0 ) * h_i(ji,jj,jl) ) * r1_rau0 )
             ! Or, b) transfer all the snow into ice (if incoming ice is likely to melt as it comes into a warmer environment)
-            !zdh = MAX( 0._wp, h_s(ji,jj,jl) * rhosn / rhoic )
+            !zdh = MAX( 0._wp, h_s(ji,jj,jl) * rhos / rhoi )
 
             ! recompute h_i, h_s
             h_i(ji,jj,jl) = MIN( hi_max(jl), h_i(ji,jj,jl) + zdh )
-            h_s(ji,jj,jl) = MAX( 0._wp, h_s(ji,jj,jl) - zdh * rhoic / rhosn ) 
+            h_s(ji,jj,jl) = MAX( 0._wp, h_s(ji,jj,jl) - zdh * rhoi / rhos ) 
 
          ENDDO
       ENDDO
@@ -197,16 +197,16 @@ CONTAINS
                v_s (ji,jj,jl) = h_s(ji,jj,jl) * a_i(ji,jj,jl)                       ! volume snw
                sv_i(ji,jj,jl) = MIN( s_i(ji,jj,jl) , sss_m(ji,jj) ) * v_i(ji,jj,jl) ! salt content
                DO jk = 1, nlay_s
-                  e_s(ji,jj,jk,jl) = rhosn * ( cpic * ( rt0 - t_s(ji,jj,jk,jl) ) + lfus )   ! enthalpy in J/m3
+                  e_s(ji,jj,jk,jl) = rhos * ( rcpi * ( rt0 - t_s(ji,jj,jk,jl) ) + rLfus )   ! enthalpy in J/m3
                   e_s(ji,jj,jk,jl) = e_s(ji,jj,jk,jl) * v_s(ji,jj,jl) * r1_nlay_s           ! enthalpy in J/m2
                END DO               
                DO jk = 1, nlay_i
-                  ztmelts          = - tmut  * sz_i(ji,jj,jk,jl)              ! Melting temperature in C
+                  ztmelts          = - rTmlt  * sz_i(ji,jj,jk,jl)             ! Melting temperature in C
                   t_i(ji,jj,jk,jl) = MIN( t_i(ji,jj,jk,jl), ztmelts + rt0 )   ! Force t_i to be lower than melting point => likely conservation issue
                   !
-                  e_i(ji,jj,jk,jl) = rhoic * ( cpic * ( ztmelts - ( t_i(ji,jj,jk,jl) - rt0 ) )           &   ! enthalpy in J/m3
-                     &                       + lfus * ( 1._wp - ztmelts / ( t_i(ji,jj,jk,jl) - rt0 ) )   &
-                     &                       - rcp  *   ztmelts )                  
+                  e_i(ji,jj,jk,jl) = rhoi * ( rcpi  * ( ztmelts - ( t_i(ji,jj,jk,jl) - rt0 ) )           &   ! enthalpy in J/m3
+                     &                      + rLfus * ( 1._wp - ztmelts / ( t_i(ji,jj,jk,jl) - rt0 ) )   &
+                     &                      - rcp   *   ztmelts )                  
                   e_i(ji,jj,jk,jl) = e_i(ji,jj,jk,jl) * v_i(ji,jj,jl) * r1_nlay_i                            ! enthalpy in J/m2
                END DO
                !

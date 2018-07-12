@@ -225,11 +225,11 @@ CONTAINS
                   IF ( v_i(ji,jj,jl) > epsi20 ) THEN     !--- icy area 
                      !
                      ze_i             =   e_i (ji,jj,jk,jl) * z1_v_i(ji,jj,jl) * zlay_i               ! Energy of melting e(S,T) [J.m-3]
-                     ztmelts          = - sz_i(ji,jj,jk,jl) * tmut                                 ! Ice layer melt temperature [C]
+                     ztmelts          = - sz_i(ji,jj,jk,jl) * rTmlt                                 ! Ice layer melt temperature [C]
                      ! Conversion q(S,T) -> T (second order equation)
-                     zbbb             = ( rcp - cpic ) * ztmelts + ze_i * r1_rhoic - lfus
-                     zccc             = SQRT( MAX( zbbb * zbbb - 4._wp * cpic * lfus * ztmelts , 0._wp) )
-                     t_i(ji,jj,jk,jl) = MAX( -100._wp , MIN( -( zbbb + zccc ) * 0.5_wp * r1_cpic , ztmelts ) ) + rt0   ! [K] with bounds: -100 < t_i < ztmelts
+                     zbbb             = ( rcp - rcpi ) * ztmelts + ze_i * r1_rhoi - rLfus
+                     zccc             = SQRT( MAX( zbbb * zbbb - 4._wp * rcpi * rLfus * ztmelts , 0._wp) )
+                     t_i(ji,jj,jk,jl) = MAX( -100._wp , MIN( -( zbbb + zccc ) * 0.5_wp * r1_rcpi , ztmelts ) ) + rt0   ! [K] with bounds: -100 < t_i < ztmelts
                      !
                   ELSE                                !--- no ice
                      t_i(ji,jj,jk,jl) = rt0
@@ -246,7 +246,7 @@ CONTAINS
       DO jk = 1, nlay_s
          WHERE( v_s(:,:,:) > epsi20 )        !--- icy area
             t_s(:,:,jk,:) = rt0 + MAX( -100._wp ,  &
-                 &                MIN( r1_cpic * ( -r1_rhosn * ( e_s(:,:,jk,:) / v_s(:,:,:) * zlay_s ) + lfus ) , 0._wp ) )
+                 &                MIN( r1_rcpi * ( -r1_rhos * ( e_s(:,:,jk,:) / v_s(:,:,:) * zlay_s ) + rLfus ) , 0._wp ) )
          ELSEWHERE                           !--- no ice
             t_s(:,:,jk,:) = rt0
          END WHERE
@@ -497,9 +497,9 @@ CONTAINS
          DO jj = 1 , jpj
             DO ji = 1 , jpi
                ! update exchanges with ocean
-               sfx_res(ji,jj)  = sfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * sv_i(ji,jj,jl)   * rhoic * r1_rdtice
-               wfx_res(ji,jj)  = wfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * v_i (ji,jj,jl)   * rhoic * r1_rdtice
-               wfx_res(ji,jj)  = wfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * v_s (ji,jj,jl)   * rhosn * r1_rdtice
+               sfx_res(ji,jj)  = sfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * sv_i(ji,jj,jl)   * rhoi * r1_rdtice
+               wfx_res(ji,jj)  = wfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * v_i (ji,jj,jl)   * rhoi * r1_rdtice
+               wfx_res(ji,jj)  = wfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * v_s (ji,jj,jl)   * rhos * r1_rdtice
                !
                !-----------------------------------------------------------------
                ! zap ice and snow volume, add water and salt to ocean
@@ -668,10 +668,10 @@ CONTAINS
                zh_s(ji,jl) = zh_i(ji,jl) * ( zhts(ji) / zhti(ji) )
                ! In case snow load is in excess that would lead to transformation from snow to ice
                ! Then, transfer the snow excess into the ice (different from icethd_dh)
-               zdh = MAX( 0._wp, ( rhosn * zh_s(ji,jl) + ( rhoic - rau0 ) * zh_i(ji,jl) ) * r1_rau0 ) 
+               zdh = MAX( 0._wp, ( rhos * zh_s(ji,jl) + ( rhoi - rau0 ) * zh_i(ji,jl) ) * r1_rau0 ) 
                ! recompute h_i, h_s avoiding out of bounds values
                zh_i(ji,jl) = MIN( hi_max(jl), zh_i(ji,jl) + zdh )
-               zh_s(ji,jl) = MAX( 0._wp, zh_s(ji,jl) - zdh * rhoic * r1_rhosn )
+               zh_s(ji,jl) = MAX( 0._wp, zh_s(ji,jl) - zdh * rhoi * r1_rhos )
             ENDIF
          END DO
       END DO
@@ -826,7 +826,7 @@ CONTAINS
       DO jl = 1, jpl
          DO jk = 1, nlay_i
             WHERE( t_i(:,:,jk,jl) < rt0 - epsi10 )   
-               bv_i(:,:,jl) = bv_i(:,:,jl) - tmut * sz_i(:,:,jk,jl) * r1_nlay_i / ( t_i(:,:,jk,jl) - rt0 )
+               bv_i(:,:,jl) = bv_i(:,:,jl) - rTmlt * sz_i(:,:,jk,jl) * r1_nlay_i / ( t_i(:,:,jk,jl) - rt0 )
             END WHERE
          END DO
       END DO
@@ -851,17 +851,17 @@ CONTAINS
       !
       DO jk = 1, nlay_i             ! Sea ice energy of melting
          DO ji = 1, npti
-            ztmelts      = - tmut  * sz_i_1d(ji,jk)
+            ztmelts      = - rTmlt  * sz_i_1d(ji,jk)
             t_i_1d(ji,jk) = MIN( t_i_1d(ji,jk), ztmelts + rt0 ) ! Force t_i_1d to be lower than melting point => likely conservation issue
                                                                 !   (sometimes zdf scheme produces abnormally high temperatures)   
-            e_i_1d(ji,jk) = rhoic * ( cpic * ( ztmelts - ( t_i_1d(ji,jk) - rt0 ) )           &
-               &                    + lfus * ( 1._wp - ztmelts / ( t_i_1d(ji,jk) - rt0 ) )   &
-               &                    - rcp  *   ztmelts )
+            e_i_1d(ji,jk) = rhoi * ( rcpi  * ( ztmelts - ( t_i_1d(ji,jk) - rt0 ) )           &
+               &                   + rLfus * ( 1._wp - ztmelts / ( t_i_1d(ji,jk) - rt0 ) )   &
+               &                   - rcp   * ztmelts )
          END DO
       END DO
       DO jk = 1, nlay_s             ! Snow energy of melting
          DO ji = 1, npti
-            e_s_1d(ji,jk) = rhosn * ( cpic * ( rt0 - t_s_1d(ji,jk) ) + lfus )
+            e_s_1d(ji,jk) = rhos * ( rcpi * ( rt0 - t_s_1d(ji,jk) ) + rLfus )
          END DO
       END DO
       !

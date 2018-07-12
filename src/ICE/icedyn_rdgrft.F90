@@ -546,7 +546,7 @@ CONTAINS
 
                ! volume and enthalpy (J/m2, >0) of seawater trapped into ridges
                vsw = v_i_2d(ji,jl1) * afrdg * rn_porordg
-               ersw(ji) = -rhoic * vsw * rcp * sst_1d(ji)   ! clem: if sst>0, then ersw <0 (is that possible?)
+               ersw(ji) = -rhoi * vsw * rcp * sst_1d(ji)   ! clem: if sst>0, then ersw <0 (is that possible?)
 
                ! volume etc of ridging / rafting ice and new ridges (vi, vs, sm, oi, es, ei)
                virdg1     = v_i_2d (ji,jl1)   * afrdg
@@ -573,28 +573,28 @@ CONTAINS
                ENDIF
 
                ! Ice-ocean exchanges associated with ice porosity
-               wfx_dyn_1d(ji) = wfx_dyn_1d(ji) - vsw * rhoic * r1_rdtice   ! increase in ice volume due to seawater frozen in voids
-               sfx_dyn_1d(ji) = sfx_dyn_1d(ji) - vsw * sss_1d(ji) * rhoic * r1_rdtice
+               wfx_dyn_1d(ji) = wfx_dyn_1d(ji) - vsw * rhoi * r1_rdtice   ! increase in ice volume due to seawater frozen in voids
+               sfx_dyn_1d(ji) = sfx_dyn_1d(ji) - vsw * sss_1d(ji) * rhoi * r1_rdtice
                hfx_dyn_1d(ji) = hfx_dyn_1d(ji) + ersw(ji) * r1_rdtice          ! > 0 [W.m-2] 
 
                ! Put the snow lost by ridging into the ocean
                !  Note that esrdg > 0; the ocean must cool to melt snow. If the ocean temp = Tf already, new ice must grow.
-               wfx_snw_dyn_1d(ji) = wfx_snw_dyn_1d(ji) + ( rhosn * vsrdg(ji) * ( 1._wp - rn_fsnwrdg )   &   ! fresh water source for ocean
-                  &                                      + rhosn * vsrft(ji) * ( 1._wp - rn_fsnwrft ) ) * r1_rdtice
+               wfx_snw_dyn_1d(ji) = wfx_snw_dyn_1d(ji) + ( rhos * vsrdg(ji) * ( 1._wp - rn_fsnwrdg )   &   ! fresh water source for ocean
+                  &                                      + rhos * vsrft(ji) * ( 1._wp - rn_fsnwrft ) ) * r1_rdtice
 
                ! Put the melt pond water into the ocean
                ! clem: I think the following lines must be commented since there
                !       is no net mass flux between melt ponds and the ocean (see icethd_pnd.F90 for ex.)
                !IF ( ln_pnd_fwb ) THEN
-               !   wfx_pnd_1d(ji) = wfx_pnd_1d(ji) + ( rhofw * vprdg(ji) * ( 1._wp - rn_fpndrdg )   &        ! fresh water source for ocean
-               !      &                              + rhofw * vprft(ji) * ( 1._wp - rn_fpndrft ) ) * r1_rdtice
+               !   wfx_pnd_1d(ji) = wfx_pnd_1d(ji) + ( rhow * vprdg(ji) * ( 1._wp - rn_fpndrdg )   &        ! fresh water source for ocean
+               !      &                              + rhow * vprft(ji) * ( 1._wp - rn_fpndrft ) ) * r1_rdtice
                !ENDIF
 
                ! virtual salt flux to keep salinity constant
                IF( nn_icesal /= 2 )  THEN
                   sirdg2(ji)     = sirdg2(ji)     - vsw * ( sss_1d(ji) - s_i_1d(ji) )        ! ridge salinity = s_i
-                  sfx_bri_1d(ji) = sfx_bri_1d(ji) + sss_1d(ji) * vsw * rhoic * r1_rdtice  &  ! put back sss_m into the ocean
-                     &                            - s_i_1d(ji) * vsw * rhoic * r1_rdtice     ! and get  s_i  from the ocean 
+                  sfx_bri_1d(ji) = sfx_bri_1d(ji) + sss_1d(ji) * vsw * rhoi * r1_rdtice  &  ! put back sss_m into the ocean
+                     &                            - s_i_1d(ji) * vsw * rhoi * r1_rdtice     ! and get  s_i  from the ocean 
                ENDIF
 
                ! Remove area, volume of new ridge to each category jl1

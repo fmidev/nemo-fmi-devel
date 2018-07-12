@@ -76,7 +76,7 @@ CONTAINS
             !  Update ice salinity from snow-ice and bottom growth
             !---------------------------------------------------------
             IF( h_i_1d(ji) > 0._wp ) THEN
-               zs_sni   = sss_1d(ji) * ( rhoic - rhosn ) * r1_rhoic                 ! Salinity of snow ice
+               zs_sni  = sss_1d(ji) * ( rhoi - rhos ) * r1_rhoi                     ! Salinity of snow ice
                zs_i_si = ( zs_sni      - s_i_1d(ji) ) * dh_snowice(ji) / h_i_1d(ji) ! snow-ice    
                zs_i_bg = ( s_i_new(ji) - s_i_1d(ji) ) * dh_i_bog  (ji) / h_i_1d(ji) ! bottom growth
                ! Update salinity (nb: salt flux already included in icethd_dh)
@@ -97,7 +97,7 @@ CONTAINS
                s_i_1d(ji) = s_i_1d(ji) + zs_i_fl + zs_i_gd
                
                ! Salt flux
-               sfx_bri_1d(ji) = sfx_bri_1d(ji) - rhoic * a_i_1d(ji) * h_i_1d(ji) * ( zs_i_fl + zs_i_gd ) * r1_rdtice
+               sfx_bri_1d(ji) = sfx_bri_1d(ji) - rhoi * a_i_1d(ji) * h_i_1d(ji) * ( zs_i_fl + zs_i_gd ) * r1_rdtice
             ENDIF
          END DO
          !

@@ -287,11 +287,11 @@ CONTAINS
       ! Recover ice temperature
       DO jk = 1, nlay_i
          DO ji = 1, npti
-            ztmelts       = -tmut * sz_i_1d(ji,jk)
+            ztmelts       = -rTmlt * sz_i_1d(ji,jk)
             ! Conversion q(S,T) -> T (second order equation)
-            zbbb          = ( rcp - cpic ) * ztmelts + e_i_1d(ji,jk) * r1_rhoic - lfus
-            zccc          = SQRT( MAX( zbbb * zbbb - 4._wp * cpic * lfus * ztmelts, 0._wp ) )
-            t_i_1d(ji,jk) = rt0 - ( zbbb + zccc ) * 0.5_wp * r1_cpic
+            zbbb          = ( rcp - rcpi ) * ztmelts + e_i_1d(ji,jk) * r1_rhoi - rLfus
+            zccc          = SQRT( MAX( zbbb * zbbb - 4._wp * rcpi * rLfus * ztmelts, 0._wp ) )
+            t_i_1d(ji,jk) = rt0 - ( zbbb + zccc ) * 0.5_wp * r1_rcpi
             
             ! mask temperature
             rswitch       = 1._wp - MAX( 0._wp , SIGN( 1._wp , - h_i_1d(ji) ) ) 

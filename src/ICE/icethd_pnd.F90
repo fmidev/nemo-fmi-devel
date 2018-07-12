@@ -132,13 +132,13 @@ CONTAINS
       REAL(wp) ::   zfr_mlt          ! fraction of available meltwater retained for melt ponding
       REAL(wp) ::   zdv_mlt          ! available meltwater for melt ponding
       REAL(wp) ::   z1_Tp            ! inverse reference temperature
-      REAL(wp) ::   z1_rhofw         ! inverse freshwater density
+      REAL(wp) ::   z1_rhow          ! inverse freshwater density
       REAL(wp) ::   z1_zpnd_aspect   ! inverse pond aspect ratio
       REAL(wp) ::   zfac, zdum
       !
       INTEGER  ::   ji   ! loop indices
       !!-------------------------------------------------------------------
-      z1_rhofw       = 1._wp / rhofw 
+      z1_rhow        = 1._wp / rhow 
       z1_zpnd_aspect = 1._wp / zpnd_aspect
       z1_Tp          = 1._wp / zTp 
 
@@ -156,7 +156,7 @@ CONTAINS
             v_ip_1d(ji) = h_ip_1d(ji) * a_ip_1d(ji)   ! record pond volume at previous time step
             !
             ! available meltwater for melt ponding [m, >0] and fraction
-            zdv_mlt = -( dh_i_sum(ji)*rhoic + dh_s_mlt(ji)*rhosn ) * z1_rhofw * a_i_1d(ji)
+            zdv_mlt = -( dh_i_sum(ji)*rhoi + dh_s_mlt(ji)*rhos ) * z1_rhow * a_i_1d(ji)
             zfr_mlt = zrmin + ( zrmax - zrmin ) * a_i_1d(ji)  ! from CICE doc
             !zfr_mlt = zrmin + zrmax * a_i_1d(ji)             ! from Holland paper 
             !
@@ -167,7 +167,7 @@ CONTAINS
             !
             ! melt pond mass flux (<0)
             IF( ln_pnd_fwb .AND. zdv_mlt > 0._wp ) THEN
-               zfac = zfr_mlt * zdv_mlt * rhofw * r1_rdtice
+               zfac = zfr_mlt * zdv_mlt * rhow * r1_rdtice
                wfx_pnd_1d(ji) = wfx_pnd_1d(ji) - zfac
                !
                ! adjust ice/snow melting flux to balance melt pond flux (>0)

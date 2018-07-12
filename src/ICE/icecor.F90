@@ -85,7 +85,7 @@ CONTAINS
       !                             !-----------------------------------------------------
       IF ( nn_icesal == 2 ) THEN    !  salinity must stay in bounds [Simin,Simax]        !
       !                             !-----------------------------------------------------
-         zzc = rhoic * r1_rdtice
+         zzc = rhoi * r1_rdtice
          DO jl = 1, jpl
             DO jj = 1, jpj 
                DO ji = 1, jpi
@@ -138,9 +138,9 @@ CONTAINS
                diag_heat(ji,jj) = - (  SUM( e_i(ji,jj,1:nlay_i,:) - e_i_b(ji,jj,1:nlay_i,:) )    & 
                   &                  + SUM( e_s(ji,jj,1:nlay_s,:) - e_s_b(ji,jj,1:nlay_s,:) )  ) * r1_rdtice
                !                 ! salt, volume
-               diag_sice(ji,jj) = SUM( sv_i(ji,jj,:) - sv_i_b(ji,jj,:) ) * rhoic * r1_rdtice
-               diag_vice(ji,jj) = SUM( v_i (ji,jj,:) - v_i_b (ji,jj,:) ) * rhoic * r1_rdtice
-               diag_vsnw(ji,jj) = SUM( v_s (ji,jj,:) - v_s_b (ji,jj,:) ) * rhosn * r1_rdtice
+               diag_sice(ji,jj) = SUM( sv_i(ji,jj,:) - sv_i_b(ji,jj,:) ) * rhoi * r1_rdtice
+               diag_vice(ji,jj) = SUM( v_i (ji,jj,:) - v_i_b (ji,jj,:) ) * rhoi * r1_rdtice
+               diag_vsnw(ji,jj) = SUM( v_s (ji,jj,:) - v_s_b (ji,jj,:) ) * rhos * r1_rdtice
             END DO
          END DO
          !                       ! concentration tendency (dynamics)
@@ -159,9 +159,9 @@ CONTAINS
                diag_heat(ji,jj) = diag_heat(ji,jj) - (  SUM( e_i(ji,jj,1:nlay_i,:) - e_i_b(ji,jj,1:nlay_i,:) )    & 
                   &                                   + SUM( e_s(ji,jj,1:nlay_s,:) - e_s_b(ji,jj,1:nlay_s,:) )  ) * r1_rdtice
                !                 ! salt, volume
-               diag_sice(ji,jj) = diag_sice(ji,jj) + SUM( sv_i(ji,jj,:) - sv_i_b(ji,jj,:) ) * rhoic * r1_rdtice
-               diag_vice(ji,jj) = diag_vice(ji,jj) + SUM( v_i (ji,jj,:) - v_i_b (ji,jj,:) ) * rhoic * r1_rdtice
-               diag_vsnw(ji,jj) = diag_vsnw(ji,jj) + SUM( v_s (ji,jj,:) - v_s_b (ji,jj,:) ) * rhosn * r1_rdtice
+               diag_sice(ji,jj) = diag_sice(ji,jj) + SUM( sv_i(ji,jj,:) - sv_i_b(ji,jj,:) ) * rhoi * r1_rdtice
+               diag_vice(ji,jj) = diag_vice(ji,jj) + SUM( v_i (ji,jj,:) - v_i_b (ji,jj,:) ) * rhoi * r1_rdtice
+               diag_vsnw(ji,jj) = diag_vsnw(ji,jj) + SUM( v_s (ji,jj,:) - v_s_b (ji,jj,:) ) * rhos * r1_rdtice
             END DO
          END DO
          !                       ! concentration tendency (total + thermo)
