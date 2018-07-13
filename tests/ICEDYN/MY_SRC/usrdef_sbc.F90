@@ -131,9 +131,9 @@ CONTAINS
       emp_ice  (:,:)   = SUM( a_i_b(:,:,:) * evap_ice(:,:,:), dim=3 ) - sprecip(:,:) * zsnw(:,:)
       emp_oce  (:,:)   = emp_oce(:,:) - sprecip(:,:) * (1._wp - zsnw(:,:) )
       qevap_ice(:,:,:) =   0._wp
-      qprec_ice(:,:)   =   rhosn * ( sst_m(:,:) * cpic - lfus ) * tmask(:,:,1) !  in J/m3
+      qprec_ice(:,:)   =   rhos * ( sst_m(:,:) * rcpi - rLfus ) * tmask(:,:,1) !  in J/m3
       qemp_oce (:,:)   = - emp_oce(:,:) * sst_m(:,:) * rcp
-      qemp_ice (:,:)   =   sprecip(:,:) * zsnw * ( sst_m(:,:) * cpic - lfus ) * tmask(:,:,1) ! solid precip (only)
+      qemp_ice (:,:)   =   sprecip(:,:) * zsnw * ( sst_m(:,:) * rcpi - rLfus ) * tmask(:,:,1) ! solid precip (only)
 
       ! total fluxes
       emp_tot (:,:) = emp_ice  + emp_oce
@@ -145,11 +145,11 @@ CONTAINS
       zfr2 = ( 0.82 * ( 1.0 - cldf_ice ) + 0.65 * cldf_ice )            ! zfr2 such that zfr1 + zfr2 to equal 1
       !
       WHERE    ( phs(:,:,:) <= 0._wp .AND. phi(:,:,:) <  0.1_wp )       ! linear decrease from hi=0 to 10cm  
-         qsr_ice_tr(:,:,:) = qsr_ice(:,:,:) * ( zfr1 + zfr2 * ( 1._wp - phi(:,:,:) * 10._wp ) )
+         qtr_ice_top(:,:,:) = qsr_ice(:,:,:) * ( zfr1 + zfr2 * ( 1._wp - phi(:,:,:) * 10._wp ) )
       ELSEWHERE( phs(:,:,:) <= 0._wp .AND. phi(:,:,:) >= 0.1_wp )       ! constant (zfr1) when hi>10cm
-         qsr_ice_tr(:,:,:) = qsr_ice(:,:,:) * zfr1
+         qtr_ice_top(:,:,:) = qsr_ice(:,:,:) * zfr1
       ELSEWHERE                                                         ! zero when hs>0
-         qsr_ice_tr(:,:,:) = 0._wp 
+         qtr_ice_top(:,:,:) = 0._wp 
       END WHERE
           
    END SUBROUTINE usrdef_sbc_ice_flx
