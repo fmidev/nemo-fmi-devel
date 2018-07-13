@@ -65,6 +65,9 @@ CONTAINS
       !! ** action :
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! number of iteration
+      !
+      INTEGER ::   jl   ! dummy loop indice
+      REAL(wp), DIMENSION(jpi,jpj) ::   zmask  ! fraction of time step with v_i < 0
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('icedyn_adv')
@@ -97,18 +100,25 @@ CONTAINS
       !----------------------------
       ! Debug the advection schemes
       !----------------------------
-      ! clem: The 2 advection schemes above are not strictly positive.
-      !       In Prather, advected fields are bounded by 0 (not anymore?) in the routine with a MAX(0,field) ==> likely conservation issues
-      !       In UMx    , advected fields are not bounded and negative values can appear.
+      ! clem: At least one advection scheme above is not strictly positive => UM from 3d to 5th order
+      !       In Prather, I am not sure if the fields are bounded by 0 or not (it seems not)
+      !       In UM3-5  , advected fields are not bounded and negative values can appear.
       !                   These values are usually very small but in some occasions they can also be non-negligible
       !                   Therefore one needs to bound the advected fields by 0 (though this is not a clean fix)
-      ! ==> 1) remove negative ice areas and volumes (conservation is ensure)
-      CALL ice_var_zapsmall 
-      ! ==> 2) remove remaining negative advected fields (conservation is not preserved) => conservation issue
-      WHERE( v_s (:,:,:)   < 0._wp )   v_s (:,:,:)   = 0._wp
-      WHERE( sv_i(:,:,:)   < 0._wp )   sv_i(:,:,:)   = 0._wp
-      WHERE( e_i (:,:,:,:) < 0._wp )   e_i (:,:,:,:) = 0._wp
-      WHERE( e_s (:,:,:,:) < 0._wp )   e_s (:,:,:,:) = 0._wp
+      !
+      ! record the negative values resulting from UMx
+      zmask(:,:) = 0._wp ! keep the init to 0 here
+      DO jl = 1, jpl
+         WHERE( v_i(:,:,jl) < 0._wp )   zmask(:,:) = 1._wp
+      END DO
+      IF( iom_use('iceneg_pres') )   CALL iom_put("iceneg_pres", zmask                                      )  ! fraction of time step with v_i < 0
+      IF( iom_use('iceneg_volu') )   CALL iom_put("iceneg_volu", SUM(MIN( v_i, 0. ), dim=3 )                )  ! negative ice volume (only)
+      IF( iom_use('iceneg_hfx' ) )   CALL iom_put("iceneg_hfx" , ( SUM(SUM( MIN( e_i(:,:,1:nlay_i,:), 0. )  &  ! negative ice heat content (only)
+         &                                                                  , dim=4 ), dim=3 ) )* r1_rdtice )  ! -- eq. heat flux [W/m2]
+      !
+      ! ==> conservation is ensured by calling this routine below,
+      !     however the global ice volume is then changed by advection (but errors are very small) 
+      CALL ice_var_zapneg( ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
 
       !------------
       ! diagnostics

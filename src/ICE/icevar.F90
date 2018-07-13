@@ -43,6 +43,7 @@ MODULE icevar
    !!   ice_var_salprof   : salinity profile in the ice
    !!   ice_var_salprof1d : salinity profile in the ice 1D
    !!   ice_var_zapsmall  : remove very small area and volume
+   !!   ice_var_zapneg    : remove negative ice fields (to debug the advection scheme UM3-5)
    !!   ice_var_itd       : convert 1-cat to jpl-cat
    !!   ice_var_itd2      : convert N-cat to jpl-cat
    !!   ice_var_bv        : brine volume
@@ -67,6 +68,7 @@ MODULE icevar
    PUBLIC   ice_var_salprof      
    PUBLIC   ice_var_salprof1d    
    PUBLIC   ice_var_zapsmall
+   PUBLIC   ice_var_zapneg
    PUBLIC   ice_var_itd
    PUBLIC   ice_var_itd2
    PUBLIC   ice_var_bv           
@@ -461,9 +463,6 @@ CONTAINS
       !
       DO jl = 1, jpl       !==  loop over the categories  ==!
          !
-         !-----------------------------------------------------------------
-         ! Zap ice energy and use ocean heat to melt ice
-         !-----------------------------------------------------------------
          WHERE( a_i(:,:,jl) > epsi10 )   ;   h_i(:,:,jl) = v_i(:,:,jl) / a_i(:,:,jl)
          ELSEWHERE                       ;   h_i(:,:,jl) = 0._wp
          END WHERE
@@ -472,6 +471,9 @@ CONTAINS
          ELSEWHERE                                                                           ;   zswitch(:,:) = 1._wp
          END WHERE
          !
+         !-----------------------------------------------------------------
+         ! Zap ice energy and use ocean heat to melt ice
+         !-----------------------------------------------------------------
          DO jk = 1, nlay_i
             DO jj = 1 , jpj
                DO ji = 1 , jpi
@@ -494,6 +496,9 @@ CONTAINS
             END DO
          END DO
          !
+         !-----------------------------------------------------------------
+         ! zap ice and snow volume, add water and salt to ocean
+         !-----------------------------------------------------------------
          DO jj = 1 , jpj
             DO ji = 1 , jpi
                ! update exchanges with ocean
@@ -501,9 +506,6 @@ CONTAINS
                wfx_res(ji,jj)  = wfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * v_i (ji,jj,jl)   * rhoi * r1_rdtice
                wfx_res(ji,jj)  = wfx_res(ji,jj) + (1._wp - zswitch(ji,jj) ) * v_s (ji,jj,jl)   * rhos * r1_rdtice
                !
-               !-----------------------------------------------------------------
-               ! zap ice and snow volume, add water and salt to ocean
-               !-----------------------------------------------------------------
                a_i  (ji,jj,jl) = a_i (ji,jj,jl) * zswitch(ji,jj)
                v_i  (ji,jj,jl) = v_i (ji,jj,jl) * zswitch(ji,jj)
                v_s  (ji,jj,jl) = v_s (ji,jj,jl) * zswitch(ji,jj)
@@ -532,6 +534,85 @@ CONTAINS
    END SUBROUTINE ice_var_zapsmall
 
 
+   SUBROUTINE ice_var_zapneg( pato_i, pv_i, pv_s, psv_i, poa_i, pa_i, pa_ip, pv_ip, pe_s, pe_i )
+      !!-------------------------------------------------------------------
+      !!                   ***  ROUTINE ice_var_zapneg ***
+      !!
+      !! ** Purpose :   Remove negative sea ice fields and correct fluxes
+      !!-------------------------------------------------------------------
+      INTEGER  ::   ji, jj, jl, jk   ! dummy loop indices
+      !
+      REAL(wp), DIMENSION(:,:)    , INTENT(inout) ::   pato_i     ! open water area
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   pv_i       ! ice volume
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   pv_s       ! snw volume
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   psv_i      ! salt content
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   poa_i      ! age content
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   pa_i       ! ice concentration
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   pa_ip      ! melt pond fraction
+      REAL(wp), DIMENSION(:,:,:)  , INTENT(inout) ::   pv_ip      ! melt pond volume
+      REAL(wp), DIMENSION(:,:,:,:), INTENT(inout) ::   pe_s       ! snw heat content
+      REAL(wp), DIMENSION(:,:,:,:), INTENT(inout) ::   pe_i       ! ice heat content
+      !!-------------------------------------------------------------------
+      !
+      WHERE( pato_i(:,:)   < 0._wp )   pato_i(:,:)   = 0._wp
+      WHERE( poa_i (:,:,:) < 0._wp )   poa_i (:,:,:) = 0._wp
+      WHERE( pa_i  (:,:,:) < 0._wp )   pa_i  (:,:,:) = 0._wp
+      WHERE( pa_ip (:,:,:) < 0._wp )   pa_ip (:,:,:) = 0._wp
+      WHERE( pv_ip (:,:,:) < 0._wp )   pv_ip (:,:,:) = 0._wp ! in theory one should change wfx_pnd(-) and wfx_sum(+)
+      !                                                        but it does not change conservation, so keep it this way is ok
+      !
+      DO jl = 1, jpl       !==  loop over the categories  ==!
+         !
+         !----------------------------------------
+         ! zap ice energy and send it to the ocean
+         !----------------------------------------
+         DO jk = 1, nlay_i
+            DO jj = 1 , jpj
+               DO ji = 1 , jpi
+                  IF( pe_i(ji,jj,jk,jl) < 0._wp ) THEN
+                     hfx_res(ji,jj)   = hfx_res(ji,jj) - pe_i(ji,jj,jk,jl) * r1_rdtice ! W.m-2 <0
+                     pe_i(ji,jj,jk,jl) = 0._wp
+                  ENDIF
+               END DO
+            END DO
+         END DO
+         !
+         DO jk = 1, nlay_s
+            DO jj = 1 , jpj
+               DO ji = 1 , jpi
+                  IF( pe_s(ji,jj,jk,jl) < 0._wp ) THEN
+                     hfx_res(ji,jj)   = hfx_res(ji,jj) - pe_s(ji,jj,jk,jl) * r1_rdtice ! W.m-2 <0
+                     pe_s(ji,jj,jk,jl) = 0._wp
+                  ENDIF
+               END DO
+            END DO
+         END DO
+         !
+         !-----------------------------------------------------
+         ! zap ice and snow volume, add water and salt to ocean
+         !-----------------------------------------------------
+         DO jj = 1 , jpj
+            DO ji = 1 , jpi
+              IF( pv_i(ji,jj,jl) < 0._wp ) THEN
+                  wfx_res(ji,jj)    = wfx_res(ji,jj) + pv_i (ji,jj,jl) * rhoi * r1_rdtice
+                  pv_i   (ji,jj,jl) = 0._wp
+               ENDIF
+               IF( pv_s(ji,jj,jl) < 0._wp ) THEN
+                  wfx_res(ji,jj)    = wfx_res(ji,jj) + pv_s (ji,jj,jl) * rhos * r1_rdtice
+                  pv_s   (ji,jj,jl) = 0._wp
+               ENDIF
+               IF( psv_i(ji,jj,jl) < 0._wp ) THEN
+                  sfx_res(ji,jj)    = sfx_res(ji,jj) + psv_i(ji,jj,jl) * rhoi * r1_rdtice
+                  psv_i  (ji,jj,jl) = 0._wp
+               ENDIF
+            END DO
+         END DO
+         !
+      END DO 
+      !
+   END SUBROUTINE ice_var_zapneg
+
+   
    SUBROUTINE ice_var_itd( zhti, zhts, zati, zh_i, zh_s, za_i )
       !!-------------------------------------------------------------------
       !!                ***  ROUTINE ice_var_itd   ***

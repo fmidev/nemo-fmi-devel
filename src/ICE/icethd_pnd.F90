@@ -162,7 +162,6 @@ CONTAINS
             !
             !--- Pond gowth ---!
             ! v_ip should never be negative, otherwise code crashes
-            ! MV: as far as I saw, UM5 can create very small negative v_ip values (not Prather)
             v_ip_1d(ji) = MAX( 0._wp, v_ip_1d(ji) + zfr_mlt * zdv_mlt )
             !
             ! melt pond mass flux (<0)
