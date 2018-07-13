@@ -94,6 +94,9 @@
          ALLOCATE( zfoldwk(jpimax,4,ipk,ipl,ipf) )
          ALLOCATE( ztabl(jpimax   ,4,ipk,ipl,ipf) , ztabr(jpimax*jpmaxngh,4,ipk,ipl,ipf) ) 
          !
+         ztabr(:,:,:,:,:) = 0._wp
+         ztabl(:,:,:,:,:) = 0._wp
+         !
          DO jf = 1, ipf
             DO jl = 1, ipl
                DO jk = 1, ipk
@@ -178,6 +181,8 @@
       ELSE                             !==  ????  ==!
          ALLOCATE( ztab       (jpiglo,4,ipk,ipl,ipf     ) )
          ALLOCATE( znorthgloio(jpimax,4,ipk,ipl,ipf,jpni) )
+         !
+         ztab(:,:,:,:,:)=0._wp
          !
          CALL MPI_ALLGATHER( znorthloc  , itaille, MPI_DOUBLE_PRECISION,                &
             &                znorthgloio, itaille, MPI_DOUBLE_PRECISION, ncomm_north, ierr )
