@@ -49,7 +49,7 @@ CONTAINS
       INTEGER  ::   ii, ij
       REAL(wp) ::   zM, zT, zW, zL, zSST, zVol, zLn, zWn, zTn, znVol, zIC, zDn
       REAL(wp) ::   zMv, zMe, zMb, zmelt, zdvo, zdva, zdM, zSs, zdMe, zdMb, zdMv
-      REAL(wp) ::   zMnew, zMnew1, zMnew2, zheat
+      REAL(wp) ::   zMnew, zMnew1, zMnew2, zheat, z1_12
       REAL(wp) ::   zMbits, znMbits, zdMbitsE, zdMbitsM, zLbits, zAbits, zMbb
       REAL(wp) ::   zxi, zyj, zff, z1_rday, z1_e1e2, zdt, z1_dt, z1_dt_e1e2
       TYPE(iceberg), POINTER ::   this, next
@@ -57,6 +57,9 @@ CONTAINS
       !!----------------------------------------------------------------------
       !
       z1_rday = 1._wp / rday
+      z1_12   = 1._wp / 12._wp
+      zdt     = berg_dt
+      z1_dt   = 1._wp / zdt
       !
       ! we're either going to ignore berg fresh water melt flux and associated heat
       ! or we pass it into the ocean, so at this point we set them both to zero,
@@ -90,28 +93,27 @@ CONTAINS
          ij  = INT( zyj + 0.5 )              
          ij  = mj1( ij )
          zVol = zT * zW * zL
-         zdt = berg_dt   ;   z1_dt = 1._wp / zdt
 
          ! Environment
          zdvo = SQRT( (pt%uvel-pt%uo)**2 + (pt%vvel-pt%vo)**2 )
          zdva = SQRT( (pt%ua  -pt%uo)**2 + (pt%va  -pt%vo)**2 )
-         zSs  = 1.5 * SQRT( zdva ) + 0.1 * zdva                ! Sea state      (eqn M.A9)
+         zSs  = 1.5_wp * SQRT( zdva ) + 0.1_wp * zdva                ! Sea state      (eqn M.A9)
 
          ! Melt rates in m/s (i.e. division by rday)
-         zMv = MAX( 7.62e-3*zSST+1.29e-3*(zSST**2)            , 0._wp ) * z1_rday   ! Buoyant convection at sides (eqn M.A10)
-         zMb = MAX( 0.58*(zdvo**0.8)*(zSST+4.0)/(zL**0.2)      , 0._wp ) * z1_rday   ! Basal turbulent melting     (eqn M.A7 )
-         zMe = MAX( 1./12.*(zSST+2.)*zSs*(1+COS(rpi*(zIC**3))) , 0._wp ) * z1_rday   ! Wave erosion                (eqn M.A8 )
+         zMv = MAX( 7.62d-3*zSST+1.29d-3*(zSST**2)                    , 0._wp ) * z1_rday   ! Buoyant convection at sides (eqn M.A10)
+         zMb = MAX( 0.58_wp*(zdvo**0.8_wp)*(zSST+4.0_wp)/(zL**0.2_wp) , 0._wp ) * z1_rday   ! Basal turbulent melting     (eqn M.A7 )
+         zMe = MAX( z1_12*(zSST+2.)*zSs*(1._wp+COS(rpi*(zIC**3)))     , 0._wp ) * z1_rday   ! Wave erosion                (eqn M.A8 )
 
          IF( ln_operator_splitting ) THEN      ! Operator split update of volume/mass
             zTn    = MAX( zT - zMb*zdt , 0._wp )         ! new total thickness (m)
             znVol  = zTn * zW * zL                       ! new volume (m^3)
-            zMnew1 = (znVol/zVol) * zM                   ! new mass (kg)
+            zMnew1 = ( znVol / zVol ) * zM               ! new mass (kg)
             zdMb   = zM - zMnew1                         ! mass lost to basal melting (>0) (kg)
             !
             zLn    = MAX( zL - zMv*zdt , 0._wp )         ! new length (m)
             zWn    = MAX( zW - zMv*zdt , 0._wp )         ! new width (m)
             znVol  = zTn * zWn * zLn                     ! new volume (m^3)
-            zMnew2 = (znVol/zVol) * zM                   ! new mass (kg)
+            zMnew2 = ( znVol / zVol ) * zM               ! new mass (kg)
             zdMv   = zMnew1 - zMnew2                     ! mass lost to buoyant convection (>0) (kg)
             !
             zLn    = MAX( zLn - zMe*zdt , 0._wp )        ! new length (m)
@@ -141,7 +143,8 @@ CONTAINS
             znMbits  = zMbits + zdMbitsE                                             ! add new bergy bits to mass (kg)
             zLbits   = MIN( zL, zW, zT, 40._wp )                                     ! assume bergy bits are smallest dimension or 40 meters
             zAbits   = ( zMbits / rn_rho_bergs ) / zLbits                            ! Effective bottom area (assuming T=Lbits)
-            zMbb     = MAX( 0.58*(zdvo**0.8)*(zSST+2.0)/(zLbits**0.2), 0.) * z1_rday ! Basal turbulent melting (for bits)
+            zMbb     = MAX( 0.58_wp*(zdvo**0.8_wp)*(zSST+2._wp) /   &
+               &                              ( zLbits**0.2_wp ) , 0._wp ) * z1_rday ! Basal turbulent melting (for bits)
             zMbb     = rn_rho_bergs * zAbits * zMbb                                  ! in kg/s
             zdMbitsM = MIN( zMbb*zdt , znMbits )                                     ! bergy bits mass lost to melting (kg)
             znMbits  = znMbits-zdMbitsM                                              ! remove mass lost to bergy bits melt

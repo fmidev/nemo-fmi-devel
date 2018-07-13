@@ -45,6 +45,7 @@ MODULE sbcmod
    USE sbcisf         ! surface boundary condition: ice shelf
    USE sbcfwb         ! surface boundary condition: freshwater budget
    USE icbstp         ! Icebergs
+   USE icb_oce  , ONLY : ln_passive_mode      ! iceberg interaction mode
    USE traqsr         ! active tracers: light penetration
    USE sbcwave        ! Wave module
    USE bdy_oce   , ONLY: ln_bdy
@@ -431,7 +432,12 @@ CONTAINS
       CASE(  3 )   ;         CALL sbc_ice_cice ( kt, nsbc )       ! CICE ice model
       END SELECT
 
-      IF( ln_icebergs    )   CALL icb_stp( kt )                   ! compute icebergs
+      IF( ln_icebergs    )   THEN
+                                     CALL icb_stp( kt )           ! compute icebergs
+         ! icebergs may advect into haloes during the icb step and alter emp.
+         ! A lbc_lnk is necessary here to ensure restartability (#2113)
+         IF( .NOT. ln_passive_mode ) CALL lbc_lnk( emp, 'T', 1. ) ! ensure restartability with icebergs
+      ENDIF
 
       IF( ln_isf         )   CALL sbc_isf( kt )                   ! compute iceshelves
 
