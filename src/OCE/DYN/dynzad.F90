@@ -88,26 +88,15 @@ CONTAINS
       END DO
       !
       ! Surface and bottom advective fluxes set to zero
-      IF( ln_isfcav ) THEN
-         DO jj = 2, jpjm1
-            DO ji = fs_2, fs_jpim1           ! vector opt.
-               zwuw(ji,jj, 1:miku(ji,jj) ) = 0._wp
-               zwvw(ji,jj, 1:mikv(ji,jj) ) = 0._wp
-               zwuw(ji,jj,jpk) = 0._wp
-               zwvw(ji,jj,jpk) = 0._wp
-            END DO
-         END DO
-      ELSE
-         DO jj = 2, jpjm1        
-            DO ji = fs_2, fs_jpim1           ! vector opt.
-               zwuw(ji,jj, 1 ) = 0._wp
-               zwvw(ji,jj, 1 ) = 0._wp
-               zwuw(ji,jj,jpk) = 0._wp
-               zwvw(ji,jj,jpk) = 0._wp
-            END DO  
-         END DO
-      END IF
-
+      DO jj = 2, jpjm1        
+         DO ji = fs_2, fs_jpim1           ! vector opt.
+            zwuw(ji,jj, 1 ) = 0._wp
+            zwvw(ji,jj, 1 ) = 0._wp
+            zwuw(ji,jj,jpk) = 0._wp
+            zwvw(ji,jj,jpk) = 0._wp
+         END DO  
+      END DO
+      !
       DO jk = 1, jpkm1              ! Vertical momentum advection at u- and v-points
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1       ! vector opt.
