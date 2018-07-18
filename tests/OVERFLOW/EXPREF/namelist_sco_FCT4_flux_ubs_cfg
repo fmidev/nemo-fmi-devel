@@ -38,8 +38,6 @@
 !-----------------------------------------------------------------------
 &namtsd    !   data : Temperature  & Salinity
 !-----------------------------------------------------------------------
-   ln_tsd_init   = .false.   !  Initialisation of ocean T & S with T &S input data (T) or not (F)
-   ln_tsd_tradmp = .false.   !  damping of ocean T & S toward T &S input data (T) or not (F)
 /
 !-----------------------------------------------------------------------
 &namsbc        !   Surface Boundary Condition (surface module)

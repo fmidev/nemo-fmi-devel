@@ -136,7 +136,7 @@
 &namdyn_vor    !   option of physics/algorithm
 !-----------------------------------------------------------------------
    ln_dynvor_ene = .false. !  enstrophy conserving scheme
-   ln_dynvor_ens = .true.  !  energy conserving scheme
+   ln_dynvor_ens = .false. !  energy conserving scheme
    ln_dynvor_mix = .false. !  mixed scheme
    ln_dynvor_een = .true. !  energy & enstrophy scheme
       nn_een_e3f = 0             !  e3f = masked averaging of e3t divided by 4 (=0) or by the sum of mask (=1)
