@@ -130,10 +130,15 @@ CONTAINS
             END DO
          END DO
       ELSE IF( ll_st_peakfr ) THEN    ! peak wave number calculated from the peak frequency received by the wave model
+         DO jj = 1, jpj
+            DO ji = 1, jpi
+               zk_t(ji,jj) = ( 2.0_wp * rpi * wfreq(ji,jj) ) * ( 2.0_wp * rpi * wfreq(ji,jj) ) / grav
+            END DO
+         END DO
          DO jj = 1, jpjm1
             DO ji = 1, jpim1
-               zk_u(ji,jj) = 0.5_wp * ( wfreq(ji,jj)*wfreq(ji,jj) + wfreq(ji+1,jj)*wfreq(ji+1,jj) ) / grav
-               zk_v(ji,jj) = 0.5_wp * ( wfreq(ji,jj)*wfreq(ji,jj) + wfreq(ji,jj+1)*wfreq(ji,jj+1) ) / grav
+               zk_u(ji,jj) = 0.5_wp * ( zk_t(ji,jj) + zk_t(ji+1,jj) )
+               zk_v(ji,jj) = 0.5_wp * ( zk_t(ji,jj) + zk_t(ji,jj+1) )
                !
                zu0_sd(ji,jj) = 0.5_wp * ( ut0sd(ji,jj) + ut0sd(ji+1,jj) )
                zv0_sd(ji,jj) = 0.5_wp * ( vt0sd(ji,jj) + vt0sd(ji,jj+1) )
