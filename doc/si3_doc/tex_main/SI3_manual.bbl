@@ -1,4 +1,4 @@
-\begin{thebibliography}{38}
+\begin{thebibliography}{39}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
@@ -109,6 +109,12 @@ Lipscomb, W.~H., 2001: Remapping the thickness distribution in sea ice models.
 Lipscomb, W.~H., E.~Hunke, W.~Maslowski, and J.~Jackaci, 2007: Ridging,
   strength, and stability in high-resolution sea ice models. \textit{Journal of
   Geophysical Research}, \textbf{112}, C03S9, \doi{doi:10.1029/2005JC003355}.
+
+\bibitem[{Massonnet et~al.(2018)Massonnet, Barth\'el\'emy, Worou, Fichefet,
+  Vancoppenolle, and Rousset}]{Massonnetetal18b}
+Massonnet, F., A.~Barth\'el\'emy, K.~Worou, T.~Fichefet, M.~Vancoppenolle, and
+  C.~Rousset, 2018: Insights on the discretization of the ice thickness
+  distribution in large-scale sea ice models. \textit{submitted}.
 
 \bibitem[{Maykut(1986)}]{Maykut86}
 Maykut, G.~A., 1986: \textit{The Geophysics of Sea Ice}, NATO ASI Series.
