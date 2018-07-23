@@ -109,7 +109,7 @@ CONTAINS
       !
       IF( ln_timing )   CALL timing_start('icealb')
       !
-      z1_href_pnd = 0.05
+      z1_href_pnd = 1. / 0.05
       z1_c1 = 1. / ( LOG(1.5) - LOG(0.05) ) 
       z1_c2 = 1. / 0.05
       z1_c3 = 1. / 0.02
