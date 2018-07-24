@@ -50,6 +50,8 @@ MODULE icbdia
    PUBLIC   icb_dia_income    ! routine called in icbclv.F90 module
 
    REAL(wp), DIMENSION(:,:)  , ALLOCATABLE, PUBLIC  ::   berg_melt       ! Melting+erosion rate of icebergs     [kg/s/m2]
+   REAL(wp), DIMENSION(:,:)  , ALLOCATABLE, PUBLIC  ::   berg_melt_hcflx ! Heat flux to ocean due to heat content of melting icebergs [J/s/m2]
+   REAL(wp), DIMENSION(:,:)  , ALLOCATABLE, PUBLIC  ::   berg_melt_qlat  ! Heat flux to ocean due to latent heat of melting icebergs [J/s/m2]
    REAL(wp), DIMENSION(:,:)  , ALLOCATABLE, PUBLIC  ::   buoy_melt       ! Buoyancy component of melting rate   [kg/s/m2]
    REAL(wp), DIMENSION(:,:)  , ALLOCATABLE, PUBLIC  ::   eros_melt       ! Erosion component of melting rate    [kg/s/m2]
    REAL(wp), DIMENSION(:,:)  , ALLOCATABLE, PUBLIC  ::   conv_melt       ! Convective component of melting rate [kg/s/m2]
@@ -100,6 +102,8 @@ CONTAINS
       IF( .NOT.ln_bergdia )   RETURN
 
       ALLOCATE( berg_melt    (jpi,jpj)   )           ;   berg_melt   (:,:)   = 0._wp
+      ALLOCATE( berg_melt_hcflx(jpi,jpj) )           ;   berg_melt_hcflx(:,:)   = 0._wp
+      ALLOCATE( berg_melt_qlat(jpi,jpj)  )           ;   berg_melt_qlat(:,:)   = 0._wp
       ALLOCATE( buoy_melt    (jpi,jpj)   )           ;   buoy_melt   (:,:)   = 0._wp
       ALLOCATE( eros_melt    (jpi,jpj)   )           ;   eros_melt   (:,:)   = 0._wp
       ALLOCATE( conv_melt    (jpi,jpj)   )           ;   conv_melt   (:,:)   = 0._wp
@@ -363,6 +367,8 @@ CONTAINS
       !
       IF( .NOT.ln_bergdia )   RETURN
       berg_melt   (:,:)   = 0._wp
+      berg_melt_hcflx(:,:)   = 0._wp
+      berg_melt_qlat(:,:)   = 0._wp
       buoy_melt   (:,:)   = 0._wp
       eros_melt   (:,:)   = 0._wp
       conv_melt   (:,:)   = 0._wp
@@ -383,6 +389,9 @@ CONTAINS
       IF( .NOT.ln_bergdia )   RETURN            !!gm useless iom will control whether it is output or not
       !
       CALL iom_put( "berg_melt"        , berg_melt   (:,:)   )   ! Melt rate of icebergs                     [kg/m2/s]
+      !! NB. The berg_melt_hcflx field is currently always zero - see comment in icbthm.F90
+      CALL iom_put( "berg_melt_hcflx"  , berg_melt_hcflx(:,:))   ! Heat flux to ocean due to heat content of melting icebergs [J/m2/s]
+      CALL iom_put( "berg_melt_qlat"   , berg_melt_qlat(:,:) )   ! Heat flux to ocean due to latent heat of melting icebergs [J/m2/s]
       CALL iom_put( "berg_buoy_melt"   , buoy_melt   (:,:)   )   ! Buoyancy component of iceberg melt rate   [kg/m2/s]
       CALL iom_put( "berg_eros_melt"   , eros_melt   (:,:)   )   ! Erosion component of iceberg melt rate    [kg/m2/s]
       CALL iom_put( "berg_conv_melt"   , conv_melt   (:,:)   )   ! Convective component of iceberg melt rate [kg/m2/s]
@@ -470,25 +479,27 @@ CONTAINS
    END SUBROUTINE icb_dia_speed
 
 
-   SUBROUTINE icb_dia_melt(ki, kj, pmnew, pheat, pmass_scale,     &
+   SUBROUTINE icb_dia_melt(ki, kj, pmnew, pheat_hcflux, pheat_latent, pmass_scale,     &
       &                    pdM, pdMbitsE, pdMbitsM, pdMb, pdMe,   &
       &                    pdMv, pz1_dt_e1e2 )
       !!----------------------------------------------------------------------
       !!----------------------------------------------------------------------
       INTEGER , INTENT(in) ::   ki, kj
-      REAL(wp), INTENT(in) ::   pmnew, pheat, pmass_scale
+      REAL(wp), INTENT(in) ::   pmnew, pheat_hcflux, pheat_latent, pmass_scale
       REAL(wp), INTENT(in) ::   pdM, pdMbitsE, pdMbitsM, pdMb, pdMe, pdMv, pz1_dt_e1e2
       !!----------------------------------------------------------------------
       !
       IF( .NOT.ln_bergdia )   RETURN
       !
       berg_melt (ki,kj) = berg_melt (ki,kj) + pdM      * pz1_dt_e1e2   ! kg/m2/s
+      berg_melt_hcflx (ki,kj) = berg_melt_hcflx (ki,kj) + pheat_hcflux * pz1_dt_e1e2   ! J/m2/s
+      berg_melt_qlat (ki,kj) = berg_melt_qlat (ki,kj) + pheat_latent * pz1_dt_e1e2   ! J/m2/s
       bits_src  (ki,kj) = bits_src  (ki,kj) + pdMbitsE * pz1_dt_e1e2   ! mass flux into bergy bitskg/m2/s
       bits_melt (ki,kj) = bits_melt (ki,kj) + pdMbitsM * pz1_dt_e1e2   ! melt rate of bergy bits kg/m2/s
       buoy_melt (ki,kj) = buoy_melt (ki,kj) + pdMb     * pz1_dt_e1e2   ! kg/m2/s
       eros_melt (ki,kj) = eros_melt (ki,kj) + pdMe     * pz1_dt_e1e2   ! erosion rate kg/m2/s
       conv_melt (ki,kj) = conv_melt (ki,kj) + pdMv     * pz1_dt_e1e2   ! kg/m2/s
-      heat_to_ocean_net = heat_to_ocean_net + pheat * pmass_scale * berg_dt         ! J
+      heat_to_ocean_net = heat_to_ocean_net + (pheat_hcflux + pheat_latent) * pmass_scale * berg_dt         ! J
       IF( pmnew <= 0._wp ) nbergs_melted = nbergs_melted + 1                        ! Delete the berg if completely melted
       !
    END SUBROUTINE icb_dia_melt

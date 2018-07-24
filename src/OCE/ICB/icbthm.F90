@@ -49,7 +49,7 @@ CONTAINS
       INTEGER  ::   ii, ij
       REAL(wp) ::   zM, zT, zW, zL, zSST, zVol, zLn, zWn, zTn, znVol, zIC, zDn
       REAL(wp) ::   zMv, zMe, zMb, zmelt, zdvo, zdva, zdM, zSs, zdMe, zdMb, zdMv
-      REAL(wp) ::   zMnew, zMnew1, zMnew2, zheat, z1_12
+      REAL(wp) ::   zMnew, zMnew1, zMnew2, zheat_hcflux, zheat_latent, z1_12
       REAL(wp) ::   zMbits, znMbits, zdMbitsE, zdMbitsM, zLbits, zAbits, zMbb
       REAL(wp) ::   zxi, zyj, zff, z1_rday, z1_e1e2, zdt, z1_dt, z1_dt_e1e2
       TYPE(iceberg), POINTER ::   this, next
@@ -67,6 +67,7 @@ CONTAINS
       ! and then pass them (or not) to the ocean
       !
       berg_grid%floating_melt(:,:) = 0._wp
+      ! calving_hflx re-used here as temporary workspace for the heat flux associated with melting
       berg_grid%calving_hflx(:,:)  = 0._wp
       !
       this => first_berg
@@ -165,9 +166,13 @@ CONTAINS
             z1_dt_e1e2 = z1_dt * z1_e1e2
             zmelt    = ( zdM - ( zdMbitsE - zdMbitsM ) ) * z1_dt   ! kg/s
             berg_grid%floating_melt(ii,ij) = berg_grid%floating_melt(ii,ij) + zmelt    * z1_e1e2    ! kg/m2/s
-            zheat = zmelt * pt%heat_density              ! kg/s x J/kg = J/s
-            berg_grid%calving_hflx (ii,ij) = berg_grid%calving_hflx (ii,ij) + zheat    * z1_e1e2    ! W/m2
-            CALL icb_dia_melt( ii, ij, zMnew, zheat, this%mass_scaling,       &
+            !! NB. The src_calving_hflx field is currently hardwired to zero in icb_stp, which means that the
+            !!     heat density of the icebergs is zero and the heat content flux to the ocean from iceberg
+            !!     melting is always zero. Leaving the term in the code until such a time as this is fixed. DS.
+            zheat_hcflux = zmelt * pt%heat_density       ! heat content flux : kg/s x J/kg = J/s
+            zheat_latent = - zmelt * rLfus               ! latent heat flux:  kg/s x J/kg = J/s
+            berg_grid%calving_hflx (ii,ij) = berg_grid%calving_hflx (ii,ij) + ( zheat_hcflux + zheat_latent ) * z1_e1e2    ! W/m2
+            CALL icb_dia_melt( ii, ij, zMnew, zheat_hcflux, zheat_latent, this%mass_scaling,       &
                &                       zdM, zdMbitsE, zdMbitsM, zdMb, zdMe,   &
                &                       zdMv, z1_dt_e1e2 )
          ELSE
@@ -213,7 +218,7 @@ CONTAINS
       !
       IF(.NOT. ln_passive_mode ) THEN
          emp (:,:) = emp (:,:) - berg_grid%floating_melt(:,:)
-!!       qns (:,:) = qns (:,:) + berg_grid%calving_hflx (:,:)  !!gm heat flux not yet properly coded ==>> need it, SOLVE that!
+         qns (:,:) = qns (:,:) + berg_grid%calving_hflx (:,:)  
       ENDIF
       !
    END SUBROUTINE icb_thm

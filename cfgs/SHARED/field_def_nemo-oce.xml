@@ -530,6 +530,8 @@
 
       <field_group id="icbvar" domain_ref="grid_T"  > 
         <field id="berg_melt"          long_name="icb melt rate of icebergs"                       unit="kg/m2/s"                    />
+        <field id="berg_melt_hcflx"    long_name="icb heat flux to ocean due to melting heat content"   unit="J/m2/s"                />
+        <field id="berg_melt_qlat"     long_name="icb heat flux to ocean due to melting latent heat"    unit="J/m2/s"                />
         <field id="berg_buoy_melt"     long_name="icb buoyancy component of iceberg melt rate"     unit="kg/m2/s"                    />
         <field id="berg_eros_melt"     long_name="icb erosion component of iceberg melt rate"      unit="kg/m2/s"                    />
         <field id="berg_conv_melt"     long_name="icb convective component of iceberg melt rate"   unit="kg/m2/s"                    />

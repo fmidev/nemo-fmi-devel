@@ -36,6 +36,7 @@
 	  <field field_ref="taum"         name="taum"     />
 	  <field field_ref="wspd"         name="windsp"   />
 	  <field field_ref="precip"       name="precip"   />
+	  <field field_ref="berg_melt_qlat"  name="berg_melt_qlat" />
 	  <!-- ice and snow -->
 	  <field field_ref="snowpre" />
 	</file>
