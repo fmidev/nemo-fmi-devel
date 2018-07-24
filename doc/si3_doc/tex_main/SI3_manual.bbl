@@ -1,4 +1,4 @@
-\begin{thebibliography}{39}
+\begin{thebibliography}{47}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
@@ -34,11 +34,22 @@ Bouillon, S., T.~Fichefet, V.~Legat, and G.~Madec, 2013: The
   elastic-viscous-plastic method revisited. \textit{Ocean Modelling},
   \textbf{71}, 2--12.
 
+\bibitem[{Brandt et~al.(2005)Brandt, Warren, Worby, and
+  Grenfell}]{Brandtetal05}
+Brandt, R.~E., S.~G. Warren, A.~P. Worby, and T.~C. Grenfell, 2005: {Surface
+  albedo of the Antarctic sea ice zone}. \textit{Journal of Climate},
+  \textbf{18}, 3606--3622.
+
 \bibitem[{Coon et~al.(1974)Coon, Maykut, Pritchard, Rothrock, and
   Thorndike}]{Coonetal74}
 Coon, M.~D., G.~A. Maykut, R.~S. Pritchard, D.~A. Rothrock, and A.~S.
   Thorndike, 1974: Modeling the pack ice as an elastic-plastic material.
   \textit{AIDJEX Bulletin}, \textbf{24}, 1--105.
+
+\bibitem[{Ebert and Curry(1993)}]{EbertCurry93}
+Ebert, E.~E. and J.~A. Curry, 1993: An intermediate one-dimensional
+  thermodynamic sea ice model for investigating ice-atmosphere interactions.
+  \textit{Journal of Geophysical Research}, \textbf{98}, 10,085--10,109.
 
 \bibitem[{Fichefet and Morales~Maqueda(1997)}]{FichefetMaqueda97}
 Fichefet, T. and M.~A. Morales~Maqueda, 1997: Sensitivity of a global sea ice
@@ -56,6 +67,15 @@ Girard, L., J.~Weiss, J.~Molines, B.~Barnier, and S.~Bouillon, 2009: Evaluation
   of high-resolution sea ice models on the basis of statistical and scaling
   properties of arctic sea ice drift and deformation. \textit{Journal of
   Geophysical Research}, \textbf{114}, \doi{10.1029/2008JC005182}.
+
+\bibitem[{Grenfell and Maykut(1977)}]{GrenfellMaykut77}
+Grenfell, T.~C. and G.~A. Maykut, 1977: The optical properties of ice and snow
+  in the arctic basin. \textit{Journal of Glaciology}, \textbf{18}, 445--463.
+
+\bibitem[{Grenfell and Perovich(2004)}]{GrenfellPerovich04}
+Grenfell, T.~C. and D.~K. Perovich, 2004: Seasonal and spatial evolution of
+  albedo in a snow-ice-land-ocean environment. \textit{J. Geophys. Res.},
+  \textbf{109~(C01001)}, \doi{10.1029/2003JC001866}.
 
 \bibitem[{Haapala(2000)}]{Haapala00}
 Haapala, J., 2000: On the modelling of ice-thickness redistribution.
@@ -90,6 +110,18 @@ Kreyscher, M., M.~Harder, P.~Lemke, and G.~M. Flato, 1999: Results of the sea
   ice model intercomparison project: Evaluation of sea ice rheology scheme for
   use in climate simulations. \textit{Jounal of Geophysical Research},
   \textbf{105}, 11,299--11,320.
+
+\bibitem[{Lecomte et~al.(2015)Lecomte, Fichefet, Flocco, Schroeder, and
+  Vancoppenolle}]{Lecomteetal15}
+Lecomte, O., T.~Fichefet, D.~Flocco, D.~Schroeder, and M.~Vancoppenolle, 2015:
+  Interactions between wind-blown snow redistribution and melt ponds in a
+  coupled ocean-sea ice model. \textit{Ocean Modelling}, \textbf{87}, 67--80.
+
+\bibitem[{Lecomte et~al.(2011)Lecomte, Fichefet, Vancoppenolle, and
+  Nicolaus}]{Lecomteetal11}
+Lecomte, O., T.~Fichefet, M.~Vancoppenolle, and M.~Nicolaus, 2011: A new snow
+  thermodynamic scheme for large-scale sea-ice models. \textit{Annals of
+  Glaciology}, \textbf{52}, 337--346.
 
 \bibitem[{Lepp\"aranta(2005)}]{Lepparanta05}
 Lepp\"aranta, M., 2005: \textit{The Drift of Sea ice}. Springer, 266 pp. pp.
@@ -154,6 +186,13 @@ Notz, D., A.~Jahn, M.~Holland, E.~Hunke, F.~Massonnet, J.~Stroeve, B.~Tremblay,
 Parmerter, R.~R., 1975: A model of simple rafting in sea ice. \textit{Journal
   of Geophysical Research}, \textbf{80}, 1948--1952.
 
+\bibitem[{Perovich et~al.(2002)Perovich, Grenfell, Light, and
+  Hobbs}]{Perovichetal02alb}
+Perovich, D.~K., T.~C. Grenfell, B.~Light, and P.~V. Hobbs, 2002: Seasonal
+  evolution of the albedo of multiyear arctic sea ice. \textit{Journal of
+  Geophysical Research}, \textbf{107}, 8044, doi:10.1029/2000JC000\,438,
+  \doi{doi:10.1029/2000JC000438}.
+
 \bibitem[{Prather(1986)}]{Prather86}
 Prather, M.~J., 1986: Numerical advection by conservation of second-order
   moments. \textit{Journal of Geophysical Research}, \textbf{91}, 6671--6681.
@@ -204,5 +243,10 @@ Worster, M.~G., 1992: \textit{Interactive Dynamics of Convection and
 \bibitem[{Zhang and Rothrock(2001)}]{ZhangRothrock01}
 Zhang, J. and D.~Rothrock, 2001: A thickness and enthalpy distribution sea ice
   model. \textit{Journal of Physical Oceanography}, \textbf{31}, 2986--3001.
+
+\bibitem[{Zuo and Oerlemans(1996)}]{ZuoOerlemans96}
+Zuo, Z. and J.~Oerlemans, 1996: Modelling albedo and specific balance of the
+  greenland ice sheet: calculations for the sondre stromfjord transect.
+  \textit{Journal of Glaciology}, \textbf{42}, 305--317.
 
 \end{thebibliography}
