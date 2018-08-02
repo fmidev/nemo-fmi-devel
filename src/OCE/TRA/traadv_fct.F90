@@ -310,15 +310,20 @@ CONTAINS
             !                             ! heat/salt transport
             IF( l_hst )   CALL dia_ar5_hst( jn, 'adv', ztrdx(:,:,:), ztrdy(:,:,:) )
             !
-            DEALLOCATE( ztrdx, ztrdy, ztrdz )
          ENDIF
          IF( l_ptr ) THEN              ! "Poleward" transports
             zptry(:,:,:) = zptry(:,:,:) + zwy(:,:,:)  ! <<< add anti-diffusive fluxes
             CALL dia_ptr_hst( jn, 'adv', zptry(:,:,:) )
-            DEALLOCATE( zptry )
          ENDIF
          !
       END DO                     ! end of tracer loop
+      !
+      IF( l_trd .OR. l_hst ) THEN 
+         DEALLOCATE( ztrdx, ztrdy, ztrdz )
+      ENDIF
+      IF( l_ptr ) THEN 
+         DEALLOCATE( zptry )
+      ENDIF
       !
    END SUBROUTINE tra_adv_fct
 
