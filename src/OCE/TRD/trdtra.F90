@@ -357,56 +357,9 @@ CONTAINS
       ELSE IF( MOD( kt, 2 ) == 1 ) THEN
          SELECT CASE( ktrd )
          CASE( jptra_atf  )   ;   CALL iom_put( "ttrd_atf" , ptrdx )        ! asselin time Filter
-            CALL iom_put( "strd_atf" , ptrdy )
-         END SELECT
-      END IF
-      !
-      ! These trends are done every second time step. When 1ts output is selected must go different (2ts) file from standard T-file
-      IF( MOD( kt, 2 ) == 0 ) THEN
-         SELECT CASE( ktrd )
-         CASE( jptra_xad  )   ;   CALL iom_put( "ttrd_xad"  , ptrdx )         ! x- horizontal advection
-                                  CALL iom_put( "strd_xad"  , ptrdy )
-         CASE( jptra_yad  )   ;   CALL iom_put( "ttrd_yad"  , ptrdx )         ! y- horizontal advection
-                                  CALL iom_put( "strd_yad"  , ptrdy )
-         CASE( jptra_zad  )   ;   CALL iom_put( "ttrd_zad"  , ptrdx )         ! z- vertical   advection
-                                  CALL iom_put( "strd_zad"  , ptrdy )
-                                  IF( ln_linssh ) THEN                   ! cst volume : adv flux through z=0 surface
-                                     ALLOCATE( z2dx(jpi,jpj) , z2dy(jpi,jpj) )
-                                     z2dx(:,:) = wn(:,:,1) * tsn(:,:,1,jp_tem) / e3t_n(:,:,1)
-                                     z2dy(:,:) = wn(:,:,1) * tsn(:,:,1,jp_sal) / e3t_n(:,:,1)
-                                     CALL iom_put( "ttrd_sad", z2dx )
-                                     CALL iom_put( "strd_sad", z2dy )
-                                     DEALLOCATE( z2dx, z2dy )
-                                  ENDIF
-         CASE( jptra_totad  ) ;   CALL iom_put( "ttrd_totad", ptrdx )         ! total   advection
-                                  CALL iom_put( "strd_totad", ptrdy )
-         CASE( jptra_ldf  )   ;   CALL iom_put( "ttrd_ldf"  , ptrdx )         ! lateral diffusion
-                                  CALL iom_put( "strd_ldf"  , ptrdy )
-         CASE( jptra_zdf  )   ;   CALL iom_put( "ttrd_zdf"  , ptrdx )         ! vertical diffusion (including Kz contribution)
-                                  CALL iom_put( "strd_zdf"  , ptrdy )
-         CASE( jptra_zdfp )   ;   CALL iom_put( "ttrd_zdfp" , ptrdx )         ! PURE vertical diffusion (no isoneutral contribution)
-                                  CALL iom_put( "strd_zdfp" , ptrdy )
-         CASE( jptra_evd )    ;   CALL iom_put( "ttrd_evd"  , ptrdx )         ! EVD trend (convection)
-                                  CALL iom_put( "strd_evd"  , ptrdy )
-         CASE( jptra_dmp  )   ;   CALL iom_put( "ttrd_dmp"  , ptrdx )         ! internal restoring (damping)
-                                  CALL iom_put( "strd_dmp"  , ptrdy )
-         CASE( jptra_bbl  )   ;   CALL iom_put( "ttrd_bbl"  , ptrdx )         ! bottom boundary layer
-                                  CALL iom_put( "strd_bbl"  , ptrdy )
-         CASE( jptra_npc  )   ;   CALL iom_put( "ttrd_npc"  , ptrdx )         ! static instability mixing
-                                  CALL iom_put( "strd_npc"  , ptrdy )
-         CASE( jptra_bbc  )   ;   CALL iom_put( "ttrd_bbc"  , ptrdx )         ! geothermal heating   (only on temperature)
-         CASE( jptra_nsr  )   ;   CALL iom_put( "ttrd_qns"  , ptrdx(:,:,1) )  ! surface forcing + runoff (ln_rnf=T)
-                                  CALL iom_put( "strd_cdt"  , ptrdy(:,:,1) )        ! output as 2D surface fields
-         CASE( jptra_qsr  )   ;   CALL iom_put( "ttrd_qsr"  , ptrdx )         ! penetrative solar radiat. (only on temperature)
-         END SELECT
-         ! the Asselin filter trend  is also every other time step but needs to be lagged one time step
-         ! Even when 1ts output is selected can go to the same (2ts) file as the trends plotted every even time step.
-      ELSEIF( MOD( kt, 2 ) == 1 ) THEN
-         SELECT CASE( ktrd )
-         CASE( jptra_atf  )   ;   CALL iom_put( "ttrd_atf" , ptrdx )        ! asselin time Filter
                                   CALL iom_put( "strd_atf" , ptrdy )
          END SELECT
-      ENDIF
+      END IF
       !
    END SUBROUTINE trd_tra_iom
 
