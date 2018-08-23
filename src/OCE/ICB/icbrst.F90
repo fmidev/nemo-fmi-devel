@@ -59,7 +59,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER                      ::   idim, ivar, iatt
       INTEGER                      ::   jn, iunlim_dim, ibergs_in_file
-      INTEGER                      ::   ii,ij,iclass
+      INTEGER                      ::   ii, ij, iclass, ibase_err, imax_icb
       REAL(wp), DIMENSION(nkounts) ::   zdata      
       LOGICAL                      ::   ll_found_restart
       CHARACTER(len=256)           ::   cl_path
@@ -76,6 +76,7 @@ CONTAINS
       cl_filename = TRIM(cn_ocerst_in)//'_icebergs'
       CALL iom_open( TRIM(cl_path)//cl_filename, ncid )
 
+      imax_icb = 0
       IF( iom_file(ncid)%iduld .GE. 0) THEN
 
          ibergs_in_file = iom_file(ncid)%lenuld
@@ -95,6 +96,7 @@ CONTAINS
 
                CALL iom_get( ncid, jpdom_unknown, 'number'       , zdata(:) , ktime=jn, kstart=(/1/), kcount=(/nkounts/) )
                localberg%number(:) = INT(zdata(:))
+               imax_icb = MAX( imax_icb, INT(zdata(1)) )
                CALL iom_get( ncid, 'mass_scaling' , localberg%mass_scaling, ktime=jn )
                CALL iom_get( ncid, 'lon'          , localpt%lon           , ktime=jn )
                CALL iom_get( ncid, 'lat'          , localpt%lat           , ktime=jn )
@@ -128,8 +130,11 @@ CONTAINS
       
       CALL iom_get( ncid, jpdom_unknown, 'kount' , zdata(:) )
       num_bergs(:) = INT(zdata(:))
+      ! Close file
+      CALL iom_close( ncid )
+      !
 
-      ! Sanity check
+      ! Sanity checks
       jn = icb_utl_count()
       IF ( lwp .AND. nn_verbose_level >= 0 )   &
          WRITE(numout,'(2(a,i5))') 'icebergs, read_restart_bergs: # bergs =',jn,' on PE',narea-1
@@ -141,8 +146,34 @@ CONTAINS
       IF( lwp )   WRITE(numout,'(a,i5,a,i5,a)') 'icebergs, icb_rst_read: there were',ibergs_in_file,   &
          &                                    ' bergs in the restart file and', jn,' bergs have been read'
       !
-      ! Finish up
-      CALL iom_close( ncid )
+      ! Confirm that all areas have a suitable base for assigning new iceberg
+      ! numbers. This will not be the case if restarting from a collated dataset
+      ! (even if using the same processor decomposition)
+      !
+      ibase_err = 0
+      IF( num_bergs(1) < 0 .AND. num_bergs(1) /= narea - jpnij ) THEN
+         ! If this area has never calved a new berg then the base should be
+         ! set to narea - jpnij. If it is negative but something else then
+         ! a new base will be needed to guarantee unique, future iceberg numbers
+         ibase_err = 1
+      ELSEIF( MOD( num_bergs(1) - narea , jpnij ) /= 0 ) THEN
+         ! If this area has a base which is not in the set {narea + N*jpnij}
+         ! for positive integers N then a new base will be needed to guarantee 
+         ! unique, future iceberg numbers
+         ibase_err = 1
+      ENDIF
+      IF( lk_mpp ) THEN
+         CALL mpp_sum(ibase_err)
+      ENDIF
+      IF( ibase_err > 0 ) THEN
+         ! 
+         ! A new base is needed. The only secure solution is to set bases such that
+         ! all future icebergs numbers will be greater than the current global maximum
+         IF( lk_mpp ) THEN
+            CALL mpp_max(imax_icb)
+         ENDIF
+         num_bergs(1) = imax_icb - jpnij + narea
+      ENDIF
       !
       IF( lwp .AND. nn_verbose_level >= 0 )  WRITE(numout,'(a)') 'icebergs, icb_rst_read: completed'
       !
