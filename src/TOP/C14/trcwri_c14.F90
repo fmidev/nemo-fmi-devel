@@ -131,7 +131,7 @@ CONTAINS
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
-   !! $Id: trcwri_c14 
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!======================================================================
 END MODULE trcwri_c14
