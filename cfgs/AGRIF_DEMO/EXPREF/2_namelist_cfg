@@ -1,5 +1,5 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!! NEMO/OPA  Configuration namelist : overwrite default values defined in SHARED/1_namelist_ref
+!! NEMO/OCE  Configuration namelist : overwrite default values defined in SHARED/1_namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !                         AGRIF ICE configuration                      !
 !!======================================================================
