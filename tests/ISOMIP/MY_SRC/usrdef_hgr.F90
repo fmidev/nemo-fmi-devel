@@ -27,9 +27,9 @@ MODULE usrdef_hgr
    PUBLIC   usr_def_hgr   ! called by domhgr.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2017)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

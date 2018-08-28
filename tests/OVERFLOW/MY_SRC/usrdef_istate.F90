@@ -25,9 +25,9 @@ MODULE usrdef_istate
    PUBLIC   usr_def_istate   ! called by istate.F90
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.7 , NEMO Consortium (2014)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
   

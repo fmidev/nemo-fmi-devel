@@ -32,9 +32,9 @@ MODULE usrdef_nam
    REAL(wp), PUBLIC ::   rn_dz     ! resolution in meters defining the vertical   domain size
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2016)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

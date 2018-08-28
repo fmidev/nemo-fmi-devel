@@ -37,9 +37,9 @@ MODULE trazdf
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2017)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: trazdf.F90 9124 2017-12-19 08:26:25Z gm $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

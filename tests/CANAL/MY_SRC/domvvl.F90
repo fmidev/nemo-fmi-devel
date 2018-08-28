@@ -63,9 +63,9 @@ MODULE domvvl
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 3.7 , NEMO-Consortium (2015) 
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: domvvl.F90 9190 2018-01-06 14:18:23Z gm $
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

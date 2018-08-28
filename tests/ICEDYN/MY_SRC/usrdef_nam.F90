@@ -33,9 +33,9 @@ MODULE usrdef_nam
    LOGICAL , PUBLIC ::   ln_corio   ! set coriolis at 0 (ln_corio=F) or not 
 
    !!----------------------------------------------------------------------
-   !! NEMO/OPA 4.0 , NEMO Consortium (2016)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (NEMOGCM/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
