@@ -50,7 +50,7 @@ MODULE trcbc
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

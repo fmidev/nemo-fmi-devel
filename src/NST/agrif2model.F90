@@ -1,19 +1,19 @@
 #if defined key_agrif
-!!----------------------------------------------------------------------
-!! NEMO/NST 4.0 , NEMO Consortium (2018)
-!! $Id$
-!! Software governed by the CeCILL licence (./LICENSE)
-!!----------------------------------------------------------------------
+   !!----------------------------------------------------------------------
+   !! NEMO/NST 4.0 , NEMO Consortium (2018)
+   !! $Id$
+   !! Software governed by the CeCILL license (see ./LICENSE)
+   !!----------------------------------------------------------------------
 SUBROUTINE Agrif2Model
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif2Model ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif2Model ***
+      !!--------------------------------------------- 
 END SUBROUTINE Agrif2model
 
 SUBROUTINE Agrif_Set_numberofcells(Agrif_Gr)
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif_Set_numberofcells ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif_Set_numberofcells ***
+      !!--------------------------------------------- 
    USE Agrif_Grids
    IMPLICIT NONE
 
@@ -26,9 +26,9 @@ SUBROUTINE Agrif_Set_numberofcells(Agrif_Gr)
 END SUBROUTINE Agrif_Set_numberofcells
 
 SUBROUTINE Agrif_Get_numberofcells(Agrif_Gr)
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif_Get_numberofcells ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif_Get_numberofcells ***
+      !!--------------------------------------------- 
    USE Agrif_Grids
    IMPLICIT NONE
 
@@ -41,9 +41,9 @@ SUBROUTINE Agrif_Get_numberofcells(Agrif_Gr)
 END SUBROUTINE Agrif_Get_numberofcells
 
 SUBROUTINE Agrif_Allocationcalls(Agrif_Gr)
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif_Allocationscalls ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif_Allocationscalls ***
+      !!--------------------------------------------- 
    USE Agrif_Grids 
 #include "include_use_Alloc_agrif.h"
    IMPLICIT NONE
@@ -55,9 +55,9 @@ SUBROUTINE Agrif_Allocationcalls(Agrif_Gr)
 END SUBROUTINE Agrif_Allocationcalls
 
 SUBROUTINE Agrif_probdim_modtype_def()
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif_probdim_modtype_def ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif_probdim_modtype_def ***
+      !!--------------------------------------------- 
    USE Agrif_Types
    IMPLICIT NONE
 
@@ -70,9 +70,9 @@ SUBROUTINE Agrif_probdim_modtype_def()
 END SUBROUTINE Agrif_probdim_modtype_def
 
 SUBROUTINE Agrif_clustering_def()
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif_clustering_def ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif_clustering_def ***
+      !!--------------------------------------------- 
    IMPLICIT NONE
 
    RETURN
@@ -81,9 +81,9 @@ END SUBROUTINE Agrif_clustering_def
 
 #else
 SUBROUTINE Agrif2Model
-   !!---------------------------------------------
-   !!   *** ROUTINE Agrif2Model ***
-   !!--------------------------------------------- 
+      !!---------------------------------------------
+      !!   *** ROUTINE Agrif2Model ***
+      !!--------------------------------------------- 
    WRITE(*,*) 'Impossible to bet here'
 END SUBROUTINE Agrif2model
 #endif

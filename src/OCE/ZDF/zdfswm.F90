@@ -27,9 +27,9 @@ MODULE zdfswm
    PUBLIC zdf_swm_init    ! routine called in zdf_phy_init
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
-   !! $Id:$
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! $Id$
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

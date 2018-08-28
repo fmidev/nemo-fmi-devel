@@ -51,6 +51,6 @@ CONTAINS
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: trcwri_cfc.F90 3160 2011-11-20 14:27:18Z cetlod $ 
-   !! Software governed by the CeCILL licence (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!======================================================================
 END MODULE trcwri_cfc

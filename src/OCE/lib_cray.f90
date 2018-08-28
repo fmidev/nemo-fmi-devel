@@ -4,11 +4,11 @@
 !  check their existence
 !  
 !  wheneq
-!!----------------------------------------------------------------------
-!!  OPA 9.0 , NEMO Consortium (2018) 
-!! $Id$ 
-!! This software is governed by the CeCILL licence see modipsl/doc/NEMO_CeCILL.txt 
-!!----------------------------------------------------------------------
+   !!----------------------------------------------------------------------
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
+   !! $Id$ 
+   !! Software governed by the CeCILL license (see ./LICENSE)
+   !!----------------------------------------------------------------------
 SUBROUTINE lib_cray
       WRITE(*,*) 'lib_cray: You should not have seen this print! error?'
 END SUBROUTINE lib_cray

@@ -52,7 +52,7 @@ MODULE zdfiwm
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id: zdfiwm.F90 8093 2017-05-30 08:13:14Z gm $
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

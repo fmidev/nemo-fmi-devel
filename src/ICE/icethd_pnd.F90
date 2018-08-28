@@ -42,7 +42,7 @@ MODULE icethd_pnd
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icethd_pnd.F90 8420 2017-10-05 13:07:10Z clem $
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

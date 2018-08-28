@@ -90,7 +90,7 @@ MODULE icestp
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icestp.F90 8319 2017-07-11 15:00:44Z clem $
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

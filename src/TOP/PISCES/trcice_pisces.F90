@@ -22,7 +22,7 @@ MODULE trcice_pisces
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: trcsub.F90 9019 2017-12-13 14:58:53Z timgraham $ 
-   !! Software governed by the CeCILL licence (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

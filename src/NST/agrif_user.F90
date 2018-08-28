@@ -1,10 +1,10 @@
 #undef UPD_HIGH   /* MIX HIGH UPDATE */
 #if defined key_agrif
-!!----------------------------------------------------------------------
-!! NEMO/NST 4.0 , NEMO Consortium (2018)
-!! $Id$
-!! Software governed by the CeCILL licence (./LICENSE)
-!!----------------------------------------------------------------------
+   !!----------------------------------------------------------------------
+   !! NEMO/NST 4.0 , NEMO Consortium (2018)
+   !! $Id$
+   !! Software governed by the CeCILL license (see ./LICENSE)
+   !!----------------------------------------------------------------------
 SUBROUTINE agrif_user
 END SUBROUTINE agrif_user
 
@@ -12,16 +12,16 @@ SUBROUTINE agrif_before_regridding
 END SUBROUTINE agrif_before_regridding
 
 SUBROUTINE Agrif_InitWorkspace
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitWorkspace ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_InitWorkspace ***
+      !!----------------------------------------------------------------------
    USE par_oce
    USE dom_oce
    USE nemogcm
    USE mppini
-   !!
+      !!
    IMPLICIT NONE
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    IF( .NOT. Agrif_Root() ) THEN
       ! no more static variables
@@ -36,11 +36,11 @@ END SUBROUTINE Agrif_InitWorkspace
 
 
 SUBROUTINE Agrif_InitValues
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitValues ***
-   !!
-   !! ** Purpose :: Declaration of variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_InitValues ***
+      !!
+      !! ** Purpose :: Declaration of variables to be interpolated
+      !!----------------------------------------------------------------------
    USE Agrif_Util
    USE oce 
    USE dom_oce
@@ -49,7 +49,7 @@ SUBROUTINE Agrif_InitValues
    USE bdy_oce   , ONLY: ln_bdy
    !!
    IMPLICIT NONE
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    CALL nemo_init       !* Initializations of each fine grid
 
@@ -68,11 +68,11 @@ END SUBROUTINE Agrif_initvalues
 
 
 SUBROUTINE Agrif_InitValues_cont_dom
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitValues_cont ***
-   !!
-   !! ** Purpose ::   Declaration of variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_InitValues_cont ***
+      !!
+      !! ** Purpose ::   Declaration of variables to be interpolated
+      !!----------------------------------------------------------------------
    USE Agrif_Util
    USE oce 
    USE dom_oce
@@ -83,7 +83,7 @@ SUBROUTINE Agrif_InitValues_cont_dom
    USE agrif_oce_sponge
    !
    IMPLICIT NONE
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    ! Declaration of the type of variable which have to be interpolated
    !
@@ -93,11 +93,11 @@ END SUBROUTINE Agrif_InitValues_cont_dom
 
 
 SUBROUTINE agrif_declare_var_dom
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE agrif_declare_var ***
-   !!
-   !! ** Purpose :: Declaration of variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE agrif_declare_var ***
+      !!
+      !! ** Purpose :: Declaration of variables to be interpolated
+      !!----------------------------------------------------------------------
    USE agrif_util
    USE par_oce       
    USE oce
@@ -105,28 +105,28 @@ SUBROUTINE agrif_declare_var_dom
    IMPLICIT NONE
    !
    INTEGER :: ind1, ind2, ind3
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
 
-   ! 1. Declaration of the type of variable which have to be interpolated
-   !---------------------------------------------------------------------
+      ! 1. Declaration of the type of variable which have to be interpolated
+      !---------------------------------------------------------------------
    ind1 =     nbghostcells
    ind2 = 1 + nbghostcells
    ind3 = 2 + nbghostcells
    CALL agrif_declare_variable((/1,2/),(/ind2,ind3/),(/'x','y'/),(/1,1/),(/nlci,nlcj/),e1u_id)
    CALL agrif_declare_variable((/2,1/),(/ind3,ind2/),(/'x','y'/),(/1,1/),(/nlci,nlcj/),e2v_id)
 
-   ! 2. Type of interpolation
-   !-------------------------
+      ! 2. Type of interpolation
+      !-------------------------
    CALL Agrif_Set_bcinterp( e1u_id, interp1=Agrif_linear, interp2=AGRIF_ppm    )
    CALL Agrif_Set_bcinterp( e2v_id, interp1=AGRIF_ppm   , interp2=Agrif_linear )
 
-   ! 3. Location of interpolation
-   !-----------------------------
+      ! 3. Location of interpolation
+      !-----------------------------
    CALL Agrif_Set_bc(e1u_id,(/0,ind1-1/))
    CALL Agrif_Set_bc(e2v_id,(/0,ind1-1/))
 
-   ! 4. Update type
-   !--------------- 
+      ! 4. Update type
+      !--------------- 
 # if defined UPD_HIGH
    CALL Agrif_Set_Updatetype(e1u_id,update1 = Agrif_Update_Average, update2=Agrif_Update_Full_Weighting)
    CALL Agrif_Set_Updatetype(e2v_id,update1 = Agrif_Update_Full_Weighting, update2=Agrif_Update_Average)
@@ -139,11 +139,11 @@ END SUBROUTINE agrif_declare_var_dom
 
 
 SUBROUTINE Agrif_InitValues_cont
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitValues_cont ***
-   !!
-   !! ** Purpose ::   Declaration of variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_InitValues_cont ***
+      !!
+      !! ** Purpose ::   Declaration of variables to be interpolated
+      !!----------------------------------------------------------------------
    USE agrif_oce_update
    USE agrif_oce_interp
    USE agrif_oce_sponge
@@ -160,7 +160,7 @@ SUBROUTINE Agrif_InitValues_cont
    !
    LOGICAL :: check_namelist
    CHARACTER(len=15) :: cl_check1, cl_check2, cl_check3, cl_check4 
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
 
    ! 1. Declaration of the type of variable which have to be interpolated
    !---------------------------------------------------------------------
@@ -292,11 +292,11 @@ SUBROUTINE Agrif_InitValues_cont
 END SUBROUTINE Agrif_InitValues_cont
 
 SUBROUTINE agrif_declare_var
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE agrif_declarE_var ***
-   !!
-   !! ** Purpose :: Declaration of variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE agrif_declarE_var ***
+      !!
+      !! ** Purpose :: Declaration of variables to be interpolated
+      !!----------------------------------------------------------------------
    USE agrif_util
    USE agrif_oce
    USE par_oce       ! ocean parameters
@@ -306,7 +306,7 @@ SUBROUTINE agrif_declare_var
    IMPLICIT NONE
    !
    INTEGER :: ind1, ind2, ind3
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
 
    ! 1. Declaration of the type of variable which have to be interpolated
    !---------------------------------------------------------------------
@@ -450,11 +450,11 @@ END SUBROUTINE agrif_declare_var
 
 #if defined key_si3
 SUBROUTINE Agrif_InitValues_cont_ice
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitValues_cont_ice ***
-   !!
-   !! ** Purpose :: Initialisation of variables to be interpolated for ice
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_InitValues_cont_ice ***
+      !!
+      !! ** Purpose :: Initialisation of variables to be interpolated for ice
+      !!----------------------------------------------------------------------
    USE Agrif_Util
    USE sbc_oce, ONLY : nn_fsbc  ! clem: necessary otherwise Agrif_Parent(nn_fsbc) = nn_fsbc
    USE ice
@@ -464,7 +464,7 @@ SUBROUTINE Agrif_InitValues_cont_ice
    USE lib_mpp
    !
    IMPLICIT NONE
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    ! Declaration of the type of variable which have to be interpolated (parent=>child)
    !----------------------------------------------------------------------------------
@@ -494,11 +494,11 @@ SUBROUTINE Agrif_InitValues_cont_ice
 END SUBROUTINE Agrif_InitValues_cont_ice
 
 SUBROUTINE agrif_declare_var_ice
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE agrif_declare_var_ice ***
-   !!
-   !! ** Purpose :: Declaration of variables to be interpolated for ice
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE agrif_declare_var_ice ***
+      !!
+      !! ** Purpose :: Declaration of variables to be interpolated for ice
+      !!----------------------------------------------------------------------
    USE Agrif_Util
    USE ice
    USE par_oce, ONLY : nbghostcells
@@ -506,7 +506,7 @@ SUBROUTINE agrif_declare_var_ice
    IMPLICIT NONE
    !
    INTEGER :: ind1, ind2, ind3
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    ! 1. Declaration of the type of variable which have to be interpolated (parent=>child)
    !       agrif_declare_variable(position,1st point index,--,--,dimensions,name)
@@ -552,11 +552,11 @@ END SUBROUTINE agrif_declare_var_ice
 
 # if defined key_top
 SUBROUTINE Agrif_InitValues_cont_top
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_InitValues_cont_top ***
-   !!
-   !! ** Purpose :: Declaration of variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_InitValues_cont_top ***
+      !!
+      !! ** Purpose :: Declaration of variables to be interpolated
+      !!----------------------------------------------------------------------
    USE Agrif_Util
    USE oce 
    USE dom_oce
@@ -574,7 +574,7 @@ SUBROUTINE Agrif_InitValues_cont_top
    !
    CHARACTER(len=10) :: cl_check1, cl_check2, cl_check3
    LOGICAL :: check_namelist
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
 
 
    ! 1. Declaration of the type of variable which have to be interpolated
@@ -633,11 +633,11 @@ END SUBROUTINE Agrif_InitValues_cont_top
 
 
 SUBROUTINE agrif_declare_var_top
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE agrif_declare_var_top ***
-   !!
-   !! ** Purpose :: Declaration of TOP variables to be interpolated
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE agrif_declare_var_top ***
+      !!
+      !! ** Purpose :: Declaration of TOP variables to be interpolated
+      !!----------------------------------------------------------------------
    USE agrif_util
    USE agrif_oce
    USE dom_oce
@@ -646,7 +646,7 @@ SUBROUTINE agrif_declare_var_top
    IMPLICIT NONE
    !
    INTEGER :: ind1, ind2, ind3
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
 
    ! 1. Declaration of the type of variable which have to be interpolated
    !---------------------------------------------------------------------
@@ -683,12 +683,12 @@ END SUBROUTINE agrif_declare_var_top
 # endif
 
 SUBROUTINE Agrif_detect( kg, ksizex )
-   !!----------------------------------------------------------------------
-   !!                      *** ROUTINE Agrif_detect ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                      *** ROUTINE Agrif_detect ***
+      !!----------------------------------------------------------------------
    INTEGER, DIMENSION(2) :: ksizex
    INTEGER, DIMENSION(ksizex(1),ksizex(2)) :: kg 
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    RETURN
    !
@@ -696,9 +696,9 @@ END SUBROUTINE Agrif_detect
 
 
 SUBROUTINE agrif_nemo_init
-   !!----------------------------------------------------------------------
-   !!                     *** ROUTINE agrif_init ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                     *** ROUTINE agrif_init ***
+      !!----------------------------------------------------------------------
    USE agrif_oce 
    USE agrif_ice
    USE in_out_manager
@@ -709,7 +709,7 @@ SUBROUTINE agrif_nemo_init
    INTEGER  ::   ios                 ! Local integer output status for namelist read
    INTEGER  ::   iminspon
    NAMELIST/namagrif/ rn_sponge_tra, rn_sponge_dyn, ln_spc_dyn, ln_chk_bathy
-   !!--------------------------------------------------------------------------------------
+      !!--------------------------------------------------------------------------------------
    !
    REWIND( numnam_ref )              ! Namelist namagrif in reference namelist : AGRIF zoom
    READ  ( numnam_ref, namagrif, IOSTAT = ios, ERR = 901)
@@ -746,15 +746,15 @@ END SUBROUTINE agrif_nemo_init
 # if defined key_mpp_mpi
 
 SUBROUTINE Agrif_InvLoc( indloc, nprocloc, i, indglob )
-   !!----------------------------------------------------------------------
-   !!                     *** ROUTINE Agrif_InvLoc ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                     *** ROUTINE Agrif_InvLoc ***
+      !!----------------------------------------------------------------------
    USE dom_oce
    !!
    IMPLICIT NONE
    !
    INTEGER :: indglob, indloc, nprocloc, i
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    SELECT CASE( i )
    CASE(1)   ;   indglob = indloc + nimppt(nprocloc+1) - 1
@@ -767,16 +767,16 @@ END SUBROUTINE Agrif_InvLoc
 
 
 SUBROUTINE Agrif_get_proc_info( imin, imax, jmin, jmax )
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_get_proc_info ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_get_proc_info ***
+      !!----------------------------------------------------------------------
    USE par_oce
    !!
    IMPLICIT NONE
    !
    INTEGER, INTENT(out) :: imin, imax
    INTEGER, INTENT(out) :: jmin, jmax
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    imin = nimppt(Agrif_Procrank+1)  ! ?????
    jmin = njmppt(Agrif_Procrank+1)  ! ?????
@@ -787,9 +787,9 @@ END SUBROUTINE Agrif_get_proc_info
 
 
 SUBROUTINE Agrif_estimate_parallel_cost(imin, imax,jmin, jmax, nbprocs, grid_cost)
-   !!----------------------------------------------------------------------
-   !!                 *** ROUTINE Agrif_estimate_parallel_cost ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                 *** ROUTINE Agrif_estimate_parallel_cost ***
+      !!----------------------------------------------------------------------
    USE par_oce
    !!
    IMPLICIT NONE
@@ -798,7 +798,7 @@ SUBROUTINE Agrif_estimate_parallel_cost(imin, imax,jmin, jmax, nbprocs, grid_cos
    INTEGER,  INTENT(in)  :: jmin, jmax
    INTEGER,  INTENT(in)  :: nbprocs
    REAL(wp), INTENT(out) :: grid_cost
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
    !
    grid_cost = REAL(imax-imin+1,wp)*REAL(jmax-jmin+1,wp) / REAL(nbprocs,wp)
    !
@@ -808,9 +808,9 @@ END SUBROUTINE Agrif_estimate_parallel_cost
 
 #else
 SUBROUTINE Subcalledbyagrif
-   !!----------------------------------------------------------------------
-   !!                   *** ROUTINE Subcalledbyagrif ***
-   !!----------------------------------------------------------------------
+      !!----------------------------------------------------------------------
+      !!                   *** ROUTINE Subcalledbyagrif ***
+      !!----------------------------------------------------------------------
    WRITE(*,*) 'Impossible to be here'
 END SUBROUTINE Subcalledbyagrif
 #endif

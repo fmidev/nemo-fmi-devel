@@ -88,9 +88,9 @@ MODULE sbcice_cice
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:), PRIVATE ::   png     ! local array used in sbc_cice_ice
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

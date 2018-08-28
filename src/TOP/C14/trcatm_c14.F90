@@ -21,9 +21,9 @@ MODULE trcatm_c14
    PUBLIC   trc_atm_c14_ini     ! called in trcini_c14.F90
    !
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: trcatm_c14.F90 .... $ 
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

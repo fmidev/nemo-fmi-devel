@@ -49,7 +49,7 @@ MODULE icedyn_adv_pra
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icedyn_adv_pra.F90 6746 2016-06-27 17:20:57Z clem $
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

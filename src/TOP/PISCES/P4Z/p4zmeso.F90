@@ -45,7 +45,7 @@ MODULE p4zmeso
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: p4zmeso.F90 3160 2011-11-20 14:27:18Z cetlod $ 
-   !! Software governed by the CeCILL licence (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

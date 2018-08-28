@@ -38,7 +38,7 @@ MODULE icedyn_adv_umx
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icedyn_adv_umx.F90 4499 2014-02-18 15:14:31Z timgraham $
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

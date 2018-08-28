@@ -30,9 +30,9 @@ MODULE sbcdcy
    PUBLIC   sbc_dcy        ! routine called by sbc
 
    !!----------------------------------------------------------------------
-   !! NEMO/OCE 4.0 , NEMO Consortium (2018) 
+   !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$ 
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

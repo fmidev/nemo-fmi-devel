@@ -37,7 +37,7 @@ MODULE agrif_ice_update
    !!----------------------------------------------------------------------
    !! NEMO/NST 4.0 , NEMO Consortium (2018)
    !! $Id: agrif_ice_update.F90 6204 2016-01-04 13:47:06Z cetlod $
-   !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

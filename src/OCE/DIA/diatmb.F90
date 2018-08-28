@@ -21,8 +21,8 @@ MODULE diatmb
 
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id:$
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! $Id$
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

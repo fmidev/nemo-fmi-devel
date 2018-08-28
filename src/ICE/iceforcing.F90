@@ -37,9 +37,9 @@ MODULE iceforcing
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/ICE 4.0 , UCL NEMO Consortium (2018)
+   !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id: icestp.F90 8319 2017-07-11 15:00:44Z clem $
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

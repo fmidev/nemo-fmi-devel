@@ -55,9 +55,9 @@ MODULE sbcssm
    TYPE(FLD), ALLOCATABLE, DIMENSION(:) :: sf_ssm_2d  ! structure of input fields (file information, fields read)
 
    !!----------------------------------------------------------------------
-   !! NEMO/OFF 4.0 , NEMO Consortium (2018)
+   !! NEMO/SAS 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL licence     (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 

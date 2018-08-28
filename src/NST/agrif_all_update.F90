@@ -29,7 +29,7 @@
    !!----------------------------------------------------------------------
    !! NEMO/NST 4.0 , NEMO Consortium (2018)
    !! $Id: agrif_all_update.F90 9758 2018-06-07 09:18:26Z jchanut $
-   !! Software governed by the CeCILL licence (./LICENSE)
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
