@@ -48,7 +48,7 @@ MODULE p4zprod
    REAL(wp) ::   texcretd   ! 1 - excretd        
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: p4zprod.F90 3160 2011-11-20 14:27:18Z cetlod $ 
    !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------

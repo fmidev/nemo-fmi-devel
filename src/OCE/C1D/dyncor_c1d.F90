@@ -32,7 +32,7 @@ MODULE dyncor_c1d
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/C1D 3.7 , NEMO Consortium (2018)
+   !! NEMO/C1D 4.0 , NEMO Consortium (2018)
    !! $Id$ 
    !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------

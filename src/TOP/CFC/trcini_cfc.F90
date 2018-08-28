@@ -24,7 +24,7 @@ MODULE trcini_cfc
    REAL(wp) ::   ylatn =  10.           ! 10 degrees north
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id$ 
    !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------

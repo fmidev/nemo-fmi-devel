@@ -26,7 +26,7 @@ MODULE p4zligand
    REAL(wp), PUBLIC ::  rfep     !: Dissolution rate of FeP
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: p4zligand.F90 3160 2011-11-20 14:27:18Z cetlod $ 
    !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------

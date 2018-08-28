@@ -1,6 +1,6 @@
 #if defined key_agrif
 !!----------------------------------------------------------------------
-!! NEMO/NST 3.6 , NEMO Consortium (2018)
+!! NEMO/NST 4.0 , NEMO Consortium (2018)
 !! $Id$
 !! Software governed by the CeCILL licence (./LICENSE)
 !!----------------------------------------------------------------------

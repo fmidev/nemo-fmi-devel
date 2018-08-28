@@ -28,7 +28,7 @@ MODULE trcrad
    LOGICAL , PUBLIC ::   ln_trcrad           !: flag to artificially correct negative concentrations
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id$ 
    !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------

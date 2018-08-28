@@ -121,7 +121,7 @@ MODULE p5zice
    REAL(wp) ::  xcoef2   = 1.21E-5 * 14. / 55.85 / 7.625 * 0.5 * 1.5
    REAL(wp) ::  xcoef3   = 1.15E-4 * 14. / 55.85 / 7.625 * 0.5 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: p4zice.F90 3160 2011-11-20 14:27:18Z cetlod $ 
    !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------

@@ -44,7 +44,7 @@ MODULE trcldf
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.7 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id$
    !! Software governed by the CeCILL licence (./LICENSE)
    !!----------------------------------------------------------------------

@@ -52,7 +52,7 @@ MODULE sms_c14
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:)     ::   tyrco2     ! Time (yr) atmospheric CO2 data
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $                                                                    $ 
    !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------

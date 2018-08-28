@@ -30,7 +30,7 @@ MODULE c1d
    LOGICAL , PUBLIC ::  ln_c1d_locpt !: Localization (or not) of 1D column in a grid
 
    !!----------------------------------------------------------------------
-   !! NEMO/C1D 3.7 , NEMO Consortium (2018)
+   !! NEMO/C1D 4.0 , NEMO Consortium (2018)
    !! $Id$ 
    !! Software governed by the CeCILL licence     (./LICENSE)
    !!======================================================================

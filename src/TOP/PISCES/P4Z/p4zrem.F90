@@ -42,7 +42,7 @@ MODULE p4zrem
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   denitr   !: denitrification array
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2018)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
    !! $Id: p4zrem.F90 3160 2011-11-20 14:27:18Z cetlod $ 
    !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
