@@ -34,7 +34,7 @@ MODULE stpctl
    INTEGER  ::   idrun, idtime, idssh, idu, ids, istatus
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id: stpctl.F90 9210 2018-01-11 15:41:21Z gm $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
