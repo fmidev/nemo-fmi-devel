@@ -36,7 +36,7 @@ MODULE icewri
 
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
-   !! $Id: icewri.F90 8409 2017-08-07 15:29:21Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

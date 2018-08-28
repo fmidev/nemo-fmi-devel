@@ -34,7 +34,7 @@ MODULE iscplhsb
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id: sbcrnf.F90 4666 2014-06-11 12:52:23Z mathiot $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

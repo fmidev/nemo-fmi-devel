@@ -51,7 +51,7 @@ MODULE zdfiwm
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id: zdfiwm.F90 8093 2017-05-30 08:13:14Z gm $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

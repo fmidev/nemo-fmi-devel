@@ -44,7 +44,7 @@ MODULE obs_averg_h2d
 
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id: obs_averg_h2d.F90 2715 2011-03-30 15:58:35Z rblod $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 

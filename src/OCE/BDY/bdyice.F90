@@ -40,7 +40,7 @@ MODULE bdyice
 
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id: bdyice.F90 8306 2017-07-10 10:18:03Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

@@ -48,7 +48,7 @@ MODULE icedyn_adv_pra
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
-   !! $Id: icedyn_adv_pra.F90 6746 2016-06-27 17:20:57Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

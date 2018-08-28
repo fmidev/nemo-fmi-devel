@@ -76,7 +76,7 @@ MODULE icevar
 
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
-   !! $Id: icevar.F90 8422 2017-08-08 13:58:05Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

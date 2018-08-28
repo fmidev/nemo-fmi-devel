@@ -45,7 +45,7 @@ MODULE icethd_do
 
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
-   !! $Id: icethd_do.F90 8420 2017-08-08 12:18:46Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

@@ -27,7 +27,7 @@ MODULE icetab
 
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
-   !! $Id: icetab.F90 8369 2017-07-25 14:38:38Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

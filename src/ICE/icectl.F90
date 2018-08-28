@@ -44,7 +44,7 @@ MODULE icectl
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
-   !! $Id: icectl.F90 5043 2015-01-28 16:44:18Z clem $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

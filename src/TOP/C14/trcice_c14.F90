@@ -13,7 +13,7 @@ MODULE trcice_c14
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
-   !! $Id: trcice_c14b.F90 4990 2014-12-15 16:42:49Z timgraham $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS

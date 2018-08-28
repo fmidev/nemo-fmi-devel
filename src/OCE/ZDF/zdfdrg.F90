@@ -75,7 +75,7 @@ MODULE zdfdrg
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
-   !! $Id: zdfdrg.F90 7753 2017-03-03 11:46:59Z gm $
+   !! $Id$
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
