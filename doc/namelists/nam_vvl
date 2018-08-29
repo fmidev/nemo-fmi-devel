@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&nam_vvl       !   vertical coordinate options                             (default: z-star)
+&nam_vvl       !   vertical coordinate options                          (default: z-star)
 !-----------------------------------------------------------------------
    ln_vvl_zstar  = .true.           !  z-star vertical coordinate
    ln_vvl_ztilde = .false.          !  z-tilde vertical coordinate: only high frequency variations

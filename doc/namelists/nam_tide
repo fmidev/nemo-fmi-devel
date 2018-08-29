@@ -1,7 +1,7 @@
 !-----------------------------------------------------------------------
-&nam_tide      !   tide parameters
+&nam_tide      !   tide parameters                                      (default: OFF)
 !-----------------------------------------------------------------------
-   ln_tide       = .false.                ! Activate tides
+   ln_tide     = .false.      ! Activate tides
       ln_tide_pot   = .true.                !  use tidal potential forcing
          ln_scal_load  = .false.               ! Use scalar approximation for
             rn_scal_load = 0.094               !     load potential

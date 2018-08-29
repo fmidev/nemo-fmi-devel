@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&nam_diaharm   !   Harmonic analysis of tidal constituents               ("key_diaharm")
+&nam_diaharm   !   Harmonic analysis of tidal constituents              ("key_diaharm")
 !-----------------------------------------------------------------------
     nit000_han = 1         ! First time step used for harmonic analysis
     nitend_han = 75        ! Last time step used for harmonic analysis

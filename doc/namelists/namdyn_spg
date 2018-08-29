@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namdyn_spg    !   surface pressure gradient                            (default: NO)
+&namdyn_spg    !   surface pressure gradient                            (default: NO selection)
 !-----------------------------------------------------------------------
    ln_dynspg_exp  = .false.   ! explicit free surface
    ln_dynspg_ts   = .false.   ! split-explicit free surface

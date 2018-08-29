@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namtra_adv_mle !   mixed layer eddy parametrisation (Fox-Kemper param) (default: NO)
+&namtra_mle    !   mixed layer eddy parametrisation (Fox-Kemper)       (default: OFF)
 !-----------------------------------------------------------------------
    ln_mle      = .false.   ! (T) use the Mixed Layer Eddy (MLE) parameterisation
    rn_ce       = 0.06      ! magnitude of the MLE (typical value: 0.06 to 0.08)

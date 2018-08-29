@@ -1,7 +1,7 @@
 !-----------------------------------------------------------------------
 &namtra_adv    !   advection scheme for tracer                          (default: NO selection)
 !-----------------------------------------------------------------------
-   ln_traadv_NONE= .false. !  No tracer advection
+   ln_traadv_OFF = .false. !  No tracer advection
    ln_traadv_cen = .false. !  2nd order centered scheme
       nn_cen_h   =  4            !  =2/4, horizontal 2nd order CEN / 4th order CEN
       nn_cen_v   =  4            !  =2/4, vertical   2nd order CEN / 4th order COMPACT

@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namflo        !   float parameters                                      ("key_float")
+&namflo        !   float parameters                                     ("key_float")
 !-----------------------------------------------------------------------
    jpnfl       = 1         !  total number of floats during the run
    jpnnewflo   = 0         !  number of floats for the restart

@@ -139,7 +139,7 @@
    ln_OFF     = .false.    !  free-slip       : Cd = 0                  (F => fill namdrg_bot
    ln_lin     = .false.    !      linear  drag: Cd = Cd0 Uc0                   &   namdrg_top)
    ln_non_lin = .true.     !  non-linear  drag: Cd = Cd0 |U|
-   ln_loglayer= .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
+   ln_loglayer = .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
    !
    ln_drgimp  = .false.    !  implicit top/bottom friction flag
 /
@@ -152,7 +152,7 @@
    rn_ke0     =  0.0e-0    !  background kinetic energy  [m2/s2] (non-linear cases)
    rn_z0      =  3.0e-3    !  roughness [m] (ln_loglayer=T)
    ln_boost   = .false.    !  =T regional boost of Cd0 ; =F constant
-      rn_boost=  50.          !  local boost factor  [-]
+      rn_boost =  50.          !  local boost factor  [-]
 /
 !-----------------------------------------------------------------------
 &namdrg_bot    !   BOTTOM friction                                  
@@ -163,7 +163,7 @@
    rn_ke0     =  2.5e-3   !  background kinetic energy  [m2/s2] (non-linear cases)
    rn_z0      =  3.e-3    !  roughness [m] (ln_loglayer=T)
    ln_boost   = .false.   !  =T regional boost of Cd0 ; =F constant
-      rn_boost=  50.         !  local boost factor  [-]
+      rn_boost =  50.         !  local boost factor  [-]
 /
 !!======================================================================
 !!                        Tracer (T-S) namelists                      !!

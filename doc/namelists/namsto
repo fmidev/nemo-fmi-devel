@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namsto        ! Stochastic parametrization of EOS                      (default: NO)
+&namsto        ! Stochastic parametrization of EOS                      (default: OFF)
 !-----------------------------------------------------------------------
    ln_sto_eos  = .false.   ! stochastic equation of state
    nn_sto_eos  = 1         ! number of independent random walks

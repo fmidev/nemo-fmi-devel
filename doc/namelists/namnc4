@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namnc4        !   netcdf4 chunking and compression settings             ("key_netcdf4")
+&namnc4        !   netcdf4 chunking and compression settings            ("key_netcdf4")
 !-----------------------------------------------------------------------
    nn_nchunks_i=   4       !  number of chunks in i-dimension
    nn_nchunks_j=   4       !  number of chunks in j-dimension

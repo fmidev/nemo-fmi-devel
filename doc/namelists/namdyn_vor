@@ -1,10 +1,14 @@
 !-----------------------------------------------------------------------
-&namdyn_vor    !   Vorticity / Coriolis scheme                          (default: NO)
+&namdyn_vor    !   Vorticity / Coriolis scheme                          (default: NO selection)
 !-----------------------------------------------------------------------
-   ln_dynvor_ene = .false. !  enstrophy conserving scheme
-   ln_dynvor_ens = .false. !  energy conserving scheme
+   ln_dynvor_ene = .false. !  energy    conserving scheme
+   ln_dynvor_ens = .false. !  enstrophy conserving scheme
    ln_dynvor_mix = .false. !  mixed scheme
+   ln_dynvor_enT = .false. !  energy conserving scheme (T-point)
+   ln_dynvor_eeT = .false. !  energy conserving scheme (een using e3t)
    ln_dynvor_een = .false. !  energy & enstrophy scheme
-      nn_een_e3f = 1          ! e3f = masked averaging of e3t divided by 4 (=0) or by the sum of mask (=1)
-   ln_dynvor_msk = .false. !  vorticity multiplied by fmask (=T) or not (=F) (all vorticity schemes)  ! PLEASE DO NOT ACTIVATE
+      nn_een_e3f = 1          ! =0  e3f = mi(mj(e3t))/4 
+      !                       ! =1  e3f = mi(mj(e3t))/mi(mj( tmask))
+   ln_dynvor_msk = .false. !  vorticity multiplied by fmask (=T)        ==>>> PLEASE DO NOT ACTIVATE
+      !                    !  (f-point vorticity schemes only)
 /

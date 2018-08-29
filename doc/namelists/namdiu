@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namdiu        !   Cool skin and warm layer models                       (default F)
+&namdiu        !   Cool skin and warm layer models                      (default: OFF)
 !-----------------------------------------------------------------------
    ln_diurnal      = .false.   !
    ln_diurnal_only = .false.   !

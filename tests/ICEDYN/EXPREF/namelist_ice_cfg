@@ -94,7 +94,7 @@
    sn_tsu = 'initice'                 , -12 ,'tsu'   ,  .false.  , .true., 'yearly'  , '' , '', ''
    sn_tmi = 'initice'                 , -12 ,'tmi'   ,  .false.  , .true., 'yearly'  , '' , '', ''
    sn_smi = 'initice'                 , -12 ,'smi'   ,  .false.  , .true., 'yearly'  , '' , '', ''
-   cn_dir='./'
+   cn_dir ='./'
 /
 !------------------------------------------------------------------------------
 &namalb         !   albedo parameters

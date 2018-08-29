@@ -1,9 +1,9 @@
 !-----------------------------------------------------------------------
-&namtra_dmp    !   tracer: T & S newtonian damping                      (default: NO)
+&namtra_dmp    !   tracer: T & S newtonian damping                      (default: OFF)
 !-----------------------------------------------------------------------
-   ln_tradmp   =  .true.   !  add a damping term
-      nn_zdmp     =    0      !  vertical shape =0    damping throughout the water column
+   ln_tradmp   =  .false.  !  add a damping term (using resto.nc coef.)
+      nn_zdmp  =    0         !  vertical shape =0    damping throughout the water column
       !                       !                 =1 no damping in the mixing layer (kz  criteria)
       !                       !                 =2 no damping in the mixed  layer (rho crieria)
-      cn_resto    ='resto.nc' !  Name of file containing restoration coeff. field (use dmp_tools to create this)
+      cn_resto = 'resto.nc'   !  Name of file containing restoration coeff. field (use dmp_tools to create this)
 /

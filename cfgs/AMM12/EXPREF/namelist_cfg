@@ -218,7 +218,7 @@
 !-----------------------------------------------------------------------
 &namdrg        !   top/bottom drag coefficient                          (default: NO selection)
 !-----------------------------------------------------------------------
-   ln_loglayer= .true.     !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
+   ln_loglayer = .true.     !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
 /
 !-----------------------------------------------------------------------
 &namdrg_bot    !   BOTTOM friction                                  

@@ -1,7 +1,8 @@
 !-----------------------------------------------------------------------
-&namobs        !  observation usage switch
+&namobs        !  observation usage switch                              (default: OFF)
 !-----------------------------------------------------------------------
    ln_diaobs   = .false.             ! Logical switch for the observation operator
+   !
    ln_t3d      = .false.             ! Logical switch for T profile observations
    ln_s3d      = .false.             ! Logical switch for S profile observations
    ln_sla      = .false.             ! Logical switch for SLA observations
@@ -50,6 +51,6 @@
    nn_2dint_sst = 0                  ! Horizontal interpolation method for SST
    nn_2dint_sss = 0                  ! Horizontal interpolation method for SSS
    nn_2dint_sic = 0                  ! Horizontal interpolation method for SIC
-   nn_msshc    = 0                   ! MSSH correction scheme
+   nn_msshc     = 0                  ! MSSH correction scheme
    nn_profdavtypes = -1              ! Profile daily average types - array
 /

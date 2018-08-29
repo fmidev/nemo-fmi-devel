@@ -49,7 +49,7 @@
       cn_ocerst_in    = "restart"   !  suffix of ocean restart name (input)
       cn_ocerst_indir = "."         !  directory from which to read input ocean restarts
       cn_ocerst_out   = "restart"   !  suffix of ocean restart name (output)
-      cn_ocerst_outdir= "."         !  directory in which to write output ocean restarts
+      cn_ocerst_outdir = "."         !  directory in which to write output ocean restarts
    ln_iscpl    = .false.   !  cavity evolution forcing or coupling to ice sheet model
    nn_istate   =       0   !  output the initial state (1) or not (0)
    ln_rst_list = .false.   !  output restarts at list of times using nn_stocklist (T) or at set frequency with nn_stock (F)
@@ -89,7 +89,7 @@
       !                         !       from the bathymetry at runtime.
       !                         !  If closea_mask field doesn't exist in the domain_cfg file
       !                         !       then this logical does nothing.
-   ln_write_cfg= .false.   !  (=T) create the domain configuration file
+   ln_write_cfg = .false.   !  (=T) create the domain configuration file
       cn_domcfg_out = "domain_cfg_out" ! newly created domain configuration filename
       !
    ln_use_jattr = .false.  !  use (T) the file attribute: open_ocean_jstart, if present
@@ -115,7 +115,7 @@
    ln_wd_il    = .false    !  T/F activation of iterative   limiter
    ln_wd_dl    = .false.   !  T/F activation of directional limiter
    ln_wd_dl_bc = .false.   !  T/F Directional limiteer Baroclinic option
-   ln_wd_dl_rmp= .false.   !  T/F Turn on directional limiter ramp
+   ln_wd_dl_rmp = .false.   !  T/F Turn on directional limiter ramp
    rn_wdmin0   =  0.30     !  depth at which WaD starts
    rn_wdmin1   =  0.2      !  Minimum wet depth on dried cells
    rn_wdmin2   =  0.0001   !  Tolerance of min wet depth on dried cells
@@ -142,7 +142,7 @@
 !-----------------------------------------------------------------------
    rn_lat1d    =      50   !  Column latitude
    rn_lon1d    =    -145   !  Column longitude
-   ln_c1d_locpt=  .true.   ! Localization of 1D config in a grid (T) or independant point (F)
+   ln_c1d_locpt =  .true.   ! Localization of 1D config in a grid (T) or independant point (F)
 /
 !-----------------------------------------------------------------------
 &namc1d_dyndmp !   U & V newtonian damping                              ("key_c1d" default: OFF)
@@ -247,8 +247,8 @@
 !-----------------------------------------------------------------------
    !                    !  bulk algorithm :
    ln_NCAR     = .false.   ! "NCAR"      algorithm   (Large and Yeager 2008)
-   ln_COARE_3p0= .false.   ! "COARE 3.0" algorithm   (Fairall et al. 2003)
-   ln_COARE_3p5= .false.   ! "COARE 3.5" algorithm   (Edson et al. 2013)
+   ln_COARE_3p0 = .false.   ! "COARE 3.0" algorithm   (Fairall et al. 2003)
+   ln_COARE_3p5 = .false.   ! "COARE 3.5" algorithm   (Edson et al. 2013)
    ln_ECMWF    = .false.   ! "ECMWF"     algorithm   (IFS cycle 31)
       !
       rn_zqt      = 10.       !  Air temperature & humidity reference height (m)
@@ -397,11 +397,11 @@
 !-----------------------------------------------------------------------
 &namsbc_rnf    !   runoffs                                              (ln_rnf =T)
 !-----------------------------------------------------------------------
-   ln_rnf_mouth= .false.   !  specific treatment at rivers mouths
+   ln_rnf_mouth = .false.   !  specific treatment at rivers mouths
       rn_hrnf     =  15.e0    !  depth over which enhanced vertical mixing is used    (ln_rnf_mouth=T)
       rn_avt_rnf  =   1.e-3   !  value of the additional vertical mixing coef. [m2/s] (ln_rnf_mouth=T)
    rn_rfact    =   1.e0    !  multiplicative factor for runoff
-   ln_rnf_depth= .false.   !  read in depth information for runoff
+   ln_rnf_depth = .false.   !  read in depth information for runoff
    ln_rnf_tem  = .false.   !  read in temperature information for runoff
    ln_rnf_sal  = .false.   !  read in salinity information for runoff
    ln_rnf_depth_ini = .false. ! compute depth at initialisation from runoff file
@@ -461,8 +461,8 @@
 !* nn_isf = 3 case
    sn_rnfisf   = 'rnfisf'    ,         -12       ,'sofwfisf' ,  .false.    , .true.  , 'yearly'  ,    ''    ,   ''     ,    ''
 !* nn_isf = 2 and 3 cases 
-   sn_depmax_isf='rnfisf'    ,         -12       ,'sozisfmax',  .false.    , .true.  , 'yearly'  ,    ''    ,   ''     ,    ''
-   sn_depmin_isf='rnfisf'    ,         -12       ,'sozisfmin',  .false.    , .true.  , 'yearly'  ,    ''    ,   ''     ,    ''
+   sn_depmax_isf ='rnfisf'    ,         -12       ,'sozisfmax',  .false.    , .true.  , 'yearly'  ,    ''    ,   ''     ,    ''
+   sn_depmin_isf ='rnfisf'    ,         -12       ,'sozisfmin',  .false.    , .true.  , 'yearly'  ,    ''    ,   ''     ,    ''
 !* nn_isf = 2 case
    sn_Leff_isf = 'rnfisf'    ,         -12       ,'Leff'     ,  .false.    , .true.  , 'yearly'  ,    ''    ,   ''     ,    ''
 /
@@ -580,7 +580,7 @@
    ln_coords_file = .true.    !  =T : read bdy coordinates from file
       cn_coords_file = 'coordinates.bdy.nc'  !  bdy coordinates files
    ln_mask_file   = .false.   !  =T : read mask from file
-      cn_mask_file= ''        !  name of mask file (if ln_mask_file=.TRUE.)
+      cn_mask_file = ''        !  name of mask file (if ln_mask_file=.TRUE.)
    cn_dyn2d    = 'none'       !
    nn_dyn2d_dta   =  0        !  = 0, bdy data are equal to the initial state
       !                       !  = 1, bdy data are read in 'bdydata   .nc' files
@@ -602,7 +602,7 @@
    ln_tra_dmp    =.false.     !  open boudaries conditions for tracers
    ln_dyn3d_dmp  =.false.     !  open boundary condition for baroclinic velocities
    rn_time_dmp   =  1.        !  Damping time scale in days
-   rn_time_dmp_out= 1.        !  Outflow damping time scale
+   rn_time_dmp_out = 1.        !  Outflow damping time scale
    nn_rimwidth   = 10         !  width of the relaxation zone
    ln_vol        = .false.    !  total volume correction (see nn_volctl parameter)
    nn_volctl     =  1         !  = 0, the total water flux across open boundaries is zero
@@ -793,7 +793,7 @@
    rn_lat      = 20.       ! reference latitude (degrees) of MLE coef.                        (case rn_mle=1)
    nn_mld_uv   = 0         ! space interpolation of MLD at u- & v-pts (0=min,1=averaged,2=max)
    nn_conv     = 0         ! =1 no MLE in case of convection ; =0 always MLE
-   rn_rho_c_mle= 0.01      ! delta rho criterion used to calculate MLD for FK
+   rn_rho_c_mle = 0.01      ! delta rho criterion used to calculate MLD for FK
 /
 !-----------------------------------------------------------------------
 &namtra_eiv    !   eddy induced velocity param.                         (default: OFF)
@@ -856,7 +856,7 @@
    ln_dynadv_OFF = .false. !  linear dynamics (no momentum advection)
    ln_dynadv_vec = .false. !  vector form - 2nd centered scheme
      nn_dynkeg     = 0        ! grad(KE) scheme: =0   C2  ;  =1   Hollingsworth correction
-   ln_dynadv_cen2= .false. !  flux form - 2nd order centered scheme
+   ln_dynadv_cen2 = .false. !  flux form - 2nd order centered scheme
    ln_dynadv_ubs = .false. !  flux form - 3rd order UBS      scheme
 /
 !-----------------------------------------------------------------------
@@ -1153,7 +1153,7 @@
    ln_flork4   = .false.   !  trajectories computed with a 4th order Runge-Kutta (T)
    !                       !  or computed with Blanke' scheme (F)
    ln_ariane   = .true.    !  Input with Ariane tool convention(T)
-   ln_flo_ascii= .true.    !  Output with Ariane tool netcdf convention(F) or ascii file (T)
+   ln_flo_ascii = .true.    !  Output with Ariane tool netcdf convention(F) or ascii file (T)
 /
 !-----------------------------------------------------------------------
 &nam_diaharm   !   Harmonic analysis of tidal constituents              ("key_diaharm")
@@ -1169,7 +1169,7 @@
 !-----------------------------------------------------------------------
     nn_dct     = 15        !  time step frequency for transports computing
     nn_dctwri  = 15        !  time step frequency for transports writing
-    nn_secdebug= 112       !      0 : no section to debug
+    nn_secdebug = 112       !      0 : no section to debug
     !                      !     -1 : debug all section
     !                      !  0 < n : debug section number n
 /
@@ -1186,9 +1186,9 @@
 !-----------------------------------------------------------------------
 &namnc4        !   netcdf4 chunking and compression settings            ("key_netcdf4")
 !-----------------------------------------------------------------------
-   nn_nchunks_i=   4       !  number of chunks in i-dimension
-   nn_nchunks_j=   4       !  number of chunks in j-dimension
-   nn_nchunks_k=   31      !  number of chunks in k-dimension
+   nn_nchunks_i =   4       !  number of chunks in i-dimension
+   nn_nchunks_j =   4       !  number of chunks in j-dimension
+   nn_nchunks_k =   31      !  number of chunks in k-dimension
    !                       !  setting nn_nchunks_k = jpk will give a chunk size of 1 in the vertical which
    !                       !  is optimal for postprocessing which works exclusively with horizontal slabs
    ln_nc4zip   = .true.    !  (T) use netcdf4 chunking and compression
@@ -1235,7 +1235,7 @@
    cn_velfbfiles = 'vel_01.nc'       ! Velocity feedback input observation file names
    cn_altbiasfile = 'altbias.nc'     ! Altimeter bias input file name
    cn_sstbiasfiles = 'sstbias.nc'    ! SST bias input file name
-   cn_gridsearchfile='gridsearch.nc' ! Grid search file name
+   cn_gridsearchfile ='gridsearch.nc' ! Grid search file name
    rn_gridsearchres = 0.5            ! Grid search resolution
    rn_mdtcorr  = 1.61                ! MDT  correction
    rn_mdtcutoff = 65.0               ! MDT cutoff for computed correction
@@ -1291,7 +1291,7 @@
    cn_mpi_send =  'I'      !  mpi send/recieve type   ='S', 'B', or 'I' for standard send,
    !                       !  buffer blocking send or immediate non-blocking sends, resp.
    nn_buffer   =   0       !  size in bytes of exported buffer ('B' case), 0 no exportation
-   ln_nnogather=  .false.  !  activate code to avoid mpi_allgather use at the northfold
+   ln_nnogather =  .false.  !  activate code to avoid mpi_allgather use at the northfold
    jpni        =   0       !  jpni   number of processors following i (set automatically if < 1)
    jpnj        =   0       !  jpnj   number of processors following j (set automatically if < 1)
    jpnij       =   0       !  jpnij  number of local domains (set automatically if < 1)
@@ -1315,7 +1315,7 @@
 !-----------------------------------------------------------------------
    ln_sto_eos  = .false.   ! stochastic equation of state
    nn_sto_eos  = 1         ! number of independent random walks
-   rn_eos_stdxy= 1.4       ! random walk horz. standard deviation (in grid points)
+   rn_eos_stdxy = 1.4       ! random walk horz. standard deviation (in grid points)
    rn_eos_stdz = 0.7       ! random walk vert. standard deviation (in grid points)
    rn_eos_tcor = 1440.     ! random walk time correlation (in timesteps)
    nn_eos_ord  = 1         ! order of autoregressive processes

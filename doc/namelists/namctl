@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namctl        !   Control prints 
+&namctl        !   Control prints                                       (default: OFF)
 !-----------------------------------------------------------------------
    ln_ctl      = .false.   !  trends control print (expensive!)
    nn_print    =    0      !  level of print (0 no extra print)

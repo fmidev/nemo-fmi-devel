@@ -73,7 +73,7 @@
    ln_OFF     = .true.     !  free-slip       : Cd = 0                  (F => fill namdrg_bot
    ln_lin     = .false.    !      linear  drag: Cd = Cd0 Uc0                   &   namdrg_top)
    ln_non_lin = .false.    !  non-linear  drag: Cd = Cd0 |U|
-   ln_loglayer= .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
+   ln_loglayer = .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
    !
    ln_drgimp  = .true.     !  implicit top/bottom friction flag
 /
@@ -124,7 +124,7 @@
    ln_dynadv_OFF = .false. !  linear dynamics (no momentum advection)
    ln_dynadv_vec = .true. !  vector form (T) or flux form (F)
    nn_dynkeg     = 0       ! scheme for grad(KE): =0   C2  ;  =1   Hollingsworth correction
-   ln_dynadv_cen2= .false. !  flux form - 2nd order centered scheme
+   ln_dynadv_cen2 = .false. !  flux form - 2nd order centered scheme
    ln_dynadv_ubs = .false. !  flux form - 3rd order UBS      scheme
 /
 !-----------------------------------------------------------------------

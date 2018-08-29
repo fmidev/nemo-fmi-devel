@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&nameos        !   ocean Equation Of Seawater                           (default: NO)
+&nameos        !   ocean Equation Of Seawater                           (default: NO selection)
 !-----------------------------------------------------------------------
    ln_teos10   = .false.         !  = Use TEOS-10
    ln_eos80    = .false.         !  = Use EOS80

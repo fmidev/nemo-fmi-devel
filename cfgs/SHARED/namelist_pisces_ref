@@ -48,7 +48,7 @@
    ferat3     =  10.E-6   ! Fe/C in zooplankton 
    wsbio2     =  50.      ! Big particles sinking speed
    wsbio2max  =  50.      ! Big particles maximum sinking speed
-   wsbio2scale=  5000.    ! Big particles length scale of sinking
+   wsbio2scale =  5000.    ! Big particles length scale of sinking
    niter1max  =  1        ! Maximum number of iterations for POC
    niter2max  =  2        ! Maximum number of iterations for GOC
 !                         !  ln_ligand enabled

@@ -49,7 +49,7 @@
 !-----------------------------------------------------------------------
    ln_read_cfg = .false.   !  (=T) read the domain configuration file
       !                    !  (=F) user defined configuration  ==>>>  see usrdef(_...) modules
-   ln_write_cfg= .true.    !  (=T) create the domain configuration file
+   ln_write_cfg = .true.    !  (=T) create the domain configuration file
 /
 !-----------------------------------------------------------------------
 &namwad        !   Wetting and Drying (WaD)                             (default: OFF)
@@ -57,7 +57,7 @@
    ln_wd_il    = .false    ! T/F activation of iterative   limiter
    ln_wd_dl    = .true.    ! T/F activation of directional limiter
    ln_wd_dl_bc = .true.    ! T/F Directional limiteer Baroclinic option
-   ln_wd_dl_rmp= .true.    ! T/F Turn on directional limiter ramp
+   ln_wd_dl_rmp = .true.    ! T/F Turn on directional limiter ramp
    rn_wdmin0   =  0.30     ! depth at which WaD starts
    rn_wdmin1   =  0.2      ! Minimum wet depth on dried cells
    rn_wdmin2   =  0.0001   ! Tolerance of min wet depth on dried cells
@@ -204,7 +204,7 @@
 !-----------------------------------------------------------------------
 &namdrg        !   top/bottom drag coefficient                          (default: NO selection)
 !-----------------------------------------------------------------------
-   ln_loglayer= .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
+   ln_loglayer = .false.    !  logarithmic drag: Cd = vkarmn/log(z/z0) |U|
    ln_lin      = .true.    !      linear  drag: Cd = Cd0 Uc0                   &   namdrg_top)
    ln_non_lin  = .false.   !  non-linear  drag: Cd = Cd0 |U|
 /
@@ -221,7 +221,7 @@
    rn_ke0     =  2.5e-3   !  background kinetic energy  [m2/s2] (non-linear cases)
    rn_z0      =  3.e-3    !  roughness [m] (ln_loglayer=T)
    ln_boost   = .false.   !  =T regional boost of Cd0 ; =F constant
-      rn_boost=  50.         !  local boost factor  [-]
+      rn_boost =  50.         !  local boost factor  [-]
 /
 !-----------------------------------------------------------------------
 &nambbc        !   bottom temperature boundary condition                (default: OFF)
@@ -315,7 +315,7 @@
    ln_dynadv_OFF = .false. !  linear dynamics (no momentum advection)
    ln_dynadv_vec = .true. !  vector form - 2nd centered scheme
      nn_dynkeg     = 0        ! grad(KE) scheme: =0   C2  ;  =1   Hollingsworth correction
-   ln_dynadv_cen2= .false. !  flux form - 2nd order centered scheme
+   ln_dynadv_cen2 = .false. !  flux form - 2nd order centered scheme
    ln_dynadv_ubs = .false. !  flux form - 3rd order UBS      scheme
 /
 !-----------------------------------------------------------------------

@@ -1,5 +1,5 @@
 !-----------------------------------------------------------------------
-&namzdf        !   vertical physics                                     (default: NO selection)
+&namzdf        !   vertical physics manager                             (default: NO selection)
 !-----------------------------------------------------------------------
    !                       ! type of vertical closure (required)
    ln_zdfcst   = .false.      !  constant mixing

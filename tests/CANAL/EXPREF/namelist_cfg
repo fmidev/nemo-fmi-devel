@@ -30,13 +30,13 @@
    nn_fcase    =      0    !  F computation (0:f0, 1:Beta, 2:real)
    rn_ppgphi0  =    38.5   !  Reference latitude      [degrees]
    rn_u10      =      0.   !  10m wind speed              [m/s]
-     rn_windszx=   4000.   !  longitudinal wind extension   [km]
-     rn_windszy=   4000.   !  latitudinal wind extension    [km]
+     rn_windszx =   4000.   !  longitudinal wind extension   [km]
+     rn_windszy =   4000.   !  latitudinal wind extension    [km]
      rn_uofac  =      0.   !  Uoce multiplicative factor (0.:absolute or 1.:relative winds)
    rn_vtxmax   =      1.   !  initial vortex max current  [m/s]
    rn_uzonal   =      1.   !  initial zonal current       [m/s]
-     rn_ujetszx=   4000.   !  longitudinal jet extension   [km]
-     rn_ujetszy=   4000.   !  latitudinal jet extension    [km]
+     rn_ujetszx =   4000.   !  longitudinal jet extension   [km]
+     rn_ujetszy =   4000.   !  latitudinal jet extension    [km]
    nn_botcase  =      0    !  bottom definition (0:flat, 1:bump)
    nn_initcase =      1    !  initial condition case (0:rest, 1:zonal current, 2:current shear, 3: gaussian zonal current,
       !                    !                          4: geostrophic zonal pulse, 5: vortex)
@@ -181,7 +181,7 @@
    ln_dynadv_OFF = .false. !  linear dynamics (no momentum advection)
    ln_dynadv_vec = .false. !  vector form (T) or flux form (F)
       nn_dynkeg     = 0       ! scheme for grad(KE): =0   C2  ;  =1   Hollingsworth correction
-   ln_dynadv_cen2= .false. !  flux form - 2nd order centered scheme
+   ln_dynadv_cen2 = .false. !  flux form - 2nd order centered scheme
    ln_dynadv_ubs = .true.  !  flux form - 3rd order UBS      scheme
 /
 !-----------------------------------------------------------------------
