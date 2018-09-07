@@ -102,7 +102,42 @@ CONTAINS
 
       IF( l_trdtrc )  THEN             ! trends: store now fields before the Asselin filter application
          ALLOCATE( ztrdt(jpi,jpj,jpk,jptra) )
-         ztrdt(:,:,:,:)  = trn(:,:,:,:)
+         ztrdt(:,:,:,:)  = 0._wp
+         IF( ln_traldf_iso ) THEN                       ! diagnose the "pure" Kz diffusive trend 
+            DO jn = 1, jptra
+               CALL trd_tra( kt, 'TRC', jn, jptra_zdfp, ztrdt(:,:,:,jn) )
+            ENDDO
+         ENDIF
+
+         ! total trend for the non-time-filtered variables. 
+         zfact = 1.0 / rdttrc
+         ! G Nurser 23 Mar 2017. Recalculate trend as Delta(e3t*T)/e3tn; e3tn cancel from tsn terms
+         IF( ln_linssh ) THEN       ! linear sea surface height only
+            DO jn = 1, jptra
+               DO jk = 1, jpkm1
+                  ztrdt(:,:,jk,jn) = ( tra(:,:,jk,jn)*e3t_a(:,:,jk) / e3t_n(:,:,jk) - trn(:,:,jk,jn)) * zfact
+               END DO
+            END DO
+         ELSE
+            DO jn = 1, jptra
+               DO jk = 1, jpkm1
+                  ztrdt(:,:,jk,jn) = ( tra(:,:,jk,jn) - trn(:,:,jk,jn) ) * zfact
+               END DO
+            END DO
+         ENDIF
+         !
+         DO jn = 1, jptra
+            CALL trd_tra( kt, 'TRC', jn, jptra_tot, ztrdt(:,:,:,jn) )
+         ENDDO
+
+         ENDIF
+         !
+         IF( ln_linssh ) THEN       ! linear sea surface height only
+            ! Store now fields before applying the Asselin filter 
+            ! in order to calculate Asselin filter trend later.
+            ztrdt(:,:,:,:) = trn(:,:,:,:) 
+         ENDIF
+
       ENDIF
       !                                ! Leap-Frog + Asselin filter time stepping
       IF( (neuler == 0 .AND. kt == nittrc000) .OR. ln_top_euler ) THEN    ! Euler time-stepping (only swap)
@@ -112,6 +147,14 @@ CONTAINS
                trb(:,:,jk,jn) = trn(:,:,jk,jn)  
             END DO
          END DO
+         IF (l_trdtrc .AND. .NOT. ln_linssh ) THEN   ! Zero Asselin filter contribution must be explicitly written out since for vvl
+            !                                        ! Asselin filter is output by tra_nxt_vvl that is not called on this time step
+            ztrdt(:,:,:,:) = 0._wp            
+            DO jn = 1, jptra
+               CALL trd_tra( kt, 'TRC', jn, jptra_atf, ztrdt(:,:,:,jn) )
+            ENDDO
+         END IF
+         !
       ELSE     
          IF( .NOT. l_offline ) THEN ! Leap-Frog + Asselin filter time stepping
             IF( ln_linssh ) THEN   ;   CALL tra_nxt_fix( kt, nittrc000,         'TRC', trb, trn, tra, jptra )  !     linear ssh
@@ -125,16 +168,16 @@ CONTAINS
          CALL lbc_lnk_multi( trb(:,:,:,:), 'T', 1._wp, trn(:,:,:,:), 'T', 1._wp, tra(:,:,:,:), 'T', 1._wp )
       ENDIF
       !
-      IF( l_trdtrc ) THEN              ! trends: send Asselin filter trends to trdtra manager for further diagnostics
+      IF( l_trdtrc .AND. ln_linssh ) THEN      ! trend of the Asselin filter (tb filtered - tb)/dt )
          DO jn = 1, jptra
             DO jk = 1, jpkm1
                zfact = 1._wp / r2dttrc  
                ztrdt(:,:,jk,jn) = ( trb(:,:,jk,jn) - ztrdt(:,:,jk,jn) ) * zfact 
-               CALL trd_tra( kt, 'TRC', jn, jptra_atf, ztrdt )
             END DO
+            CALL trd_tra( kt, 'TRC', jn, jptra_atf, ztrdt(:,:,:,jn) )
          END DO
-         DEALLOCATE( ztrdt ) 
       END IF
+      IF( l_trdtrc ) DEALLOCATE( ztrdt ) 
       !
       IF(ln_ctl)   THEN  ! print mean trends (used for debugging)
          WRITE(charout, FMT="('nxt')")

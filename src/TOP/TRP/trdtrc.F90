@@ -80,21 +80,21 @@ CONTAINS
       IF( lk_trdtrc .AND. ln_trdtrc( kjn ) ) THEN
          !
          SELECT CASE( ktrd )
-         CASE( jptra_xad  )       ;    WRITE (cltra,'("XAD_",4a)')
-         CASE( jptra_yad  )       ;    WRITE (cltra,'("YAD_",4a)')
-         CASE( jptra_zad  )       ;    WRITE (cltra,'("ZAD_",4a)')
-         CASE( jptra_ldf  )       ;    WRITE (cltra,'("LDF_",4a)')
-         CASE( jptra_bbl  )       ;    WRITE (cltra,'("BBL_",4a)')
-         CASE( jptra_nsr  )       ;    WRITE (cltra,'("FOR_",4a)')
-         CASE( jptra_zdf  )       ;    WRITE (cltra,'("ZDF_",4a)')
-         CASE( jptra_dmp  )       ;    WRITE (cltra,'("DMP_",4a)')
-         CASE( jptra_sms  )       ;    WRITE (cltra,'("SMS_",4a)')
-         CASE( jptra_atf  )       ;    WRITE (cltra,'("ATF_",4a)')
-         CASE( jptra_radb )       ;    WRITE (cltra,'("RDB_",4a)')
-         CASE( jptra_radn )       ;    WRITE (cltra,'("RDN_",4a)')
+         CASE( jptra_xad  )  ;  WRITE (cltra,'("XAD_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_yad  )  ;  WRITE (cltra,'("YAD_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_zad  )  ;  WRITE (cltra,'("ZAD_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_ldf  )  ;  WRITE (cltra,'("LDF_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_bbl  )  ;  WRITE (cltra,'("BBL_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_nsr  )  ;  WRITE (cltra,'("FOR_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_zdf  )  ;  WRITE (cltra,'("ZDF_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_zdfp )  ;  WRITE (cltra,'("ZDP_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_dmp  )  ;  WRITE (cltra,'("DMP_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_sms  )  ;  WRITE (cltra,'("SMS_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_tot  )  ;  WRITE (cltra,'("TOT_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_atf  )  ;  WRITE (cltra,'("ATF_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_radb )  ;  WRITE (cltra,'("RDB_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
+         CASE( jptra_radn )  ;  WRITE (cltra,'("RDN_",4a)')  ; cltra = TRIM(cltra)//TRIM(ctrcnm(kjn)) ; CALL iom_put( cltra,  ptrtrd(:,:,:) )
          END SELECT
-                                          cltra = TRIM(cltra)//TRIM(ctrcnm(kjn))
-                                          CALL iom_put( cltra,  ptrtrd(:,:,:) )
          !
       END IF
 
