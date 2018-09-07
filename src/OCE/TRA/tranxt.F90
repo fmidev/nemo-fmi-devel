@@ -290,7 +290,7 @@ CONTAINS
          ALLOCATE( ztrd_atf(jpi,jpj,jpk,kjpt) )
          ztrd_atf(:,:,:,:) = 0.0_wp
       ENDIF
-      zfact = 1._wp / r2dt
+      zfact = 1._wp / p2dt
       zfact1 = atfp * p2dt
       zfact2 = zfact1 * r1_rau0
       DO jn = 1, kjpt      
