@@ -96,13 +96,15 @@ CONTAINS
       !                                      !==  MLD used for MLE  ==!
       !                                                ! compute from the 10m density to deal with the diurnal cycle
       inml_mle(:,:) = mbkt(:,:) + 1                    ! init. to number of ocean w-level (T-level + 1)
-      DO jk = jpkm1, nlb10, -1                         ! from the bottom to nlb10 (10m)
-         DO jj = 1, jpj
-            DO ji = 1, jpi                             ! index of the w-level at the ML based
-               IF( rhop(ji,jj,jk) > rhop(ji,jj,nla10) + rn_rho_c_mle )   inml_mle(ji,jj) = jk      ! Mixed layer
+      IF ( nla10 > 0 ) THEN                            ! avoid case where first level is thicker than 10m
+         DO jk = jpkm1, nlb10, -1                      ! from the bottom to nlb10 (10m)
+            DO jj = 1, jpj
+               DO ji = 1, jpi                          ! index of the w-level at the ML based
+                  IF( rhop(ji,jj,jk) > rhop(ji,jj,nla10) + rn_rho_c_mle )   inml_mle(ji,jj) = jk      ! Mixed layer
+               END DO
             END DO
          END DO
-      END DO
+      ENDIF
       ikmax = MIN( MAXVAL( inml_mle(:,:) ), jpkm1 )                  ! max level of the computation
       !
       !
