@@ -129,8 +129,6 @@ CONTAINS
          DO jn = 1, jptra
             CALL trd_tra( kt, 'TRC', jn, jptra_tot, ztrdt(:,:,:,jn) )
          ENDDO
-
-         ENDIF
          !
          IF( ln_linssh ) THEN       ! linear sea surface height only
             ! Store now fields before applying the Asselin filter 

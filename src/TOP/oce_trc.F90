@@ -81,7 +81,8 @@ MODULE oce_trc
    USE ldfslp , ONLY :   vslp       =>   vslp         !: j-slope at v-point
    USE ldfslp , ONLY :   wslpi      =>   wslpi        !: i-slope at w-point
    USE ldfslp , ONLY :   wslpj      =>   wslpj        !: j-slope at w-point
-   USE ldfslp , ONLY :  ln_traldf_triad => ln_traldf_triad   !: use of triad scheme
+   USE ldfslp , ONLY :   ln_traldf_triad => ln_traldf_triad   !: use of triad scheme
+   USE ldfslp , ONLY :   ln_traldf_iso => ln_traldf_iso   !: use of isopycnal scheme
 !!gm end
 
    !* vertical diffusion *
