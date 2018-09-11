@@ -369,6 +369,7 @@
    ln_ironice  =  .true.   ! boolean for Fe input from sea ice
    ln_hydrofe  =  .false.  ! boolean for from hydrothermal vents
    sedfeinput  =  2.e-9    ! Coastal release of Iron
+   distcoast   =  5.e3     ! Distance off the coast for Iron from sediments
    dustsolub   =  0.02     ! Solubility of the dusta
    mfrac       =  0.035    ! Fe mineral fraction of dust
    wdust       =  2.0      ! Dust sinking speed 

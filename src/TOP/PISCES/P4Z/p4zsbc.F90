@@ -36,6 +36,7 @@ MODULE p4zsbc
    REAL(wp), PUBLIC ::   diazolight   !: Nitrogen fixation sensitivty to light 
    REAL(wp), PUBLIC ::   concfediaz   !: Fe half-saturation Cste for diazotrophs 
    REAL(wp)         ::   hratio       !: Fe:3He ratio assumed for vent iron supply
+   REAL(wp)         ::   distcoast    !: Distance off the coast for Iron from sediments
    REAL(wp), PUBLIC ::   fep_rats     !: Fep/Fer ratio from sed  sources
    REAL(wp), PUBLIC ::   fep_rath     !: Fep/Fer ratio from hydro sources
    REAL(wp), PUBLIC ::   lgw_rath     !: Weak ligand ratio from hydro sources
@@ -204,7 +205,7 @@ CONTAINS
       INTEGER  :: ios                 ! Local integer output status for namelist read
       INTEGER  :: ik50                !  last level where depth less than 50 m
       INTEGER  :: isrow             ! index for ORCA1 starting row
-      REAL(wp) :: zexpide, zdenitide, zmaskt
+      REAL(wp) :: zexpide, zdenitide, zmaskt, zsurfc, zsurfp,ze3t, ze3t2, zcslp
       REAL(wp) :: ztimes_dust, ztimes_riv, ztimes_ndep 
       REAL(wp), DIMENSION(nbtimes) :: zsteps                 ! times records
       REAL(wp), DIMENSION(:), ALLOCATABLE :: rivinput
@@ -219,7 +220,7 @@ CONTAINS
       NAMELIST/nampissbc/cn_dir, sn_dust, sn_solub, sn_riverdic, sn_riverdoc, sn_riverdin, sn_riverdon,     &
         &                sn_riverdip, sn_riverdop, sn_riverdsi, sn_ndepo, sn_ironsed, sn_hydrofe, &
         &                ln_dust, ln_solub, ln_river, ln_ndepo, ln_ironsed, ln_ironice, ln_hydrofe,    &
-        &                sedfeinput, dustsolub, icefeinput, wdust, mfrac, nitrfix, diazolight, concfediaz, &
+        &                sedfeinput, distcoast, dustsolub, icefeinput, wdust, mfrac, nitrfix, diazolight, concfediaz, &
         &                hratio, fep_rats, fep_rath, lgw_rath
       !!----------------------------------------------------------------------
       !
@@ -247,6 +248,7 @@ CONTAINS
          WRITE(numout,*) '      Fe input from seaice                     ln_ironice  = ', ln_ironice
          WRITE(numout,*) '      fe input from hydrothermal vents         ln_hydrofe  = ', ln_hydrofe
          WRITE(numout,*) '      coastal release of iron                  sedfeinput  = ', sedfeinput
+         WRITE(numout,*) '      distance off the coast                   distcoast   = ', distcoast
          WRITE(numout,*) '      solubility of the dust                   dustsolub   = ', dustsolub
          WRITE(numout,*) '      Mineral Fe content of the dust           mfrac       = ', mfrac
          WRITE(numout,*) '      Iron concentration in sea ice            icefeinput  = ', icefeinput
@@ -458,11 +460,17 @@ CONTAINS
          DO jk = 1, ik50
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
-                  IF( tmask(ji,jj,jk) /= 0. ) THEN
-                     zmaskt = tmask(ji+1,jj,jk) * tmask(ji-1,jj,jk) * tmask(ji,jj+1,jk)    &
-                        &                       * tmask(ji,jj-1,jk) * tmask(ji,jj,jk+1)
-                     IF( zmaskt == 0. )   zcmask(ji,jj,jk ) = MAX( 0.1, zcmask(ji,jj,jk) ) 
-                  END IF
+                  ze3t   = e3t_0(ji,jj,jk)
+                  zsurfc =  e1u(ji,jj) * ( 1. - umask(ji  ,jj  ,jk) )   &
+                          + e1u(ji,jj) * ( 1. - umask(ji-1,jj  ,jk) )   &
+                          + e2v(ji,jj) * ( 1. - vmask(ji  ,jj  ,jk) )   &
+                          + e2v(ji,jj) * ( 1. - vmask(ji  ,jj-1,jk) )
+                  zsurfp = zsurfc * ze3t / e1e2t(ji,jj)
+                  ! estimation of the coastal slope : 5 km off the coast
+                  ze3t2 = ze3t * ze3t
+                  zcslp = SQRT( ( distcoast*distcoast + ze3t2 ) / ze3t2 )
+                  !
+                  zcmask(ji,jj,jk) = zcmask(ji,jj,jk) + zcslp * zsurfp
                END DO
             END DO
          END DO
