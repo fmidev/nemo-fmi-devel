@@ -68,6 +68,9 @@ MODULE cpl_oasis3
    INTEGER, PUBLIC, PARAMETER ::   nmaxfld=60   ! Maximum number of coupling fields
    INTEGER, PUBLIC, PARAMETER ::   nmaxcat=5    ! Maximum number of coupling fields
    INTEGER, PUBLIC, PARAMETER ::   nmaxcpl=5    ! Maximum number of coupling fields
+   LOGICAL, PARAMETER         ::   ltmp_wapatch = .TRUE.   ! patch to restore wraparound rows in cpl_send, cpl_rcv, cpl_define  
+   INTEGER                    ::   nldi_save, nlei_save
+   INTEGER                    ::   nldj_save, nlej_save
    
    TYPE, PUBLIC ::   FLD_CPL               !: Type for coupling field information
       LOGICAL               ::   laction   ! To be coupled or not
@@ -144,6 +147,15 @@ CONTAINS
       CHARACTER(LEN=2) :: cli2
       !!--------------------------------------------------------------------
 
+      ! patch to restore wraparound rows in cpl_send, cpl_rcv, cpl_define
+      IF ( ltmp_wapatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+         IF( nimpp           ==      1 ) nldi = 1
+         IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+         IF( njmpp           ==      1 ) nldj = 1
+         IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+      ENDIF 
       IF(lwp) WRITE(numout,*)
       IF(lwp) WRITE(numout,*) 'cpl_define : initialization in coupled ocean/atmosphere case'
       IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~~~~'
@@ -295,6 +307,10 @@ CONTAINS
       CALL oasis_enddef(nerror)
       IF( nerror /= OASIS_Ok )   CALL oasis_abort ( ncomp_id, 'cpl_define', 'Failure in oasis_enddef')
       !
+      IF ( ltmp_wapatch ) THEN
+         nldi = nldi_save   ;   nlei = nlei_save
+         nldj = nldj_save   ;   nlej = nlej_save
+      ENDIF
    END SUBROUTINE cpl_define
    
    
@@ -312,6 +328,15 @@ CONTAINS
       !!
       INTEGER                                   ::   jc,jm     ! local loop index
       !!--------------------------------------------------------------------
+      ! patch to restore wraparound rows in cpl_send, cpl_rcv, cpl_define
+      IF ( ltmp_wapatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+         IF( nimpp           ==      1 ) nldi = 1
+         IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+         IF( njmpp           ==      1 ) nldj = 1
+         IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+      ENDIF
       !
       ! snd data to OASIS3
       !
@@ -340,6 +365,10 @@ CONTAINS
             
          ENDDO
       ENDDO
+      IF ( ltmp_wapatch ) THEN
+         nldi = nldi_save   ;   nlei = nlei_save
+         nldj = nldj_save   ;   nlej = nlej_save
+      ENDIF
       !
     END SUBROUTINE cpl_snd
 
@@ -360,12 +389,23 @@ CONTAINS
       INTEGER                                   ::   jc,jm     ! local loop index
       LOGICAL                                   ::   llaction, llfisrt
       !!--------------------------------------------------------------------
+      ! patch to restore wraparound rows in cpl_send, cpl_rcv, cpl_define
+      IF ( ltmp_wapatch ) THEN
+         nldi_save = nldi   ;   nlei_save = nlei
+         nldj_save = nldj   ;   nlej_save = nlej
+      ENDIF
       !
       ! receive local data from OASIS3 on every process
       !
       kinfo = OASIS_idle
       !
       DO jc = 1, srcv(kid)%nct
+         IF ( ltmp_wapatch ) THEN
+            IF( nimpp           ==      1 ) nldi = 1
+            IF( nimpp + jpi - 1 == jpiglo ) nlei = jpi
+            IF( njmpp           ==      1 ) nldj = 1
+            IF( njmpp + jpj - 1 == jpjglo ) nlej = jpj
+         ENDIF
          llfisrt = .TRUE.
 
          DO jm = 1, srcv(kid)%ncplmodel
@@ -407,6 +447,10 @@ CONTAINS
             
          ENDDO
 
+         IF ( ltmp_wapatch ) THEN
+            nldi = nldi_save   ;   nlei = nlei_save
+            nldj = nldj_save   ;   nlej = nlej_save
+         ENDIF
          !--- Fill the overlap areas and extra hallows (mpp)
          !--- check periodicity conditions (all cases)
          IF( .not. llfisrt )   CALL lbc_lnk( pdata(:,:,jc), srcv(kid)%clgrid, srcv(kid)%nsgn )   
