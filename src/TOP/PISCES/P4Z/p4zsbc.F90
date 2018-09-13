@@ -74,8 +74,9 @@ MODULE p4zsbc
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ironsed          !: Coastal supply of iron
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   hydrofe          !: Hydrothermal vent supply of iron
 
-   REAL(wp), PUBLIC ::   rivalkinput, rivdicinput, nitdepinput, sumdepsi
-   REAL(wp), PUBLIC ::   rivdininput, rivdipinput, rivdsiinput
+   REAL(wp), PUBLIC :: sedsilfrac, sedcalfrac
+   REAL(wp), PUBLIC :: rivalkinput, rivdicinput
+   REAL(wp), PUBLIC :: rivdininput, rivdipinput, rivdsiinput
 
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
@@ -109,8 +110,8 @@ CONTAINS
       IF( ln_dust ) THEN
          IF( kt == nit000 .OR. ( kt /= nit000 .AND. ntimes_dust > 1 ) ) THEN
             CALL fld_read( kt, 1, sf_dust )
-            IF( nn_ice_tr == -1 .AND. .NOT.ln_ironice ) THEN   ;   dust(:,:) = sf_dust(1)%fnow(:,:,1)
-            ELSE                                               ;   dust(:,:) = sf_dust(1)%fnow(:,:,1) * ( 1.-fr_i(:,:) )
+            IF( nn_ice_tr == -1 .AND. .NOT.ln_ironice ) THEN   ;   dust(:,:) = MAX( rtrn, sf_dust(1)%fnow(:,:,1) )
+            ELSE                                               ;   dust(:,:) = MAX( rtrn, sf_dust(1)%fnow(:,:,1) * ( 1.-fr_i(:,:) ) )
             ENDIF
          ENDIF
       ENDIF
@@ -173,11 +174,11 @@ CONTAINS
          IF( kt == nit000 .OR. ( kt /= nit000 .AND. ntimes_ndep > 1 ) ) THEN
              zcoef = rno3 * 14E6 * ryyss
              CALL fld_read( kt, 1, sf_ndepo )
-             nitdep(:,:) = sf_ndepo(1)%fnow(:,:,1) / zcoef / e3t_n(:,:,1) 
+             nitdep(:,:) = MAX( rtrn, sf_ndepo(1)%fnow(:,:,1) / zcoef / e3t_n(:,:,1) )
          ENDIF
          IF( .NOT.ln_linssh ) THEN
            zcoef = rno3 * 14E6 * ryyss
-           nitdep(:,:) = sf_ndepo(1)%fnow(:,:,1) / zcoef / e3t_n(:,:,1) 
+           nitdep(:,:) = MAX( rtrn, sf_ndepo(1)%fnow(:,:,1) / zcoef / e3t_n(:,:,1) )
          ENDIF
       ENDIF
       !
@@ -209,7 +210,7 @@ CONTAINS
       REAL(wp) :: ztimes_dust, ztimes_riv, ztimes_ndep 
       REAL(wp), DIMENSION(nbtimes) :: zsteps                 ! times records
       REAL(wp), DIMENSION(:), ALLOCATABLE :: rivinput
-      REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zdust, zndepo, zriver, zcmask
+      REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zriver, zcmask
       !
       CHARACTER(len=100) ::  cn_dir          ! Root directory for location of ssr files
       TYPE(FLD_N), DIMENSION(jpriv) ::  slf_river    ! array of namelist informations on the fields to read
@@ -308,21 +309,7 @@ CONTAINS
             ! Get total input dust ; need to compute total atmospheric supply of Si in a year
             CALL iom_open (  TRIM( sn_dust%clname ) , numdust )
             CALL iom_gettime( numdust, zsteps, kntime=ntimes_dust)  ! get number of record in file
-            ALLOCATE( zdust(jpi,jpj,ntimes_dust) )
-            DO jm = 1, ntimes_dust
-               CALL iom_get( numdust, jpdom_data, TRIM( sn_dust%clvar ), zdust(:,:,jm), jm )
-            END DO
-            CALL iom_close( numdust )
-            ztimes_dust = 1._wp / REAL(ntimes_dust, wp) 
-            sumdepsi = 0.e0
-            DO jm = 1, ntimes_dust
-               sumdepsi = sumdepsi + glob_sum( zdust(:,:,jm) * e1e2t(:,:) * tmask(:,:,1) * ztimes_dust )
-            END DO
-            sumdepsi = sumdepsi / ( nyear_len(1) * rday ) * 12. * 8.8 * 0.075 * mfrac / 28.1 
-            DEALLOCATE( zdust)
-         ENDIF
-      ELSE
-         sumdepsi  = 0._wp
+         END IF
       END IF
 
       ! Solubility of dust deposition of iron
@@ -420,21 +407,7 @@ CONTAINS
             ! Get total input dust ; need to compute total atmospheric supply of N in a year
             CALL iom_open ( TRIM( sn_ndepo%clname ), numdepo )
             CALL iom_gettime( numdepo, zsteps, kntime=ntimes_ndep)
-            ALLOCATE( zndepo(jpi,jpj,ntimes_ndep) )
-            DO jm = 1, ntimes_ndep
-               CALL iom_get( numdepo, jpdom_data, TRIM( sn_ndepo%clvar ), zndepo(:,:,jm), jm )
-            END DO
-            CALL iom_close( numdepo )
-            ztimes_ndep = 1._wp / REAL(ntimes_ndep, wp) 
-            nitdepinput = 0._wp
-            DO jm = 1, ntimes_ndep
-              nitdepinput = nitdepinput + glob_sum( zndepo(:,:,jm) * e1e2t(:,:) * tmask(:,:,1) * ztimes_ndep )
-            ENDDO
-            nitdepinput = nitdepinput / rno3 / 14E6 
-            DEALLOCATE( zndepo)
          ENDIF
-      ELSE
-         nitdepinput = 0._wp
       ENDIF
 
       ! coastal and island masks
@@ -526,11 +499,10 @@ CONTAINS
          WRITE(numout,*) '    Alk Supply : ', rivalkinput*1E3/1E12         ,' Teq/yr'
          WRITE(numout,*) '    DIC Supply : ', rivdicinput*1E3*12./1E12     ,' TgC/yr'
          WRITE(numout,*) 
-         WRITE(numout,*) '    Total input of elements from atmospheric supply'
-         WRITE(numout,*) '    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-         WRITE(numout,*) '    N Supply   : ', nitdepinput*rno3*1E3/1E12*14.,' TgN/yr'
-         WRITE(numout,*) 
       ENDIF
+      !
+      sedsilfrac = 0.03     ! percentage of silica loss in the sediments
+      sedcalfrac = 0.6      ! percentage of calcite loss in the sediments
       !
    END SUBROUTINE p4z_sbc_init
 

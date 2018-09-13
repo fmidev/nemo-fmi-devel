@@ -48,9 +48,8 @@ CONTAINS
       !!---------------------------------------------------------------------
       !
       INTEGER, INTENT(in) ::   kt, knt ! ocean time step
-      INTEGER  ::   ji, jj, jk, ikt
-      REAL(wp) ::   zsumsedsi, zsumsedpo4, zsumsedcal
-      REAL(wp) ::   zrivalk, zrivsil, zrivno3
+      INTEGER  ::  ji, jj, jk, ikt
+      REAL(wp) ::  zrivalk, zrivsil, zrivno3
       REAL(wp) ::  zwflux, zfminus, zfplus
       REAL(wp) ::  zlim, zfact, zfactcal
       REAL(wp) ::  zo2, zno3, zflx, zpdenit, z1pdenit, zolimit
@@ -61,8 +60,7 @@ CONTAINS
       REAL(wp) ::  zwssfep
       !
       CHARACTER (len=25) :: charout
-      REAL(wp), DIMENSION(jpi,jpj    ) :: zwork1, zwork2, zwork3
-      REAL(wp), DIMENSION(jpi,jpj    ) :: zdenit2d, zbureff
+      REAL(wp), DIMENSION(jpi,jpj    ) :: zdenit2d, zbureff, zwork
       REAL(wp), DIMENSION(jpi,jpj    ) :: zwsbio3, zwsbio4, zwscal
       REAL(wp), DIMENSION(jpi,jpj    ) :: zsedcal, zsedsi, zsedc
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: zsoufer, zlight
@@ -81,9 +79,7 @@ CONTAINS
 
       zdenit2d(:,:) = 0.e0
       zbureff (:,:) = 0.e0
-      zwork1  (:,:) = 0.e0
-      zwork2  (:,:) = 0.e0
-      zwork3  (:,:) = 0.e0
+      zwork   (:,:) = 0.e0
       zsedsi  (:,:) = 0.e0
       zsedcal (:,:) = 0.e0
       zsedc   (:,:) = 0.e0
@@ -254,37 +250,16 @@ CONTAINS
                  zflx = (  trb(ji,jj,ikt,jpgoc) * zwsbio4(ji,jj)   &
                    &     + trb(ji,jj,ikt,jppoc) * zwsbio3(ji,jj) ) * 1E6
                  zbureff(ji,jj) = 0.013 + 0.53 * zflx**2 / ( 7.0 + zflx )**2
-                ENDIF
-              END DO
-           END DO 
-
-           ! Loss of biogenic silicon, Caco3 organic carbon in the sediments. 
-           ! First, the total loss is computed.
-           ! The factor for calcite comes from the alkalinity effect
-           ! -------------------------------------------------------------
-           DO jj = 1, jpj
-              DO ji = 1, jpi
-                 IF( tmask(ji,jj,1) == 1 ) THEN
-                    ikt = mbkt(ji,jj) 
-                    zwork1(ji,jj) = trb(ji,jj,ikt,jpgsi) * zwsbio4(ji,jj)
-                    zwork2(ji,jj) = trb(ji,jj,ikt,jpgoc) * zwsbio4(ji,jj) + trb(ji,jj,ikt,jppoc) * zwsbio3(ji,jj) 
-                    ! For calcite, burial efficiency is made a function of saturation
-                    zfactcal      = MIN( excess(ji,jj,ikt), 0.2 )
-                    zfactcal      = MIN( 1., 1.3 * ( 0.2 - zfactcal ) / ( 0.4 - zfactcal ) )
-                    zwork3(ji,jj) = trb(ji,jj,ikt,jpcal) * zwscal(ji,jj) * 2.e0 * zfactcal
-                ENDIF
+              ENDIF
             END DO
-         END DO
-         zsumsedsi  = glob_sum( zwork1(:,:) * e1e2t(:,:) ) * r1_rday
-         zsumsedpo4 = glob_sum( zwork2(:,:) * e1e2t(:,:) ) * r1_rday
-         zsumsedcal = glob_sum( zwork3(:,:) * e1e2t(:,:) ) * r1_rday
+         END DO 
          !
       ENDIF
 
       ! This loss is scaled at each bottom grid cell for equilibrating the total budget of silica in the ocean.
       ! Thus, the amount of silica lost in the sediments equal the supply at the surface (dust+rivers)
       ! ------------------------------------------------------
-      IF( .NOT.lk_sed )  zrivsil =  1._wp - ( sumdepsi + rivdsiinput * r1_ryyss ) / ( zsumsedsi + rtrn )
+      IF( .NOT.lk_sed )  zrivsil = 1._wp - sedsilfrac
 
       DO jj = 1, jpj
          DO ji = 1, jpi
@@ -311,7 +286,7 @@ CONTAINS
                !
                zfactcal = MIN( excess(ji,jj,ikt), 0.2 )
                zfactcal = MIN( 1., 1.3 * ( 0.2 - zfactcal ) / ( 0.4 - zfactcal ) )
-               zrivalk  =  1._wp - ( rivalkinput * r1_ryyss ) * zfactcal / ( zsumsedcal + rtrn )
+               zrivalk  = sedcalfrac * zfactcal
                tra(ji,jj,ikt,jptal) =  tra(ji,jj,ikt,jptal) + zcaloss * zrivalk * 2.0
                tra(ji,jj,ikt,jpdic) =  tra(ji,jj,ikt,jpdic) + zcaloss * zrivalk
                zsedcal(ji,jj) = (1.0 - zrivalk) * zcaloss * e3t_n(ji,jj,ikt) 
@@ -491,11 +466,11 @@ CONTAINS
             zfact = 1.e+3 * rfact2r !  conversion from molC/l/kt  to molN/m3/s
             IF( iom_use("Nfix"   ) ) CALL iom_put( "Nfix", nitrpot(:,:,:) * nitrfix * rno3 * zfact * tmask(:,:,:) )  ! nitrogen fixation 
             IF( iom_use("INTNFIX") ) THEN   ! nitrogen fixation rate in ocean ( vertically integrated )
-               zwork1(:,:) = 0.
+               zwork(:,:) = 0.
                DO jk = 1, jpkm1
-                 zwork1(:,:) = zwork1(:,:) + nitrpot(:,:,jk) * nitrfix * rno3 * zfact * e3t_n(:,:,jk) * tmask(:,:,jk)
+                 zwork(:,:) = zwork(:,:) + nitrpot(:,:,jk) * nitrfix * rno3 * zfact * e3t_n(:,:,jk) * tmask(:,:,jk)
                ENDDO
-               CALL iom_put( "INTNFIX" , zwork1 ) 
+               CALL iom_put( "INTNFIX" , zwork ) 
             ENDIF
             IF( iom_use("SedCal" ) ) CALL iom_put( "SedCal", zsedcal(:,:) * zfact )
             IF( iom_use("SedSi" ) )  CALL iom_put( "SedSi",  zsedsi (:,:) * zfact )
