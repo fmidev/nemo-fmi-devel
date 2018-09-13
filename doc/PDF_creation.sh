@@ -5,7 +5,6 @@
 
 cd tex_main
 pdflatex -shell-escape NEMO_manual
-mv NEMO_manual.pdf ..
 cd -
 
 exit 0
