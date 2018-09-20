@@ -77,7 +77,8 @@ the surface height, again so long as $\eta > -H$.
 \section{Surface pressure gradient and sea surface heigth (\protect\mdl{dynspg})}
 \label{sec:DYN_hpg_spg}
 %-----------------------------------------nam_dynspg----------------------------------------------------
-\forfile{../namelists/nam_dynspg} 
+
+\nlst{nam_dynspg} 
 %------------------------------------------------------------------------------------------------------------
 Options are defined through the  \ngn{nam\_dynspg} namelist variables.
 The surface pressure gradient term is related to the representation of the free surface (\autoref{sec:PE_hor_pg}). The main distinction is between the fixed volume case (linear free surface or rigid lid) and the variable volume case (nonlinear free surface, \key{vvl} is active). In the linear free surface case (\autoref{subsec:PE_free_surface}) and rigid lid (\autoref{PE_rigid_lid}), the vertical scale factors $e_{3}$ are fixed in time, while in the nonlinear case (\autoref{subsec:PE_free_surface}) they are time-dependent. With both linear and nonlinear free surface, external gravity waves are allowed in the equations, which imposes a very small time step when an explicit time stepping is used. Two methods are proposed to allow a longer time step for the three-dimensional equations: the filtered free surface, which is a modification of the continuous equations (see \autoref{eq:PE_flt}), and the split-explicit free surface described below. The extra term introduced in the filtered method is calculated implicitly, so that the update of the next velocities is done in module \mdl{dynspg\_flt} and not in \mdl{dynnxt}.
@@ -114,7 +115,8 @@ Consistent with the linearization, a $\left. \rho \right|_{k=1} / \rho _o$ facto
 \subsubsection{Split-explicit time-stepping (\protect\key{dynspg\_ts})}
 \label{subsec:DYN_spg_ts}
 %--------------------------------------------namdom----------------------------------------------------
-\forfile{../namelists/namdom} 
+
+\nlst{namdom} 
 %--------------------------------------------------------------------------------------------------------------
 The split-explicit free surface formulation used in OPA follows the one proposed by \citet{Griffies2004}. The general idea is to solve the free surface equation with a small time step, while the three dimensional prognostic variables are solved with a longer time step that is a multiple of \np{rdtbt}
 in the  \ngn{namdom} namelist. 

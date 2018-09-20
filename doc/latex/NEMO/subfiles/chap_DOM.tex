@@ -308,7 +308,8 @@ e1e2u , e1e2v are u and v surfaces (if gridsize reduction in some straits)\\
 ie1e2u\_v is a flag to flag set u and  v surfaces are neither read nor computed.\\
  
 These fields can be read in an domain input file which name is setted in \np{cn\_domcfg} parameter specified in \ngn{namcfg}.
-\forfile{../namelists/namcfg}
+
+\nlst{namcfg}
 or they can be defined in an analytical way in MY\_SRC directory of the configuration.
 For Reference Configurations of NEMO input domain files are supplied by NEMO System Team. For analytical definition of input fields two routines are supplied: \mdl{userdef\_hgr} and \mdl{userdef\_zgr}. They are an example of GYRE configuration parameters, and they are available in NEMO/OPA\_SRC/USR directory, they provide the horizontal and vertical mesh. 
 % -------------------------------------------------------------------------------------------------------------
@@ -427,8 +428,10 @@ $\ $\newline    % force a new line
 \section{Vertical grid (\protect\mdl{domzgr})}
 \label{sec:DOM_zgr}
 %-----------------------------------------nam_zgr & namdom-------------------------------------------
-%\forfile{../namelists/namzgr} 
-\forfile{../namelists/namdom} 
+%
+%\nlst{namzgr} 
+
+\nlst{namdom} 
 %-------------------------------------------------------------------------------------------------------------
 
 Variables are defined through the \ngn{namzgr} and \ngn{namdom} namelists.
@@ -686,7 +689,8 @@ from \autoref{eq:DOM_zgr_ana_2} using the coefficients given in \autoref{eq:DOM_
 \subsection{$Z$-coordinate with partial step (\protect\np{ln\_zps}\forcode{ = .true.})}
 \label{subsec:DOM_zps}
 %--------------------------------------------namdom-------------------------------------------------------
-\forfile{../namelists/namdom} 
+
+\nlst{namdom} 
 %--------------------------------------------------------------------------------------------------------------
 
 In $z$-coordinate partial step, the depths of the model levels are defined by the 
@@ -718,7 +722,8 @@ usually 10\%, of the default thickness $e_{3t}(jk)$).
 \subsection{$S$-coordinate (\protect\np{ln\_sco}\forcode{ = .true.})}
 \label{subsec:DOM_sco}
 %------------------------------------------nam_zgr_sco---------------------------------------------------
-%\forfile{../namelists/namzgr_sco} 
+%
+%\nlst{namzgr_sco} 
 %--------------------------------------------------------------------------------------------------------------
 Options are defined in \ngn{namzgr\_sco}.
 In $s$-coordinate (\np{ln\_sco}\forcode{ = .true.}), the depth and thickness of the model 
@@ -908,7 +913,8 @@ column equal to the second one and its first column equal to the last but one
 \section{Initial state (\protect\mdl{istate} and \protect\mdl{dtatsd})}
 \label{sec:DTA_tsd}
 %-----------------------------------------namtsd-------------------------------------------
-\forfile{../namelists/namtsd} 
+
+\nlst{namtsd} 
 %------------------------------------------------------------------------------------------
 
 Options are defined in \ngn{namtsd}.

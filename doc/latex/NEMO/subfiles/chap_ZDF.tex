@@ -51,7 +51,8 @@ coefficients, and thus of the formulation used (see \autoref{chap:STP}).
 \subsection{Constant (\protect\key{zdfcst})}
 \label{subsec:ZDF_cst}
 %--------------------------------------------namzdf---------------------------------------------------------
-\forfile{../namelists/namzdf}
+
+\nlst{namzdf}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the  \ngn{namzdf} namelist variables.
@@ -77,7 +78,8 @@ $\sim10^{-7}~m^2.s^{-1}$ for temperature and $\sim10^{-9}~m^2.s^{-1}$ for salini
 \label{subsec:ZDF_ric}
 
 %--------------------------------------------namric---------------------------------------------------------
-\forfile{../namelists/namzdf_ric}
+
+\nlst{namzdf_ric}
 %--------------------------------------------------------------------------------------------------------------
 
 When \key{zdfric} is defined, a local Richardson number dependent formulation 
@@ -135,7 +137,8 @@ the empirical values \np{rn\_wtmix} and \np{rn\_wvmix} \citep{Lermusiaux2001}.
 \label{subsec:ZDF_tke}
 
 %--------------------------------------------namzdf_tke--------------------------------------------------
-\forfile{../namelists/namzdf_tke}
+
+\nlst{namzdf_tke}
 %--------------------------------------------------------------------------------------------------------------
 
 The vertical eddy viscosity and diffusivity coefficients are computed from a TKE 
@@ -511,7 +514,8 @@ the ratio $\sqrt{\bar{e}}/l_\epsilon$ which is stored.
 \label{subsec:ZDF_gls}
 
 %--------------------------------------------namzdf_gls---------------------------------------------------------
-\forfile{../namelists/namzdf_gls}
+
+\nlst{namzdf_gls}
 %--------------------------------------------------------------------------------------------------------------
 
 The Generic Length Scale (GLS) scheme is a turbulent closure scheme based on 
@@ -618,7 +622,8 @@ Examples of performance of the 4 turbulent closure scheme can be found in \citet
 \label{subsec:ZDF_osm}
 
 %--------------------------------------------namzdf_osm---------------------------------------------------------
-\forfile{../namelists/namzdf_osm}
+
+\nlst{namzdf_osm}
 %--------------------------------------------------------------------------------------------------------------
 
 The OSMOSIS turbulent closure scheme is based on......   TBC
@@ -630,7 +635,8 @@ The OSMOSIS turbulent closure scheme is based on......   TBC
 \label{sec:ZDF_conv}
 
 %--------------------------------------------namzdf--------------------------------------------------------
-\forfile{../namelists/namzdf}
+
+\nlst{namzdf}
 %--------------------------------------------------------------------------------------------------------------
 
 Static instabilities (i.e. light potential densities under heavy ones) may 
@@ -650,7 +656,8 @@ use of a turbulent closure scheme.
 \label{subsec:ZDF_npc}
 
 %--------------------------------------------namzdf--------------------------------------------------------
-\forfile{../namelists/namzdf}
+
+\nlst{namzdf}
 %--------------------------------------------------------------------------------------------------------------
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -716,7 +723,8 @@ mixing iteration.
 \label{subsec:ZDF_evd}
 
 %--------------------------------------------namzdf--------------------------------------------------------
-\forfile{../namelists/namzdf}
+
+\nlst{namzdf}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the  \ngn{namzdf} namelist variables.
@@ -774,7 +782,8 @@ scheme. %gm%  + one word on non local flux with KPP scheme trakpp.F90 module...
 \label{sec:ZDF_ddm}
 
 %-------------------------------------------namzdf_ddm-------------------------------------------------
-%\forfile{../namelists/namzdf_ddm}
+%
+%\nlst{namzdf_ddm}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the  \ngn{namzdf\_ddm} namelist variables.
@@ -856,7 +865,8 @@ $\alpha$ and $\beta$ (which is usually quite expensive).
 \label{sec:ZDF_bfr}
 
 %--------------------------------------------nambfr--------------------------------------------------------
-%\forfile{../namelists/nambfr}
+%
+%\nlst{nambfr}
 %--------------------------------------------------------------------------------------------------------------
 
 Options to define the top and bottom friction are defined through the  \ngn{nambfr} namelist variables.
@@ -1195,7 +1205,8 @@ all the components to the vertically integrated momentum trend except for that d
 \label{sec:ZDF_tmx}
 
 %--------------------------------------------namzdf_tmx--------------------------------------------------
-%\forfile{../namelists/namzdf_tmx}
+%
+%\nlst{namzdf_tmx}
 %--------------------------------------------------------------------------------------------------------------
 
 
@@ -1317,7 +1328,8 @@ of global coupled GCMs \citep{Koch-Larrouy_al_CD10}.
 \label{sec:ZDF_tmx_new}
 
 %--------------------------------------------namzdf_tmx_new------------------------------------------
-%\forfile{../namelists/namzdf_tmx_new}
+%
+%\nlst{namzdf_tmx_new}
 %--------------------------------------------------------------------------------------------------------------
 
 The parameterization of mixing induced by breaking internal waves is a generalization 

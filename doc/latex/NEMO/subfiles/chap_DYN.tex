@@ -159,7 +159,8 @@ to the indexing used in the semi-discrete equations such as \autoref{eq:wzv}
 \section{Coriolis and advection: vector invariant form}
 \label{sec:DYN_adv_cor_vect}
 %-----------------------------------------nam_dynadv----------------------------------------------------
-\forfile{../namelists/namdyn_adv} 
+
+\nlst{namdyn_adv} 
 %-------------------------------------------------------------------------------------------------------------
 
 The vector invariant form of the momentum equations is the one most 
@@ -178,7 +179,8 @@ conditions are applied following \autoref{chap:LBC}.
 \subsection{Vorticity term (\protect\mdl{dynvor})}
 \label{subsec:DYN_vor}
 %------------------------------------------nam_dynvor----------------------------------------------------
-\forfile{../namelists/namdyn_vor} 
+
+\nlst{namdyn_vor} 
 %-------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namdyn\_vor} namelist variables.
@@ -385,7 +387,8 @@ an option which is only available with a TVD scheme (see \np{ln\_traadv\_tvd\_zt
 \section{Coriolis and advection: flux form}
 \label{sec:DYN_adv_cor_flux}
 %------------------------------------------nam_dynadv----------------------------------------------------
-\forfile{../namelists/namdyn_adv} 
+
+\nlst{namdyn_adv} 
 %-------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namdyn\_adv} namelist variables.
@@ -527,7 +530,8 @@ ROMS. This is an error and should be suppressed soon.
 \section{Hydrostatic pressure gradient (\protect\mdl{dynhpg})}
 \label{sec:DYN_hpg}
 %------------------------------------------nam_dynhpg---------------------------------------------------
-\forfile{../namelists/namdyn_hpg} 
+
+\nlst{namdyn_hpg} 
 %-------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namdyn\_hpg} namelist variables.
@@ -723,7 +727,8 @@ reproducibility. This option is controlled by  \np{nn\_dynhpg\_rst}, a namelist 
 \section{Surface pressure gradient (\protect\mdl{dynspg})}
 \label{sec:DYN_spg}
 %-----------------------------------------nam_dynspg----------------------------------------------------
-\forfile{../namelists/namdyn_spg} 
+
+\nlst{namdyn_spg} 
 %------------------------------------------------------------------------------------------------------------
 
 $\ $\newline      %force an empty line
@@ -783,7 +788,8 @@ allowed in the computation of the hydrostatic pressure gradient. Thus, nothing i
 \subsection{Split-explicit free surface (\protect\key{dynspg\_ts})}
 \label{subsec:DYN_spg_ts}
 %------------------------------------------namsplit-----------------------------------------------------------
-%\forfile{../namelists/namsplit}
+%
+%\nlst{namsplit}
 %-------------------------------------------------------------------------------------------------------------
 
 The split-explicit free surface formulation used in \NEMO (\key{dynspg\_ts} defined),
@@ -991,7 +997,8 @@ is time-independent and so is the matrix to be inverted. It is computed once and
 \section{Lateral diffusion term and operators (\protect\mdl{dynldf})}
 \label{sec:DYN_ldf}
 %------------------------------------------nam_dynldf----------------------------------------------------
-\forfile{../namelists/namdyn_ldf} 
+
+\nlst{namdyn_ldf} 
 %-------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namdyn\_ldf} namelist variables.
@@ -1134,7 +1141,8 @@ derivative terms normal to the coast are set to zero (see \autoref{chap:LBC}).
 \section{Vertical diffusion term (\protect\mdl{dynzdf})}
 \label{sec:DYN_zdf}
 %----------------------------------------------namzdf------------------------------------------------------
-\forfile{../namelists/namzdf} 
+
+\nlst{namzdf} 
 %-------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namzdf} namelist variables.
@@ -1211,7 +1219,8 @@ the snow-ice mass is taken into account when computing the surface pressure grad
 \label{sec:DYN_nxt}
 
 %----------------------------------------------namdom----------------------------------------------------
-\forfile{../namelists/namdom} 
+
+\nlst{namdom} 
 %-------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namdom} namelist variables.

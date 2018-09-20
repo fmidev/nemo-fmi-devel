@@ -123,7 +123,8 @@ ncatted  -a open_ocean_jstart,global,a,d,41 eORCA1_bathymetry_v2.nc
  
 \noindent Add the logical switch to \ngn{namcfg} in the configuration namelist and set true:
 %--------------------------------------------namcfg--------------------------------------------------------
-\forfile{../namelists/namcfg}
+
+\nlst{namcfg}
 %--------------------------------------------------------------------------------------------------------------
 
 \noindent Note the j-size of the global domain is the (extended j-size minus
@@ -232,7 +233,8 @@ configuration.
 \section{Model optimisation, control print and benchmark}
 \label{sec:MISC_opt}
 %--------------------------------------------namctl-------------------------------------------------------
-\forfile{../namelists/namctl} 
+
+\nlst{namctl} 
 %--------------------------------------------------------------------------------------------------------------
 
  \gmcomment{why not make these bullets into subsections?}

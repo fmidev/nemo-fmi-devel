@@ -65,7 +65,8 @@ $\ $\newline    % force a new ligne
 \section{Tracer advection (\protect\mdl{traadv})}
 \label{sec:TRA_adv}
 %------------------------------------------namtra_adv-----------------------------------------------------
-\forfile{../namelists/namtra_adv}
+
+\nlst{namtra_adv}
 %-------------------------------------------------------------------------------------------------------------
 
 When considered ($i.e.$ when \np{ln\_traadv\_NONE} is not set to \forcode{.true.}), 
@@ -424,7 +425,8 @@ to restore this property.
 \section{Tracer lateral diffusion (\protect\mdl{traldf})}
 \label{sec:TRA_ldf}
 %-----------------------------------------nam_traldf------------------------------------------------------
-\forfile{../namelists/namtra_ldf}
+
+\nlst{namtra_ldf}
 %-------------------------------------------------------------------------------------------------------------
  
 Options are defined through the \ngn{namtra\_ldf} namelist variables.
@@ -638,7 +640,8 @@ coast, normal to the bottom and normal to the surface are set to zero.
 \section{Tracer vertical diffusion (\protect\mdl{trazdf})}
 \label{sec:TRA_zdf}
 %--------------------------------------------namzdf---------------------------------------------------------
-\forfile{../namelists/namzdf}
+
+\nlst{namzdf}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namzdf} namelist variables.
@@ -761,7 +764,8 @@ This is the reason why the modified filter is not applied in the linear free sur
 \subsection{Solar radiation penetration (\protect\mdl{traqsr})}
 \label{subsec:TRA_qsr}
 %--------------------------------------------namqsr--------------------------------------------------------
-\forfile{../namelists/namtra_qsr}
+
+\nlst{namtra_qsr}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{namtra\_qsr} namelist variables.
@@ -871,7 +875,8 @@ monochromatic formulation (green), 4 waveband RGB formulation (red),
 \subsection{Bottom boundary condition (\protect\mdl{trabbc})}
 \label{subsec:TRA_bbc}
 %--------------------------------------------nambbc--------------------------------------------------------
-\forfile{../namelists/nambbc}
+
+\nlst{nambbc}
 %--------------------------------------------------------------------------------------------------------------
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{figure}[!t] 	  \begin{center}
@@ -909,7 +914,8 @@ introduced which is provided in the \ifile{geothermal\_heating} NetCDF file
 \section{Bottom boundary layer (\protect\mdl{trabbl} - \protect\key{trabbl})}
 \label{sec:TRA_bbl}
 %--------------------------------------------nambbl---------------------------------------------------------
-\forfile{../namelists/nambbl}
+
+\nlst{nambbl}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the  \ngn{nambbl} namelist variables.
@@ -1068,7 +1074,8 @@ as well as the effective overturning circulation.
 \section{Tracer damping (\protect\mdl{tradmp})}
 \label{sec:TRA_dmp}
 %--------------------------------------------namtra_dmp-------------------------------------------------
-\forfile{../namelists/namtra_dmp}
+
+\nlst{namtra_dmp}
 %--------------------------------------------------------------------------------------------------------------
 
 In some applications it can be useful to add a Newtonian damping term 
@@ -1152,7 +1159,8 @@ hyperbolic tangent, with \np{rn\_surf} as surface value, \np{rn\_bot} as bottom 
 \section{Tracer time evolution (\protect\mdl{tranxt})}
 \label{sec:TRA_nxt}
 %--------------------------------------------namdom-----------------------------------------------------
-\forfile{../namelists/namdom}
+
+\nlst{namdom}
 %--------------------------------------------------------------------------------------------------------------
 
 Options are defined through the  \ngn{namdom} namelist variables.
@@ -1190,7 +1198,8 @@ a swap of tracer arrays is performed: $T^{t-\rdt} = T^t$ and $T^t = T_f$.
 \section{Equation of state (\protect\mdl{eosbn2}) }
 \label{sec:TRA_eosbn2}
 %--------------------------------------------nameos-----------------------------------------------------
-\forfile{../namelists/nameos}
+
+\nlst{nameos}
 %--------------------------------------------------------------------------------------------------------------
 
 % -------------------------------------------------------------------------------------------------------------

@@ -1160,7 +1160,8 @@ NEMO executables linked with NetCDF4 libraries can be made to produce NetCDF3 fi
 setting the \np{ln\_nc4zip} logical to false in the \textit{namnc4} namelist:
 
 %------------------------------------------namnc4----------------------------------------------------
-\forfile{../namelists/namnc4}
+
+\nlst{namnc4}
 %-------------------------------------------------------------------------------------------------------------
 
 If \key{netcdf4} has not been defined, these namelist parameters are not read.
@@ -1263,7 +1264,8 @@ the invidual processing regions and different chunking choices may be desired.
 \label{sec:DIA_trd}
 
 %------------------------------------------namtrd----------------------------------------------------
-\forfile{../namelists/namtrd} 
+
+\nlst{namtrd} 
 %-------------------------------------------------------------------------------------------------------------
 
 Each trend of the dynamics and/or temperature and salinity time evolution equations can be send to 
@@ -1304,7 +1306,8 @@ not working, and none of the options have been tested with variable volume ($i.e
 \section{FLO: On-Line Floats trajectories (\protect\key{floats})}
 \label{sec:FLO}
 %--------------------------------------------namflo-------------------------------------------------------
-\forfile{../namelists/namflo} 
+
+\nlst{namflo} 
 %--------------------------------------------------------------------------------------------------------------
 
 The on-line computation of floats advected either by the three dimensional velocity field or 
@@ -1407,7 +1410,8 @@ the off-line use of this marvellous diagnostic tool.
 \label{sec:DIA_diag_harm}
 
 %------------------------------------------namdia_harm----------------------------------------------------
-%\forfile{../namelists/namdia_harm}
+%
+\nlst{nam_diaharm}
 %----------------------------------------------------------------------------------------------------------
 
 A module is available to compute the amplitude and phase of tidal waves.
@@ -1450,7 +1454,8 @@ We obtain in output $C_{j}$ and $S_{j}$ for each tidal wave.
 \label{sec:DIA_diag_dct}
 
 %------------------------------------------namdct----------------------------------------------------
-\forfile{../namelists/namdct}
+
+\nlst{namdct}
 %-------------------------------------------------------------------------------------------------------------
 
 A module is available to compute the transport of volume, heat and salt through sections. 
@@ -1772,7 +1777,8 @@ Among the available diagnostics the following ones are obtained when defining th
 \subsection{Poleward heat and salt transports (\protect\mdl{diaptr})}
 
 %------------------------------------------namptr-----------------------------------------
-\forfile{../namelists/namptr} 
+
+\nlst{namptr} 
 %-----------------------------------------------------------------------------------------
 
 The poleward heat and salt transports, their advective and diffusive component, and 
@@ -1813,7 +1819,8 @@ Activating those outputs requires to define the \key{diaar5} CPP key.
 \subsection{25 hour mean output for tidal models}
 
 %------------------------------------------nam_dia25h-------------------------------------
-\forfile{../namelists/nam_dia25h}
+
+\nlst{nam_dia25h}
 %-----------------------------------------------------------------------------------------
 
 A module is available to compute a crudely detided M2 signal by obtaining a 25 hour mean.
@@ -1827,7 +1834,8 @@ This diagnostic is actived with the logical  $ln\_dia25h$
 \subsection{Top middle and bed hourly output}
 
 %------------------------------------------nam_diatmb-----------------------------------------------------
-\forfile{../namelists/nam_diatmb}
+
+\nlst{nam_diatmb}
 %----------------------------------------------------------------------------------------------------------
 
 A module is available to output the surface (top), mid water and bed diagnostics of a set of 

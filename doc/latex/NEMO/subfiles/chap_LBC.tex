@@ -19,7 +19,8 @@ $\ $\newline    % force a new ligne
 \section{Boundary condition at the coast (\protect\np{rn\_shlat})}
 \label{sec:LBC_coast}
 %--------------------------------------------nam_lbc-------------------------------------------------------
-\forfile{../namelists/namlbc} 
+
+\nlst{namlbc} 
 %--------------------------------------------------------------------------------------------------------------
 
 %The lateral ocean boundary conditions contiguous to coastlines are Neumann conditions for heat and salt (no flux across boundaries) and Dirichlet conditions for momentum (ranging from free-slip to "strong" no-slip). They are handled automatically by the mask system (see \autoref{subsec:DOM_msk}). 
@@ -349,16 +350,20 @@ of processors really used during the computation is jpnij=128.}
 \label{sec:LBC_bdy}
 
 %-----------------------------------------nambdy--------------------------------------------
-\forfile{../namelists/nambdy} 
+
+\nlst{nambdy} 
 %-----------------------------------------------------------------------------------------------
 %-----------------------------------------nambdy_index--------------------------------------------
-%\forfile{../namelists/nambdy_index}
+%
+%\nlst{nambdy_index}
 %-----------------------------------------------------------------------------------------------
 %-----------------------------------------nambdy_dta--------------------------------------------
-\forfile{../namelists/nambdy_dta} 
+
+\nlst{nambdy_dta} 
 %-----------------------------------------------------------------------------------------------
 %-----------------------------------------nambdy_dta--------------------------------------------
-%\forfile{../namelists/nambdy_dta2} 
+%
+%\nlst{nambdy_dta2} 
 %-----------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{nambdy} \ngn{nambdy\_index} 
@@ -630,7 +635,8 @@ applied to all boundaries at once.
 \label{subsec:BDY_tides}
 
 %-----------------------------------------nambdy_tide--------------------------------------------
-\forfile{../namelists/nambdy_tide} 
+
+\nlst{nambdy_tide} 
 %-----------------------------------------------------------------------------------------------
 
 Options are defined through the  \ngn{nambdy\_tide} namelist variables.

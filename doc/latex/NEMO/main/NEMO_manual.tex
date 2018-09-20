@@ -14,8 +14,9 @@
 %% Preamble
 %% ==============================================================================
 
-\usepackage{../tex_main/NEMO_manual}
-\usepackage{../tex_sub/NEMO_minted}
+%% Custom style
+\usepackage{../main/NEMO_manual}
+\usepackage{../main/NEMO_minted}
 
 \makeindex
 
@@ -71,66 +72,66 @@ Decembre 2017																											\\
 
 %% Abstract - Foreword
 
-\subfile{../tex_sub/abstract_foreword}
+\subfile{../subfiles/abstract_foreword}
 
 
 % Introduction
 
-\subfile{../tex_sub/introduction}
+\subfile{../subfiles/introduction}
 
 
 % Chapters
 
-\subfile{../tex_sub/chap_model_basics}
+\subfile{../subfiles/chap_model_basics}
 
-\subfile{../tex_sub/chap_time_domain}				% Time discretisation (time stepping strategy)
+\subfile{../subfiles/chap_time_domain}   % Time discretisation (time stepping strategy)
 
-\subfile{../tex_sub/chap_DOM}				% Space discretisation
+\subfile{../subfiles/chap_DOM}           % Space discretisation
 
-\subfile{../tex_sub/chap_TRA}				% Tracer advection/diffusion equation
+\subfile{../subfiles/chap_TRA}           % Tracer advection/diffusion equation
 
-\subfile{../tex_sub/chap_DYN}				% Dynamics : momentum equation
+\subfile{../subfiles/chap_DYN}           % Dynamics : momentum equation
 
-\subfile{../tex_sub/chap_SBC}				% Surface Boundary Conditions
+\subfile{../subfiles/chap_SBC}           % Surface Boundary Conditions
 
-\subfile{../tex_sub/chap_LBC}				% Lateral Boundary Conditions
+\subfile{../subfiles/chap_LBC}           % Lateral Boundary Conditions
 
-\subfile{../tex_sub/chap_LDF}				% Lateral diffusion
+\subfile{../subfiles/chap_LDF}           % Lateral diffusion
 
-\subfile{../tex_sub/chap_ZDF}				% Vertical diffusion
+\subfile{../subfiles/chap_ZDF}           % Vertical diffusion
 
-\subfile{../tex_sub/chap_DIA}				% Outputs and Diagnostics
+\subfile{../subfiles/chap_DIA}           % Outputs and Diagnostics
 
-\subfile{../tex_sub/chap_OBS}				% Observation operator
+\subfile{../subfiles/chap_OBS}           % Observation operator
 
-\subfile{../tex_sub/chap_ASM}				% Assimilation increments
+\subfile{../subfiles/chap_ASM}           % Assimilation increments
 
-\subfile{../tex_sub/chap_STO}				% Stochastic param.
+\subfile{../subfiles/chap_STO}           % Stochastic param.
 
-\subfile{../tex_sub/chap_misc}				% Miscellaneous topics
+\subfile{../subfiles/chap_misc}          % Miscellaneous topics
 
-\subfile{../tex_sub/chap_CONFIG}			% Predefined configurations
+\subfile{../subfiles/chap_CONFIG}        % Predefined configurations
 
 
 %% Appendix
 
 \appendix
 
-\subfile{../tex_sub/annex_A}					% Generalised vertical coordinate
+\subfile{../subfiles/annex_A}					% Generalised vertical coordinate
 
-\subfile{../tex_sub/annex_B}					% Diffusive operator
+\subfile{../subfiles/annex_B}					% Diffusive operator
 
-\subfile{../tex_sub/annex_C}					% Discrete invariants of the eqs.
+\subfile{../subfiles/annex_C}					% Discrete invariants of the eqs.
 
-\subfile{../tex_sub/annex_iso}				% Isoneutral diffusion using triads
+\subfile{../subfiles/annex_iso}				% Isoneutral diffusion using triads
 
-\subfile{../tex_sub/annex_D}					% Coding rules
+\subfile{../subfiles/annex_D}					% Coding rules
 
 %% Not included
-%\subfile{../tex_sub/chap_conservation}	%
-%\subfile{../tex_sub/annex_E}				% Notes on some on going staff
-%\subfile{../tex_sub/annex_Fox-Kemper}	% Notes on Fox-Kemper
-%\subfile{../tex_sub/annex_EVP}				% Notes on EVP
+%\subfile{../subfiles/chap_conservation}	%
+%\subfile{../subfiles/annex_E}				% Notes on some on going staff
+%\subfile{../subfiles/annex_Fox-Kemper}	% Notes on Fox-Kemper
+%\subfile{../subfiles/annex_EVP}				% Notes on EVP
 
 
 %% Backmatter
@@ -144,7 +145,7 @@ Decembre 2017																											\\
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}
-\bibliography{../tex_main/NEMO_manual}
+\bibliography{../main/NEMO_manual}
 
 
 %% Index
