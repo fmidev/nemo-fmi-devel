@@ -60,7 +60,7 @@ CONTAINS
       INTEGER ::   ios, ii   ! Local integer
       REAL(wp)::   zlx, zly  ! Local scalars
       !!
-      NAMELIST/namusr_def/ ln_zco, rn_dx, rn_dy, ln_corio, rn_ppgphi0
+      NAMELIST/namusr_def/ rn_dx, rn_dy, ln_corio, rn_ppgphi0
       !!----------------------------------------------------------------------
       !
       ii = 1
