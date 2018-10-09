@@ -1,13 +1,10 @@
-================
-NEMO 4.0 Release
-================
+======================
+What's new in NEMO 4.0
+======================
 
 .. contents::
-
-----------
-What's new
-----------
-
+	:local:
+      
 Original sea-ice component SI\ :sup:`3`\
 ========================================
 
@@ -107,7 +104,7 @@ Passive tracer TOP and biogeochemical PISCES components
 
 - The passive tracers transport component was redesigned toward a modular structure and
   users can enable each module directly through logical flags in namelist_top (no more Fortran macros!).
-- TOP on-line user documentation is available on NEMO Trac platform (TOP-UserQuickGuide_)
+- TOP on-line user documentation is available on NEMO Trac platform (`TOP User Quick Guide`_)
 - TOP currently accounts for the following 5 modules:
 
   * ``CFC`` contains inorganic carbon tracers (CFC11/CFC12/SF6)
@@ -129,6 +126,66 @@ Passive tracer TOP and biogeochemical PISCES components
 
 AGRIF (embedded zooms)
 ----------------------
+
+The NEMO 4.0 includes new capabilities, configurations and test cases with AGRIF:
+
+.. role:: underline
+	:class: underline
+
+:underline:`New capabilities from NEMO 3.6 to NEMO 4.0`
+
+AGRIF is continuously maintained so that it could be activated with all NEMO components (OPA, sea-ice, TOP).
+Depending on NEMO version, it is nevertheless not the case so that some options may not be compatible with
+the use of online grid refinement.
+Check out the table below to know the status according to the NEMO release you may use.
+
+:underline:`Status of available options with AGRIF (if not listed, option is compatible with AGRIF)`:
+
++--------------------------------------------------------+----------------+---------------------+
+|                                                        | NEMO 3.6       | NEMO 4.0            |
++========================================================+================+=====================+
+| LIM2                                                   | yes            | ``-``               |
++--------------------------------------------------------+----------------+---------------------+
+| LIM3/SI3                                               | no             | yes                 |
++--------------------------------------------------------+----------------+---------------------+
+| TOP                                                    | yes            | yes                 |
++--------------------------------------------------------+----------------+---------------------+
+| GLS vertical mixing                                    | no             | yes                 |
++--------------------------------------------------------+----------------+---------------------+
+| z*                                                     | no             | yes                 |
++--------------------------------------------------------+----------------+---------------------+
+| z~                                                     | no             | no                  |
++--------------------------------------------------------+----------------+---------------------+
+| Lagrangian icebergs                                    | no             | no                  |
++--------------------------------------------------------+----------------+---------------------+
+| East-west periodic and/or north fold bcs in zooms      | no             | no                  |
++--------------------------------------------------------+----------------+---------------------+
+| Online timing                                          | no             | no                  |
++--------------------------------------------------------+----------------+---------------------+
+| Stochastic parameterization                            | no             | no                  |
++--------------------------------------------------------+----------------+---------------------+
+| Vertical coordinate change in zooms (``key_vertical``) | no             | yes, but not tested |
++--------------------------------------------------------+----------------+---------------------+
+| Number of ghost cells                                  | 1 (hard coded) | 3 (parameter)       |
++--------------------------------------------------------+----------------+---------------------+
+
+[Important notice concerning the change of ghost cells number]
+
+The default number of ghost cells (i.e. the number of cells that serve as open boundary data provision) has been
+increased from 1 to 3 in NEMO 4.0.
+This allows to properly handle boundary conditions for numerical schemes that
+have a discretization order greater than 2.
+On the user point of view this does not change anything++ except in the definition of level 1 grids in
+the ``AGRIF_FixedGrids.in`` file.
+In order to retrieve exactly the position of a nested grid in NEMO 4.0 one has to shift indices by
+2 points to the south-west.
+Taking the ``ICEDYN`` example above for NEMO 4.0, the "old" NEMO 3.6 corresponding file would contain::
+
+	1
+	36 65 36 65 3 3 3
+	0
+
+++ Child grid output files are now greater by 4 points in each direction.
 
 - Now compatible with new sea ice component and z* coordinate
 - Extended ghost cells area to properly handle scheme with spatial order >2
@@ -158,7 +215,7 @@ Physics
 - Lateral physics (LDF): scale aware setting of eddy viscosity and diffusivity
 - Wave coupling: large scale wave interaction process added in momentum and tracer equations
 - Remove the acceleration of convergence
-  
+
 Numerics
 --------
 
@@ -196,7 +253,7 @@ Environment
 - Improvements of reliability through automatic and regular testing of the changes made in repository
 
 .. _sea ice working group:       http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/SI3
-.. _TOP-UserQuickGuide:          http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/top-dg/TOP-UserQuickGuide
+.. _TOP User Quick Guide:        http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/top-dg/TOP-UserQuickGuide
 
 .. _Hunter 2006:                 http://staff.acecrc.org.au/~bkgalton/ISOMIP/test_cavities.pdf
 .. _Brodeau 2017:                http://doi.org/10.1175/JPO-D-16-0169.1
