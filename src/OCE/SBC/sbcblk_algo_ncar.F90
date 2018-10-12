@@ -148,6 +148,8 @@ CONTAINS
       Ce = 1.e-3*( 34.6 * sqrt_Cd_n10 )
       Ch = 1.e-3*sqrt_Cd_n10*(18.*stab + 32.7*(1. - stab))
       stab = sqrt_Cd_n10   ! Temporaty array !!! stab == SQRT(Cd)
+ 
+      IF( ln_cdgw )   Cen = Ce  ; Chn = Ch
 
       !! Initializing values at z_u with z_t values:
       t_zu = t_zt   ;   q_zu = q_zt
@@ -185,7 +187,14 @@ CONTAINS
          ztmp2 = psi_m(zeta_u)
          IF( ln_cdgw ) THEN      ! surface wave case
             stab = vkarmn / ( vkarmn / sqrt_Cd_n10 - ztmp2 )  ! (stab == SQRT(Cd))
-            Cd      = stab * stab
+            Cd   = stab * stab
+            ztmp0 = (LOG(zu/10.) - zpsi_h_u) / vkarmn / sqrt_Cd_n10
+            ztmp2 = stab / sqrt_Cd_n10   ! (stab == SQRT(Cd))
+            ztmp1 = 1. + Chn * ztmp0     
+            Ch    = Chn * ztmp2 / ztmp1  ! L&Y 2004 eq. (10b)
+            ztmp1 = 1. + Cen * ztmp0
+            Ce    = Cen * ztmp2 / ztmp1  ! L&Y 2004 eq. (10c)
+
          ELSE
             ! Update neutral wind speed at 10m and neutral Cd at 10m (L&Y 2004 eq. 9a)...
             !   In very rare low-wind conditions, the old way of estimating the
@@ -204,17 +213,17 @@ CONTAINS
             ztmp1 = 1. + sqrt_Cd_n10/vkarmn*(LOG(zu/10.) - ztmp2)   ! L&Y 2004 eq. (10a) (ztmp2 == psi_m(zeta_u))
             Cd      = ztmp0 / ( ztmp1*ztmp1 )
             stab = SQRT( Cd ) ! Temporary array !!! (stab == SQRT(Cd))
-         ENDIF
 
-         ztmp0 = (LOG(zu/10.) - zpsi_h_u) / vkarmn / sqrt_Cd_n10
-         ztmp2 = stab / sqrt_Cd_n10   ! (stab == SQRT(Cd))
-         ztmp1 = 1. + Cx_n10*ztmp0    ! (Cx_n10 == Ch_n10)
-         Ch  = Cx_n10*ztmp2 / ztmp1   ! L&Y 2004 eq. (10b)
+            ztmp0 = (LOG(zu/10.) - zpsi_h_u) / vkarmn / sqrt_Cd_n10
+            ztmp2 = stab / sqrt_Cd_n10   ! (stab == SQRT(Cd))
+            ztmp1 = 1. + Cx_n10*ztmp0    ! (Cx_n10 == Ch_n10)
+            Ch  = Cx_n10*ztmp2 / ztmp1   ! L&Y 2004 eq. (10b)
 
-         Cx_n10  = 1.e-3 * (34.6 * sqrt_Cd_n10)  ! L&Y 2004 eq. (6b)    ! Cx_n10 == Ce_n10
-         Cen(:,:) = Cx_n10
-         ztmp1 = 1. + Cx_n10*ztmp0
-         Ce  = Cx_n10*ztmp2 / ztmp1  ! L&Y 2004 eq. (10c)
+            Cx_n10  = 1.e-3 * (34.6 * sqrt_Cd_n10)  ! L&Y 2004 eq. (6b)    ! Cx_n10 == Ce_n10
+            Cen(:,:) = Cx_n10
+            ztmp1 = 1. + Cx_n10*ztmp0
+            Ce  = Cx_n10*ztmp2 / ztmp1  ! L&Y 2004 eq. (10c)
+            ENDIF
          !
       END DO
       !

@@ -156,9 +156,12 @@ CONTAINS
          WRITE(numout,*) '               wave modified ocean stress           ln_tauwoc     = ', ln_tauwoc
          WRITE(numout,*) '               wave modified ocean stress component ln_tauw       = ', ln_tauw
          WRITE(numout,*) '               Stokes coriolis term                 ln_stcor      = ', ln_stcor
-         WRITE(numout,*) '               neutral drag coefficient (CORE, MFS) ln_cdgw       = ', ln_cdgw
+         WRITE(numout,*) '               neutral drag coefficient (CORE,NCAR) ln_cdgw       = ', ln_cdgw
       ENDIF
       !
+      IF( .NOT.ln_wave ) THEN
+         ln_sdw = .false. ; ln_cdgw = .false. ; ln_tauwoc = .false. ; ln_tauw = .false. ; ln_stcor = .false.
+      ENDIF 
       IF( ln_sdw ) THEN
          IF( .NOT.(nn_sdrift==jp_breivik_2014 .OR. nn_sdrift==jp_li_2017 .OR. nn_sdrift==jp_peakfr) ) &
             CALL ctl_stop( 'The chosen nn_sdrift for Stokes drift vertical velocity must be 0, 1, or 2' )

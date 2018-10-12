@@ -238,7 +238,7 @@ CONTAINS
             CALL ctl_warn( 'Ask for wave coupling but ln_cdgw=F, ln_sdw=F, ln_tauwoc=F, ln_stcor=F')
       !drag coefficient read from wave model definable only with mfs bulk formulae and core 
          ELSEIF (ln_cdgw .AND. .NOT. ln_NCAR )       THEN       
-             CALL ctl_stop( 'drag coefficient read from wave model definable only with mfs bulk formulae and core')
+             CALL ctl_stop( 'drag coefficient read from wave model definable only with NCAR and CORE bulk formulae')
          ELSEIF (ln_stcor .AND. .NOT. ln_sdw)                             THEN
              CALL ctl_stop( 'Stokes-Coriolis term calculated only if activated Stokes Drift ln_sdw=T')
          ENDIF
