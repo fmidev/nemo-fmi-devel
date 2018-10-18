@@ -24,9 +24,9 @@ copyright = '2018, NEMO System Team'
 author = 'NEMO System Team'
 
 # The short X.Y version
-version = ''
+version = '4.0'
 # The full version, including alpha/beta/rc tags
-release = '4.0'
+release = '4.0rc'
 
 
 # -- General configuration ---------------------------------------------------
@@ -38,8 +38,7 @@ release = '4.0'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = ['sphinxcontrib.bibtex']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

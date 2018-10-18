@@ -2,6 +2,8 @@
 What's new in NEMO 4.0
 ======================
 
+.. include:: .global.rst
+
 .. contents::
 	:local:
       
@@ -45,56 +47,6 @@ First Test Cases
 ================
 
 Define and install a separate repository for test cases to all easy contributions from the NEMO Users Community
-
-+-------------------+--------------------------------------------------------+------------------------------------+
-| Name              | Purpose                                                | References                         |
-+===================+=================+======================================+====================================+
-| ``CANAL``         | East-west periodic canal of variable size with several |                                    |
-|                   | initial states and associated geostrophic currents     |                                    |
-|                   | (zonal jets or vortex).                                |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-| ``ICEDYN``        | East-west + north-south periodic channel.              |                                    |
-|                   | The common configuration includes an AGRIF zoom (1:3)  |                                    |
-|                   | in the middle of the basin to test how an ice patch is |                                    |
-|                   | advected through it but one can also test the          |                                    |
-|                   | advection schemes (Prather and Ultimate-Macho) by      |                                    |
-|                   | removing the ``key_agrif`` in the CPP keys.            |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-| ``ISOMIP``        | Simple box configuration with an iceshelf with simple  | `Hunter 2006`_                     |
-|                   | geometry on top.                                       |                                    |
-|                   | The purpose of this test case is to evaluate the       |                                    |
-|                   | impact of various schemes and new development with     |                                    |
-|                   | iceshelf cavities.                                     |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-| ``LOCK_EXCHANGE`` | Classical fluid dynamics experiment that has been      | - `Haidvogel and Beckmann 1999`_   |
-|                   | adapted for testing advection schemes in ocean         | - `Burchard and Bolding 2002`_     |
-|                   | circulation models.                                    | - `Ilıcak 2012`_                   |
-|                   | This experiment can in particular illustrate the       |                                    |
-|                   | impact of different choices of numerical schemes       |                                    |
-|                   | and/or subgrid closures on spurious interior mixing.   |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-| ``OVERFLOW``      | Adapted from the non-rotating overflow configuration   | - `Haidvogel and Beckmann 1999`_   |
-|                   | Illustrates the impact of different choices of         | - `Ilıcak 2012`_                   |
-|                   | numerical schemes and/or subgrid closures on spurious  |                                    |
-|                   | interior mixing close to bottom topography.            |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-| ``VORTEX``        | Illustrates the propagation of an anticyclonic eddy    | - `Debreu 2012`_                   |
-|                   | over a Beta plan and flat bottom.                      | - `Penven 2006`_                   |
-|                   | It is implemented here with an online refined          | - `Spall and Holland 1991`_        |
-|                   | subdomain (thanks to AGRIF library) out of which the   |                                    |
-|                   | vortex propagates and serves as a benchmark to         |                                    |
-|                   | diagnose nesting errors.                               |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-| ``WAD``           | Set of simple closed basin geometries for testing the  |                                    |
-|                   | wetting and drying capabilities.                       |                                    |
-|                   | Examples range from a closed channel with EW linear    |                                    |
-|                   | bottom slope to a parabolic EW channel with a Gaussian |                                    |
-|                   | ridge.                                                 |                                    |
-+-------------------+--------------------------------------------------------+------------------------------------+
-
------------
-Improvments
------------
 
 Core components
 ===============
@@ -255,14 +207,7 @@ Environment
 .. _sea ice working group:       http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/SI3
 .. _TOP User Quick Guide:        http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/top-dg/TOP-UserQuickGuide
 
-.. _Hunter 2006:                 http://staff.acecrc.org.au/~bkgalton/ISOMIP/test_cavities.pdf
 .. _Brodeau 2017:                http://doi.org/10.1175/JPO-D-16-0169.1
-.. _Haidvogel and Beckmann 1999: http://hdl.handle.net/10013/epic.11761
-.. _Burchard and Bolding 2002:   http://www.researchgate.net/publication/258128069_GETM_A_General_Estuarine_Transport_Model_Scientific_Documentation
-.. _Ilıcak 2012:                 http://doi.org/10.1016/j.ocemod.2011.10.003
-.. _Debreu 2012:                 http://doi.org/10.1016/j.ocemod.2012.03.003
-.. _Penven 2006:                 http://doi.org/10.1016/j.ocemod.2005.05.002
-.. _Spall and Holland 1991:      http://www.researchgate.net/publication/232101325_A_Nested_Primitive_Equation_Model_for_Oceanic_Applications
 .. _Holland 2012:                http://doi.org/10.1175/JCLI-D-11-00078.1
 .. _Lupkes 2012:                 http://doi.org/10.1029/2012JD017630
 .. _Lupkes 2014:                 http://doi.org/10.1002/2014JD022418

@@ -2,6 +2,8 @@
 Install the framework
 =====================
 
+.. include:: .global.rst
+
 .. contents:: \
 	:local:
       
@@ -115,9 +117,8 @@ Folder intended to contain your customised routines (modified from initial ones 
 After successful execution of makenemo command, the executable called opa is created in the EXP00 directory (in the example above, the executable is created in CONFIG/MY_GYRE/EXP00).
 More options
 
-.. includefile::
-
-	
+..
+	.. literalinclude::
 
 -----------------
 Default behaviour
@@ -165,8 +166,8 @@ Examples
 Running the model
 -----------------
 
-Once makenemo has run successfully, the opa executable is available in CONFIG/"MY_CONFIG"/EXP00
-For the reference configurations, the EXP00 folder also contains the initial input files (namelists, *xml files for the IOs…). If the configuration also needs NetCDF input files, this should be downloaded here from the corresponding tar file, see Users/Reference Configurations
+Once makenemo has run successfully, the opa executable is available in ``CONFIG/MY_CONFIG/EXP00``
+For the reference configurations, the EXP00 folder also contains the initial input files (namelists, \*xml files for the IOs…). If the configuration also needs NetCDF input files, this should be downloaded here from the corresponding tar file, see Users/Reference Configurations
 
    cd 'MY_CONFIG'/EXP00
    mpirun -n $NPROCS ./opa    # $NPROCS is the number of processes ; mpirun is your MPI wrapper
