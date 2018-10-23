@@ -272,7 +272,7 @@ CONTAINS
             WHERE( gphit(:,:) >= 0._wp ) ; trc_o(:,:,jn) = zpisc(jn,2) ; END WHERE ! Arctic 
             WHERE( gphit(:,:) <  0._wp ) ; trc_o(:,:,jn) = zpisc(jn,3) ; END WHERE ! Antarctic 
          ENDIF
-         IF( cn_cfg == "orca" ) THEN     !  Baltic Sea particular case for ORCA configurations
+         IF( cn_cfg == "orca" .OR. cn_cfg == "ORCA" ) THEN     !  Baltic Sea particular case for ORCA configurations
              WHERE( 14._wp <= glamt(:,:) .AND. glamt(:,:) <= 32._wp .AND.    &
                     54._wp <= gphit(:,:) .AND. gphit(:,:) <= 66._wp )
                     trc_o(:,:,jn) = zpisc(jn,4)
@@ -311,7 +311,7 @@ CONTAINS
          ENDIF
        
          !-- Baltic
-         IF( cn_cfg == "orca" ) THEN  ! Baltic treated seperately for ORCA configs
+         IF( cn_cfg == "orca" .OR. cn_cfg == "ORCA" ) THEN     
             IF ( trc_ice_ratio(jn) >= - 1._wp ) THEN ! no prescribed conc. ; typically everything but iron) 
                WHERE( 14._wp <= glamt(:,:) .AND. glamt(:,:) <= 32._wp .AND.    &
                       54._wp <= gphit(:,:) .AND. gphit(:,:) <= 66._wp )

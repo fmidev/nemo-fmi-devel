@@ -233,11 +233,13 @@ CONTAINS
                   ENDIF
                END DO
             END DO
-            IF( cn_cfg == "orca" .AND. nn_cfg == 3 ) THEN   ! ORCA2: Suppress ztilde in the Foxe Basin for ORCA2
-               ii0 = 103   ;   ii1 = 111       
-               ij0 = 128   ;   ij1 = 135   ;   
-               frq_rst_e3t( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  0.0_wp
-               frq_rst_hdv( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  1.e0_wp / rdt
+            IF( cn_cfg == "orca" .OR. cn_cfg == "ORCA" ) THEN
+               IF( nn_cfg == 3 ) THEN   ! ORCA2: Suppress ztilde in the Foxe Basin for ORCA2
+                  ii0 = 103   ;   ii1 = 111       
+                  ij0 = 128   ;   ij1 = 135   ;   
+                  frq_rst_e3t( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  0.0_wp
+                  frq_rst_hdv( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  1.e0_wp / rdt
+               ENDIF
             ENDIF
          ENDIF
       ENDIF

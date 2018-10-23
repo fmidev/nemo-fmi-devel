@@ -250,7 +250,7 @@ CONTAINS
          ! set the closed seas (in data domain indices)
          ! -------------------
 
-         IF( cn_cfg == "orca" ) THEN
+         IF( cn_cfg == "orca" .OR. cn_cfg == "ORCA") THEN
             !
             SELECT CASE ( nn_cfg )
             !                                           ! =======================

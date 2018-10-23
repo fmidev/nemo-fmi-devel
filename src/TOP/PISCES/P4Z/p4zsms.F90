@@ -351,47 +351,49 @@ CONTAINS
       IF(lwp)  WRITE(numout,*) ' p4z_dmp : Restoring of nutrients at time-step kt = ', kt
       IF(lwp)  WRITE(numout,*)
 
-      IF( cn_cfg == "orca" .AND. .NOT. lk_c1d ) THEN      ! ORCA configuration (not 1D) !
-         !                                                ! --------------------------- !
-         ! set total alkalinity, phosphate, nitrate & silicate
-         zarea          = 1._wp / glob_sum( cvol(:,:,:) ) * 1e6              
+      IF( cn_cfg == "ORCA" .OR. cn_cfg == "orca" ) THEN
+         IF( .NOT. lk_c1d ) THEN      ! ORCA configuration (not 1D) !
+            !                                                ! --------------------------- !
+            ! set total alkalinity, phosphate, nitrate & silicate
+            zarea          = 1._wp / glob_sum( cvol(:,:,:) ) * 1e6              
 
-         zalksumn = glob_sum( trn(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
-         zpo4sumn = glob_sum( trn(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
-         zno3sumn = glob_sum( trn(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
-         zsilsumn = glob_sum( trn(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
+            zalksumn = glob_sum( trn(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
+            zpo4sumn = glob_sum( trn(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
+            zno3sumn = glob_sum( trn(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
+            zsilsumn = glob_sum( trn(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
  
-         IF(lwp) WRITE(numout,*) '       TALKN mean : ', zalksumn
-         trn(:,:,:,jptal) = trn(:,:,:,jptal) * alkmean / zalksumn
+            IF(lwp) WRITE(numout,*) '       TALKN mean : ', zalksumn
+            trn(:,:,:,jptal) = trn(:,:,:,jptal) * alkmean / zalksumn
 
-         IF(lwp) WRITE(numout,*) '       PO4N  mean : ', zpo4sumn
-         trn(:,:,:,jppo4) = trn(:,:,:,jppo4) * po4mean / zpo4sumn
+            IF(lwp) WRITE(numout,*) '       PO4N  mean : ', zpo4sumn
+            trn(:,:,:,jppo4) = trn(:,:,:,jppo4) * po4mean / zpo4sumn
 
-         IF(lwp) WRITE(numout,*) '       NO3N  mean : ', zno3sumn
-         trn(:,:,:,jpno3) = trn(:,:,:,jpno3) * no3mean / zno3sumn
+            IF(lwp) WRITE(numout,*) '       NO3N  mean : ', zno3sumn
+            trn(:,:,:,jpno3) = trn(:,:,:,jpno3) * no3mean / zno3sumn
 
-         IF(lwp) WRITE(numout,*) '       SiO3N mean : ', zsilsumn
-         trn(:,:,:,jpsil) = MIN( 400.e-6,trn(:,:,:,jpsil) * silmean / zsilsumn )
-         !
-         !
-         IF( .NOT. ln_top_euler ) THEN
-            zalksumb = glob_sum( trb(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
-            zpo4sumb = glob_sum( trb(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
-            zno3sumb = glob_sum( trb(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
-            zsilsumb = glob_sum( trb(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
+            IF(lwp) WRITE(numout,*) '       SiO3N mean : ', zsilsumn
+            trn(:,:,:,jpsil) = MIN( 400.e-6,trn(:,:,:,jpsil) * silmean / zsilsumn )
+            !
+            !
+            IF( .NOT. ln_top_euler ) THEN
+               zalksumb = glob_sum( trb(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
+               zpo4sumb = glob_sum( trb(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
+               zno3sumb = glob_sum( trb(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
+               zsilsumb = glob_sum( trb(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
  
-            IF(lwp) WRITE(numout,*) ' '
-            IF(lwp) WRITE(numout,*) '       TALKB mean : ', zalksumb
-            trb(:,:,:,jptal) = trb(:,:,:,jptal) * alkmean / zalksumb
+               IF(lwp) WRITE(numout,*) ' '
+               IF(lwp) WRITE(numout,*) '       TALKB mean : ', zalksumb
+               trb(:,:,:,jptal) = trb(:,:,:,jptal) * alkmean / zalksumb
 
-            IF(lwp) WRITE(numout,*) '       PO4B  mean : ', zpo4sumb
-            trb(:,:,:,jppo4) = trb(:,:,:,jppo4) * po4mean / zpo4sumb
+               IF(lwp) WRITE(numout,*) '       PO4B  mean : ', zpo4sumb
+               trb(:,:,:,jppo4) = trb(:,:,:,jppo4) * po4mean / zpo4sumb
 
-            IF(lwp) WRITE(numout,*) '       NO3B  mean : ', zno3sumb
-            trb(:,:,:,jpno3) = trb(:,:,:,jpno3) * no3mean / zno3sumb
+               IF(lwp) WRITE(numout,*) '       NO3B  mean : ', zno3sumb
+               trb(:,:,:,jpno3) = trb(:,:,:,jpno3) * no3mean / zno3sumb
 
-            IF(lwp) WRITE(numout,*) '       SiO3B mean : ', zsilsumb
-            trb(:,:,:,jpsil) = MIN( 400.e-6,trb(:,:,:,jpsil) * silmean / zsilsumb )
+               IF(lwp) WRITE(numout,*) '       SiO3B mean : ', zsilsumb
+               trb(:,:,:,jpsil) = MIN( 400.e-6,trb(:,:,:,jpsil) * silmean / zsilsumb )
+           ENDIF
         ENDIF
         !
       ENDIF

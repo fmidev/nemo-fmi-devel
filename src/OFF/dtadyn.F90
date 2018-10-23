@@ -163,6 +163,7 @@ CONTAINS
       !
       hmld(:,:)       = sf_dyn(jf_mld)%fnow(:,:,1) * tmask(:,:,1)    ! mixed layer depht
       avt(:,:,:)      = sf_dyn(jf_avt)%fnow(:,:,:) * tmask(:,:,:)    ! vertical diffusive coefficient 
+      avs(:,:,:)      = avt(:,:,:)
       !
       IF( ln_trabbl .AND. .NOT.lk_c1d ) THEN       ! diffusive Bottom boundary layer param 
          ahu_bbl(:,:) = sf_dyn(jf_ubl)%fnow(:,:,1) * umask(:,:,1)    ! bbl diffusive coef

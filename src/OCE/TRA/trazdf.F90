@@ -183,6 +183,9 @@ CONTAINS
                      zwi(ji,jj,jk) = - p2dt * zwt(ji,jj,jk  ) / e3w_n(ji,jj,jk  )
                      zws(ji,jj,jk) = - p2dt * zwt(ji,jj,jk+1) / e3w_n(ji,jj,jk+1)
                      zwd(ji,jj,jk) = e3t_a(ji,jj,jk) - zwi(ji,jj,jk) - zws(ji,jj,jk)
+                     IF (mig(ji) == 72 .and. mjg(jj) == 74 ) THEN
+                       write(0,*) 'plante zdf2 ',jk,avt(ji,jj,jk),avs(ji,jj,jk)
+                     ENDIF
                  END DO
                END DO
             END DO
