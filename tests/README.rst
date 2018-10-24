@@ -56,9 +56,7 @@ LOCK_EXCHANGE
   The LOCK EXCHANGE experiment can in particulart illustrate the impact of different choices of numerical schemes 
   and/or subgrid closures on spurious interior mixing.
 
-  The plot below xxxxx
-
-  .. image:: _static/LOCK_EXCHANGE_image.png
+  .. image:: _static/LOCK-FCT4_flux_ubs.gif
 
 OVERFLOW
 ========
@@ -70,7 +68,7 @@ OVERFLOW
   Here we can assess the behaviour of the second-order tracer advection scheme FCT2 and fortht-order FCT4, 
   with some exemple of python scripts into the notebook associated.
 
-  .. image:: _static/OVERFLOW_image.png
+  .. image:: _static/OVF-sco_FCT4_flux_cen-ahm1000.gif
 
 WAD
 ===
