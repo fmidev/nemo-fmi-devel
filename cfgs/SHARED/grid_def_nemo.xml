@@ -16,6 +16,11 @@
          <axis id="deptht" />
        </grid>
         <!--  -->
+       <grid id="grid_T_3DS" >
+         <domain id="grid_T" />
+         <axis id="profsed" />
+       </grid>
+        <!--  -->
        <grid id="grid_U_2D" >
          <domain id="grid_U" />
        </grid>

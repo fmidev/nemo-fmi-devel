@@ -22,6 +22,7 @@
       <axis id="depthu" long_name="Vertical U levels" unit="m" positive="down" />
       <axis id="depthv" long_name="Vertical V levels" unit="m" positive="down" />
       <axis id="depthw" long_name="Vertical W levels" unit="m" positive="down" />
+      <axis id="profsed" long_name="Vertical S levels" unit="cm" positive="down" />
       <axis id="nfloat" long_name="Float number"      unit="-"                 />
       <axis id="icbcla"  long_name="Iceberg class"      unit="1"               />
       <axis id="ncatice" long_name="Ice category"       unit="1"               />

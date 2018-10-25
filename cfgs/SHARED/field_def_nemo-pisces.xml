@@ -115,6 +115,51 @@
 
      </field_group>
 
+     <!-- SEDIMENT variables on T sediment grid  -->
+     <field_group id="sed_T" grid_ref="grid_T_3DS">
+       <field id="SedDIC"          long_name="Dissolved inorganic Concentration"        unit="mmol/m3" />
+       <field id="SedAlkalini"     long_name="Total Alkalinity Concentration"           unit="mmol/m3" />
+       <field id="SedO2"           long_name="Oxygen Concentration"                     unit="mmol/m3" />
+       <field id="SedCaCO3"        long_name="Calcite Concentration"                    unit="%" />
+       <field id="SedPOS"          long_name="Semi-ref POC Concentration"               unit="%" />
+       <field id="SedPOR"          long_name="Refractory POC Concentration"             unit="%" />
+       <field id="SedPO4"          long_name="Phosphate Concentration"                  unit="mmol/m3" />
+       <field id="SedPOC"          long_name="Labile POC Concentration"                 unit="%" />
+       <field id="SedSil"          long_name="Silicate Concentration"                   unit="mmol/m3" />
+       <field id="SedFe2"          long_name="Fe2+ Concentration"                       unit="mmol/m3" />
+       <field id="SedBSi"          long_name="Biogenic Silicate Concentration"          unit="%" />
+       <field id="SedNO3"          long_name="Nitrate Concentration"                    unit="mmol/m3" />
+       <field id="SedNH4"          long_name="Ammonium Concentration"                   unit="mmol/m3" />
+       <field id="SedH2S"          long_name="H2S Concentration"                        unit="mmol/m3" />
+       <field id="SedSO4"          long_name="SO4 Concentration"                        unit="mmol/m3" />
+       <field id="SedClay"         long_name="Clay Concentration"                       unit="%" />
+       <field id="SedFeO"          long_name="Fe(OH)3 Concentration"                    unit="%" />
+       <field id="SedFeS"          long_name="FeS Concentration"                        unit="%" />
+       <field id="SedpH"           long_name="PH"                                       unit="1"          />
+       <field id="SedCO3por"       long_name="Bicarbonates"                             unit="mol/m3" />
+     </field_group>
+
+     <!-- SEDIMENT additional variables on T sediment grid  -->
+     <field_group id="Diag_S" grid_ref="grid_T_2D">
+       <field id="FlxSi"       long_name="Si sediment flux"                        unit="mol/cm2/s"     />
+       <field id="FlxO2"       long_name="O2 sediment flux"                        unit="mol/cm2/s"     />
+       <field id="FlxDIC"      long_name="DIC sediment flux"                       unit="mol/cm2/s"     />
+       <field id="FlxNO3"      long_name="NO3 sediment flux"                       unit="mol/cm2/s"     />
+       <field id="FlxPO4"      long_name="PO4 sediment flux"                       unit="mol/cm2/s"     />
+       <field id="FlxAlkalini" long_name="Alkalinity sediment flux"                unit="mol/cm2/s"     />
+       <field id="FlxNH4"      long_name="Ammonium sediment flux"                  unit="mol/cm2/s"     />
+       <field id="FlxH2S"      long_name="H2S sediment flux"                       unit="mol/cm2/s"     />
+       <field id="FlxSO4"      long_name="SO4 sediment flux"                       unit="mol/cm2/s"     />
+       <field id="FlxFe2"      long_name="Fe2+ sediment flux"                      unit="mol/cm2/s"     />
+       <field id="Flxtot"      long_name="Sediment net burial rate"                unit="cm/s"     />
+       <field id="dzdep"       long_name="Sedimentation rate"                      unit="cm/s"     />
+       <field id="sflxclay"    long_name="Clay sedimentation rate"                 unit="g/m2/s"     />
+       <field id="sflxcal"     long_name="Calcite sedimentation rate"              unit="mol/m2/s"     />
+       <field id="sflxbsi"     long_name="BSi Sedimentation rate"                  unit="mol/m2/s"     />
+       <field id="sflxpoc"     long_name="POC Sedimentation rate"                  unit="mol/m2/s"     />
+       <field id="sflxfeo"     long_name="Fe(OH)3 Sedimentation rate"              unit="mol/m2/s"     />
+</field_group>
+
      <!-- PISCES additional diagnostics on T grid  -->
 
      <field_group id="diad_T" grid_ref="grid_T_2D">
