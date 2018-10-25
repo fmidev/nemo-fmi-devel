@@ -100,11 +100,12 @@ CONTAINS
          END DO
       ENDIF
       !
+      IF( ll_sbc ) CALL p4z_sbc( kt )   ! external sources of nutrients 
+      !
+#if ! defined key_sed_off
       CALL p4z_che              ! computation of chemical constants
       CALL p4z_int( kt )        ! computation of various rates for biogeochemistry
       !
-      IF( ll_sbc ) CALL p4z_sbc( kt )   ! external sources of nutrients 
-
       DO jnt = 1, nrdttrc          ! Potential time splitting if requested
          !
          CALL p4z_bio( kt, jnt )   ! Biology
@@ -148,10 +149,17 @@ CONTAINS
            CALL trd_trc( tra(:,:,:,jn), jn, jptra_sms, kt )   ! save trends
          END DO
       END IF
+#endif
       !
-      IF( lk_sed ) THEN 
+      IF( ln_sediment ) THEN 
          !
          CALL sed_model( kt )     !  Main program of Sediment model
+         !
+         IF( ln_top_euler ) THEN
+            DO jn = jp_pcs0, jp_pcs1
+               trn(:,:,:,jn) = trb(:,:,:,jn)
+            END DO
+         ENDIF
          !
       ENDIF
       !
@@ -351,7 +359,7 @@ CONTAINS
       IF(lwp)  WRITE(numout,*) ' p4z_dmp : Restoring of nutrients at time-step kt = ', kt
       IF(lwp)  WRITE(numout,*)
 
-      IF( cn_cfg == "ORCA" .OR. cn_cfg == "orca" ) THEN
+      IF( cn_cfg == "ORCA" .OR. cn_cfg == "orca") THEN
          IF( .NOT. lk_c1d ) THEN      ! ORCA configuration (not 1D) !
             !                                                ! --------------------------- !
             ! set total alkalinity, phosphate, nitrate & silicate

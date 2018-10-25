@@ -1,5 +1,4 @@
 MODULE sedmbc
-#if defined key_sed
    !!======================================================================
    !!              ***  MODULE  sedmbc  ***
    !! Sediment : mass balance calculation
@@ -11,6 +10,7 @@ MODULE sedmbc
    !! * Modules used
    USE sed     ! sediment global variable
    USE seddsr
+   USE lib_mpp         ! distribued memory computing library
 
    IMPLICIT NONE
    PRIVATE
@@ -26,14 +26,6 @@ MODULE sedmbc
 
    REAL(wp), DIMENSION(jpwat) :: diss_in_tot   ! total input in pore water
    REAL(wp), DIMENSION(jpwat) :: diss_out_tot  ! total output from pore water
-
-   REAL(wp)  :: cons_tot_o2                   ! cumulative o2 consomation
-   REAL(wp)  :: sour_tot_no3                  ! cumulative no3 source
-   REAL(wp)  :: cons_tot_no3                  ! cumulative no3 consomation
-   REAL(wp)  :: sour_tot_c13                  ! cumulative o2 source
-
-   REAL(wp)  :: src13p  
-   REAL(wp)  :: src13ca  
 
    !! $Id$
 CONTAINS
@@ -66,18 +58,15 @@ CONTAINS
       REAL, DIMENSION(jpsol) :: zsolcp_inv_i, zsolcp_inv_f
       REAL, DIMENSION(jpwat) :: zpwcp_inv_i, zpwcp_inv_f
       REAL(wp) ::  zdelta_sil, zdelta_clay
-      REAL(wp) ::  zdelta_co2, zdelta_oxy
+      REAL(wp) ::  zdelta_co2, zdelta_fe
       REAL(wp) ::  zdelta_po4, zdelta_no3
-      REAL(wp) ::  zdelta_c13, zdelta_c13b
 
       !!----------------------------------------------------------------------
       ! Initilization
       !---------------
+      IF( ln_timing )  CALL timing_start('sed_mbc')
+!
       IF( kt == nitsed000 ) THEN
-         cons_tot_o2  = 0.
-         sour_tot_no3 = 0.
-         cons_tot_no3 = 0.
-         sour_tot_c13 = 0.
 
          DO js = 1, jpsol
             rain_tot   (js) = 0.
@@ -91,8 +80,6 @@ CONTAINS
             diss_out_tot(jw) = 0.
          ENDDO
 
-         src13p  = rc13P  * pdb
-         src13ca = rc13Ca * pdb
       ENDIF
 
 
@@ -105,10 +92,10 @@ CONTAINS
          DO ji = 1, jpoce
             ! input [mol]
             rain_tot   (js) = rain_tot   (js) + dtsed * rainrm_dta(ji,js)
-            fromsed_tot(js) = fromsed_tot(js) + fromsed(ji,js)
+            fromsed_tot(js) = fromsed_tot(js) + fromsed(ji,js) / mol_wgt(js)
             ! output [mol]
-            tosed_tot  (js) = tosed_tot (js) + tosed(ji,js)
-            rloss_tot  (js) = rloss_tot (js) + rloss(ji,js)
+            tosed_tot  (js) = tosed_tot (js) + tosed(ji,js) / mol_wgt(js)
+            rloss_tot  (js) = rloss_tot (js) + rloss(ji,js) / mol_wgt(js)
          ENDDO
       ENDDO
 
@@ -122,15 +109,6 @@ CONTAINS
          ENDDO
       ENDDO
 
-      ! cumulativ o2 and no3 consomation
-      DO ji = 1, jpoce
-         cons_tot_o2  = cons_tot_o2  + cons_o2 (ji)
-         sour_tot_no3 = sour_tot_no3 + sour_no3(ji)
-         cons_tot_no3 = cons_tot_no3 + cons_no3(ji)
-         sour_tot_c13 = sour_tot_c13 + sour_c13(ji)
-      ENDDO
-     
-
       ! Mass balance check
       !---------------------
       IF( kt == nitsedend ) THEN
@@ -140,7 +118,7 @@ CONTAINS
          zpwcp_inv_i (:) = 0.       
          zpwcp_inv_f (:) = 0.        
          DO js = 1, jpsol
-            zdsw = dens / mol_wgt(js)
+            zdsw = denssol / mol_wgt(js)
             DO jk = 2, jpksed
                DO ji = 1, jpoce
                   zvol = vols3d(ji,jk) * zdsw
@@ -177,145 +155,103 @@ CONTAINS
          zdelta_clay= ( zfinal + zoutput ) - ( zinit + zinput )
 
          ! mass balance for carbon ( carbon in POC, CaCo3, DIC )
-         zinit      = zsolcp_inv_i(jspoc) + zsolcp_inv_i(jscal) + zpwcp_inv_i(jwdic)
-         zfinal     = zsolcp_inv_f(jspoc) + zsolcp_inv_f(jscal) + zpwcp_inv_f(jwdic)
-         zinput     = rain_tot   (jspoc) + rain_tot   (jscal) + diss_in_tot(jwdic)
-         zoutput    = tosed_tot  (jspoc) + tosed_tot  (jscal) + diss_out_tot(jwdic) &
-            &       + rloss_tot  (jspoc) + rloss_tot  (jscal) 
+         zinit      = zsolcp_inv_i(jspoc) + zsolcp_inv_i(jspos) + zsolcp_inv_i(jspor) &
+         &          + zsolcp_inv_i(jscal) + zpwcp_inv_i(jwdic)
+         zfinal     = zsolcp_inv_f(jspoc) + zsolcp_inv_f(jspos) + zsolcp_inv_f(jspor) &
+         &          + zsolcp_inv_f(jscal) + zpwcp_inv_f(jwdic)
+         zinput     = rain_tot (jspoc) + rain_tot   (jspos)  +  rain_tot   (jspor) &
+         &          + rain_tot (jscal) + diss_in_tot(jwdic)
+         zoutput    = tosed_tot(jspoc) + tosed_tot(jspos) + tosed_tot(jspor) + tosed_tot(jscal) + diss_out_tot(jwdic) &
+            &       + rloss_tot(jspoc) + rloss_tot(jspos) + rloss_tot(jspor) + rloss_tot(jscal) 
          zdelta_co2 = ( zfinal + zoutput ) - ( zinit + zinput )
 
-         ! mass balance for oxygen : O2 is in POC remineralization
-         zinit      = zpwcp_inv_i(jwoxy)
-         zfinal     = zpwcp_inv_f(jwoxy)
-         zinput     = diss_in_tot(jwoxy)
-         zoutput    = diss_out_tot(jwoxy) + cons_tot_o2
-         zdelta_oxy = ( zfinal + zoutput ) - ( zinit + zinput )
-
-         ! mass balance for phosphate ( PO4 in POC and dissolved phosphates )
-         zinit      = zsolcp_inv_i(jspoc) * spo4r + zpwcp_inv_i(jwpo4)
-         zfinal     = zsolcp_inv_f(jspoc) * spo4r + zpwcp_inv_f(jwpo4)
-         zinput     = rain_tot   (jspoc) * spo4r + diss_in_tot(jwpo4)
-         zoutput    = tosed_tot  (jspoc) * spo4r + diss_out_tot(jwpo4) &
-            &       + rloss_tot  (jspoc) * spo4r
-         zdelta_po4 = ( zfinal + zoutput ) - ( zinit + zinput )
-
-
-         ! mass balance for Nitrate
-         zinit      = zpwcp_inv_i  (jwno3)
-         zfinal     = zpwcp_inv_f  (jwno3)
-         zinput     = diss_in_tot (jwno3) + sour_tot_no3
-         zoutput    = diss_out_tot(jwno3) + cons_tot_no3
+         ! mass balance for Sulfur
+         zinit      = zpwcp_inv_i(jwso4) + zpwcp_inv_i(jwh2s)   &
+         &          + zsolcp_inv_i(jsfes) 
+         zfinal     = zpwcp_inv_f(jwso4) + zpwcp_inv_f(jwh2s)   &
+         &          + zsolcp_inv_f(jsfes)
+         zinput     = diss_in_tot (jwso4) + diss_in_tot (jwh2s) &
+         &          + rain_tot (jsfes)
+         zoutput    = diss_out_tot(jwso4) + diss_out_tot(jwh2s) &
+         &          + tosed_tot(jsfes)    + rloss_tot(jsfes)
          zdelta_no3 = ( zfinal + zoutput ) - ( zinit + zinput )
 
-         ! mass balance for DIC13
-         zinit      =  zpwcp_inv_i(jwc13)   &
-            &        + src13p * zsolcp_inv_i(jspoc) + src13Ca * zsolcp_inv_i(jscal) 
-         zfinal     =  zpwcp_inv_f(jwc13)   &
-            &        + src13p * zsolcp_inv_f(jspoc) + src13Ca * zsolcp_inv_f(jscal)
-         zinput     =  diss_in_tot (jwc13)  &
-            &        + src13p * rain_tot(jspoc) + src13Ca * rain_tot(jscal)
-         zoutput    =  diss_out_tot(jwc13)  &
-            &        + src13p * tosed_tot(jspoc) + src13Ca * tosed_tot(jscal) &   
-            &        + src13p * rloss_tot(jspoc) + src13Ca * rloss_tot(jscal)
-         zdelta_c13 = ( zfinal + zoutput ) - ( zinit + zinput )
+         ! mass balance for iron
+         zinit      = zpwcp_inv_i(jwfe2)  + zsolcp_inv_i(jsfeo)   &
+         &          + zsolcp_inv_i(jsfes)
+         zfinal     = zpwcp_inv_f(jwfe2)  + zsolcp_inv_f(jsfeo)   &
+         &          + zsolcp_inv_f(jsfes)
+         zinput     = diss_in_tot (jwfe2) + rain_tot (jsfeo) &
+         &          + rain_tot (jsfes)
+         zoutput    = diss_out_tot(jwfe2) + tosed_tot(jsfeo) &
+         &          + tosed_tot(jsfes)    + rloss_tot(jsfes) + rloss_tot(jsfeo)
+         zdelta_fe  = ( zfinal + zoutput ) - ( zinit + zinput )
 
-         ! other mass balance for DIC13
-         zinit      = zpwcp_inv_i  (jwc13)
-         zfinal     = zpwcp_inv_f  (jwc13)
-         zinput     = diss_in_tot (jwc13) + sour_tot_c13
-         zoutput    = diss_out_tot(jwc13)
-         zdelta_c13b= ( zfinal + zoutput ) - ( zinit + zinput )    
 
       END IF
 
       IF( kt == nitsedend) THEN 
 
+         IF (lwp) THEN
          WRITE(numsed,*)
          WRITE(numsed,*)'==================    General mass balance   ==================  '
          WRITE(numsed,*)' '
          WRITE(numsed,*)' '
-         WRITE(numsed,*)' Initial total solid Masses (mole/dx.dy) (k=2-11) '
+         WRITE(numsed,*)' Initial total solid Masses (mole/dx.dy)        '
          WRITE(numsed,*)' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-         WRITE(numsed,*)'    Opale,      Clay,       POC,        CaCO3,         C13'
-         WRITE(numsed,'(4x,5(1PE10.3,2X))')zsolcp_inv_i(jsopal),zsolcp_inv_i(jsclay),zsolcp_inv_i(jspoc), &
-            & zsolcp_inv_i(jscal),( src13P * zsolcp_inv_i(jspoc) + src13Ca * zsolcp_inv_i(jscal) )
+         WRITE(numsed,*)'    Opal,      Clay,       POC,       POS,      POR,        CaCO3,     FeOH,     FeS'
+         WRITE(numsed,'(8x,4(1PE10.3,2X))')zsolcp_inv_i(jsopal),zsolcp_inv_i(jsclay),zsolcp_inv_i(jspoc), &
+            & zsolcp_inv_i(jspos),zsolcp_inv_i(jspor),zsolcp_inv_i(jscal),zsolcp_inv_i(jsfeo),zsolcp_inv_i(jsfes)
          WRITE(numsed,*)' '
-         WRITE(numsed,*)' Initial total dissolved Masses (mole/dx.dy) (k=2-11) '
+         WRITE(numsed,*)' Initial total dissolved Masses (mole/dx.dy)    '
          WRITE(numsed,*)' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-         WRITE(numsed,*)'    Si,         O2,         DIC,        Nit         Phos,       DIC13'
-         WRITE(numsed,'(4x,6(1PE10.3,2X))') zpwcp_inv_i(jwsil), zpwcp_inv_i(jwoxy), &
-            & zpwcp_inv_i(jwdic), zpwcp_inv_i(jwno3), zpwcp_inv_i(jwpo4), zpwcp_inv_i(jwc13)
+         WRITE(numsed,*)'    Si,         O2,         DIC,        Nit,         Phos,         Fe2+'
+         WRITE(numsed,'(5x,5(1PE10.3,2X))') zpwcp_inv_i(jwsil), zpwcp_inv_i(jwoxy), &
+            & zpwcp_inv_i(jwdic), zpwcp_inv_i(jwno3), zpwcp_inv_i(jwpo4), zpwcp_inv_i(jwfe2)
          WRITE(numsed,*)' '
-         WRITE(numsed,*)'  Solid inputs :  Opale,      Clay,       POC,        CaCO3,         C13'
-         WRITE(numsed,'(A4,10X,5(1PE10.3,2X))')'Rain : ',rain_tot(jsopal),rain_tot(jsclay),rain_tot(jspoc),&
-            & rain_tot(jscal),( src13P * rain_tot(jspoc) + src13Ca * rain_tot(jscal) )
-         WRITE(numsed,'(A12,6x,4(1PE10.3,2X))')' From Sed : ',fromsed_tot(jsopal), fromsed_tot(jsclay), &
-            & fromsed_tot(jspoc), fromsed_tot(jscal)
-         WRITE(numsed,*)'Diss. inputs : Si,    O2,         DIC,         Nit,       Phos,       DIC13'
+         WRITE(numsed,*)'  Solid inputs :  Opale,      Clay,       POC,        CaCO3,        Fe'
+         WRITE(numsed,'(A4,10X,5(1PE10.3,2X))')'Rain : ',rain_tot(jsopal),rain_tot(jsclay),rain_tot(jspoc) + rain_tot(jspos) + rain_tot(jspor),&
+            & rain_tot(jscal), rain_tot(jsfeo)
+         WRITE(numsed,'(A12,6x,5(1PE10.3,2X))')' From Sed : ',fromsed_tot(jsopal), fromsed_tot(jsclay), &
+            & fromsed_tot(jspoc)+fromsed_tot(jspos)+fromsed_tot(jspor), fromsed_tot(jscal),    &
+            & fromsed_tot(jsfeo) + fromsed_tot(jsfes)
+         WRITE(numsed,*)'Diss. inputs : Si,    O2,         DIC,         Nit,       Phos,      Fe'
          WRITE(numsed,'(A9,1x,6(1PE10.3,2X))')' From Pisc : ', diss_in_tot(jwsil), &
-            & diss_in_tot(jwoxy), diss_in_tot(jwdic), diss_in_tot(jwno3), diss_in_tot(jwpo4), &
-            & diss_in_tot(jwc13)
+            & diss_in_tot(jwoxy), diss_in_tot(jwdic), diss_in_tot(jwno3), diss_in_tot(jwpo4), diss_in_tot(jwfe2)
          WRITE(numsed,*)' '
-         WRITE(numsed,*)'Solid output : Opale,      Clay,       POC,        CaCO3,          C13'
-         WRITE(numsed,'(A6,8x,5(1PE10.3,2X))')'To sed', tosed_tot(jsopal),tosed_tot(jsclay),tosed_tot(jspoc),&
-            & tosed_tot(jscal),( src13P * tosed_tot(jspoc) + src13Ca * tosed_tot(jscal) )
-         WRITE(numsed,'(A5,9x,5(1PE10.3,2X))')'Perdu', rloss_tot(jsopal),rloss_tot(jsclay),rloss_tot(jspoc),&
-            & rloss_tot(jscal),( src13P * rloss_tot(jspoc) + src13Ca * rloss_tot(jscal) )
-         WRITE(numsed,*)'Diss. output : Si,     O2,        DIC,          Nit,       Phos,       DIC13 '  
+         WRITE(numsed,*)'Solid output : Opale,      Clay,       POC,        CaCO3,        Fe'
+         WRITE(numsed,'(A6,8x,5(1PE10.3,2X))')'To sed', tosed_tot(jsopal),tosed_tot(jsclay),tosed_tot(jspoc) &
+            & +tosed_tot(jspos)+tosed_tot(jspor),tosed_tot(jscal), tosed_tot(jsfeo)+tosed_tot(jsfes)
+         WRITE(numsed,'(A5,9x,5(1PE10.3,2X))')'Perdu', rloss_tot(jsopal),rloss_tot(jsclay),rloss_tot(jspoc) &
+            & +rloss_tot(jspos)+rloss_tot(jspor),rloss_tot(jscal),rloss_tot(jsfeo)+rloss_tot(jsfes)
+         WRITE(numsed,*)'Diss. output : Si,     O2,        DIC,          Nit,       Phos,        Fe '  
          WRITE(numsed,'(A7,2x,6(1PE10.3,2X))')'To kbot', diss_out_tot(jwsil), &
-            & diss_out_tot(jwoxy), diss_out_tot(jwdic), diss_out_tot(jwno3), diss_out_tot(jwpo4), &
-            & diss_out_tot(jwc13)
+            & diss_out_tot(jwoxy), diss_out_tot(jwdic), diss_out_tot(jwno3), diss_out_tot(jwpo4), diss_out_tot(jwfe2)
          WRITE(numsed,*)' '
-         WRITE(numsed,*)' Total consomation in POC remineralization [mol]:  O2,         NO3'
-         WRITE(numsed,'(51x,2(1PE10.3,2X))') cons_tot_o2,cons_tot_no3
-         WRITE(numsed,*)' '
-         WRITE(numsed,*)'Final solid  Masses (mole/dx.dy) (k=2-11)'
-         WRITE(numsed,*)'    Opale,      Clay,       POC,        CaCO3,          C13'
-         WRITE(numsed,'(4x,5(1PE10.3,2X))')zsolcp_inv_f(jsopal),zsolcp_inv_f(jsclay),zsolcp_inv_f(jspoc), &
-            & zsolcp_inv_f(jscal),( src13P * zsolcp_inv_f(jspoc) + src13Ca * zsolcp_inv_f(jscal) )
+         WRITE(numsed,*)'Final solid  Masses (mole/dx.dy) '
+         WRITE(numsed,*)'    Opale,      Clay,       POC,        CaCO3,      Fe'
+         WRITE(numsed,'(4x,5(1PE10.3,2X))')zsolcp_inv_f(jsopal),zsolcp_inv_f(jsclay),zsolcp_inv_f(jspoc)  &
+            & +zsolcp_inv_f(jspos)+zsolcp_inv_f(jspor),zsolcp_inv_f(jscal),zsolcp_inv_f(jsfeo)+zsolcp_inv_f(jsfes)
          WRITE(numsed,*)' '
          WRITE(numsed,*)'Final dissolved  Masses (mole/dx.dy) (k=2-11)'
-         WRITE(numsed,*)'    Si,        O2,         DIC,        Nit,        Phos,    DIC13'
+         WRITE(numsed,*)'    Si,        O2,         DIC,        Nit,        Phos,        Fe'
          WRITE(numsed,'(4x,6(1PE10.3,2X))') zpwcp_inv_f(jwsil), zpwcp_inv_f(jwoxy), &
-            & zpwcp_inv_f(jwdic), zpwcp_inv_f(jwno3), zpwcp_inv_f(jwpo4), zpwcp_inv_f(jwc13)
+            & zpwcp_inv_f(jwdic), zpwcp_inv_f(jwno3), zpwcp_inv_f(jwpo4), zpwcp_inv_f(jwfe2)
          WRITE(numsed,*)' '     
-         WRITE(numsed,*)'Delta : Opale,      Clay,       C,          O,          N,          P,        C13'
-         WRITE(numsed,'(7x,7(1PE11.3,1X))') zdelta_sil, zdelta_clay, zdelta_co2, zdelta_oxy, zdelta_no3,&
-            &                          zdelta_po4, zdelta_c13
-         WRITE(numsed,*)' ' 
-         WRITE(numsed,*)'deltaC13bis : ',zdelta_c13b     
-
-         WRITE(numsed,*)'=========================================================================='
-         WRITE(numsed,*)' Composition of final sediment for point jpoce'
-         WRITE(numsed,*)' ========================================='
-         WRITE(numsed,*)'Opale,      Clay,       POC,        CaCo3,      hipor,      pH,         co3por'
-         DO jk = 1,jpksed
-            WRITE(numsed,'(4(F8.4,4X),3(1PE10.3,2X))') solcp(jpoce,jk,jsopal)*100.,solcp(jpoce,jk,jsclay)*100.,&
-               &       solcp(jpoce,jk,jspoc)*100.,solcp(jpoce,jk,jscal)*100.,&
-               &       hipor(jpoce,jk),-LOG10(hipor(jpoce,jk)/densSW(jpoce)),co3por(jpoce,jk)
-         ENDDO
-         WRITE(numsed,*)'Silicic A.,  Oxygen,     DIC,        Nitrats,    Phosphats,  Alkal.,     DIC13'
-         DO jk = 1, jpksed
-            WRITE(numsed,'(8(1PE10.3,2X))')pwcp(jpoce,jk,jwsil),pwcp(jpoce,jk,jwoxy),&
-               & pwcp(jpoce,jk,jwdic),pwcp(jpoce,jk,jwno3),pwcp(jpoce,jk,jwpo4),pwcp(jpoce,jk,jwalk),pwcp(jpoce,jk,jwc13)
-         ENDDO
-         WRITE(numsed,*)'densSW at the end : ',densSW(jpoce)
+         WRITE(numsed,*)'Delta : Opale,      Clay,       C,         Fe,          S,'
+         WRITE(numsed,'(7x,6(1PE11.3,1X))') zdelta_sil / ( zsolcp_inv_i(jsopal) + zpwcp_inv_i(jwsil) ) , &
+         &            zdelta_clay / ( zsolcp_inv_i(jsclay) ) ,      & 
+         &            zdelta_co2 / ( zsolcp_inv_i(jspoc) + zsolcp_inv_i(jspos) + zsolcp_inv_i(jspor) &
+         &          + zsolcp_inv_i(jscal) + zpwcp_inv_i(jwdic) ),     &
+         &            zdelta_fe / ( zpwcp_inv_i(jwfe2)  + zsolcp_inv_i(jsfeo) + + zsolcp_inv_i(jsfes) ) ,  &
+         &            zdelta_no3 / ( zpwcp_inv_i(jwso4) + zpwcp_inv_i(jwh2s) + zsolcp_inv_i(jsfes) )
          WRITE(numsed,*)'=========================================================================='
 
       ENDIF
+      ENDIF
+
+      IF( ln_timing )  CALL timing_stop('sed_mbc')
   
    END SUBROUTINE sed_mbc
 
-
-#else
-   !!======================================================================
-   !! MODULE sedmbc :   Dummy module 
-   !!======================================================================
-   !! $Id$
-CONTAINS
-   SUBROUTINE sed_mbc( kt )         ! Empty routine
-      INTEGER, INTENT(in) :: kt
-      WRITE(*,*) 'sed_mbc: You should not have seen this print! error?', kt
-   END SUBROUTINE sed_mbc
-#endif
 END MODULE sedmbc

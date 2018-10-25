@@ -109,9 +109,12 @@ CONTAINS
          !
          IF( istp /= nit000 )   CALL day        ( istp )         ! Calendar (day was already called at nit000 in day_init)
                                 CALL iom_setkt  ( istp - nit000 + 1, cxios_context )   ! say to iom that we are at time step kstp
+#if defined key_sed_off
+                                CALL dta_dyn_sed( istp )         ! Interpolation of the dynamical fields
+#else
                                 CALL dta_dyn    ( istp )         ! Interpolation of the dynamical fields
          IF( .NOT.ln_linssh )   CALL dta_dyn_swp( istp )         ! swap of sea  surface height and vertical scale factors
-
+#endif
                                 CALL trc_stp    ( istp )         ! time-stepping
                                 CALL stp_ctl    ( istp, indic )  ! Time loop: control and print
          istp = istp + 1
@@ -286,7 +289,11 @@ CONTAINS
       !                                      ! Passive tracers
                            CALL trc_nam_run    ! Needed to get restart parameters for passive tracers
                            CALL trc_rst_cal( nit000, 'READ' )   ! calendar
+#if defined key_sed_off
+                           CALL dta_dyn_sed_init ! Initialization for the dynamics
+#else
                            CALL dta_dyn_init   ! Initialization for the dynamics
+#endif
 
                            CALL     trc_init   ! Passive tracers initialization
                            CALL dia_ptr_init   ! Poleward TRansports initialization

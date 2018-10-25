@@ -23,6 +23,7 @@ MODULE sms_pisces
    LOGICAL  ::  ln_p4z            !: Flag to use PISCES  model
    LOGICAL  ::  ln_p5z            !: Flag to use PISCES  quota model
    LOGICAL  ::  ln_ligand         !: Flag to enable organic ligands
+   LOGICAL  ::  ln_sediment       !: Flag to enable sediment module
 
    !!*  Time variables
    INTEGER  ::   nrdttrc           !: ???
@@ -121,12 +122,6 @@ MODULE sms_pisces
    !!* Temperature dependancy of SMS terms
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   tgfunc    !: Temp. dependancy of various biological rates
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   tgfunc2   !: Temp. dependancy of mesozooplankton rates
-
-#if defined key_sed
-   LOGICAL, PUBLIC, PARAMETER ::   lk_sed = .TRUE.     !: sediment flag
-#else
-   LOGICAL, PUBLIC, PARAMETER ::   lk_sed = .FALSE.     !: sediment flag
-#endif
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)

@@ -216,22 +216,22 @@ CONTAINS
             ! 
          ELSE                                !==   z- or zps- coordinate   ==!
             ! zps-coordinate (partial steps) interpolation at the last ocean level
-            IF( ln_zps ) THEN
-               DO jj = 1, jpj
-                  DO ji = 1, jpi
-                     ik = mbkt(ji,jj) 
-                     IF( ik > 1 ) THEN
-                        zl = ( gdept_1d(ik) - gdept_0(ji,jj,ik) ) / ( gdept_1d(ik) - gdept_1d(ik-1) )
-                        ptrcdta(ji,jj,ik) = (1.-zl) * ptrcdta(ji,jj,ik) + zl * ptrcdta(ji,jj,ik-1)
-                     ENDIF
-                     ik = mikt(ji,jj)
-                     IF( ik > 1 ) THEN
-                        zl = ( gdept_0(ji,jj,ik) - gdept_1d(ik) ) / ( gdept_1d(ik+1) - gdept_1d(ik) )
-                        ptrcdta(ji,jj,ik) = (1.-zl) * ptrcdta(ji,jj,ik) + zl * ptrcdta(ji,jj,ik+1)
-                     ENDIF
-                  END DO
-              END DO
-            ENDIF
+!            IF( ln_zps ) THEN
+!               DO jj = 1, jpj
+!                  DO ji = 1, jpi
+!                     ik = mbkt(ji,jj) 
+!                     IF( ik > 1 ) THEN
+!                        zl = ( gdept_1d(ik) - gdept_0(ji,jj,ik) ) / ( gdept_1d(ik) - gdept_1d(ik-1) )
+!                        ptrcdta(ji,jj,ik) = (1.-zl) * ptrcdta(ji,jj,ik) + zl * ptrcdta(ji,jj,ik-1)
+!                     ENDIF
+!                     ik = mikt(ji,jj)
+!                     IF( ik > 1 ) THEN
+!                        zl = ( gdept_0(ji,jj,ik) - gdept_1d(ik) ) / ( gdept_1d(ik+1) - gdept_1d(ik) )
+!                        ptrcdta(ji,jj,ik) = (1.-zl) * ptrcdta(ji,jj,ik) + zl * ptrcdta(ji,jj,ik+1)
+!                     ENDIF
+!                  END DO
+!              END DO
+!            ENDIF
             !
          ENDIF
          !

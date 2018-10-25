@@ -107,7 +107,7 @@ CONTAINS
                zfoodlim  = MAX( 0., zfood - MIN( 0.5 * zfood, xthresh2 ) )
                zdenom    = zfoodlim / ( xkgraz2 + zfoodlim )
                zdenom2   = zdenom / ( zfood + rtrn )
-               zgraze2   = grazrat2 * xstep * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpmes) 
+               zgraze2   = grazrat2 * xstep * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpmes) * (1. - nitrfac(ji,jj,jk)) 
 
                zgrazd    = zgraze2  * xprefc   * zcompadi  * zdenom2 
                zgrazz    = zgraze2  * xprefz   * zcompaz   * zdenom2 

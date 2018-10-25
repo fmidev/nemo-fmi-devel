@@ -45,9 +45,11 @@ MODULE dtadyn
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   dta_dyn_init   ! called by opa.F90
-   PUBLIC   dta_dyn        ! called by step.F90
-   PUBLIC   dta_dyn_swp   ! called by step.F90
+   PUBLIC   dta_dyn_init       ! called by opa.F90
+   PUBLIC   dta_dyn            ! called by step.F90
+   PUBLIC   dta_dyn_sed_init   ! called by opa.F90
+   PUBLIC   dta_dyn_sed        ! called by step.F90
+   PUBLIC   dta_dyn_swp        ! called by step.F90
 
    CHARACTER(len=100) ::   cn_dir          !: Root directory for location of ssr files
    LOGICAL            ::   ln_dynrnf       !: read runoff data in file (T) or set to zero (F)
@@ -182,12 +184,6 @@ CONTAINS
          CALL prt_ctl(tab3d_1=avt              , clinfo1=' kz      - : ', mask1=tmask,  kdim=jpk   )
          CALL prt_ctl(tab3d_1=uslp             , clinfo1=' slp  - u : ', tab3d_2=vslp, clinfo2=' v : ', kdim=jpk)
          CALL prt_ctl(tab3d_1=wslpi            , clinfo1=' slp  - wi: ', tab3d_2=wslpj, clinfo2=' wj: ', kdim=jpk)
-!         CALL prt_ctl(tab2d_1=fr_i             , clinfo1=' fr_i    - : ', mask1=tmask )
-!         CALL prt_ctl(tab2d_1=hmld             , clinfo1=' hmld    - : ', mask1=tmask )
-!         CALL prt_ctl(tab2d_1=fmmflx           , clinfo1=' fmmflx  - : ', mask1=tmask )
-!         CALL prt_ctl(tab2d_1=emp              , clinfo1=' emp     - : ', mask1=tmask )
-!         CALL prt_ctl(tab2d_1=wndm             , clinfo1=' wspd    - : ', mask1=tmask )
-!         CALL prt_ctl(tab2d_1=qsr              , clinfo1=' qsr     - : ', mask1=tmask )
       ENDIF
       !
       IF( ln_timing )   CALL timing_stop( 'dta_dyn')
@@ -418,6 +414,119 @@ CONTAINS
       !
    END SUBROUTINE dta_dyn_init
 
+   SUBROUTINE dta_dyn_sed( kt )
+      !!----------------------------------------------------------------------
+      !!                  ***  ROUTINE dta_dyn  ***
+      !!
+      !! ** Purpose :  Prepares dynamics and physics fields from a NEMO run
+      !!               for an off-line simulation of passive tracers
+      !!
+      !! ** Method : calculates the position of data
+      !!             - computes slopes if needed
+      !!             - interpolates data if needed
+      !!----------------------------------------------------------------------
+      INTEGER, INTENT(in) ::   kt   ! ocean time-step index
+      !
+      !!----------------------------------------------------------------------
+      !
+      IF( ln_timing )   CALL timing_start( 'dta_dyn_sed')
+      !
+      nsecdyn = nsec_year + nsec1jan000   ! number of seconds between Jan. 1st 00h of nit000 year and the middle of time step
+      !
+      IF( kt == nit000 ) THEN    ;    nprevrec = 0
+      ELSE                       ;    nprevrec = sf_dyn(jf_tem)%nrec_a(2)
+      ENDIF
+      CALL fld_read( kt, 1, sf_dyn )      !=  read data at kt time step   ==!
+      !
+      tsn(:,:,:,jp_tem) = sf_dyn(jf_tem)%fnow(:,:,:)  * tmask(:,:,:)    ! temperature
+      tsn(:,:,:,jp_sal) = sf_dyn(jf_sal)%fnow(:,:,:)  * tmask(:,:,:)    ! salinity
+      !
+      CALL eos    ( tsn, rhd, rhop, gdept_0(:,:,:) ) ! In any case, we need rhop
+
+      IF(ln_ctl) THEN                  ! print control
+         CALL prt_ctl(tab3d_1=tsn(:,:,:,jp_tem), clinfo1=' tn      - : ', mask1=tmask,  kdim=jpk   )
+         CALL prt_ctl(tab3d_1=tsn(:,:,:,jp_sal), clinfo1=' sn      - : ', mask1=tmask,  kdim=jpk   )
+      ENDIF
+      !
+      IF( ln_timing )   CALL timing_stop( 'dta_dyn_sed')
+      !
+   END SUBROUTINE dta_dyn_sed
+
+
+   SUBROUTINE dta_dyn_sed_init
+      !!----------------------------------------------------------------------
+      !!                  ***  ROUTINE dta_dyn_init  ***
+      !!
+      !! ** Purpose :   Initialisation of the dynamical data
+      !! ** Method  : - read the data namdta_dyn namelist
+      !!----------------------------------------------------------------------
+      INTEGER  :: ierr, ierr0, ierr1, ierr2, ierr3   ! return error code
+      INTEGER  :: ifpr                               ! dummy loop indice
+      INTEGER  :: jfld                               ! dummy loop arguments
+      INTEGER  :: inum, idv, idimv                   ! local integer
+      INTEGER  :: ios                                ! Local integer output status for namelist read
+      !!
+      CHARACTER(len=100)            ::  cn_dir        !   Root directory for location of core files
+      TYPE(FLD_N), DIMENSION(2) ::  slf_d         ! array of namelist informations on the fields to read
+      TYPE(FLD_N) :: sn_tem , sn_sal   !   "                 "
+      !!
+      NAMELIST/namdta_dyn/cn_dir, ln_dynrnf, ln_dynrnf_depth,  fwbcorr, &
+         &                sn_tem, sn_sal
+      !!----------------------------------------------------------------------
+      !
+      REWIND( numnam_ref )              ! Namelist namdta_dyn in reference namelist : Offline: init. of dynamical data
+      READ  ( numnam_ref, namdta_dyn, IOSTAT = ios, ERR = 901)
+901   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namdta_dyn in reference namelist', lwp )
+      REWIND( numnam_cfg )              ! Namelist namdta_dyn in configuration namelist : Offline: init. of dynamical data
+      READ  ( numnam_cfg, namdta_dyn, IOSTAT = ios, ERR = 902 )
+902   IF( ios >  0 )   CALL ctl_nam ( ios , 'namdta_dyn in configuration namelist', lwp )
+      IF(lwm) WRITE ( numond, namdta_dyn )
+      !                                         ! store namelist information in an array
+      !                                         ! Control print
+      IF(lwp) THEN
+         WRITE(numout,*)
+         WRITE(numout,*) 'dta_dyn : offline dynamics '
+         WRITE(numout,*) '~~~~~~~ '
+         WRITE(numout,*) '   Namelist namdta_dyn'
+         WRITE(numout,*) '      runoffs option enabled (T) or not (F)            ln_dynrnf        = ', ln_dynrnf
+         WRITE(numout,*) '      runoffs is spread in vertical                    ln_dynrnf_depth  = ', ln_dynrnf_depth
+         WRITE(numout,*) '      annual global mean of empmr for ssh correction   fwbcorr          = ', fwbcorr
+         WRITE(numout,*)
+      ENDIF
+      !
+      jf_tem  = 1     ;   jf_sal  = 2    ;   jfld   = jf_sal
+      !
+      slf_d(jf_tem)  = sn_tem    ;   slf_d(jf_sal)  = sn_sal
+      !
+      ALLOCATE( sf_dyn(jfld), STAT=ierr )         ! set sf structure
+      IF( ierr > 0 )  THEN
+         CALL ctl_stop( 'dta_dyn: unable to allocate sf structure' )   ;   RETURN
+      ENDIF
+      !                                         ! fill sf with slf_i and control print
+      CALL fld_fill( sf_dyn, slf_d, cn_dir, 'dta_dyn_init', 'Data in file', 'namdta_dyn' )
+      !
+      ! Open file for each variable to get his number of dimension
+      DO ifpr = 1, jfld
+         CALL fld_clopn( sf_dyn(ifpr), nyear, nmonth, nday )
+         idv   = iom_varid( sf_dyn(ifpr)%num , slf_d(ifpr)%clvar )        ! id of the variable sdjf%clvar
+         idimv = iom_file ( sf_dyn(ifpr)%num )%ndims(idv)                 ! number of dimension for variable sdjf%clvar
+         IF( sf_dyn(ifpr)%num /= 0 )   CALL iom_close( sf_dyn(ifpr)%num ) ! close file if already open
+         ierr1=0
+         IF( idimv == 3 ) THEN    ! 2D variable
+                                      ALLOCATE( sf_dyn(ifpr)%fnow(jpi,jpj,1)    , STAT=ierr0 )
+            IF( slf_d(ifpr)%ln_tint ) ALLOCATE( sf_dyn(ifpr)%fdta(jpi,jpj,1,2)  , STAT=ierr1 )
+         ELSE                     ! 3D variable
+                                      ALLOCATE( sf_dyn(ifpr)%fnow(jpi,jpj,jpk)  , STAT=ierr0 )
+            IF( slf_d(ifpr)%ln_tint ) ALLOCATE( sf_dyn(ifpr)%fdta(jpi,jpj,jpk,2), STAT=ierr1 )
+         ENDIF
+         IF( ierr0 + ierr1 > 0 ) THEN
+            CALL ctl_stop( 'dta_dyn_init : unable to allocate sf_dyn array structure' )   ;   RETURN
+         ENDIF
+      END DO
+      !
+      CALL dta_dyn_sed( nit000 )
+      !
+   END SUBROUTINE dta_dyn_sed_init
 
    SUBROUTINE dta_dyn_swp( kt )
      !!---------------------------------------------------------------------

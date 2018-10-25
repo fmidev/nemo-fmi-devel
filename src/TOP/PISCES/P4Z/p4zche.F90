@@ -36,17 +36,17 @@ MODULE p4zche
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   salinprac  ! Practical salinity
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   tempis   ! In situ temperature
 
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   akb3       !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   akw3       !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   akf3       !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   aks3       !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ak1p3      !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ak2p3      !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ak3p3      !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   aksi3      !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   borat      !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   fluorid    !: ???
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sulfat     !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   akb3       !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   akw3       !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   akf3       !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   aks3       !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ak1p3      !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ak2p3      !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ak3p3      !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   aksi3      !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   borat      !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   fluorid    !: ???
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sulfat     !: ???
 
    !!* Variable for chemistry of the CO2 cycle
 
@@ -231,8 +231,6 @@ CONTAINS
             END DO
           END DO
         END DO
-
-
 
       ! CHEMICAL CONSTANTS - DEEP OCEAN
       ! -------------------------------
@@ -448,7 +446,6 @@ CONTAINS
       IF( ln_timing )  CALL timing_stop('p4z_che')
       !
    END SUBROUTINE p4z_che
-
 
    SUBROUTINE ahini_for_at(p_hini)
       !!---------------------------------------------------------------------

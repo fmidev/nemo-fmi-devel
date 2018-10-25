@@ -1,5 +1,4 @@
 MODULE sedbtb
-#if defined key_sed
    !!======================================================================
    !!              ***  MODULE  sedbtb  ***
    !!    Sediment : bioturbation of the solid components
@@ -7,6 +6,10 @@ MODULE sedbtb
    !! * Modules used
    USE sed     ! sediment global variable
    USE sedmat  ! linear system of equations
+   USE lib_mpp         ! distribued memory computing library
+
+   IMPLICIT NONE
+   PRIVATE
 
    PUBLIC sed_btb
 
@@ -32,20 +35,19 @@ CONTAINS
 
       ! * local variables
       INTEGER :: ji, jk, js
-      REAL(wp), DIMENSION(:,:,:) , ALLOCATABLE ::  zsol  !   solution
+      REAL(wp), DIMENSION(jpoce,jpksedm1,jpsol) ::  zsol  !   solution
       !------------------------------------------------------------------------
 
+      IF( ln_timing )  CALL timing_start('sed_btb')
+
       IF( kt == nitsed000 ) THEN
-         WRITE(numsed,*) ' sed_btb : Bioturbation  '
-         WRITE(numsed,*) ' '
+         IF (lwp) WRITE(numsed,*) ' sed_btb : Bioturbation  '
+         IF (lwp) WRITE(numsed,*) ' '
       ENDIF
 
       ! Initializations
       !----------------
-      ALLOCATE( zsol(jpoce,jpksedm1,jpsol) )
-
       zsol(:,:,:) = 0.
-
 
       ! right hand side of coefficient matrix
       !--------------------------------------
@@ -57,7 +59,7 @@ CONTAINS
          ENDDO
       ENDDO
 
-      CALL sed_mat( jpsol, jpoce, jpksedm1, zsol )
+      CALL sed_mat( jpsol, jpoce, jpksedm1, zsol, dtsed / 2.0 )
 
 
       ! store solution of the tridiagonal system
@@ -69,22 +71,9 @@ CONTAINS
             ENDDO
          ENDDO
       ENDDO
-     
-      DEALLOCATE( zsol )
+
+      IF( ln_timing )  CALL timing_stop('sed_btb')
 
    END SUBROUTINE sed_btb
-#else
-   !!======================================================================
-   !! MODULE sedbtb  :   Dummy module 
-   !!======================================================================
-   !! $Id$
-CONTAINS
-   SUBROUTINE sed_btb( kt )         ! Empty routine
-      INTEGER, INTENT(in) :: kt
-      WRITE(*,*) 'sed_btb: You should not have seen this print! error?', kt
-   END SUBROUTINE sed_btb
 
-   !!======================================================================
-
-#endif
 END MODULE sedbtb

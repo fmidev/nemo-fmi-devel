@@ -173,11 +173,12 @@ CONTAINS
          ln_trc_obc(jn) =       sn_tracer(jn)%llobc
       END DO
       !    
-      IF( ln_pisces  )   CALL trc_ini_pisces     !  PISCES model
-      IF( ln_my_trc  )   CALL trc_ini_my_trc     !  MY_TRC model
-      IF( ll_cfc     )   CALL trc_ini_cfc        !  CFC's
-      IF( ln_c14     )   CALL trc_ini_c14        !  C14 model
-      IF( ln_age     )   CALL trc_ini_age        !  AGE
+      IF( ln_pisces      )   CALL trc_ini_pisces     !  PISCES model
+      IF( ln_my_trc      )   CALL trc_ini_my_trc     !  MY_TRC model
+      IF( ll_cfc         )   CALL trc_ini_cfc        !  CFC's
+      IF( ln_c14         )   CALL trc_ini_c14        !  C14 model
+      IF( ln_age         )   CALL trc_ini_age        !  AGE
+      IF( .NOT.ln_pisces ) ALLOCATE( profsed(2) )
       !
       IF(lwp) THEN                   ! control print
          WRITE(numout,*)

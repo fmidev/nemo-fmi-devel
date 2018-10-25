@@ -251,7 +251,7 @@ CONTAINS
              ELSE
                ! parameters corresponding to nit000 - 1 (as we start the step
                ! loop with a call to day)
-               ndastp = ndate0        ! ndate0 read in the namelist in dom_nam
+               ndastp = ndate0 - 1       ! ndate0 read in the namelist in dom_nam
                nhour   =   nn_time0 / 100
                nminute = ( nn_time0 - nhour * 100 )
                IF( nhour*3600+nminute*60-ndt05 .lt. 0 )  ndastp=ndastp-1      ! Start hour is specified in the namelist (default 0)

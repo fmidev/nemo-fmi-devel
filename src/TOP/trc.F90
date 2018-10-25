@@ -121,6 +121,9 @@ MODULE trc
    CHARACTER(len=20), PUBLIC, DIMENSION(jp_bdy) :: cn_trc_dflt   ! Default OBC condition for all tracers
    CHARACTER(len=20), PUBLIC, DIMENSION(jp_bdy) :: cn_trc        ! Choice of boundary condition for tracers
    INTEGER,           PUBLIC, DIMENSION(jp_bdy) :: nn_trcdmp_bdy !: =T Tracer damping
+   !
+   ! Vertical axis used in the sediment module
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   profsed
 !$AGRIF_DO_NOT_TREAT
    ! External data structure of BDY for TOP. Available elements: cn_obc, ll_trc, trcnow, dmp
    TYPE(OBC_DATA), PUBLIC, ALLOCATABLE, DIMENSION(:,:), TARGET ::   trcdta_bdy   !: bdy external data (local process)

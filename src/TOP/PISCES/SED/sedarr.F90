@@ -3,13 +3,15 @@ MODULE sedarr
    !!                       ***  MODULE sedarr   ***
    !!              transform 1D (2D) array to a 2D (1D) table
    !!======================================================================
-#if defined key_sed
+
    !!----------------------------------------------------------------------
    !!   arr_2d_1d  : 2-D to 1-D
    !!   arr_1d_2d  : 1-D to 2-D
    !!----------------------------------------------------------------------
    !! * Modules used
    USE par_sed
+   USE dom_oce
+   USE sed
 
    IMPLICIT NONE
    PRIVATE
@@ -27,9 +29,9 @@ MODULE sedarr
    PUBLIC unpack_arr
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
+   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
    !! $Id$ 
-   !! Software governed by the CeCILL license (see ./LICENSE)
+   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -41,12 +43,16 @@ CONTAINS
       REAL(wp), DIMENSION(ndim1d), INTENT (out) ::  tab1d
 
       INTEGER ::  jn, jid, jjd
+
+      IF( ln_timing )   CALL timing_start('pack_arr_2d_1d')
         
       DO jn = 1, ndim1d
          jid        = MOD( tab_ind(jn) - 1, jpi ) + 1
          jjd        = ( tab_ind(jn) - 1 ) / jpi + 1
          tab1d(jn)  = tab2d(jid, jjd)
       END DO 
+
+      IF( ln_timing )   CALL timing_stop('pack_arr_2d_1d')
 
    END SUBROUTINE pack_arr_2d_1d
 
@@ -58,11 +64,15 @@ CONTAINS
       REAL(wp), DIMENSION (jpi, jpj), INTENT ( out) ::  tab2d
       INTEGER ::  jn, jid, jjd
 
+      IF( ln_timing )   CALL timing_start('unpack_arr_1d_2d')
+
       DO jn = 1, ndim1d
          jid             = MOD( tab_ind(jn) - 1, jpi) + 1
          jjd             =    ( tab_ind(jn) - 1 ) / jpi  + 1
          tab2d(jid, jjd) = tab1d(jn)
       END DO
+
+      IF( ln_timing )   CALL timing_stop('unpack_arr_1d_2d')
 
    END SUBROUTINE unpack_arr_1d_2d
 
@@ -74,6 +84,8 @@ CONTAINS
       REAL(wp), DIMENSION(ndim1d,jpksed), INTENT (out) ::    tab2d 
       INTEGER, DIMENSION(ndim1d) ::  jid, jjd        
       INTEGER ::    jk, jn , ji, jj
+
+      IF( ln_timing )   CALL timing_start('pack_arr_2d_3d')
       
       DO jn = 1, ndim1d
          jid(jn) = MOD( tab_ind(jn) - 1, jpi ) + 1
@@ -87,6 +99,8 @@ CONTAINS
             tab2d(jn,jk)  = tab3d(ji,jj,jk) 
          ENDDO
       ENDDO
+
+      IF( ln_timing )   CALL timing_stop('pack_arr_2d_3d')
       
    END SUBROUTINE pack_arr_3d_2d
 
@@ -99,8 +113,10 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj,jpksed), INTENT (out) ::    tab3d 
       INTEGER, DIMENSION(ndim1d) ::  jid, jjd        
       INTEGER ::   jk, jn , ji, jj
-
-     DO jn = 1, ndim1d
+      !
+      IF( ln_timing )   CALL timing_start('unpack_arr_2d_3d')
+      !
+      DO jn = 1, ndim1d
          jid(jn) = MOD( tab_ind(jn) - 1, jpi ) + 1
          jjd(jn) = ( tab_ind(jn) - 1 ) / jpi + 1
       END DO
@@ -113,17 +129,8 @@ CONTAINS
          ENDDO
       ENDDO
 
+      IF( ln_timing )   CALL timing_stop('unpack_arr_2d_3d')
+
    END SUBROUTINE unpack_arr_2d_3d
 
-#else
-   !!======================================================================
-   !! MODULE sedarr  :   Dummy module
-   !!======================================================================
-CONTAINS
-   SUBROUTINE pack_arr         ! Empty routine
-   END SUBROUTINE  pack_arr
-   SUBROUTINE unpack_arr         ! Empty routine
-   END SUBROUTINE  unpack_arr
-   !!======================================================================
-#endif
 END MODULE sedarr

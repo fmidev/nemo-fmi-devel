@@ -42,7 +42,7 @@ CONTAINS
       INTEGER :: ios, ioptio         ! Local integer
       CHARACTER(LEN=20)::   clname
       !!
-      NAMELIST/nampismod/ln_p2z, ln_p4z, ln_p5z, ln_ligand
+      NAMELIST/nampismod/ln_p2z, ln_p4z, ln_p5z, ln_ligand, ln_sediment
       !!----------------------------------------------------------------------
 
       IF(lwp) WRITE(numout,*)
@@ -64,18 +64,20 @@ CONTAINS
       !
       IF(lwp) THEN                  ! control print
          WRITE(numout,*) '   Namelist : nampismod '
-         WRITE(numout,*) '      Flag to use LOBSTER model            ln_p2z    = ', ln_p2z
-         WRITE(numout,*) '      Flag to use PISCES standard model    ln_p4z    = ', ln_p4z
-         WRITE(numout,*) '      Flag to use PISCES quota    model    ln_p5z    = ', ln_p5z
-         WRITE(numout,*) '      Flag to ligand                       ln_ligand = ', ln_ligand
+         WRITE(numout,*) '      Flag to use LOBSTER model            ln_p2z      = ', ln_p2z
+         WRITE(numout,*) '      Flag to use PISCES standard model    ln_p4z      = ', ln_p4z
+         WRITE(numout,*) '      Flag to use PISCES quota    model    ln_p5z      = ', ln_p5z
+         WRITE(numout,*) '      Flag to ligand                       ln_ligand   = ', ln_ligand
+         WRITE(numout,*) '      Flag to use sediment                 ln_sediment = ', ln_sediment
       ENDIF
       !
       IF(lwp) THEN                         ! control print
          WRITE(numout,*)
-         IF( ln_p5z    )  WRITE(numout,*) '   ==>>>   PISCES QUOTA model is used'
-         IF( ln_p4z    )  WRITE(numout,*) '   ==>>>   PISCES STANDARD model is used'
-         IF( ln_p2z    )  WRITE(numout,*) '   ==>>>   LOBSTER model is used'
+         IF( ln_p5z      )  WRITE(numout,*) '   ==>>>   PISCES QUOTA model is used'
+         IF( ln_p4z      )  WRITE(numout,*) '   ==>>>   PISCES STANDARD model is used'
+         IF( ln_p2z      )  WRITE(numout,*) '   ==>>>   LOBSTER model is used'
          IF( ln_ligand )  WRITE(numout,*) '   ==>>>   Compute remineralization/dissolution of organic ligands'
+         IF( ln_sediment )  WRITE(numout,*) '   ==>>>   Sediment module is used'
       ENDIF
     
       ioptio = 0

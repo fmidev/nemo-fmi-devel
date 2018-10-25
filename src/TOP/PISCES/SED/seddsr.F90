@@ -1,541 +1,705 @@
 MODULE seddsr
-#if defined key_sed
    !!======================================================================
    !!              ***  MODULE  seddsr  ***
-   !!    Sediment : dissolution and reaction in pore water
+   !!    Sediment : dissolution and reaction in pore water related 
+   !!    related to organic matter
    !!=====================================================================
    !! * Modules used
    USE sed     ! sediment global variable
-   USE sedmat  ! linear system of equations
-   USE sedco3  ! carbonate ion and proton concentration 
+   USE sed_oce
+   USE sedini
+   USE lib_mpp         ! distribued memory computing library
+   USE lib_fortran
+
+   IMPLICIT NONE
+   PRIVATE
 
    PUBLIC sed_dsr
 
    !! * Module variables
 
-   REAL(wp), DIMENSION(:), ALLOCATABLE, PUBLIC :: cons_o2
-   REAL(wp), DIMENSION(:), ALLOCATABLE, PUBLIC :: cons_no3
-   REAL(wp), DIMENSION(:), ALLOCATABLE, PUBLIC :: sour_no3
-   REAL(wp), DIMENSION(:), ALLOCATABLE, PUBLIC :: sour_c13
-   REAL(wp), DIMENSION(:), ALLOCATABLE, PUBLIC ::  dens_mol_wgt  ! molecular density 
+   REAL(wp) :: zadsnh4
+   REAL(wp), DIMENSION(jpsol), PUBLIC      :: dens_mol_wgt  ! molecular density 
+   REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zvolc    ! temp. variables
+
 
    !! $Id$
 CONTAINS
    
-   SUBROUTINE sed_dsr( kt ) 
+   SUBROUTINE sed_dsr( kt, knt ) 
       !!----------------------------------------------------------------------
       !!                   ***  ROUTINE sed_dsr  ***
       !! 
       !!  ** Purpose :  computes pore water dissolution and reaction
       !!
-      !!  ** Methode :  implicit simultaneous computation of undersaturation
-      !!               resulting from diffusive pore water transport and chemical
-      !!               pore water reactions. Solid material is consumed according
-      !!               to redissolution and remineralisation
-      !!
-      !!  ** Remarks :
-      !!              - undersaturation : deviation from saturation concentration
-      !!              - reaction rate   : sink of undersaturation from dissolution
-      !!                                 of solid material 
+      !!  ** Methode :  Computation of the redox reactions in sediment.
+      !!                The main redox reactions are solved in sed_dsr whereas
+      !!                the secondary reactions are solved in sed_dsr_redoxb.
+      !!                A strand spliting approach is being used here (see 
+      !!                sed_dsr_redoxb for more information). 
       !!
       !!   History :
       !!        !  98-08 (E. Maier-Reimer, Christoph Heinze )  Original code
       !!        !  04-10 (N. Emprin, M. Gehlen ) f90
       !!        !  06-04 (C. Ethe)  Re-organization
+      !!        !  19-08 (O. Aumont) Debugging and improvement of the model.
+      !!                             The original method is replaced by a 
+      !!                              Strand splitting method which deals 
+      !!                              well with stiff reactions.
       !!----------------------------------------------------------------------
       !! Arguments
-      INTEGER, INTENT(in) ::   kt       ! number of iteration
+      INTEGER, INTENT(in) ::   kt, knt       ! number of iteration
       ! --- local variables
-      INTEGER :: ji, jk, js, jw   ! dummy looop indices
-      INTEGER :: nv               ! number of variables in linear tridiagonal eq
+      INTEGER :: ji, jk, js, jw, jn   ! dummy looop indices
 
-      REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zrearat    ! reaction rate in pore water
-      REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zundsat    ! undersaturation ; indice jpwatp1 is for calcite   
-      REAL(wp), DIMENSION(:    ), ALLOCATABLE :: zmo2_0, zmo2_1  ! temp. array for mass balance calculation
-      REAL(wp), DIMENSION(:    ), ALLOCATABLE :: zmno3_0, zmno3_1, zmno3_2
-      REAL(wp), DIMENSION(:    ), ALLOCATABLE :: zmc13_0, zmc13_1, zmc13_2, zmc13_3
-      REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zvolc    ! temp. variables
+      REAL(wp), DIMENSION(jpoce,jpksed) :: zrearat1, zrearat2, zrearat3    ! reaction rate in pore water
+      REAL(wp), DIMENSION(jpoce,jpksed) :: zundsat    ! undersaturation ; indice jpwatp1 is for calcite   
+      REAL(wp), DIMENSION(jpoce,jpksed) :: zkpoc, zkpos, zkpor, zlimo2, zlimno3, zlimso4, zlimfeo    ! undersaturation ; indice jpwatp1 is for calcite   
+      REAL(wp), DIMENSION(jpoce)        :: zsumtot
       REAL(wp)  ::  zsolid1, zsolid2, zsolid3, zvolw, zreasat
-
+      REAL(wp)  ::  zsatur, zsatur2, znusil, zkpoca, zkpocb, zkpocc
+      REAL(wp)  ::  zratio, zgamma, zbeta, zlimtmp, zundsat2
       !!
       !!----------------------------------------------------------------------
 
-      IF( kt == nitsed000 ) THEN
-         WRITE(numsed,*) ' sed_dsr : Dissolution reaction '
-         WRITE(numsed,*) ' '
-         ! 
-         ALLOCATE( dens_mol_wgt((jpoce) ) 
-         dens_mol_wgt(1:jpsol) = dens / mol_wgt(1:jpsol)
-         ! 
-         ALLOCATE( cons_o2 (jpoce) ) ;   ALLOCATE( cons_no3(jpoce) ) 
-         ALLOCATE( sour_no3(jpoce) ) ;   ALLOCATE( sour_c13(jpoce) )  
+      IF( ln_timing )  CALL timing_start('sed_dsr')
+!
+      IF( kt == nitsed000 .AND. knt == 1 ) THEN
+         IF (lwp) THEN
+            WRITE(numsed,*) ' sed_dsr : Dissolution reaction '
+            WRITE(numsed,*) ' '
+         ENDIF
       ENDIF
 
-      ! Initialization of data for mass balance calculation
-      !---------------------------------------------------
-
-      tokbot(:,:)  = 0.
-      cons_o2 (:)  = 0. 
-      cons_no3(:)  = 0.  
-      sour_no3(:)  = 0.  
-      sour_c13(:)  = 0.       
-   
-      ! Initializations
-      !----------------------
-      ALLOCATE( zmo2_0 (jpoce) ) ;  ALLOCATE( zmo2_1 (jpoce) ) 
-      ALLOCATE( zmno3_0(jpoce) ) ;  ALLOCATE( zmno3_1(jpoce) )  ;  ALLOCATE( zmno3_2(jpoce) ) 
-      ALLOCATE( zmc13_0(jpoce) ) ;  ALLOCATE( zmc13_1(jpoce) )  ;  ALLOCATE( zmc13_2(jpoce) ) ;  ALLOCATE( zmc13_3(jpoce) ) 
-
-      zmo2_0 (:) = 0.  ; zmo2_1 (:) = 0.
-      zmno3_0(:) = 0.  ; zmno3_1(:) = 0.  ;  zmno3_2(:) = 0.
-      zmc13_0(:) = 0.  ; zmc13_1(:) = 0.  ;  zmc13_2(:) = 0.  ; zmc13_3(:) = 0.
+     ! Initializations
+     !----------------------
       
-      ALLOCATE( zrearat(jpoce,jpksed,3) ) ;  ALLOCATE( zundsat(jpoce,jpksed,3) )      
-      zrearat(:,:,:)   = 0.    ;   zundsat(:,:,:) = 0. 
+      zrearat1(:,:)   = 0.    ;   zundsat(:,:) = 0. ; zkpoc(:,:) = 0.
+      zlimo2 (:,:)    = 0.    ;   zlimno3(:,:) = 0. ; zrearat2(:,:) = 0.
+      zlimso4(:,:)    = 0.    ;   zkpor(:,:)   = 0. ; zrearat3(:,:) = 0.
+      zkpos  (:,:)    = 0.
+      zsumtot(:)      = rtrn
+  
+      ALLOCATE( zvolc(jpoce, jpksed, jpsol) )
+      zvolc(:,:,:)    = 0.
+      zadsnh4 = 1.0 / ( 1.0 + adsnh4 )
 
-
-      ALLOCATE( zvolc(jpoce,jpksed,jpsol) ) 
-      zvolc(:,:,:)   = 0.
-
-      !--------------------------------------------------------------------
-      ! Temporary accomodation to take account of  particule rain deposition
-      !---------------------------------------------------------------------
-      
-      
-      ! 1. Change of geometry
-      !    Increase of dz3d(2) thickness : dz3d(2) = dz3d(2)+dzdep
-      !    Warning : no change for dz(2)
-      !---------------------------------------------------------
-      dz3d(1:jpoce,2) = dz3d(1:jpoce,2) + dzdep(1:jpoce)
-
-      
-      ! New values for volw3d(:,2) and vols3d(:,2)
-      ! Warning : no change neither for volw(2) nor  vols(2)
-      !------------------------------------------------------
-      volw3d(1:jpoce,2) = dz3d(1:jpoce,2) * por(2)
-      vols3d(1:jpoce,2) = dz3d(1:jpoce,2) * por1(2)
+      ! Inhibition terms for the different redox equations
+      ! --------------------------------------------------
+      DO jk = 1, jpksed
+         DO ji = 1, jpoce
+            zkpoc(ji,jk) = reac_pocl 
+            zkpos(ji,jk) = reac_pocs
+            zkpor(ji,jk) = reac_pocr
+         END DO
+      END DO
 
       ! Conversion of volume units
       !----------------------------
       DO js = 1, jpsol
          DO jk = 1, jpksed
-            DO ji = 1, jpoce    
+            DO ji = 1, jpoce
                zvolc(ji,jk,js) = ( vols3d(ji,jk) * dens_mol_wgt(js) ) /  &
-                  &              ( volw3d(ji,jk) * 1.e-3 )     
+                  &              ( volw3d(ji,jk) * 1.e-3 )
             ENDDO
          ENDDO
       ENDDO
 
-      ! 2. Change of previous solid fractions (due to volum changes) for k=2
-      !---------------------------------------------------------------------
-
-      DO js = 1, jpsol
-         DO ji = 1, jpoce
-            solcp(ji,2,js) = solcp(ji,2,js) * dz(2) / dz3d(ji,2)
-         ENDDO
-      END DO
-
-      ! 3. New solid fractions (including solid rain fractions) for k=2  
-      !------------------------------------------------------------------   
-      DO js = 1, jpsol
-         DO ji = 1, jpoce
-            solcp(ji,2,js) = solcp(ji,2,js) + &
-            &           ( rainrg(ji,js) / raintg(ji) ) * ( dzdep(ji) / dz3d(ji,2) )
-            ! rainrm are temporary cancel
-            rainrm(ji,js) = 0.
-         END DO
-      ENDDO
-
-      ! 4.  Adjustment of bottom water concen.(pwcp(1)): 
-      !     We impose that pwcp(2) is constant. Including dzdep in dz3d(:,2) we assume 
-      !     that dzdep has got a porosity of por(2). So pore water volum of jk=2 increase.
-      !     To keep pwcp(2) cste we must compensate this "increase" by a slight adjusment
-      !     of bottom water concentration.
-      !     This adjustment is compensate at the end of routine
-      !-------------------------------------------------------------
-      DO jw = 1, jpwat
-         DO ji = 1, jpoce
-            pwcp(ji,1,jw) = pwcp(ji,1,jw) - &
-               &            pwcp(ji,2,jw) * dzdep(ji) * por(2) / dzkbot(ji)
-         END DO
-      ENDDO
-
- 
       !----------------------------------------------------------
-      ! 5.  Beginning of  Pore Water diffusion and solid reaction
+      ! 5.  Beginning of solid reaction
       !---------------------------------------------------------
-      
-      !-----------------------------------------------------------------------------
-      ! For jk=2,jpksed, and for couple 
-      !  1 : jwsil/jsopal  ( SI/Opal )
-      !  2 : jsclay/jsclay ( clay/clay ) 
-      !  3 : jwoxy/jspoc   ( O2/POC )
-      !  reaction rate is a function of solid=concentration in solid reactif in [mol/l] 
-      !  and undersaturation in [mol/l].
-      !  Solid weight fractions should be in ie [mol/l])
-      !  second member and solution are in zundsat variable
-      !-------------------------------------------------------------------------
-
-      !number of variables
-      nv  = 3
-     
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            ! For Silicic Acid and clay
-            zundsat(ji,jk,1) = sat_sil   - pwcp(ji,jk,jwsil)
-            zundsat(ji,jk,2) = sat_clay
-            ! For O2
-            zundsat(ji,jk,3) = pwcp(ji,jk,jwoxy) / so2ut 
-         ENDDO
-      ENDDO
-      
       
       ! Definition of reaction rates [rearat]=sans dim 
       ! For jk=1 no reaction (pure water without solid) for each solid compo
-      DO ji = 1, jpoce
-         zrearat(ji,1,:) = 0.
-      ENDDO
+      zrearat1(:,:) = 0.
+      zrearat2(:,:) = 0.
+      zrearat3(:,:) = 0.
 
+      zundsat(:,:) = pwcp(:,:,jwoxy)
 
-      ! left hand side of coefficient matrix
       DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zsolid1 = zvolc(ji,jk,jsopal) * solcp(ji,jk,jsopal)
-            zsolid2 = zvolc(ji,jk,jsclay) * solcp(ji,jk,jsclay)
-            zsolid3 = zvolc(ji,jk,jspoc)  * solcp(ji,jk,jspoc)
-
-            zrearat(ji,jk,1)  = ( reac_sil * dtsed * zsolid1 ) / &
-               &                ( 1. + reac_sil * dtsed * zundsat(ji,jk,1 ) )
-            zrearat(ji,jk,2)  = ( reac_clay * dtsed * zsolid2 ) / &
-               &                ( 1. + reac_clay * dtsed * zundsat(ji,jk,2 ) )
-            zrearat(ji,jk,3)  = ( reac_poc  * dtsed * zsolid3 ) / &
-               &                ( 1. + reac_poc  * dtsed * zundsat(ji,jk,3 ) )
+            zlimo2(ji,jk) = 1.0 / ( zundsat(ji,jk) + xksedo2 )
+            zsolid1 = zvolc(ji,jk,jspoc)  * solcp(ji,jk,jspoc)
+            zsolid2 = zvolc(ji,jk,jspos)  * solcp(ji,jk,jspos)
+            zsolid3 = zvolc(ji,jk,jspor)  * solcp(ji,jk,jspor)
+            zkpoca  = zkpoc(ji,jk) * zlimo2(ji,jk)
+            zkpocb  = zkpos(ji,jk) * zlimo2(ji,jk)
+            zkpocc  = zkpor(ji,jk) * zlimo2(ji,jk)
+            zrearat1(ji,jk)  = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+            &                 ( 1. + zkpoca * zundsat(ji,jk ) * dtsed2 )
+            zrearat2(ji,jk)  = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+            &                 ( 1. + zkpocb * zundsat(ji,jk ) * dtsed2 )
+            zrearat3(ji,jk)  = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+            &                 ( 1. + zkpocc * zundsat(ji,jk ) * dtsed2 )
          ENDDO
       ENDDO
 
-
-      CALL sed_mat( nv, jpoce, jpksed, zrearat, zundsat )
-
+      ! left hand side of coefficient matrix
+!      DO jn = 1, 5
+      DO jk = 2, jpksed
+         DO ji = 1, jpoce
+jflag1:     DO jn = 1, 10
+               zsolid1 = zvolc(ji,jk,jspoc)  * solcp(ji,jk,jspoc)
+               zsolid2 = zvolc(ji,jk,jspos)  * solcp(ji,jk,jspos)
+               zsolid3 = zvolc(ji,jk,jspor)  * solcp(ji,jk,jspor)
+               zbeta   = xksedo2 - pwcp(ji,jk,jwoxy) + so2ut * ( zrearat1(ji,jk)    &
+               &         + zrearat2(ji,jk) + zrearat3(ji,jk) )
+               zgamma = - xksedo2 * pwcp(ji,jk,jwoxy)
+               zundsat2 = zundsat(ji,jk)
+               zundsat(ji,jk) = ( - zbeta + SQRT( zbeta**2 - 4.0 * zgamma ) ) / 2.0
+               zlimo2(ji,jk) = 1.0 / ( zundsat(ji,jk) + xksedo2 )
+               zkpoca  = zkpoc(ji,jk) * zlimo2(ji,jk)
+               zkpocb  = zkpos(ji,jk) * zlimo2(ji,jk)
+               zkpocc  = zkpor(ji,jk) * zlimo2(ji,jk)
+               zrearat1(ji,jk)  = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+               &                 ( 1. + zkpoca * zundsat(ji,jk ) * dtsed2 )
+               zrearat2(ji,jk)  = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+               &                 ( 1. + zkpocb * zundsat(ji,jk ) * dtsed2 )
+               zrearat3(ji,jk)  = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+               &                 ( 1. + zkpocc * zundsat(ji,jk ) * dtsed2 )
+               IF ( ABS( (zundsat(ji,jk)-zundsat2)/(zundsat2+rtrn)) < 1E-8 ) THEN
+                  EXIT jflag1
+               ENDIF
+            END DO jflag1
+         END DO
+      END DO
 
       ! New solid concentration values (jk=2 to jksed) for each couple 
-      DO js = 1, nv
-         DO jk = 2, jpksed
-            DO ji = 1, jpoce
-               zreasat = zrearat(ji,jk,js) * zundsat(ji,jk,js) / zvolc(ji,jk,js)
-               solcp(ji,jk,js) = solcp(ji,jk,js) - zreasat
-            ENDDO
-         ENDDO
-      ENDDO
-      ! mass of O2/NO3 before POC remin. for mass balance check 
-      ! det. of o2 consomation/NO3 production Mc13
-      DO jk = 1, jpksed
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zvolw = volw3d(ji,jk) * 1.e-3
-            zmo2_0 (ji)  = zmo2_0 (ji) + pwcp(ji,jk,jwoxy) * zvolw
-            zmno3_0(ji)  = zmno3_0(ji) + pwcp(ji,jk,jwno3) * zvolw
-            zmc13_0(ji)  = zmc13_0(ji) + pwcp(ji,jk,jwc13) * zvolw
+            zreasat = zrearat1(ji,jk) * zlimo2(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspoc)
+            solcp(ji,jk,jspoc) = solcp(ji,jk,jspoc) - zreasat
+            zreasat = zrearat2(ji,jk) * zlimo2(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspos)
+            solcp(ji,jk,jspos) = solcp(ji,jk,jspos) - zreasat
+            zreasat = zrearat3(ji,jk) * zlimo2(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspor)
+            solcp(ji,jk,jspor) = solcp(ji,jk,jspor) - zreasat
          ENDDO
       ENDDO
 
       ! New pore water concentrations    
-      DO jk = 1, jpksed
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
             ! Acid Silicic 
-            pwcp(ji,jk,jwsil)  = sat_sil - zundsat(ji,jk,1)            
-            ! For O2 (in mol/l)
-            pwcp(ji,jk,jwoxy)  = zundsat(ji,jk,3) * so2ut 
-            zreasat = zrearat(ji,jk,3) * zundsat(ji,jk,3)    ! oxygen         
+            pwcp(ji,jk,jwoxy)  = zundsat(ji,jk)
+            zreasat = ( zrearat1(ji,jk) + zrearat2(ji,jk) + zrearat3(ji,jk) ) * zlimo2(ji,jk) * zundsat(ji,jk)    ! oxygen         
             ! For DIC
             pwcp(ji,jk,jwdic)  = pwcp(ji,jk,jwdic) + zreasat
-            ! For nitrates
-            pwcp(ji,jk,jwno3)  = pwcp(ji,jk,jwno3) + zreasat * srno3            
+            zsumtot(ji) = zsumtot(ji) + zreasat / dtsed2 * volw3d(ji,jk) * 1.e-3 * 86400. * 365. * 1E3
             ! For Phosphate (in mol/l)
-            pwcp(ji,jk,jwpo4)  = pwcp(ji,jk,jwpo4) + zreasat * spo4r            
+            pwcp(ji,jk,jwpo4)  = pwcp(ji,jk,jwpo4) + zreasat * spo4r
+            ! For iron (in mol/l)
+            pwcp(ji,jk,jwfe2)  = pwcp(ji,jk,jwfe2) + fecratio(ji) * zreasat
             ! For alkalinity
-            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) - zreasat * ( srno3 + 2.* spo4r )           
-            ! For DIC13
-            pwcp(ji,jk,jwc13)  = pwcp(ji,jk,jwc13) + zreasat * rc13P * pdb
+            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) + zreasat * ( srno3 * zadsnh4 - 2.* spo4r )
+            ! Ammonium
+            pwcp(ji,jk,jwnh4)  = pwcp(ji,jk,jwnh4) + zreasat * srno3 * zadsnh4
+            ! Ligands
+            sedligand(ji,jk)   = sedligand(ji,jk) + ratligc * zreasat - reac_ligc * sedligand(ji,jk)
          ENDDO
       ENDDO
-
-
-      ! Mass of O2 for mass balance check and det. of o2 consomation
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            zvolw = volw3d(ji,jk) * 1.e-3
-            zmo2_1 (ji) = zmo2_1 (ji) + pwcp(ji,jk,jwoxy) * zvolw
-            zmno3_1(ji) = zmno3_1(ji) + pwcp(ji,jk,jwno3) * zvolw
-            zmc13_1(ji) = zmc13_1(ji) + pwcp(ji,jk,jwc13) * zvolw
-         ENDDO
-      ENDDO
-
-      DO ji = 1, jpoce
-         cons_o2 (ji) = zmo2_0 (ji) - zmo2_1 (ji)
-         sour_no3(ji) = zmno3_1(ji) - zmno3_0(ji)     
-         sour_c13(ji) = zmc13_1(ji) - zmc13_0(ji) 
-      ENDDO
- 
 
       !--------------------------------------------------------------------
       ! Begining POC denitrification and NO3- diffusion
       ! (indice n°5 for couple POC/NO3- ie solcp(:,:,jspoc)/pwcp(:,:,jwno3))
       !--------------------------------------------------------------------
 
-      nv = 1
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            zundsat(ji,jk,1) = pwcp(ji,jk,jwno3) / srDnit
-         ENDDO
-      ENDDO
+      zrearat1(:,:) = 0.
+      zrearat2(:,:) = 0.
+      zrearat3(:,:) = 0.
+
+      zundsat(:,:) = pwcp(:,:,jwno3)
+
       DO jk = 2, jpksed
          DO ji = 1, jpoce
-            IF( pwcp(ji,jk,jwoxy) < sthrO2 ) THEN
-               zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
-               zrearat(ji,jk,1) = ( reac_no3 * dtsed * zsolid1 ) / &
-                  &                    ( 1. + reac_no3 * dtsed * zundsat(ji,jk,1 ) )
-            ELSE
-               zrearat(ji,jk,1) = 0.
-            ENDIF
-         END DO
+            zlimno3(ji,jk) = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) / ( zundsat(ji,jk) + xksedno3 )
+            zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
+            zsolid2 = zvolc(ji,jk,jspos) * solcp(ji,jk,jspos)
+            zsolid3 = zvolc(ji,jk,jspor) * solcp(ji,jk,jspor)
+            zkpoca = zkpoc(ji,jk) * zlimno3(ji,jk)
+            zkpocb = zkpos(ji,jk) * zlimno3(ji,jk)
+            zkpocc = zkpor(ji,jk) * zlimno3(ji,jk)
+            zrearat1(ji,jk)  = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+            &                 ( 1. + zkpoca * zundsat(ji,jk ) * dtsed2 )
+            zrearat2(ji,jk)  = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+            &                 ( 1. + zkpocb * zundsat(ji,jk ) * dtsed2 )
+            zrearat3(ji,jk)  = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+            &                 ( 1. + zkpocc * zundsat(ji,jk ) * dtsed2 )
+        END DO
       END DO
 
-
-      ! solves tridiagonal system
-      CALL sed_mat( nv, jpoce, jpksed, zrearat, zundsat )
+!      DO jn = 1, 5
+      DO jk = 2, jpksed
+         DO ji = 1, jpoce
+jflag2:    DO jn = 1, 10
+               zlimtmp = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) )
+               zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
+               zsolid2 = zvolc(ji,jk,jspos) * solcp(ji,jk,jspos)
+               zsolid3 = zvolc(ji,jk,jspor) * solcp(ji,jk,jspor)
+               zbeta   = xksedno3 - pwcp(ji,jk,jwno3) + srDnit * ( zrearat1(ji,jk)    &
+               &         + zrearat2(ji,jk) + zrearat3(ji,jk) ) * zlimtmp
+               zgamma = - xksedno3 * pwcp(ji,jk,jwno3)
+               zundsat2 = zundsat(ji,jk)
+               zundsat(ji,jk) = ( - zbeta + SQRT( zbeta**2 - 4.0 * zgamma ) ) / 2.0
+               zlimno3(ji,jk) = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) / ( zundsat(ji,jk) + xksedno3 )
+               zkpoca  = zkpoc(ji,jk) * zlimno3(ji,jk)
+               zkpocb  = zkpos(ji,jk) * zlimno3(ji,jk)
+               zkpocc  = zkpor(ji,jk) * zlimno3(ji,jk)
+               zrearat1(ji,jk)  = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+               &                 ( 1. + zkpoca * zundsat(ji,jk ) * dtsed2 )
+               zrearat2(ji,jk)  = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+               &                 ( 1. + zkpocb * zundsat(ji,jk ) * dtsed2 )
+               zrearat3(ji,jk)  = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+               &                 ( 1. + zkpocc * zundsat(ji,jk ) * dtsed2 )
+               IF ( ABS( (zundsat(ji,jk)-zundsat2)/(zundsat2+rtrn)) < 1E-8 ) THEN
+                  EXIT jflag2
+               ENDIF
+            END DO jflag2
+         END DO
+      END DO
 
 
       ! New solid concentration values (jk=2 to jksed) for each couple 
       DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zreasat = zrearat(ji,jk,1) * zundsat(ji,jk,1) / zvolc(ji,jk,jspoc)
+            zreasat = zrearat1(ji,jk) * zlimno3(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspoc)
             solcp(ji,jk,jspoc) = solcp(ji,jk,jspoc) - zreasat
+            zreasat = zrearat2(ji,jk) * zlimno3(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspos)
+            solcp(ji,jk,jspos) = solcp(ji,jk,jspos) - zreasat
+            zreasat = zrearat3(ji,jk) * zlimno3(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspor)
+            solcp(ji,jk,jspor) = solcp(ji,jk,jspor) - zreasat
          ENDDO
       ENDDO
 
       ! New dissolved concentrations
-      DO jk = 1, jpksed
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zreasat = zrearat(ji,jk,1) * zundsat(ji,jk,1)    
             ! For nitrates
-            pwcp(ji,jk,jwno3)  =  zundsat(ji,jk,1) * srDnit
+            pwcp(ji,jk,jwno3)  =  zundsat(ji,jk)
+            zreasat = ( zrearat1(ji,jk) + zrearat2(ji,jk) + zrearat3(ji,jk) ) * zlimno3(ji,jk) * zundsat(ji,jk)
             ! For DIC
             pwcp(ji,jk,jwdic)  = pwcp(ji,jk,jwdic) + zreasat
+            zsumtot(ji) = zsumtot(ji) + zreasat / dtsed2 * volw3d(ji,jk) * 1.e-3 * 86400. * 365. * 1E3
             ! For Phosphate (in mol/l)
             pwcp(ji,jk,jwpo4)  = pwcp(ji,jk,jwpo4) + zreasat * spo4r            
+            ! Ligands
+            sedligand(ji,jk)   = sedligand(ji,jk) + ratligc * zreasat
+            ! For iron (in mol/l)
+            pwcp(ji,jk,jwfe2)  = pwcp(ji,jk,jwfe2) + fecratio(ji) * zreasat
             ! For alkalinity
-            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) + zreasat * ( srDnit - 2.* spo4r )           
-            ! For DIC13
-            pwcp(ji,jk,jwc13)  = pwcp(ji,jk,jwc13) + zreasat * rc13P * pdb
+            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) + zreasat * ( srDnit + srno3 * zadsnh4 - 2.* spo4r )           
+            ! Ammonium
+            pwcp(ji,jk,jwnh4)  = pwcp(ji,jk,jwnh4) + zreasat * srno3 * zadsnh4
          ENDDO
       ENDDO
 
+      !--------------------------------------------------------------------
+      ! Begining POC iron reduction
+      ! (indice nï¿½5 for couple POFe(OH)3 ie solcp(:,:,jspoc)/pwcp(:,:,jsfeo))
+      !--------------------------------------------------------------------
 
-      ! Mass of O2 for mass balance check and det. of o2 consomation
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            zvolw = volw3d(ji,jk) * 1.e-3
-            zmno3_2(ji) = zmno3_2(ji) + pwcp(ji,jk ,jwno3) * zvolw
-            zmc13_2(ji) = zmc13_2(ji) + pwcp(ji,jk ,jwc13) * zvolw   
-         ENDDO
-      ENDDO
+      zrearat1(:,:) = 0.
+      zrearat2(:,:) = 0.
+      zrearat3(:,:) = 0.
 
-      DO ji = 1, jpoce
-         cons_no3(ji) = zmno3_1(ji) - zmno3_2(ji)  
-         sour_c13(ji) = sour_c13(ji) + zmc13_2(ji) - zmc13_1(ji)     
-      ENDDO
-
-
-      !---------------------------
-      ! Solves PO4 diffusion 
-      !----------------------------
-
-      nv = 1
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            zundsat(ji,jk,1) = pwcp(ji,jk,jwpo4)
-            zrearat(ji,jk,1) = 0.
-         ENDDO
-      ENDDO
-
-
-      ! solves tridiagonal system
-      CALL sed_mat( nv, jpoce, jpksed, zrearat, zundsat )
-
-
-      ! New undsaturation values and dissolved concentrations
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            pwcp(ji,jk,jwpo4) = zundsat(ji,jk,1)
-         ENDDO
-      ENDDO
-
-
-      !---------------------------------------------------------------
-      ! Performs CaCO3 particle deposition and redissolution (indice 9)
-      !--------------------------------------------------------------
-
-      ! computes co3por from the updated pwcp concentrations (note [co3por] = mol/l)
-
-      CALL sed_co3( kt )
-
-
-      nv = 1
-      ! *densSW(l)**2 converts aksps [mol2/kg sol2] into [mol2/l2] to get [undsat] in [mol/l]
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            zundsat(ji,jk,1) = aksps(ji) * densSW(ji) * densSW(ji) / calcon2(ji) &
-               &                     - co3por(ji,jk)
-            ! positive values of undersaturation
-            zundsat(ji,jk,1) = MAX( 0., zundsat(ji,jk,1) )            
-         ENDDO
-      ENDDO
+      zundsat(:,:) = solcp(:,:,jsfeo)
 
       DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zsolid1 = zvolc(ji,jk,jscal) * solcp(ji,jk,jscal)
-            zrearat(ji,jk,1) = ( reac_cal * dtsed * zsolid1 ) / &
-                  &               ( 1. + reac_cal * dtsed * zundsat(ji,jk,1) )
+            zlimfeo(ji,jk) = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) * ( 1.0 - pwcp(ji,jk,jwno3)    &
+            &                / ( pwcp(ji,jk,jwno3) + xksedno3 ) ) / ( zundsat(ji,jk) + xksedfeo )
+            zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
+            zsolid2 = zvolc(ji,jk,jspos) * solcp(ji,jk,jspos)
+            zsolid3 = zvolc(ji,jk,jspor) * solcp(ji,jk,jspor)
+            zkpoca = zkpoc(ji,jk) * zlimfeo(ji,jk)
+            zkpocb = zkpos(ji,jk) * zlimfeo(ji,jk)
+            zkpocc = zkpor(ji,jk) * zlimfeo(ji,jk)
+            zrearat1(ji,jk) = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+            &                    ( 1. + zkpoca * zundsat(ji,jk) * dtsed2 )
+            zrearat2(ji,jk) = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+            &                    ( 1. + zkpocb * zundsat(ji,jk) * dtsed2 )
+            zrearat3(ji,jk) = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+            &                    ( 1. + zkpocc * zundsat(ji,jk) * dtsed2 )
+         END DO
+      END DO
+
+!      DO jn = 1, 5
+      DO jk = 2, jpksed
+         DO ji = 1, jpoce
+jflag3:     DO jn = 1, 10
+               zlimtmp = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) * ( 1.0 - pwcp(ji,jk,jwno3)    &
+               &                / ( pwcp(ji,jk,jwno3) + xksedno3 ) )
+               zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
+               zsolid2 = zvolc(ji,jk,jspos) * solcp(ji,jk,jspos)
+               zsolid3 = zvolc(ji,jk,jspor) * solcp(ji,jk,jspor)
+               zreasat = ( zrearat1(ji,jk) + zrearat2(ji,jk) + zrearat3(ji,jk) ) / zvolc(ji,jk,jsfeo)
+               zbeta   = xksedfeo - solcp(ji,jk,jsfeo) + 4.0 * zreasat * zlimtmp
+               zgamma  = -xksedfeo * solcp(ji,jk,jsfeo)
+               zundsat2 = zundsat(ji,jk)
+               zundsat(ji,jk) = ( - zbeta + SQRT( zbeta**2 - 4.0 * zgamma ) ) / 2.0
+               zlimfeo(ji,jk) = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) * ( 1.0 - pwcp(ji,jk,jwno3)    &
+               &                / ( pwcp(ji,jk,jwno3) + xksedno3 ) ) / ( zundsat(ji,jk) + xksedfeo )
+               zkpoca  = zkpoc(ji,jk) * zlimfeo(ji,jk)
+               zkpocb  = zkpos(ji,jk) * zlimfeo(ji,jk)
+               zkpocc  = zkpor(ji,jk) * zlimfeo(ji,jk)
+               zrearat1(ji,jk) = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+               &                    ( 1. + zkpoca * zundsat(ji,jk) * dtsed2 )
+               zrearat2(ji,jk) = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+               &                    ( 1. + zkpocb * zundsat(ji,jk) * dtsed2 )
+               zrearat3(ji,jk) = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+               &                    ( 1. + zkpocc * zundsat(ji,jk) * dtsed2 )
+               IF ( ABS( (zundsat(ji,jk)-zundsat2)/( MAX(0.,zundsat2)+rtrn)) < 1E-8 ) THEN
+                  EXIT jflag3
+               ENDIF
+            END DO jflag3
          END DO
       END DO
 
 
-      ! solves tridiagonal system
-      CALL sed_mat( nv, jpoce, jpksed, zrearat, zundsat )
-
-
-      ! New solid concentration values (jk=2 to jksed) for cacO3
+         ! New solid concentration values (jk=2 to jksed) for each couple 
       DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zreasat = zrearat(ji,jk,1) * zundsat(ji,jk,1) / zvolc(ji,jk,jscal)
-            solcp(ji,jk,jscal) = solcp(ji,jk,jscal) - zreasat
-         ENDDO
-      ENDDO
+            zreasat = zrearat1(ji,jk) * zlimfeo(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspoc)
+            solcp(ji,jk,jspoc) = solcp(ji,jk,jspoc) - zreasat
+            zreasat = zrearat2(ji,jk) * zlimfeo(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspos)
+            solcp(ji,jk,jspos) = solcp(ji,jk,jspos) - zreasat
+            zreasat = zrearat3(ji,jk) * zlimfeo(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspor)
+            solcp(ji,jk,jspor) = solcp(ji,jk,jspor) - zreasat
+         END DO
+      END DO
 
       ! New dissolved concentrations
-      DO jk = 1, jpksed
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            zreasat = zrearat(ji,jk,1) * zundsat(ji,jk,1)    
+            zreasat = ( zrearat1(ji,jk) + zrearat2(ji,jk) + zrearat3(ji,jk) ) * zlimfeo(ji,jk) * zundsat(ji,jk)
+            ! For FEOH
+            solcp(ji,jk,jsfeo) = zundsat(ji,jk)
             ! For DIC
             pwcp(ji,jk,jwdic)  = pwcp(ji,jk,jwdic) + zreasat
+            zsumtot(ji) = zsumtot(ji) + zreasat / dtsed2 * volw3d(ji,jk) * 1.e-3 * 86400. * 365. * 1E3
+            ! For Phosphate (in mol/l)
+            pwcp(ji,jk,jwpo4)  = pwcp(ji,jk,jwpo4) + zreasat * ( spo4r + 4.0 * redfep )
+            ! Ligands
+            sedligand(ji,jk)   = sedligand(ji,jk) + ratligc * zreasat
+            ! For iron (in mol/l)
+            pwcp(ji,jk,jwfe2)  = pwcp(ji,jk,jwfe2) + fecratio(ji) * zreasat
             ! For alkalinity
-            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) + 2.* zreasat 
-            ! For DIC13
-            pwcp(ji,jk,jwc13)  = pwcp(ji,jk,jwc13) + zreasat * rc13Ca * pdb
+            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) + zreasat * ( srno3 * zadsnh4 - 2.* spo4r ) + 8.0 * zreasat
+            ! Ammonium
+            pwcp(ji,jk,jwnh4)  = pwcp(ji,jk,jwnh4) + zreasat * srno3 * zadsnh4
+            pwcp(ji,jk,jwfe2)  = pwcp(ji,jk,jwfe2) + zreasat * 4.0
          ENDDO
       ENDDO
 
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce
-            zmc13_3(ji) = zmc13_3(ji) + pwcp(ji,jk,jwc13) * volw3d(ji,jk) * 1.e-3                  
-         ENDDO
-      ENDDO
-
-      DO ji = 1, jpoce     
-         sour_c13(ji) = sour_c13(ji) + zmc13_3(ji) - zmc13_2(ji)   
-      ENDDO
-      
-      !-------------------------------------------------
-      ! Beginning DIC, Alkalinity and DIC13 diffusion
-      !-------------------------------------------------
-      
-      nv = 3
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce      
-            zundsat(ji,jk,1) = pwcp(ji,jk,jwdic)
-            zundsat(ji,jk,2) = pwcp(ji,jk,jwalk)
-            zundsat(ji,jk,3) = pwcp(ji,jk,jwc13)
-      
-            zrearat(ji,jk,1) = 0.
-            zrearat(ji,jk,2) = 0.
-            zrearat(ji,jk,3) = 0.
-      
-         ENDDO
-      ENDDO
-
-
-      ! solves tridiagonal system
-      CALL sed_mat( nv, jpoce, jpksed, zrearat, zundsat )
-
-
-      ! New dissolved concentrations      
-      DO jk = 1, jpksed
-         DO ji = 1, jpoce                      
-            pwcp(ji,jk,jwdic) = zundsat(ji,jk,1)
-            pwcp(ji,jk,jwalk) = zundsat(ji,jk,2)
-            pwcp(ji,jk,jwc13) = zundsat(ji,jk,3)
-         ENDDO
-      ENDDO            
-      
-      !----------------------------------
-      !   Back to initial geometry
-      !-----------------------------
-      
-      !---------------------------------------------------------------------
-      !   1/ Compensation for ajustement of the bottom water concentrations
-      !      (see note n° 1 about *por(2))
       !--------------------------------------------------------------------
-      DO jw = 1, jpwat
+      ! Begining POC denitrification and NO3- diffusion
+      ! (indice nï¿½5 for couple POC/NO3- ie solcp(:,:,jspoc)/pwcp(:,:,jwno3))
+      !--------------------------------------------------------------------
+
+      zrearat1(:,:) = 0.
+      zrearat2(:,:) = 0.
+      zrearat3(:,:) = 0.
+
+      zundsat(:,:) = pwcp(:,:,jwso4)
+
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            pwcp(ji,1,jw) = pwcp(ji,1,jw) + &
-               &            pwcp(ji,2,jw) * dzdep(ji) * por(2) / dzkbot(ji)
-         END DO
-      ENDDO
-      
-      !-----------------------------------------------------------------------
-      !    2/ Det of new rainrg taking account of the new weight fraction obtained 
-      !      in dz3d(2) after diffusion/reaction (react/diffu are also in dzdep!)
-      !      This new rain (rgntg rm) will be used in advection/burial routine
-      !------------------------------------------------------------------------
-      DO js = 1, jpsol
+            zlimso4(ji,jk) = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) * ( 1.0 - pwcp(ji,jk,jwno3)    &
+            &                / ( pwcp(ji,jk,jwno3) + xksedno3 ) ) * ( 1. - solcp(ji,jk,jsfeo)  &
+            &                / ( solcp(ji,jk,jsfeo) + xksedfeo ) ) / ( zundsat(ji,jk) + xksedso4 )
+            zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
+            zsolid2 = zvolc(ji,jk,jspos) * solcp(ji,jk,jspos)
+            zsolid3 = zvolc(ji,jk,jspor) * solcp(ji,jk,jspor)
+            zkpoca = zkpoc(ji,jk) * zlimso4(ji,jk)
+            zkpocb = zkpos(ji,jk) * zlimso4(ji,jk)
+            zkpocc = zkpor(ji,jk) * zlimso4(ji,jk)
+            zrearat1(ji,jk)  = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+            &                 ( 1. + zkpoca * zundsat(ji,jk ) * dtsed2 )
+            zrearat2(ji,jk)  = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+            &                 ( 1. + zkpocb * zundsat(ji,jk ) * dtsed2 )
+            zrearat3(ji,jk)  = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+            &                 ( 1. + zkpocc * zundsat(ji,jk ) * dtsed2 )
+        END DO
+      END DO
+!
+!      DO jn = 1, 5 
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            rainrg(ji,js) = raintg(ji) * solcp(ji,2,js)
-            rainrm(ji,js) = rainrg(ji,js) / mol_wgt(js)
+jflag4:     DO jn = 1, 10
+               zlimtmp = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) * ( 1.0 - pwcp(ji,jk,jwno3)    &
+               &         / ( pwcp(ji,jk,jwno3) + xksedno3 ) ) * ( 1. - solcp(ji,jk,jsfeo)  &
+               &         / ( solcp(ji,jk,jsfeo) + xksedfeo ) ) 
+               zsolid1 = zvolc(ji,jk,jspoc) * solcp(ji,jk,jspoc)
+               zsolid2 = zvolc(ji,jk,jspos) * solcp(ji,jk,jspos)
+               zsolid3 = zvolc(ji,jk,jspor) * solcp(ji,jk,jspor)
+               zreasat = ( zrearat1(ji,jk) + zrearat2(ji,jk) + zrearat3(ji,jk) ) 
+               zbeta   = xksedso4 - pwcp(ji,jk,jwso4) + 0.5 * zreasat * zlimtmp
+               zgamma = - xksedso4 * pwcp(ji,jk,jwso4)
+               zundsat2 = zundsat(ji,jk)
+               zundsat(ji,jk) = ( - zbeta + SQRT( zbeta**2 - 4.0 * zgamma ) ) / 2.0
+               zlimso4(ji,jk) = ( 1.0 - pwcp(ji,jk,jwoxy) * zlimo2(ji,jk) ) * ( 1.0 - pwcp(ji,jk,jwno3)    &
+               &                / ( pwcp(ji,jk,jwno3) + xksedno3 ) ) * ( 1. - solcp(ji,jk,jsfeo)  &
+               &                / ( solcp(ji,jk,jsfeo) + xksedfeo ) ) / ( zundsat(ji,jk) + xksedso4 )
+               zkpoca  = zkpoc(ji,jk) * zlimso4(ji,jk)
+               zkpocb  = zkpos(ji,jk) * zlimso4(ji,jk)
+               zkpocc  = zkpor(ji,jk) * zlimso4(ji,jk)
+               zrearat1(ji,jk)  = ( zkpoc(ji,jk) * dtsed2 * zsolid1 ) / &
+               &                 ( 1. + zkpoca * zundsat(ji,jk ) * dtsed2 )
+               zrearat2(ji,jk)  = ( zkpos(ji,jk) * dtsed2 * zsolid2 ) / &
+               &                 ( 1. + zkpocb * zundsat(ji,jk ) * dtsed2 )
+               zrearat3(ji,jk)  = ( zkpor(ji,jk) * dtsed2 * zsolid3 ) / &
+               &                 ( 1. + zkpocc * zundsat(ji,jk ) * dtsed2 )
+               IF ( ABS( (zundsat(ji,jk)-zundsat2)/(zundsat2+rtrn)) < 1E-8 ) THEN
+                  EXIT jflag4
+               ENDIF
+            END DO jflag4
          END DO
-      ENDDO
-      
-      !  New raintg
-      raintg(:) = 0.
-      DO js = 1, jpsol
+      END DO
+
+     ! New solid concentration values (jk=2 to jksed) for each couple 
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            raintg(ji) = raintg(ji) + rainrg(ji,js)
-         END DO
+            zreasat = zrearat1(ji,jk) * zlimso4(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspoc)
+            solcp(ji,jk,jspoc) = solcp(ji,jk,jspoc) - zreasat
+            zreasat = zrearat2(ji,jk) * zlimso4(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspos)
+            solcp(ji,jk,jspos) = solcp(ji,jk,jspos) - zreasat
+            zreasat = zrearat3(ji,jk) * zlimso4(ji,jk) * zundsat(ji,jk) / zvolc(ji,jk,jspor)
+            solcp(ji,jk,jspor) = solcp(ji,jk,jspor) - zreasat
+         ENDDO
       ENDDO
-      
-      !--------------------------------
-      !    3/ back to initial geometry
-      !--------------------------------
-      DO ji = 1, jpoce
-         dz3d  (ji,2) = dz(2)
-         volw3d(ji,2) = dz3d(ji,2) * por(2)
-         vols3d(ji,2) = dz3d(ji,2) * por1(2)
-      ENDDO
-      
-      !----------------------------------------------------------------------
-      !    4/ Saving new amount of material in dzkbot for mass balance check
-      !       tokbot in [mol] (implicit *1cm*1cm for spacial dim)
-      !----------------------------------------------------------------------
-      DO jw = 1, jpwat 
+!
+      ! New dissolved concentrations
+      DO jk = 2, jpksed
          DO ji = 1, jpoce
-            tokbot(ji,jw) = pwcp(ji,1,jw) * 1.e-3 * dzkbot(ji)
-         END DO
+            ! For sulfur
+            pwcp(ji,jk,jwh2s)  = pwcp(ji,jk,jwh2s) - ( zundsat(ji,jk) - pwcp(ji,jk,jwso4) ) 
+            pwcp(ji,jk,jwso4)  =  zundsat(ji,jk)
+            zreasat = ( zrearat1(ji,jk) + zrearat2(ji,jk) + zrearat3(ji,jk) ) * zlimso4(ji,jk) * zundsat(ji,jk)
+            ! For DIC
+            pwcp(ji,jk,jwdic)  = pwcp(ji,jk,jwdic) + zreasat
+            zsumtot(ji) = zsumtot(ji) + zreasat / dtsed2 * volw3d(ji,jk) * 1.e-3 * 86400. * 365. * 1E3
+            ! For Phosphate (in mol/l)
+            pwcp(ji,jk,jwpo4)  = pwcp(ji,jk,jwpo4) + zreasat * spo4r
+            ! Ligands
+            sedligand(ji,jk)   = sedligand(ji,jk) + ratligc * zreasat
+            ! For iron (in mol/l)
+            pwcp(ji,jk,jwfe2)  = pwcp(ji,jk,jwfe2) + fecratio(ji) * zreasat
+            ! For alkalinity
+            pwcp(ji,jk,jwalk)  = pwcp(ji,jk,jwalk) + zreasat * ( srno3 * zadsnh4 - 2.* spo4r ) + zreasat
+            ! Ammonium
+            pwcp(ji,jk,jwnh4)  = pwcp(ji,jk,jwnh4) + zreasat * srno3 * zadsnh4
+         ENDDO
       ENDDO
 
-      DEALLOCATE( zmo2_0  ) ;  DEALLOCATE( zmno3_1 )  ;  DEALLOCATE( zmno3_2 ) 
-      DEALLOCATE( zmc13_0 ) ;  DEALLOCATE( zmc13_1 )  ;  DEALLOCATE( zmc13_2 ) ;  DEALLOCATE( zmc13_3 ) 
-      
-      DEALLOCATE( zrearat ) ;  DEALLOCATE( zundsat )  ;  DEALLOCATE( zvolc )   
-      
+      ! Oxydation of the reduced products. Here only ammonium and ODU is accounted for
+      ! There are two options here: A simple time splitting scheme and a modified 
+     ! Patankar scheme
+      ! ------------------------------------------------------------------------------
+
+      call sed_dsr_redoxb
+
+      ! -------------------------------------------------------------- 
+      !    4/ Computation of the bioturbation coefficient
+      !       This parameterization is taken from Archer et al. (2002)
+      ! --------------------------------------------------------------
+
+      DO ji = 1, jpoce
+         db(ji,:) = dbiot * zsumtot(ji) * pwcp(ji,1,jwoxy) / (pwcp(ji,1,jwoxy) + 20.E-6)
+      END DO
+
+      ! ------------------------------------------------------
+      !    Vertical variations of the bioturbation coefficient
+      ! ------------------------------------------------------
+      IF (ln_btbz) THEN
+         DO ji = 1, jpoce
+            db(ji,:) = db(ji,:) * exp( -(profsedw(:) / dbtbzsc)**2 ) / (365.0 * 86400.0)
+         END DO
+      ELSE
+         DO jk = 1, jpksed
+            IF (profsedw(jk) > dbtbzsc) THEN
+                db(:,jk) = 0.0
+            ENDIF
+         END DO
+      ENDIF
+
+      IF (ln_irrig) THEN
+         DO jk = 1, jpksed
+            DO ji = 1, jpoce
+               irrig(ji,jk) = ( 7.63752 - 7.4465 * exp( -0.89603 * zsumtot(ji) ) ) * pwcp(ji,1,jwoxy)  &
+               &             / (pwcp(ji,1,jwoxy) + 20.E-6) 
+               irrig(ji,jk) = irrig(ji,jk) * exp( -(profsedw(jk) / xirrzsc) )
+            END DO
+         END DO
+      ELSE
+         irrig(:,:) = 0.0
+      ENDIF
+
+      DEALLOCATE( zvolc )
+
+      IF( ln_timing )  CALL timing_stop('sed_dsr')
+!      
    END SUBROUTINE sed_dsr
-#else
-   !!======================================================================
-   !! MODULE seddsr  :   Dummy module 
-   !!======================================================================
-   !! $Id$
-CONTAINS
-   SUBROUTINE sed_dsr ( kt )
-     INTEGER, INTENT(in) :: kt
-     WRITE(*,*) 'sed_dsr: You should not have seen this print! error?', kt
-  END SUBROUTINE sed_dsr
-#endif
-   
+
+   SUBROUTINE sed_dsr_redoxb
+      !!----------------------------------------------------------------------
+      !!                   ***  ROUTINE sed_dsr_redox  ***
+      !! 
+      !!  ** Purpose :  computes secondary redox reactions
+      !!
+      !!  ** Methode :  It uses Strand splitter algorithm proposed by 
+      !!                Nguyen et al. (2009) and modified by Wang et al. (2018)
+      !!                Basically, each equation is solved analytically when 
+      !!                feasible, otherwise numerically at t+1/2. Then 
+      !!                the last equation is solved at t+1. The other equations
+      !!                are then solved at t+1 starting in the reverse order.
+      !!                Ideally, it's better to start from the fastest reaction
+      !!                to the slowest and then reverse the order to finish up
+      !!                with the fastest one. But random order works well also.
+      !!                The scheme is second order, positive and mass 
+      !!                conserving. It works well for stiff systems.
+      !! 
+      !!   History :
+      !!        !  18-08 (O. Aumont)  Original code
+      !!----------------------------------------------------------------------
+      !! Arguments
+      ! --- local variables
+      INTEGER   ::  ji, jk, jn   ! dummy looop indices
+
+      REAL, DIMENSION(6)  :: zsedtrn, zsedtra
+      REAL(wp)  ::  zalpha, zbeta, zgamma, zdelta, zepsi, zsedfer
+      !!
+      !!----------------------------------------------------------------------
+
+      IF( ln_timing )  CALL timing_start('sed_dsr_redoxb')
+
+      DO ji = 1, jpoce
+         DO jk = 2, jpksed
+            zsedtrn(1)  = pwcp(ji,jk,jwoxy)
+            zsedtrn(2)  = MAX(0., pwcp(ji,jk,jwh2s) )
+            zsedtrn(3)  = pwcp(ji,jk,jwnh4)
+            zsedtrn(4)  = MAX(0., pwcp(ji,jk,jwfe2) - sedligand(ji,jk) )
+            zsedfer     = MIN(0., pwcp(ji,jk,jwfe2) - sedligand(ji,jk) )
+            zsedtrn(5)  = solcp(ji,jk,jsfeo) * zvolc(ji,jk,jsfeo)
+            zsedtrn(6)  = solcp(ji,jk,jsfes) * zvolc(ji,jk,jsfes)
+            zsedtra(:)  = zsedtrn(:) 
+
+            ! First pass of the scheme. At the end, it is 1st order 
+            ! -----------------------------------------------------
+            ! Fe + O2
+            zalpha = zsedtra(1) - 0.25 * zsedtra(4)
+            zbeta  = zsedtra(4) + zsedtra(5) 
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
+            zdelta = pwcp(ji,jk,jwpo4) - redfep * zsedtra(4)
+            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( 0.25 * zsedtra(4) * ( exp( reac_fe2 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_fe2 * zalpha * dtsed2 / 2. ) + rtrn )
+            zsedtra(1) = zalpha + 0.25 * zsedtra(4) 
+            zsedtra(5) = zbeta  - zsedtra(4)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
+            pwcp(ji,jk,jwpo4) = zdelta + redfep * zsedtra(4)
+            ! H2S + O2
+            zalpha = zsedtra(1) - 2.0 * zsedtra(2)
+            zbeta  = pwcp(ji,jk,jwso4) + zsedtra(2)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(2)
+            zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_h2s * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_h2s * zalpha * dtsed2 / 2. ) + rtrn )
+            zsedtra(1) = zalpha + 2.0 * zsedtra(2)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(2)
+            pwcp(ji,jk,jwso4) = zbeta - zsedtra(2)
+            ! NH4 + O2
+            zalpha = zsedtra(1) - 2.0 * zsedtra(3)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(3)
+            zsedtra(3) = ( zsedtra(3) * zalpha ) / ( 2.0 * zsedtra(3) * ( exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 /2. ) + rtrn )
+            zsedtra(1) = zalpha + 2.0 * zsedtra(3)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(3)
+            ! FeS - O2
+            zalpha = zsedtra(1) - 2.0 * zsedtra(6)
+            zbeta  = zsedtra(4) + zsedtra(6)
+            zgamma = pwcp(ji,jk,jwso4) + zsedtra(6)
+            zsedtra(6) = ( zsedtra(6) * zalpha ) / ( 2.0 * zsedtra(6) * ( exp( reac_feso * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_feso * zalpha * dtsed2 /2. ) + rtrn )
+            zsedtra(1) = zalpha + 2.0 * zsedtra(6)
+            zsedtra(4) = zbeta  - zsedtra(6)
+            pwcp(ji,jk,jwso4) = zgamma - zsedtra(6)
+!            ! Fe - H2S
+            zalpha = zsedtra(2) - zsedtra(4)
+            zbeta  = zsedtra(4) + zsedtra(6)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
+            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( zsedtra(4) * ( exp( reac_fes * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_fes * zalpha * dtsed2 /2. ) + rtrn )
+            zsedtra(2) = zalpha + zsedtra(4)
+            zsedtra(6) = zbeta  - zsedtra(4)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
+            ! FEOH + H2S
+            zalpha = zsedtra(5) - 2.0 * zsedtra(2)
+            zbeta  = zsedtra(5) + zsedtra(4)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
+            zdelta = pwcp(ji,jk,jwso4) + zsedtra(2)
+            zepsi  = pwcp(ji,jk,jwpo4) + redfep * zsedtra(5)
+            zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_feh2s * zalpha * dtsed2 ) - 1.0 )  &
+            &            + zalpha * exp( reac_feh2s * zalpha * dtsed2 ) + rtrn )
+            zsedtra(5) = zalpha + 2.0 * zsedtra(2)
+            zsedtra(4) = zbeta  - zsedtra(5)
+            pwcp(ji,jk,jwso4) = zdelta - zsedtra(2)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
+            pwcp(ji,jk,jwpo4) = zepsi - redfep * zsedtra(5)
+            ! Fe - H2S
+            zalpha = zsedtra(2) - zsedtra(4)
+            zbeta  = zsedtra(4) + zsedtra(6)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
+            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( zsedtra(4) * ( exp( reac_fes * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_fes * zalpha * dtsed2 /2. ) + rtrn )
+            zsedtra(2) = zalpha + zsedtra(4)
+            zsedtra(6) = zbeta  - zsedtra(4)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
+            ! FeS - O2
+            zalpha = zsedtra(1) - 2.0 * zsedtra(6)
+            zbeta  = zsedtra(4) + zsedtra(6)
+            zgamma = pwcp(ji,jk,jwso4) + zsedtra(6)
+            zsedtra(6) = ( zsedtra(6) * zalpha ) / ( 2.0 * zsedtra(6) * ( exp( reac_feso * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_feso * zalpha * dtsed2 /2. ) + rtrn )
+            zsedtra(1) = zalpha + 2.0 * zsedtra(6)
+            zsedtra(4) = zbeta  - zsedtra(6)
+            pwcp(ji,jk,jwso4) = zgamma - zsedtra(6)
+            ! NH4 + O2
+            zalpha = zsedtra(1) - 2.0 * zsedtra(3)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(3)
+            zsedtra(3) = ( zsedtra(3) * zalpha ) / ( 2.0 * zsedtra(3) * ( exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 /2. ) + rtrn )
+            zsedtra(1) = zalpha + 2.0 * zsedtra(3)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(3)
+            ! H2S + O2
+            zalpha = zsedtra(1) - 2.0 * zsedtra(2)
+            zbeta  = pwcp(ji,jk,jwso4) + zsedtra(2)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(2)
+            zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_h2s * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_h2s * zalpha * dtsed2 / 2. ) + rtrn )
+            zsedtra(1) = zalpha + 2.0 * zsedtra(2)
+            pwcp(ji,jk,jwso4) = zbeta - zsedtra(2)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(2)
+            ! Fe + O2
+            zalpha = zsedtra(1) - 0.25 * zsedtra(4)
+            zbeta  = zsedtra(4) + zsedtra(5)
+            zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
+            zdelta = pwcp(ji,jk,jwpo4) - redfep * zsedtra(4)
+            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( 0.25 * zsedtra(4) * ( exp( reac_fe2 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+            &            + zalpha * exp( reac_fe2 * zalpha * dtsed2 / 2. ) + rtrn )
+            zsedtra(1) = zalpha + 0.25 * zsedtra(4)
+            zsedtra(5) = zbeta  - zsedtra(4)
+            pwcp(ji,jk,jwpo4) = zdelta + redfep * zsedtra(4)
+            pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
+            pwcp(ji,jk,jwoxy)  = zsedtra(1)
+            pwcp(ji,jk,jwh2s)  = zsedtra(2)
+            pwcp(ji,jk,jwnh4)  = zsedtra(3)
+            pwcp(ji,jk,jwfe2)  = zsedtra(4) + sedligand(ji,jk) + zsedfer
+            pwcp(ji,jk,jwno3)  = pwcp(ji,jk,jwno3)  + ( zsedtrn(3) - pwcp(ji,jk,jwnh4) )
+            solcp(ji,jk,jsfeo) = zsedtra(5) / zvolc(ji,jk,jsfeo)
+            solcp(ji,jk,jsfes) = zsedtra(6) / zvolc(ji,jk,jsfes)
+         END DO
+      END DO
+
+      IF( ln_timing )  CALL timing_stop('sed_dsr_redoxb')
+
+  END SUBROUTINE sed_dsr_redoxb
+
 END MODULE seddsr

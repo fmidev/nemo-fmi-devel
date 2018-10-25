@@ -17,6 +17,7 @@ MODULE trcini_pisces
    USE trc             !  passive tracers common variables 
    USE trcnam_pisces   !  PISCES namelist
    USE sms_pisces      !  PISCES Source Minus Sink variables
+   USE sedini          !  SEDIMENTS initialization routine
 
    IMPLICIT NONE
    PRIVATE
@@ -267,6 +268,13 @@ CONTAINS
       CALL p4z_lys_init          !  calcite saturation
       IF( .NOT.l_co2cpl ) &
         & CALL p4z_flx_init      !  gas exchange 
+
+      ! Initialization of the sediment model
+      IF( ln_sediment) THEN
+         CALL sed_init
+      ELSE
+         ALLOCATE( profsed(2) )
+      ENDIF
 
       IF(lwp) WRITE(numout,*) 
       IF(lwp) WRITE(numout,*) '   ==>>>   Initialization of PISCES tracers done'

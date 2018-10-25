@@ -115,7 +115,8 @@ CONTAINS
                   ! -------------------------------------------------------
                   zammonic = zremik * nitrfac(ji,jj,jk) * trb(ji,jj,jk,jpdoc)
                   denitr(ji,jj,jk)  = zammonic * ( 1. - nitrfac2(ji,jj,jk) )
-                  zoxyrem           = zammonic *        nitrfac2(ji,jj,jk)
+                  denitr(ji,jj,jk)  = MIN( ( trb(ji,jj,jk,jpno3) - rtrn ) / rdenit, denitr(ji,jj,jk) )
+                  zoxyrem           = zammonic - denitr(ji,jj,jk)
                   !
                   zolimi (ji,jj,jk) = MAX( 0.e0, zolimi (ji,jj,jk) )
                   denitr (ji,jj,jk) = MAX( 0.e0, denitr (ji,jj,jk) )
@@ -188,6 +189,7 @@ CONTAINS
                zonitr  = nitrif * xstep * trb(ji,jj,jk,jpnh4) * ( 1.- nitrfac(ji,jj,jk) )  &
                &         / ( 1.+ emoy(ji,jj,jk) ) * ( 1. + fr_i(ji,jj) * emoy(ji,jj,jk) ) 
                zdenitnh4 = nitrif * xstep * trb(ji,jj,jk,jpnh4) * nitrfac(ji,jj,jk)
+               zdenitnh4 = MIN(  ( trb(ji,jj,jk,jpno3) - rtrn ) / rdenita, zdenitnh4 ) 
                ! Update of the tracers trends
                ! ----------------------------
                tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) - zonitr - zdenitnh4

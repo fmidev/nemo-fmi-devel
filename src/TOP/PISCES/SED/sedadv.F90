@@ -3,21 +3,21 @@ MODULE sedadv
    !!              ***  MODULE  sedadv  ***
    !!    Sediment : vertical advection and burial
    !!=====================================================================
-#if defined key_sed
-   !!----------------------------------------------------------------------
-   !!   'key_sed'                                                  Sediment 
+   !! * Modules used
    !!----------------------------------------------------------------------
    !!   sed_adv :
    !!----------------------------------------------------------------------
    USE sed     ! sediment global variable
+   USE lib_mpp         ! distribued memory computing library
+
+   IMPLICIT NONE
+   PRIVATE
 
    PUBLIC sed_adv
+   PUBLIC sed_adv_alloc
 
-   !! * Module variable
-   INTEGER, PARAMETER  ::  nztime = jpksed         ! number of time step between sunrise and sunset
-
-   REAL(wp), DIMENSION(jpksed), SAVE :: dvolsp, dvolsm
-   REAL(wp), DIMENSION(jpksed), SAVE :: c2por, ckpor
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:) :: dvolsp, dvolsm
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:) :: c2por, ckpor
 
    REAL(wp) :: cpor
    REAL(wp) :: por1clay 
@@ -48,24 +48,28 @@ CONTAINS
          kt                     ! time step
       ! * local variables
       INTEGER :: ji, jk, js 
-      INTEGER :: jn, ntimes, ikwneg
+      INTEGER :: jn, ntimes, nztime, ikwneg
       
-      REAL(wp), DIMENSION(:,:), ALLOCATABLE :: zsolcpno
-      REAL(wp), DIMENSION(:  ), ALLOCATABLE :: zfilled, zfull, zfromup, zempty
-      REAL(wp), DIMENSION(:,:), ALLOCATABLE :: zgap, zwb
-      REAL(wp), DIMENSION(:,:), ALLOCATABLE :: zrainrf
-      REAL(wp), DIMENSION(nztime) ::  zraipush
+      REAL(wp), DIMENSION(jpksed,jpsol) :: zsolcpno
+      REAL(wp), DIMENSION(jpksed)       :: zfilled, zfull, zfromup, zempty
+      REAL(wp), DIMENSION(jpoce,jpksed) :: zgap, zwb
+      REAL(wp), DIMENSION(jpoce,jpsol) :: zrainrf
+      REAL(wp), DIMENSION(:  ), ALLOCATABLE :: zraipush
 
-      REAL(wp) :: zkwnup, zkwnlo, zfrac,  zfromce, zrest
+      REAL(wp) :: zkwnup, zkwnlo, zfrac,  zfromce, zrest, sumtot, zsumtot1
 
       !------------------------------------------------------------------------
 
 
+      IF( ln_timing )  CALL timing_start('sed_adv')
+!
       IF( kt == nitsed000 ) THEN
-         WRITE(numsed,*) ' '
-         WRITE(numsed,*) ' sed_adv : vertical sediment advection  '
-         WRITE(numsed,*) ' '
-         por1clay = dens * por1(jpksed) * dz(jpksed) / mol_wgt(jsclay)
+         IF (lwp) THEN
+            WRITE(numsed,*) ' '
+            WRITE(numsed,*) ' sed_adv : vertical sediment advection  '
+            WRITE(numsed,*) ' '
+         ENDIF
+         por1clay = denssol * por1(jpksed) * dz(jpksed)
          cpor     = por1(jpksed) / por1(2)
          DO jk = 2, jpksed
             c2por(jk) = por1(2)      / por1(jk)
@@ -79,16 +83,15 @@ CONTAINS
         ENDDO
       ENDIF
 
-      ALLOCATE( zsolcpno(jpksed,jpsol), zrainrf(jpoce,jpsol) )
-      ALLOCATE( zfilled(jpksed), zfull(jpksed), zfromup(jpksed), zempty(jpksed) )
-      ALLOCATE( zgap (jpoce,jpksed)   , zwb(jpoce,jpksed)  )  
-
       ! Initialization of data for mass balance calculation
       !---------------------------------------------------
       fromsed(:,:) = 0.
       tosed  (:,:) = 0. 
       rloss  (:,:) = 0.
+      ikwneg = 1
+      nztime = jpksed
 
+      ALLOCATE( zraipush(nztime) )
 
       ! Initiate gap 
       !--------------
@@ -103,12 +106,11 @@ CONTAINS
 
       zgap(1:jpoce,1:jpksed) = 1. - zgap(1:jpoce,1:jpksed)   
 
-
       ! Initiate burial rates
       !-----------------------
       zwb(:,:) = 0.
       DO jk = 2, jpksed
-         zfrac =  dtsed / ( dens * por1(jk) )     
+         zfrac =  dtsed / ( denssol * por1(jk) )     
          DO ji = 1, jpoce
             zwb(ji,jk) = zfrac * raintg(ji)
          END DO
@@ -125,7 +127,6 @@ CONTAINS
             zwb(ji,jk) = zwb(ji,jk-1) * zfrac - zgap(ji,jk) * dz(jk)
          END DO
       ENDDO
-
 
       zrainrf(:,:) = 0.
       DO ji = 1, jpoce
@@ -205,16 +206,13 @@ CONTAINS
                   fromsed(ji,js) = 0.
                   ! quantities to push in deeper sediment
                   tosed  (ji,js) = zsolcpno(jpksed,js) &
-                     &           * zwb(ji,jpksed) * dens * por1(jpksed) / mol_wgt(js)
+                     &           * zwb(ji,jpksed) * denssol * por1(jpksed)
                ENDDO
-               
+
             ELSE ! what is remaining is great than dz(2)
 
                ntimes = INT( zrest / dz(2) ) + 1
-               IF( ntimes > nztime ) THEN
-                  WRITE( numsed,* ) ' sedadv : rest too large at sediment point ji = ', ji
-                  STOP
-               ENDIF
+               IF( ntimes > nztime ) CALL ctl_stop( 'STOP', 'sed_adv : rest too large ' )
                zraipush(1) = dz(2)
                zrest = zrest - zraipush(1)
                DO jn = 2, ntimes
@@ -248,7 +246,7 @@ CONTAINS
                      ENDDO
                      fromsed(ji,js) = 0.
                      tosed  (ji,js) = tosed(ji,js) + zsolcpno(jpksed,js) * zraipush(jn) &
-                        &             * dens * por1(2) / mol_wgt(js)
+                        &             * denssol * por1(2) 
                   ENDDO
                ENDDO
  
@@ -278,9 +276,7 @@ CONTAINS
             ENDDO
             ! for the last layer, one make go up clay 
             solcp(ji,jpksed,jsclay) = solcp(ji,jpksed,jsclay) + zempty(jpksed) * 1.
-            !! C. Heinze      fromsed(ji,jsclay) = zempty(jpksed) * 1. * dens * por1(jpksed) / mol_wgt(jsclay)
             fromsed(ji,jsclay) = zempty(jpksed) * 1. * por1clay
-
          ELSE  ! rain > 0 and rain < total reaction loss
 
 
@@ -322,7 +318,7 @@ CONTAINS
                   fromsed(ji,js) = 0.
                ENDDO
                solcp(ji,jpksed,jsclay) =  solcp(ji,jpksed,jsclay) + zempty(jpksed) * 1.
-               !! C. Heinze  fromsed(ji,jsclay) = zempty(jpksed) * 1. * dens * por1(jpksed) / mol_wgt(jsclay)
+               !! C. Heinze  fromsed(ji,jsclay) = zempty(jpksed) * 1. * denssol * por1(jpksed) / mol_wgt(jsclay)
                fromsed(ji,jsclay) = zempty(jpksed) * 1. * por1clay
                
             ELSE IF( ikwneg == jpksed ) THEN
@@ -338,7 +334,7 @@ CONTAINS
                DO  js = 1, jpsol
                   solcp(ji,2,js) = zfull(2) * zsolcpno(2,js) + zempty(2) * zrainrf(ji,js)
                ENDDO
-               DO  js = 1, jpsol              
+               DO  js = 1, jpsol
                   DO jk = jpksedm1, 3, -1
                      solcp(ji,jk,js) = zfull(jk) * zsolcpno(jk,js) + zempty(jk) * zsolcpno(jk-1,js)
                   ENDDO
@@ -348,7 +344,7 @@ CONTAINS
                   fromsed(ji,js) = 0.
                ENDDO
                solcp(ji,jpksed,jsclay) = solcp(ji,jpksed,jsclay) + zkwnlo * 1.
-               ! Heinze  fromsed(ji,jsclay) = zkwnlo * 1. * dens * por1(jpksed) / mol_wgt(jsclay)
+               ! Heinze  fromsed(ji,jsclay) = zkwnlo * 1. * denssol * por1(jpksed) / mol_wgt(jsclay)
                fromsed(ji,jsclay) = zkwnlo * 1.* por1clay
             ELSE   ! 2 < ikwneg(ji) <= jpksedm1
 
@@ -414,8 +410,9 @@ CONTAINS
                   tosed  (ji,js)   = 0.
                   fromsed(ji,js)   = 0.
                ENDDO
-               ! Heinze  fromsed(ji,jsclay) = zempty * 1. * dens * por1(jpksed) / mol_wgt(jsclay)
+               ! Heinze  fromsed(ji,jsclay) = zempty * 1. * denssol * por1(jpksed) / mol_wgt(jsclay)
                fromsed(ji,jsclay) = zempty(jpksed) * 1. * por1clay
+
             ENDIF ! ikwneg(ji) = 2
          ENDIF  ! zwb > 0
       ENDDO  ! ji = 1, jpoce
@@ -424,29 +421,22 @@ CONTAINS
       rainrg(:,:) = 0.
       raintg(:)   = 0.
 
-      DEALLOCATE( zsolcpno )   
-      DEALLOCATE( zrainrf  )
-      DEALLOCATE( zfilled  )
-      DEALLOCATE( zfull    )
-      DEALLOCATE( zfromup  )
-      DEALLOCATE( zempty   )
-      DEALLOCATE( zgap     )  
-      DEALLOCATE( zwb      )
+      DEALLOCATE( zraipush )
 
+      IF( ln_timing )  CALL timing_stop('sed_adv')
 
    END SUBROUTINE sed_adv
-#else
-   !!======================================================================
-   !! MODULE sedbtb  :   Dummy module 
-   !!======================================================================
-   !! $Id$
-CONTAINS
-   SUBROUTINE sed_adv( kt )         ! Empty routine
-      INTEGER, INTENT(in) :: kt
-      WRITE(*,*) 'sed_adv: You should not have seen this print! error?', kt
-   END SUBROUTINE sed_adv
 
-   !!======================================================================
 
-#endif
+   INTEGER FUNCTION sed_adv_alloc()
+      !!----------------------------------------------------------------------
+      !!                     ***  ROUTINE p4z_prod_alloc  ***
+      !!----------------------------------------------------------------------
+      ALLOCATE( dvolsp(jpksed), dvolsm(jpksed), c2por(jpksed),         &
+      &         ckpor(jpksed) ,           STAT = sed_adv_alloc )
+      !
+      IF( sed_adv_alloc /= 0 ) CALL ctl_warn('sed_adv_alloc : failed to allocate arrays.')
+      !
+   END FUNCTION sed_adv_alloc
+
 END MODULE sedadv
