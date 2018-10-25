@@ -16,7 +16,7 @@ MODULE p4zrem
    USE sms_pisces      !  PISCES Source Minus Sink variables
    USE p4zche          !  chemical model
    USE p4zprod         !  Growth rate of the 2 phyto groups
-   USE p4zice
+   USE p4zlim
    USE prtctl_trc      !  print control for debugging
    USE iom             !  I/O manager
 

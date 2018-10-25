@@ -13,7 +13,7 @@ MODULE p4zsed
    USE oce_trc         !  shared variables between ocean and passive tracers
    USE trc             !  passive tracers common variables 
    USE sms_pisces      !  PISCES Source Minus Sink variables
-   USE p4zice          !  Co-limitations of differents nutrients
+   USE p4zlim          !  Co-limitations of differents nutrients
    USE p4zsbc          !  External source of nutrients 
    USE p4zint          !  interpolation and computation of various fields
    USE sed             !  Sediment module

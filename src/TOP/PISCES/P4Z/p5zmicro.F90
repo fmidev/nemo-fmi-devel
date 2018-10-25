@@ -14,7 +14,7 @@ MODULE p5zmicro
    USE oce_trc         !  shared variables between ocean and passive tracers
    USE trc             !  passive tracers common variables 
    USE sms_pisces      !  PISCES Source Minus Sink variables
-   USE p5zice          !  Phytoplankton limitation terms
+   USE p5zlim          !  Phytoplankton limitation terms
    USE iom             !  I/O manager
    USE prtctl_trc      !  print control for debugging
 

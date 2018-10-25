@@ -1,6 +1,6 @@
-MODULE p5zice
+MODULE p5zlim
    !!======================================================================
-   !!                         ***  MODULE p5zice  ***
+   !!                         ***  MODULE p5zlim  ***
    !! TOP :   PISCES with variable stoichiometry 
    !!======================================================================
    !! History :   1.0  !  2004     (O. Aumont) Original code
@@ -122,7 +122,7 @@ MODULE p5zice
    REAL(wp) ::  xcoef3   = 1.15E-4 * 14. / 55.85 / 7.625 * 0.5 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
-   !! $Id$ 
+   !! $Id: p5zlim.F90 10070 2018-08-28 14:30:54Z nicolasmartin $ 
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 
@@ -466,7 +466,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER :: ios                 ! Local integer output status for namelist read
       !!
-      NAMELIST/namp5zice/ concnno3, concpno3, concdno3, concnnh4, concpnh4, concdnh4,  &
+      NAMELIST/namp5zlim/ concnno3, concpno3, concdno3, concnnh4, concpnh4, concdnh4,  &
          &                concnfer, concpfer, concdfer, concbfe, concnpo4, concppo4,   &
          &                concdpo4, concbno3, concbnh4, concbpo4, xsizedia, xsizepic,  &
          &                xsizephy, xsizern, xsizerp, xsizerd, xksi1, xksi2, xkdoc,    &
@@ -478,17 +478,17 @@ CONTAINS
       !!----------------------------------------------------------------------
       !
       REWIND( numnatp_ref )              ! Namelist nampislim in reference namelist : Pisces nutrient limitation parameters
-      READ  ( numnatp_ref, namp5zice, IOSTAT = ios, ERR = 901)
+      READ  ( numnatp_ref, namp5zlim, IOSTAT = ios, ERR = 901)
 901   IF( ios /= 0 ) CALL ctl_nam ( ios , 'nampislim in reference namelist', lwp )
       !
       REWIND( numnatp_cfg )              ! Namelist nampislim in configuration namelist : Pisces nutrient limitation parameters 
-      READ  ( numnatp_cfg, namp5zice, IOSTAT = ios, ERR = 902 )
+      READ  ( numnatp_cfg, namp5zlim, IOSTAT = ios, ERR = 902 )
 902   IF( ios >  0 ) CALL ctl_nam ( ios , 'nampislim in configuration namelist', lwp )
-      IF(lwm) WRITE ( numonp, namp5zice )
+      IF(lwm) WRITE ( numonp, namp5zlim )
       !
       IF(lwp) THEN                         ! control print
          WRITE(numout,*) ' '
-         WRITE(numout,*) ' Namelist parameters for nutrient limitations, namp5zice'
+         WRITE(numout,*) ' Namelist parameters for nutrient limitations, namp5zlim'
          WRITE(numout,*) ' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
          WRITE(numout,*) '    mean rainratio                           caco3r    = ', caco3r
          WRITE(numout,*) '    NO3 half saturation of nanophyto         concnno3  = ', concnno3
@@ -599,4 +599,4 @@ CONTAINS
       !
    END FUNCTION p5z_lim_alloc
    !!======================================================================
-END MODULE p5zice
+END MODULE p5zlim

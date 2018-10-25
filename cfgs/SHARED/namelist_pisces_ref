@@ -62,7 +62,7 @@
    po4rat3    =  0.0094   ! P/C ratio in zooplankton
 /
 !-----------------------------------------------------------------------
-&namp4zice     !   parameters for nutrient limitations for PISCES std  - ln_p4z
+&namp4zlim     !   parameters for nutrient limitations for PISCES std  - ln_p4z
 !-----------------------------------------------------------------------
    concnno3   =  1.e-6    ! Nitrate half saturation of nanophytoplankton
    concdno3   =  3.E-6    ! Nitrate half saturation for diatoms
@@ -86,7 +86,7 @@
    oxymin     =  1.E-6    ! Half-saturation constant for anoxia
 /
 !-----------------------------------------------------------------------
-&namp5zice     !   parameters for nutrient limitations PISCES QUOTA    - ln_p5z
+&namp5zlim     !   parameters for nutrient limitations PISCES QUOTA    - ln_p5z
 !-----------------------------------------------------------------------
    concnno3   =  3e-6     ! Nitrate half saturation of nanophytoplankton
    concpno3   =  1e-6

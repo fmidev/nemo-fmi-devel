@@ -15,7 +15,7 @@ MODULE p5zprod
    USE oce_trc         !  shared variables between ocean and passive tracers
    USE trc             !  passive tracers common variables 
    USE sms_pisces      !  PISCES Source Minus Sink variables
-   USE p5zice          !  Co-limitations of differents nutrients
+   USE p5zlim          !  Co-limitations of differents nutrients
    USE prtctl_trc      !  print control for debugging
    USE iom             !  I/O manager
 

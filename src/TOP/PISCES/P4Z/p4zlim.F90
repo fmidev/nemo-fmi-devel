@@ -1,6 +1,6 @@
-MODULE p4zice
+MODULE p4zlim
    !!======================================================================
-   !!                         ***  MODULE p4zice  ***
+   !!                         ***  MODULE p4zlim  ***
    !! TOP :   PISCES 
    !!======================================================================
    !! History :   1.0  !  2004     (O. Aumont) Original code
@@ -68,7 +68,7 @@ MODULE p4zice
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
-   !! $Id$ 
+   !! $Id: p4zlim.F90 10069 2018-08-28 14:12:24Z nicolasmartin $ 
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
@@ -240,7 +240,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER ::   ios   ! Local integer
       !
-      NAMELIST/namp4zice/ concnno3, concdno3, concnnh4, concdnh4, concnfer, concdfer, concbfe,   &
+      NAMELIST/namp4zlim/ concnno3, concdno3, concnnh4, concdnh4, concnfer, concdfer, concbfe,   &
          &                concbno3, concbnh4, xsizedia, xsizephy, xsizern, xsizerd,          & 
          &                xksi1, xksi2, xkdoc, qnfelim, qdfelim, caco3r, oxymin
       !!----------------------------------------------------------------------
@@ -252,15 +252,15 @@ CONTAINS
       ENDIF
       !
       REWIND( numnatp_ref )              ! Namelist nampislim in reference namelist : Pisces nutrient limitation parameters
-      READ  ( numnatp_ref, namp4zice, IOSTAT = ios, ERR = 901)
-901   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namp4zice in reference namelist', lwp )
+      READ  ( numnatp_ref, namp4zlim, IOSTAT = ios, ERR = 901)
+901   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namp4zlim in reference namelist', lwp )
       REWIND( numnatp_cfg )              ! Namelist nampislim in configuration namelist : Pisces nutrient limitation parameters 
-      READ  ( numnatp_cfg, namp4zice, IOSTAT = ios, ERR = 902 )
-902   IF( ios >  0 )   CALL ctl_nam ( ios , 'namp4zice in configuration namelist', lwp )
-      IF(lwm) WRITE( numonp, namp4zice )
+      READ  ( numnatp_cfg, namp4zlim, IOSTAT = ios, ERR = 902 )
+902   IF( ios >  0 )   CALL ctl_nam ( ios , 'namp4zlim in configuration namelist', lwp )
+      IF(lwm) WRITE( numonp, namp4zlim )
       !
       IF(lwp) THEN                         ! control print
-         WRITE(numout,*) '   Namelist : namp4zice'
+         WRITE(numout,*) '   Namelist : namp4zlim'
          WRITE(numout,*) '      mean rainratio                           caco3r    = ', caco3r
          WRITE(numout,*) '      NO3 half saturation of nanophyto         concnno3  = ', concnno3
          WRITE(numout,*) '      NO3 half saturation of diatoms           concdno3  = ', concdno3
@@ -310,4 +310,4 @@ CONTAINS
    END FUNCTION p4z_lim_alloc
 
    !!======================================================================
-END MODULE p4zice
+END MODULE p4zlim

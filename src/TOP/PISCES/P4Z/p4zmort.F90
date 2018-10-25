@@ -13,7 +13,7 @@ MODULE p4zmort
    USE trc             ! passive tracers common variables 
    USE sms_pisces      ! PISCES Source Minus Sink variables
    USE p4zprod         ! Primary productivity 
-   USE p4zice          ! Phytoplankton limitation terms
+   USE p4zlim          ! Phytoplankton limitation terms
    USE prtctl_trc      ! print control for debugging
 
    IMPLICIT NONE

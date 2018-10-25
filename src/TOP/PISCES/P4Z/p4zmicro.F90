@@ -13,7 +13,7 @@ MODULE p4zmicro
    USE oce_trc         ! shared variables between ocean and passive tracers
    USE trc             ! passive tracers common variables 
    USE sms_pisces      ! PISCES Source Minus Sink variables
-   USE p4zice          ! Co-limitations
+   USE p4zlim          ! Co-limitations
    USE p4zprod         ! production
    USE iom             ! I/O manager
    USE prtctl_trc      ! print control for debugging

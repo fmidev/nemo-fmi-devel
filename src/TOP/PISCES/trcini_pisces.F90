@@ -61,7 +61,7 @@ CONTAINS
       USE p4zfechem       !  Iron chemistry
       USE p4zrem          !  Remineralisation of organic matter
       USE p4zflx          !  Gas exchange
-      USE p4zice          !  Co-limitations of differents nutrients
+      USE p4zlim          !  Co-limitations of differents nutrients
       USE p4zprod         !  Growth rate of the 2 phyto groups
       USE p4zmicro        !  Sources and sinks of microzooplankton
       USE p4zmeso         !  Sources and sinks of mesozooplankton
@@ -70,7 +70,7 @@ CONTAINS
       USE p4zsed          !  Sedimentation & burial
       USE p4zpoc          !  Remineralization of organic particles
       USE p4zligand       !  Remineralization of organic ligands
-      USE p5zice          !  Co-limitations of differents nutrients
+      USE p5zlim          !  Co-limitations of differents nutrients
       USE p5zprod         !  Growth rate of the 2 phyto groups
       USE p5zmicro        !  Sources and sinks of microzooplankton
       USE p5zmeso         !  Sources and sinks of mesozooplankton

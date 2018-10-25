@@ -16,11 +16,11 @@
    nrdttrc    =  4        ! time step frequency for biology
 /
 !-----------------------------------------------------------------------
-&namp4zice     !   parameters for nutrient limitations for PISCES std  - ln_p4z
+&namp4zlim     !   parameters for nutrient limitations for PISCES std  - ln_p4z
 !-----------------------------------------------------------------------
 /
 !-----------------------------------------------------------------------
-&namp5zice     !   parameters for nutrient limitations PISCES QUOTA    - ln_p5z
+&namp5zlim     !   parameters for nutrient limitations PISCES QUOTA    - ln_p5z
 !-----------------------------------------------------------------------
 /
 !-----------------------------------------------------------------------

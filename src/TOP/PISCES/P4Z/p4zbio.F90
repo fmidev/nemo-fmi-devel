@@ -14,12 +14,12 @@ MODULE p4zbio
    USE sms_pisces      !  PISCES Source Minus Sink variables
    USE p4zsink         !  vertical flux of particulate matter due to sinking
    USE p4zopt          !  optical model
-   USE p4zice          !  Co-limitations of differents nutrients
+   USE p4zlim          !  Co-limitations of differents nutrients
    USE p4zprod         !  Growth rate of the 2 phyto groups
    USE p4zmort         !  Mortality terms for phytoplankton
    USE p4zmicro        !  Sources and sinks of microzooplankton
    USE p4zmeso         !  Sources and sinks of mesozooplankton
-   USE p5zice          !  Co-limitations of differents nutrients
+   USE p5zlim          !  Co-limitations of differents nutrients
    USE p5zprod         !  Growth rate of the 2 phyto groups
    USE p5zmort         !  Mortality terms for phytoplankton
    USE p5zmicro        !  Sources and sinks of microzooplankton
