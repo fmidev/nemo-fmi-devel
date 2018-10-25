@@ -16,6 +16,7 @@ MODULE p4zsed
    USE p4zice          !  Co-limitations of differents nutrients
    USE p4zsbc          !  External source of nutrients 
    USE p4zint          !  interpolation and computation of various fields
+   USE sed             !  Sediment module
    USE iom             !  I/O manager
    USE prtctl_trc      !  print control for debugging
 
@@ -28,6 +29,7 @@ MODULE p4zsed
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: nitrpot    !: Nitrogen fixation 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:  ) :: sdenit     !: Nitrate reduction in the sediments
    REAL(wp) :: r1_rday                  !: inverse of rday
+   LOGICAL, SAVE :: lk_sed
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -69,6 +71,15 @@ CONTAINS
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )  CALL timing_start('p4z_sed')
+      !
+      IF( kt == nittrc000 .AND. knt == 1 )   THEN
+          r1_rday  = 1. / rday
+          IF (ln_sediment .AND. ln_sed_2way) THEN
+             lk_sed = .TRUE.
+          ELSE
+             lk_sed = .FALSE.
+          ENDIF
+      ENDIF
       !
       IF( kt == nittrc000 .AND. knt == 1 )   r1_rday  = 1. / rday
       !
@@ -184,16 +195,6 @@ CONTAINS
          tra(:,:,1,jptal) = tra(:,:,1,jptal) - rno3 * nitdep(:,:) * rfact2
       ENDIF
 
-      ! Add the external input of iron from sediment mobilization
-      ! ------------------------------------------------------
-      IF( ln_ironsed ) THEN
-                         tra(:,:,:,jpfer) = tra(:,:,:,jpfer) + ironsed(:,:,:) * rfact2
-         IF( ln_ligand ) tra(:,:,:,jpfep) = tra(:,:,:,jpfep) + ( ironsed(:,:,:) * fep_rats ) * rfact2
-         !
-         IF( lk_iomput .AND. knt == nrdttrc .AND. iom_use( "Ironsed" ) )   &
-            &   CALL iom_put( "Ironsed", ironsed(:,:,:) * 1.e+3 * tmask(:,:,:) ) ! iron inputs from sediments
-      ENDIF
-
       ! Add the external input of iron from hydrothermal vents
       ! ------------------------------------------------------
       IF( ln_hydrofe ) THEN
@@ -230,6 +231,17 @@ CONTAINS
       ENDIF
 
       IF( .NOT.lk_sed ) THEN
+!
+         ! Add the external input of iron from sediment mobilization
+         ! ------------------------------------------------------
+         IF( ln_ironsed ) THEN
+                            tra(:,:,:,jpfer) = tra(:,:,:,jpfer) + ironsed(:,:,:) * rfact2
+            IF( ln_ligand ) tra(:,:,:,jpfep) = tra(:,:,:,jpfep) + ( ironsed(:,:,:) * fep_rats ) * rfact2
+            !
+            IF( lk_iomput .AND. knt == nrdttrc .AND. iom_use( "Ironsed" ) )   &
+               &   CALL iom_put( "Ironsed", ironsed(:,:,:) * 1.e+3 * tmask(:,:,:) ) ! iron inputs from sediments
+         ENDIF
+
          ! Computation of the sediment denitrification proportion: The metamodel from midlleburg (2006) is being used
          ! Computation of the fraction of organic matter that is permanently buried from Dunne's model
          ! -------------------------------------------------------
