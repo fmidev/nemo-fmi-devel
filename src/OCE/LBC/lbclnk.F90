@@ -89,7 +89,7 @@ CONTAINS
    END INTERFACE
    !
    INTERFACE lbc_bdy_lnk
-      MODULE PROCEDURE lbc_bdy_lnk_2d, lbc_bdy_lnk_3d
+      MODULE PROCEDURE lbc_bdy_lnk_2d, lbc_bdy_lnk_3d, lbc_bdy_lnk_4d
    END INTERFACE
    !
    INTERFACE lbc_lnk_icb
@@ -172,12 +172,22 @@ CONTAINS
    !!======================================================================
 
    !!----------------------------------------------------------------------
-   !!                   ***  routine lbc_bdy_lnk_(2,3)d  ***
+   !!                   ***  routine lbc_bdy_lnk_(2,3,4)d  ***
    !!
    !!   wrapper rountine to 'lbc_lnk_3d'. This wrapper is used
    !!   to maintain the same interface with regards to the mpp case
    !!----------------------------------------------------------------------
    
+   SUBROUTINE lbc_bdy_lnk_4d( pt4d, cd_type, psgn, ib_bdy )
+      !!----------------------------------------------------------------------
+      REAL(wp), DIMENSION(:,:,:,:), INTENT(inout) ::   pt4d      ! 4D array on which the lbc is applied
+      CHARACTER(len=1)            , INTENT(in   ) ::   cd_type   ! nature of pt4d grid-points
+      REAL(wp)                    , INTENT(in   ) ::   psgn      ! sign used across north fold 
+      INTEGER                     , INTENT(in   ) ::   ib_bdy    ! BDY boundary set
+      !!----------------------------------------------------------------------
+      CALL lbc_lnk_4d( pt4d, cd_type, psgn)
+   END SUBROUTINE lbc_bdy_lnk_4d
+
    SUBROUTINE lbc_bdy_lnk_3d( pt3d, cd_type, psgn, ib_bdy )
       !!----------------------------------------------------------------------
       REAL(wp), DIMENSION(:,:,:), INTENT(inout) ::   pt3d      ! 3D array on which the lbc is applied
