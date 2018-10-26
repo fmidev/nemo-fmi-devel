@@ -7,17 +7,10 @@ Explore the test cases
 
 .. _Github repository:   https://github.com/sflavoni/NEMO-test-cases/
 
-CANAL
-=====
-
-  East-west periodic canal of variable size with several initial states and associated geostrophic currents (zonal jets or vortex)
-
-  .. image::_static/CANAL_image.gif
-
 ICEDYN
 ======
   
-  This is an East-t cases illustrate the advection of an ice patch across a East/West and North/South periodic channel. 
+  This test case illustrates the advection of an ice patch across a East/West and North/South periodic channel. 
   This configuration can be used to test the advection of the ice patch in an AGRIF zoom (1:3) 
   and across the AGRIF boundary or to test the ice advection schemes (Prather and Ultimate-Macho). 
   In the latest case user need to remove ``key_agrif`` out of the CPP keys list. 
@@ -29,8 +22,8 @@ VORTEX
   
   This test case illustrates the propagation of an anticyclonic eddy over a Beta plan and a flat bottom.
   It is implemented here with an online refined subdomain (1:3) out of which the vortex propagates.
-  It serves as a benchmark for quantitative estimates of nesting errors as in Debreu et al. (2012),
-  Penven et al. (2006) or Spall and Holland (1991).
+  It serves as a benchmark for quantitative estimates of nesting errors as in Debreu et al. (2012) :cite:`DEBREU2012`,
+  Penven et al. (2006) :cite:`PENVEN2006` or Spall and Holland (1991) :cite:`SPALL1991`.
   
   The animation below (sea level anomaly in meters) illustrates with two 1:2 successively nested grids how
   the vortex smoothly propagates out of the refined grids.
@@ -41,7 +34,7 @@ ISOMIP
 ======
 
   The purpose of this test case is to evaluate the impact of various schemes and new development with the iceshelf cavities circulation and melt.
-  This configuration served as initial assesment of the ice shelf module in Losh et al. (2008) and Mathiot et al. (2017). 
+  This configuration served as initial assesment of the ice shelf module in Losh et al. (2008) :cite:`LOSCH2008` and Mathiot et al. (2017) :cite:`MATHIOT2017`. 
   The default setup is the one described `here <http://staff.acecrc.org.au/~bkgalton/ISOMIP/test_cavities.pdf>`_.
   
   The figure below (meridional overturning circulation) illustrates the circulation generated after 10000 days by the ice shelf melting (ice pump).
@@ -52,10 +45,12 @@ LOCK_EXCHANGE
 =============
 
   The LOCK EXCHANGE experiment is a classical fluid dynamics experiment that has been adapted
-  by Haidvogel and Beckmann (1999) for testing advection schemes in ocean circulation models.
-  It has been used by several authors including Burchard and Bolding (2002) and Ilicak et al. (2012).
-  The LOCK EXCHANGE experiment can in particulart illustrate the impact of different choices of numerical schemes 
+  by Haidvogel and Beckmann (1999) :cite:`HAIDVOGEL1999` for testing advection schemes in ocean circulation models.
+  It has been used by several authors including Burchard and Bolding (2002) :cite:`BURCHARD2002` and Ilicak et al. (2012) :cite:`ILICAK2012`.
+  The LOCK EXCHANGE experiment can in particular illustrate the impact of different choices of numerical schemes 
   and/or subgrid closures on spurious interior mixing.
+
+  Below the animation of the LOCK_EXCHANGE test case using the advection scheme FCT4 (forth order) for tracer and ubs for dynamics.
 
   .. image:: _static/LOCK-FCT4_flux_ubs.gif
 
@@ -65,9 +60,10 @@ OVERFLOW
   The OVERFLOW experiment illustrates the impact of different choices of numerical schemes 
   and/or subgrid closures on spurious interior mixing close to bottom topography. 
   The OVERFLOW experiment is adapted from the non-rotating overflow configuration described 
-  in Haidvogel and Beckmann (1999) and further used by Ilicak et al. (2012).
-  Here we can assess the behaviour of the second-order tracer advection scheme FCT2 and fortht-order FCT4, 
-  with some exemple of python scripts into the notebook associated.
+  in Haidvogel and Beckmann (1999) :cite:`HAIDVOGEL1999` and further used by Ilicak et al. (2012) :cite:`ILICAK2012`.
+  Here we can assess the behaviour of the second-order tracer advection scheme FCT2 and fortht-order FCT4, z-coordinate and sigma coordinate (...).
+
+  Below the animation of the OVERFLOW test case in sigma coordinate with the forth-order advection scheme FCT4.
 
   .. image:: _static/OVF-sco_FCT4_flux_cen-ahm1000.gif
 
@@ -83,16 +79,38 @@ WAD
 
   .. image:: _static/wad_testcase_7.gif
 
+CANAL
+=====
+
+  East-west periodic canal of variable size with several initial states and associated geostrophic currents (zonal jets or vortex).
+
+  .. image::_static/CANAL_image.gif
+
+==================
+Compile test cases
+==================
+The compilation of the test cases is very similar to the manner the reference configurations are compiled.
+If you are not familiar on how to compile NEMO, it is first recomended to read the instruction 
+`here <http://forge.ipsl.jussieu.fr/nemo/wiki/Users/ModelInstall>`_
+
+| In the same manner as the ref. cfg are compiled with '-r' option, test cases can be compile by the use of makenemo with '-a' option.
+
+| Here an example to compile a copy named WAD2 of the wetting and drying test case (WAD) on the macport_osx architecture on 4 cores:
+
+.. code-block:: console
+                   
+        $ ./makenemo -n WAD2 -a WAD -m macport_osx -j 4
+
+=====================================
+Run and analyse the test cases
+=====================================
+There no requirement of specific input file for the test_cases presented here. The XIOS xml input files and namelist are already setup correctly. 
+All the detailed on how to run a specific test cases and Jupyter notebook are available on github `here <https://github.com/sflavoni/NEMO-test-cases>`_.
+
 ==========
 References
 ==========
-- Burchard, H., Bolding, K., 2002. GETM - a general estuarine transport model. Scientific documentation. Tech. Rep. EUR 20253 EN, European Commission.
-- Debreu, L., P. Marchesiello, P. Penven and G. Cambon, 2012: Two-way nesting in split-explicit ocean models: Algorithms, implementation and validation. Ocean Modelling, 49-50, 1-21.
-- Haidvogel, Dale B., and Aike Beckmann. Numerical ocean circulation modeling. Vol. 2. World Scientific, 1999. 
-- Haidvogel, Dale B., and Aike Beckmann. Numerical ocean circulation modeling. Vol. 2. World Scientific, 1999. 
-- Ilicak, Mehmet, et al. "Spurious dianeutral mixing and the role of momentum closure." Ocean Modelling 45 (2012): 37-58.
-- Ilicak, Mehmet, et al. "Spurious dianeutral mixing and the role of momentum closure." Ocean Modelling 45 (2012): 37-58.
-- Losch, M., 2008: Modeling ice shelf cavities in a z coordinate ocean general circulation model, J. Geophys. Res.-Oceans, 113, C08043.
-- Mathiot, P., Jenkins, A., Harris, C., and Madec, G., 2017: Explicit representation and parametrised impacts of under ice shelf seas in the z* coordinate ocean model NEMO 3.6, Geosci. Model Dev., 10, 2849-2874.
-- Penven, P., L. Debreu, P. Marchesiello and J. C. Mc Williams, 2006: Evaluation and application of the ROMS 1-way embedding procedure to the central california upwelling system. Ocean Modelling, 12, 157-187.
-- Spall, M. A. and W. R. Holland, 1991: A Nested Primitive Equation Model for Oceanic Applications. J. Phys. Ocean., 21, 205-220.
+
+..      bibliography:: test_cases.bib
+                :all:
+        :style: unsrt

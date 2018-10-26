@@ -1,7 +1,0 @@
-## List of available test cases is in demo_cfgs.txt
-
-## HOW TO COMPILE TEST CASES :
-
-In the same manner as ref. cfg with '-r' option, use makenemo with '-a' option
-
-./makenemo -n WAD2 -a WAD -m macport_osx -j 4
