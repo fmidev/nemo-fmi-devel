@@ -31,6 +31,7 @@ VORTEX
   It is implemented here with an online refined subdomain (1:3) out of which the vortex propagates.
   It serves as a benchmark for quantitative estimates of nesting errors as in Debreu et al. (2012),
   Penven et al. (2006) or Spall and Holland (1991).
+  
   The animation below (sea level anomaly in meters) illustrates with two 1:2 successively nested grids how
   the vortex smoothly propagates out of the refined grids.
   
@@ -39,11 +40,11 @@ VORTEX
 ISOMIP
 ======
 
-  Simple box configuration with an ice shelf covering all the domain. South part is a sloping ice shelf and north part is a flat ice shelf. 
-  The purpose of this test case is to evaluate the impact of various schemes and new development with iceshelf cavities.
-  This configuration served as initial assesment of the ice shelf module in Losh et al. (2008) and Mathiot et al. (2017).
+  The purpose of this test case is to evaluate the impact of various schemes and new development with the iceshelf cavities circulation and melt.
+  This configuration served as initial assesment of the ice shelf module in Losh et al. (2008) and Mathiot et al. (2017). 
+  The default setup is the one described `here <http://staff.acecrc.org.au/~bkgalton/ISOMIP/test_cavities.pdf>`_.
   
-  The default setup is the one described [http://staff.acecrc.org.au/~bkgalton/ISOMIP/test_cavities.pdf].
+  The figure below (meridional overturning circulation) illustrates the circulation generated after 10000 days by the ice shelf melting (ice pump).
 
   .. image:: _static/ISOMIP_moc.png
 
@@ -81,8 +82,6 @@ WAD
   The parameters are chosen such that the surge rises above sea-level before falling back and oscillating towards an equilibrium position
 
   .. image:: _static/wad_testcase_7.gif
-
-
 
 ==========
 References
