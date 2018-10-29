@@ -243,7 +243,7 @@ CONTAINS
          &            zdelta_clay / ( zsolcp_inv_i(jsclay) ) ,      & 
          &            zdelta_co2 / ( zsolcp_inv_i(jspoc) + zsolcp_inv_i(jspos) + zsolcp_inv_i(jspor) &
          &          + zsolcp_inv_i(jscal) + zpwcp_inv_i(jwdic) ),     &
-         &            zdelta_fe / ( zpwcp_inv_i(jwfe2)  + zsolcp_inv_i(jsfeo) + + zsolcp_inv_i(jsfes) ) ,  &
+         &            zdelta_fe / ( zpwcp_inv_i(jwfe2) + zsolcp_inv_i(jsfeo) + zsolcp_inv_i(jsfes) ) ,  &
          &            zdelta_no3 / ( zpwcp_inv_i(jwso4) + zpwcp_inv_i(jwh2s) + zsolcp_inv_i(jsfes) )
          WRITE(numsed,*)'=========================================================================='
 
