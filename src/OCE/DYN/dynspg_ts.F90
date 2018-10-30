@@ -1392,7 +1392,7 @@ CONTAINS
       !
       IF( TRIM(cdrw) == 'READ' ) THEN        ! Read/initialise 
          !                                   ! ---------------
-         IF( ln_rstart .AND. ln_bt_fw ) THEN    !* Read the restart file
+         IF( ln_rstart .AND. ln_bt_fw .AND. (neuler/=0) ) THEN    !* Read the restart file
             CALL iom_get( numror, jpdom_autoglo, 'ub2_b'  , ub2_b  (:,:), ldxios = lrxios )   
             CALL iom_get( numror, jpdom_autoglo, 'vb2_b'  , vb2_b  (:,:), ldxios = lrxios ) 
             CALL iom_get( numror, jpdom_autoglo, 'un_bf'  , un_bf  (:,:), ldxios = lrxios )   
