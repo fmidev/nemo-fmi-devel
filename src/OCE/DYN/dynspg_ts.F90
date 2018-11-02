@@ -1113,12 +1113,6 @@ CONTAINS
                             &                                 + zv_frc(ji,jj) ) &
                             &   ) * ssvmask(ji,jj)
  
-!jth implicit bottom friction:
-                  IF ( ll_wd ) THEN ! revert to explicit for bit comparison tests in non wad runs
-                     ua_e(ji,jj) =  ua_e(ji,jj) /(1.0 -   rdtbt * zCdU_u(ji,jj) * hur_e(ji,jj))
-                     va_e(ji,jj) =  va_e(ji,jj) /(1.0 -   rdtbt * zCdU_v(ji,jj) * hvr_e(ji,jj))
-                  ENDIF
-
                END DO
             END DO
             !
@@ -1143,6 +1137,15 @@ CONTAINS
                             &               + zhvp2_e(ji,jj)  * zv_trd(ji,jj)   &
                             &               +    hv_n(ji,jj)  * zv_frc(ji,jj) ) &
                             &   ) * zhvra
+               END DO
+            END DO
+         ENDIF
+!jth implicit bottom friction:
+         IF ( ll_wd ) THEN ! revert to explicit for bit comparison tests in non wad runs
+            DO jj = 2, jpjm1
+               DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ua_e(ji,jj) =  ua_e(ji,jj) /(1.0 -   rdtbt * zCdU_u(ji,jj) * hur_e(ji,jj))
+                     va_e(ji,jj) =  va_e(ji,jj) /(1.0 -   rdtbt * zCdU_v(ji,jj) * hvr_e(ji,jj))
                END DO
             END DO
          ENDIF
