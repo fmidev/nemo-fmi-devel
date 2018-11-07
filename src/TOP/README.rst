@@ -1,7 +1,6 @@
-TOP interface
-=============
-
-.. include:: .global.rst
+*********************
+Oceanic tracers (TOP)
+*********************
 
 .. contents::
 	:local:
@@ -16,9 +15,8 @@ evaluate dispersion processes (by means of MY_TRC), track water masses age (AGE 
 assess the ocean interior penetration of persistent chemical compounds (e.g., gases like CFC or even PCBs),
 up to the full set of equations involving marine biogeochemical cycles.
 
----------
 Structure
----------
+=========
 
 TOP interface has the following location in the source code ``./src/MBG/`` and
 the following modules are available:
@@ -72,9 +70,8 @@ Here below the list of preprocessing keys that applies to the TOP interface (bes
 ``key_trdtrc`` & ``key_trdmxl_trc``
 	trend computation for tracers
 
-------------------
 Synthetic Workflow
-------------------
+==================
 
 A synthetic description of the TOP interface workflow is given below to summarize the steps involved in
 the computation of biogeochemical and physical trends and their time integration and outputs,
@@ -124,9 +121,8 @@ call to trc_stp.F90 (trcstp.F90)
 
   ↳ call trc_rst_wri, output tracers restart files
 
----------------------
 Namelists walkthrough
----------------------
+=====================
 
 namelist_top
 ------------
@@ -234,9 +230,8 @@ Here below the description of namelist_trc_ref used to handle Carbon tracers mod
 
 |||| &'''namc14_fcg'''     !  files & dates ||
 
------------------------------------------------------
 ``MY_TRC`` interface for coupling external BGC models
------------------------------------------------------
+=====================================================
 
 The generalized interface is pivoted on MY_TRC module that contains template files to build the coupling between
 NEMO and any external BGC model.
@@ -276,9 +271,8 @@ The following 6 fortran files are available in MY_TRC with the specific purposes
 	It is possible to place here the output of additional variables produced by the model,
 	if not done elsewhere in the code, using the call to iom_put.
 
----------------------------------------------------
 Coupling an external BGC model using NEMO framework
----------------------------------------------------
+===================================================
 
 The coupling with an external BGC model through the NEMO compilation framework can be achieved in
 different ways according to the degree of coding complexity of the Biogeochemical model, like e.g.,

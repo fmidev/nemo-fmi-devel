@@ -1,11 +1,9 @@
-.. include:: .global.rst
-
+:Authors: NEMO System Team
 :Release: |release|
 :Date:    |today|
-            
-NEMO for *Nucleus for European Modelling of the Ocean* is a state-of-the-art modelling framework of 
-ocean related engines for oceanographic research, operational oceanography, seasonal forecast and 
-[paleo]climate studies.
+
+`NEMO`_ for *Nucleus for European Modelling of the Ocean* is a state-of-the-art modelling framework for
+research activities and forecasting services in ocean and climate sciences.
 
 .. contents::
 	:local:
@@ -13,17 +11,16 @@ ocean related engines for oceanographic research, operational oceanography, seas
 Overview
 ========
 
-Distributed under CeCILL license (GNU GPL compatible - see ``./LICENSE``),
-the NEMO ocean model has 3 major components:
+The NEMO ocean model has 3 major components:
 
-- :rstblue:`OPA` is fundamental to all users by modelling the ocean [thermo]dynamics and 
-  solving the primitive equations         (``./src/OCE``); :cite:`madec_bk08`
-- :rstgrey:`SI`\ :rstgreysup:`3` for sea-ice simulates ice [thermo]dynamics, brine inclusions and 
-  subgrid-scale thickness variations      (``./src/ICE``); :cite:`gmd-8-2991-2015,vancoppenolle200933`
-- :rstgreen:`TOP-PISCES` models biogeochemistry with TOP for the on/offline oceanic tracers transport and 
-  PISCES for the biogeochemical processes (``./src/MBG``). :cite:`gmd-8-2465-2015`
+- |OPA| models the ocean [thermo]dynamics and solves the primitive equations
+  (``./src/OCE``) :cite:`NEMO_manual`;
+- |SI3| simulates ice [thermo]dynamics, brine inclusions and subgrid-scale thickness variations
+  (``./src/ICE``) :cite:`SI3_manual`;
+- |TOP| models the [on|off]line oceanic tracers transport and the biogeochemical processes
+  (``./src/MBG``) :cite:`TOP_manual`.
 
-These physical engines are described in their respective reference publications that must be cited for
+These physical core engines are described in their respective <reference publications> that must be cited for
 any work related to their use.
 
 Applications and capabilities
@@ -32,50 +29,61 @@ Applications and capabilities
 Not only does the NEMO framework model the ocean circulation,
 it offers various features to enable
 
-- 2-way nesting package `AGRIF`_ to create :doc:`embedded zooms <zooms>` seamlessly
-- Flexible biogeochemistry with :doc:`online coarsening <coarsening>` and
-  opportunity to integrate an :doc:`alternative model <tracers>`
-- Versatile :doc:`data assimilation interface <data_assimilation>`
+- Create :doc:`embedded zooms <zooms>` seamlessly with 2-way nesting package `AGRIF`_.
+- :doc:`Low cost biogeochemistry <coarsening>` and :doc:`alternative model opportunity <tracers>`.
+- Versatile :doc:`assimilation <assimilation>`.
+- :doc:`Output diagnostics <diagnostics>` with `XIOS`_ server.
+- :doc:`Coupling <coupling>` via `OASIS`_ for Earth system modelling.
 
-lation a efficient XIOS_ server for outputing diagnostics a coupled via OASIS_ to alternative components or other models to enable Earth system modelling.
-
-| Several :doc:`builtins configurations <reference_configurations>` are provided to assess the skills and
-	performances of the model which can be used as templates for setting up a new configuration (``./cfgs``).
-| The end user could also find some :doc:`idealised test cases <test_cases>` on the web to serve as examples and
+| Several :doc:`builtins configurations <configurations>` are provided to assess the skills and performances of
+	the model which can be used as templates for :doc:`setting up a new configuration <setup>` (``./cfgs``).
+| The end user could also find some :doc:`idealised test cases <test_cases>` online to serve as templates and
 	to study particular processes (``./tests``).
 
-A set of tools is also provided to setup your own configuration and [pre|post]process your data (``./tools``).
+A set of :doc:`utilities <tools>` is also provided to [pre|post]process your data (``./tools``).
 
 Literature
 ==========
 
-| The NEMO reference manual and a quick start guide can be generated from Latex and RST source code files
-	(``./doc``), either in PDF or in HTML format, but it might require some additional installations.
-| In any case, both formats are available online: `HTML`_ | `PDF`_
+:doc:`install`
 
-| Since 2014 the project has a `Special Issue`_ in the open-access journal Geoscientific Model Development (GMD) 
-	from the European Geosciences Union (EGU).
-	The main scope is to collect relevant manuscripts which cover a wide variety of topics like
-	process studies, new parameterizations, implementation of new model features and new NEMO configurations.
-| Also it provides a single portal to search, discover and understand about
-	the NEMO modelling framework potential and evolution and to submit their contributions. 
+The reference documentation is archived online
+
++-------+-------------------+----------------+
+|       | Reference manual  | |NEMO manual|_ |
+| |OPA| +-------------------+----------------+
+|       | Quick start guide | |NEMO guide|_  |
++-------+-------------------+----------------+
+| |SI3|                     | |SI3 manual|_  |
++---------------------------+----------------+
+| |TOP|                     | |TOP manual|_  |
++---------------------------+----------------+
+
+.. |NEMO manual| image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1464816.svg
+.. |NEMO guide|  image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1475325.svg
+.. |SI3 manual|  image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1471689.svg
+.. |TOP manual|  image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1471700.svg
+
+| Reference manuals and quick start guide can be build from source and exported to HTML or PDF (``./doc``).
+| In any case, one can find them online:
+
+Since 2014 the project has a `Special Issue <http://www.geosci-model-dev.net/special_issue40.html>`_ in
+the open-access journal Geoscientific Model Development (GMD) from the European Geosciences Union (EGU).
+The main scope is to collect relevant manuscripts covering various topics and to provide a single portal to
+assess the model potential and evolution.
+
+Used by a wide audience, numerous :website:`associated projects <projects>` have been carried out and
+extensive :website:`bibliography <bibliography/publications>` published.
 
 Community development
 =====================
 
-| The NEMO Consortium gathering 6 European institutes (`CMCC`_, `CNRS`_, `MOI`_, `Met Office`_ and `NERC`_)
-	organises the sustainable development in order to keep a reliable evolving system since 2008.
-| It defines the multi-year development strategy which is implemented by the NEMO System Team.
+| The NEMO Consortium pulling together 5 European institutes (`CMCC`_, `CNRS`_, `MOI`_, `Met Office`_ and `NERC`_)
+	plans the sustainable development in order to keep a reliable evolving framework since 2008.
+| It defines the |NEMO strategy|_ which is implemented by the System Team on
+	a yearly basis in	order to release a new version almost every four years.
 
-When the need arises, `Working Groups`_ are created or resumed to gather the expertise in the community in order to
-focus the development work on a specific subject or major component of the framework.
+.. |NEMO strategy| replace:: multi-year development strategy
 
-How to cite NEMO
-================
-
-..	bibliography:: references.bib
-	:all:
-	:style: unsrt
-
-.. _HTML:           http://www.nemo-ocean.eu/doc
-.. _PDF:            http://www.nemo-ocean.eu/wp-content/uploads/NEMO_book.pdf
+When the need arises, :forge:`working groups <wiki/WorkingGroups>` are created or resumed to
+gather the community expertise for advising on the development activities.

@@ -1,14 +1,17 @@
-======================
+**********************
 Explore the test cases
-======================
+**********************
+
+.. contents::
+	:local:
+
+List
+====
 
   The description below is a brief description of the test cases available in NEMO. 
-  For detailed description and notebook, the reader is directed on the `Github repository`_
-
-.. _Github repository:   https://github.com/sflavoni/NEMO-test-cases/
 
 ICEDYN
-======
+------
   
   This test case illustrates the advection of an ice patch across a East/West and North/South periodic channel. 
   This configuration can be used to test the advection of the ice patch in an AGRIF zoom (1:3) 
@@ -18,7 +21,7 @@ ICEDYN
   .. image:: _static/ICEDYN_UDIAG_43days_UM5.gif
 
 VORTEX
-======
+------
   
   This test case illustrates the propagation of an anticyclonic eddy over a Beta plan and a flat bottom.
   It is implemented here with an online refined subdomain (1:3) out of which the vortex propagates.
@@ -31,7 +34,7 @@ VORTEX
   .. image:: _static/VORTEX_anim.gif
 
 ISOMIP
-======
+------
 
   The purpose of this test case is to evaluate the impact of various schemes and new development with the iceshelf cavities circulation and melt.
   This configuration served as initial assesment of the ice shelf module in Losh et al. (2008) :cite:`LOSCH2008` and Mathiot et al. (2017) :cite:`MATHIOT2017`. 
@@ -42,7 +45,7 @@ ISOMIP
   .. image:: _static/ISOMIP_moc.png
 
 LOCK_EXCHANGE
-=============
+-------------
 
   The LOCK EXCHANGE experiment is a classical fluid dynamics experiment that has been adapted
   by Haidvogel and Beckmann (1999) :cite:`HAIDVOGEL1999` for testing advection schemes in ocean circulation models.
@@ -55,7 +58,7 @@ LOCK_EXCHANGE
   .. image:: _static/LOCK-FCT4_flux_ubs.gif
 
 OVERFLOW
-========
+--------
 
   The OVERFLOW experiment illustrates the impact of different choices of numerical schemes 
   and/or subgrid closures on spurious interior mixing close to bottom topography. 
@@ -68,7 +71,7 @@ OVERFLOW
   .. image:: _static/OVF-sco_FCT4_flux_cen-ahm1000.gif
 
 WAD
-===
+---
 
   A set of simple closed basin geometries for testing the Wetting and drying capabilities. 
   Examples range from a closed channel with EW linear bottom slope to a parabolic EW channel with a Gaussian ridge.
@@ -80,37 +83,37 @@ WAD
   .. image:: _static/wad_testcase_7.gif
 
 CANAL
-=====
+-----
 
   East-west periodic canal of variable size with several initial states and associated geostrophic currents (zonal jets or vortex).
 
   .. image::_static/CANAL_image.gif
 
-==================
 Compile test cases
 ==================
+
 The compilation of the test cases is very similar to the manner the reference configurations are compiled.
-If you are not familiar on how to compile NEMO, it is first recomended to read the instruction 
-`here <http://forge.ipsl.jussieu.fr/nemo/wiki/Users/ModelInstall>`_
+If you are not familiar on how to compile NEMO, it is first recomended to read :doc:`the instructions <install>`
 
 | In the same manner as the ref. cfg are compiled with '-r' option, test cases can be compile by the use of makenemo with '-a' option.
 
 | Here an example to compile a copy named WAD2 of the wetting and drying test case (WAD) on the macport_osx architecture on 4 cores:
 
 .. code-block:: console
-                   
-        $ ./makenemo -n WAD2 -a WAD -m macport_osx -j 4
+ 
+	$ ./makenemo -n WAD2 -a WAD -m macport_osx -j 4
 
-=====================================
 Run and analyse the test cases
-=====================================
-There no requirement of specific input file for the test_cases presented here. The XIOS xml input files and namelist are already setup correctly. 
-All the detailed on how to run a specific test cases and Jupyter notebook are available on github `here <https://github.com/sflavoni/NEMO-test-cases>`_.
+==============================
 
-==========
+There no requirement of specific input file for the test_cases presented here. The XIOS xml input files and namelist are already setup correctly. 
+For detailed description and Jupyter notebook, the reader is directed on
+the `NEMO test cases repository <http://github.com/NEMO-ocean/NEMO-examples>`_
+
 References
 ==========
 
-..      bibliography:: test_cases.bib
-                :all:
-        :style: unsrt
+.. bibliography:: test_cases.bib
+	:all:
+	:style: unsrt
+	:labelprefix: T

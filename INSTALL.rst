@@ -1,10 +1,8 @@
-=====================
+*********************
 Install the framework
-=====================
+*********************
 
-.. include:: .global.rst
-
-.. contents:: \
+.. contents::
 	:local:
       
 Dependencies
@@ -23,40 +21,42 @@ you will probably have to compile them from source for enabling parallel I/O sup
 Extract the source code
 =======================
 
-Download the source code 
+Download the source code
+------------------------
 
 .. code:: console
 
 	$ svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/release-4.0
 
 Description of directory tree
-=============================
+-----------------------------
 
-+-----------+---------------------------------------------------------------+
-| Folder    | Purpose                                                       |
-+===========+===============================================================+
-| ``arch``  | Settings (per architecture-compiler pair)                     |
-+-----------+---------------------------------------------------------------+
-| ``cfgs``  | Reference configurations                                      |
-+-----------+---------------------------------------------------------------+
-| ``doc``   | - ``latex``: reference manuals for NEMO, SI\ :sup:`3`\  & TOP |
-|           | - ``rst``:   quick start guide                                |
-+-----------+---------------------------------------------------------------+
-| ``ext``   | Dependencies included (AGRIF, FCM & IOIPSL)                   |
-+-----------+---------------------------------------------------------------+
-| ``mk``    | Building  routines                                            |
-+-----------+---------------------------------------------------------------+
-| ``src``   | Modelling routines                                            |
-|           |                                                               |
-|           | - ``ICE``: SI\ :sup:`3`\ for sea ice                          |
-|           | - ``NST``: AGRIF         for embedded zooms                   |
-|           | - ``OCE``: OPA           for ocean dynamics                   |
-|           | - ``MBG``: TOP           for tracers                          |
-+-----------+---------------------------------------------------------------+
-| ``tests`` | Test cases                                                    |
-+-----------+---------------------------------------------------------------+
-| ``tools`` | Utilities to [pre|post]process data                           |
-+-----------+---------------------------------------------------------------+
++-----------+------------------------------------------------------------+
+| Folder    | Purpose                                                    |
++===========+============================================================+
+| ``arch``  | Settings (per architecture-compiler pair)                  |
++-----------+------------------------------------------------------------+
+| ``cfgs``  | :doc:`Reference configurations <configurations>`           |
++-----------+------------------------------------------------------------+
+| ``doc``   | - ``latex``: reference manuals for |OPA|, |SI3| & |TOP|    |
+|           | - ``namelists``: k start guide                             |
+|           | - ``rst``:   quick start guide                             |
++-----------+------------------------------------------------------------+
+| ``ext``   | Dependencies included (AGRIF, FCM & IOIPSL)                |
++-----------+------------------------------------------------------------+
+| ``mk``    | Building  routines                                         |
++-----------+------------------------------------------------------------+
+| ``src``   | Modelling routines                                         |
+|           |                                                            |
+|           | - ``ICE``: |SI3| for sea ice                               |
+|           | - ``NST``: AGRIF for embedded zooms                        |
+|           | - ``OCE``: |OPA| for ocean dynamics                        |
+|           | - ``MBG``: |TOP| for tracers                               |
++-----------+------------------------------------------------------------+
+| ``tests`` | :doc:`Test cases <test_cases>` (unsupported)               |
++-----------+------------------------------------------------------------+
+| ``tools`` | :doc:`Utilities <tools>` to [pre|post]process data         |
++-----------+------------------------------------------------------------+
 
 Extract and install XIOS
 ========================
@@ -120,14 +120,12 @@ More options
 ..
 	.. literalinclude::
 
------------------
 Default behaviour
 -----------------
 
     At the first use, you need the -m option to specify the architecture configuration file (compiler and its options, routines and libraries to include), then for next compilation, it is assumed you will be using the same compiler.
     If –n option is not specified, ORCA2_LIM is the default configuration used. 
 
------------------------------
 Tools used during the process
 -----------------------------
 
@@ -135,7 +133,6 @@ Tools used during the process
     cfg.txt : text list of configurations and source directories
     bld.cfg : FCM rules to compile 
 
---------
 Examples
 --------
 
@@ -162,9 +159,8 @@ Examples
         echo "Example to add and remove keys for a new configuration, and do not compile";
         echo "./makenemo -n MY_CONFIG -j0 add_key \"key_iomput key_mpp_mpi\" del_key \"key_agrif\" ";
 
------------------
 Running the model
------------------
+=================
 
 Once makenemo has run successfully, the opa executable is available in ``CONFIG/MY_CONFIG/EXP00``
 For the reference configurations, the EXP00 folder also contains the initial input files (namelists, \*xml files for the IOs…). If the configuration also needs NetCDF input files, this should be downloaded here from the corresponding tar file, see Users/Reference Configurations
@@ -172,9 +168,8 @@ For the reference configurations, the EXP00 folder also contains the initial inp
    cd 'MY_CONFIG'/EXP00
    mpirun -n $NPROCS ./opa    # $NPROCS is the number of processes ; mpirun is your MPI wrapper
 
---------------------------------------------
 Viewing and changing list of active CPP keys
---------------------------------------------
+============================================
 
 For a given configuration (here called MY_CONFIG), the list of active CPP keys can be found in::
 

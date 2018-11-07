@@ -1,7 +1,6 @@
-Data assimilation
-=================
-
-.. include:: .global.rst
+**************************************
+Data assimilation (OBS/SAO, ASM & TAM)
+**************************************
 
 .. contents::
    :local:
@@ -11,12 +10,11 @@ The assimilation interface to NEMO is split into three modules.
 - ASM for the application of increments and model bias correction (based on the assimilation increments).
 - TAM the tangent linear and adjoint model.
 
-Please see the `NEMO reference manual`_ for more details including information about the input file formats and
+Please see the `NEMO manual`_ for more details including information about the input file formats and
 the namelist settings.
 
---------------------------------------
 Observation and model comparison (OBS)
---------------------------------------
+======================================
 
 The observation and model comparison code (OBS) reads in observation files (profile temperature and salinity,
 sea surface temperature, sea level anomaly, sea ice concentration, and velocity) and
@@ -27,7 +25,7 @@ can be used for validation or verification of model or any other data assimilati
 This is all controlled by the namelist.
 To build with the OBS code active ``key_diaobs`` must be set. 
 
-More details in the `NEMO reference manual`_ chapter 12.
+More details in the `NEMO manual`_ chapter 12.
 
 Standalone observation operator (SAO)
 -------------------------------------
@@ -42,11 +40,10 @@ Then include ``SAO`` at the end of the relevant line in ``cfg.txt`` file.
 Then recompile with the replacement main program in ``./src/SAO``.
 This is a special version of ``nemogcm.F90`` (which doesn't run the model, but reads in the model fields, and
 observations and runs the OBS code.
-See section 12.4 of the `NEMO reference manual`_.
+See section 12.4 of the `NEMO manual`_.
 
------------------------------------
 Apply assimilation increments (ASM)
------------------------------------
+===================================
 
 The ASM code adds the functionality to apply increments to the model variables:
 temperature, salinity, sea surface height, velocity and sea ice concentration.
@@ -55,12 +52,9 @@ The code can also output model background fields which are used as an input to d
 This is all controlled by the namelist nam_asminc.
 To build the ASM code ``key asminc`` must be set.
 
-More details in the `NEMO reference manual`_ chapter 13.
+More details in the `NEMO manual`_ chapter 13.
 
---------------------------------
 Tangent linear and adjoint (TAM)
---------------------------------
+================================
 
 This is the tangent linear and adjoint code of NEMO which is useful to 4D VAR assimilation.
-
-.. _NEMO reference manual: http://doi.org/10.5281/zenodo.

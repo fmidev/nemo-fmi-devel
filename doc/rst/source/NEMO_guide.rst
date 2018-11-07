@@ -1,37 +1,9 @@
-.. NEMO documentation master file, created by
-   sphinx-quickstart on Tue Oct  9 18:14:01 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 #################
 Quick Start Guide
 #################
 
 ..
-	A hidden .global.rst should be included in every subfiles with `include` directive
-   It contains a list of common URL links 
-     
-.. include:: .global.rst
-
-.. include:: readme.rst
-
-Summary
-=======
-
-.. toctree::
-	:maxdepth: 1
-	:titlesonly:
-
-	release_notes.rst
-	install.rst
-	reference_configurations.rst
-	test_cases.rst
-	setup_configuration.rst
-	interfacing_options.rst
-	definitions.rst
-
-..
-   For headings markup, this convention is recommended from Python’s Style Guide
+	For headings markup, this convention is recommended from Python’s Style Guide
 	# with overline, for parts
 	* with overline, for chapters
 	=, for sections
@@ -39,9 +11,64 @@ Summary
 	^, for subsubsections
 	", for paragraphs
 
-..
-	Indices and tables
-	==================
-	* :ref:`genindex`
-	* :ref:`modindex`
-	* :ref:`search`
+	'global.rst' contains a list of common directives (roles, substitutions and URL links)
+	It is loaded for each file thanks to 'rst_epilog' setting in 'conf.py'
+
+.. toctree::
+	:hidden:
+
+	release_notes.rst
+
+.. toctree::
+	:hidden:
+	:caption: Getting started
+
+	install
+	configurations
+	test_cases
+
+.. toctree::
+	:hidden:
+	:caption: Setup your configuration
+
+	setup
+	diagnostics
+	tools
+
+.. toctree::
+	:hidden:
+	:caption: Advanced use
+
+	zooms
+	coarsening
+	coupling
+	assimilation
+	tracers
+
+.. toctree::
+	:hidden:
+	:caption: Glossary
+
+	definitions
+
+.. include:: readme.rst
+
+.. Next headings markup acording to readme.rst
+
+How to cite NEMO
+================
+
+..	bibliography:: references.bib
+	:all:
+	:style: unsrt
+	:labelprefix: R
+
+Disclaimer
+==========
+
+The NEMO source code is freely available and distributed under CeCILL license
+(GNU GPL compatible - see ``./LICENSE``).
+
+You can use, modify and/or redistribute the software under its terms,
+but users are provided only with a limited warranty and the software's authors and
+the successive licensor's have only limited liability.

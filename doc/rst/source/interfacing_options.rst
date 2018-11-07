@@ -2,13 +2,18 @@
 Interfacing options
 ===================
 
-.. include:: .global.rst
-
-.. contents::
+..
+	contents::
 	:local:
 	:depth: 1
 
 .. include:: zooms.rst
+
+.. bibliography:: zooms.bib
+	:all:
+	:style: unsrt
+	:labelprefix: A
+	:keyprefix: a-
 
 ----
 
@@ -20,7 +25,7 @@ Interfacing options
 
 ----
 
-.. include:: data_assimilation.rst
+.. include:: assimilation.rst
 
 ----
 

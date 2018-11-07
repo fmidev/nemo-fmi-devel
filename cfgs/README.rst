@@ -1,16 +1,11 @@
-=====================
-Build a configuration
-=====================
-
-.. include:: .global.rst
+*****************************
+Run a reference configuration
+*****************************
 
 .. contents::
 	:local:
 	:depth: 1
       
-.. role:: underline 
-   :class: underline
-
 Official configurations
 =======================
 
@@ -46,7 +41,6 @@ Official configurations
 | `SPITZ12`_           |  X  |  X  |     |        |       | `SPITZ12_v4.0.tar`_           |
 +----------------------+-----+-----+-----+--------+-------+-------------------------------+
 
-----------
 AGRIF_DEMO
 ----------
 
@@ -77,7 +71,6 @@ Corresponding ``AGRIF_FixedGrids.in`` file is given by::
 	38 80 71 111 3 3 3
 	0
 
------
 AMM12
 -----
 
@@ -100,7 +93,6 @@ Sample surface fluxes, river forcing and a sample initial restart file are inclu
 The Baltic boundary is included within the river input file and is specified as a river source.
 Unlike ordinary river points the Baltic inputs also include salinity and temperature data.
 
---------
 C1D_PAPA
 --------
 
@@ -126,14 +118,12 @@ The inputs tar file includes:
   (``init_PAPASTATION_m06d15.nc``)
 - surface chlorophyll file (``chlorophyll_PAPASTATION.nc``) deduced from Seawifs data.
 
---------
 GYRE_BFM
 --------
 
 ``GYRE_BFM`` is the same configuration as `GYRE_PISCES`_, except that PISCES is replaced by
 BFM biogeochemichal model in coupled mode.
 
------------
 GYRE_PISCES
 -----------
 
@@ -144,7 +134,7 @@ GYRE_PISCES
 | This configuration is coupled to `PISCES biogeochemical model`_.
 
 Running GYRE as a benchmark
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This simple configuration can be used as a benchmark since it is easy to increase resolution
 (and in this case no physical meaning of outputs):
@@ -205,7 +195,6 @@ The GYRE CPP keys, namelists and scripts can be explored in the ``GYRE`` configu
 Find monthly mean outputs of 1 year run here:
 http://prodn.idris.fr/thredds/catalog/ipsl_public/reee451/NEMO_OUT/GYRE/catalog.html
 
-----------------
 ORCA2_ICE_PISCES
 ----------------
 
@@ -292,7 +281,6 @@ ORCA2_ICE_PISCES is a reference configuration with the following characteristics
   continents, ready to be used for on the fly option:
   `COREII`_ forcing files extrapolated on continents
 
-----------------
 ORCA2_OFF_PISCES
 ----------------
 
@@ -304,7 +292,6 @@ See `ORCA2_ICE_PISCES`_ for general description of ORCA2.
 The input files for PISCES are needed, in addition the dynamical fields are used as input.
 They are coming from a 2000 years of an ORCA2_LIM climatological run using ERA40 atmospheric forcing.
 
--------------
 ORCA2_OFF_TRC
 -------------
 
@@ -319,7 +306,6 @@ a user-defined tracer.
 The dynamical fields are used as input, they are coming from a 2000 years of an ORCA2_LIM climatological run using
 ERA40 atmospheric forcing.
 
--------------
 ORCA2_SAS_ICE
 -------------
 
@@ -334,9 +320,8 @@ See `ORCA2_ICE_PISCES`_ for general description of ORCA2.
 
 Same input files as `ORCA2_ICE_PISCES`_ are needed plus fields from a previous ORCA2_LIM run.
 
-More informations on input and configuration files in `NEMO Reference manual`_.
+More informations on input and configuration files in `NEMO manual`_.
 
--------
 SPITZ12
 -------
 
@@ -357,7 +342,6 @@ these projects are welcome to publicize it here: http://www.nemo-ocean.eu/projec
 .. _ORCA2_OFF_v4.0.tar:           http://prodn.idris.fr/thredds/fileServer/ipsl_public/romr005/Online_forcing_archives/ORCA2_OFF_v4.0.tar
 .. _ORCA2_ICE_v4.0.tar:           http://prodn.idris.fr/thredds/fileServer/ipsl_public/romr005/Online_forcing_archives/ORCA2_ICE_v4.0.tar
 .. _INPUTS_SAS_v4.0.tar:          http://prodn.idris.fr/thredds/fileServer/ipsl_public/romr005/Online_forcing_archives/INPUTS_SAS_v4.0.tar
-.. _NEMO Reference manual:        http://forge.ipsl.jussieu.fr/nemo/doxygen/index.html?doc=NEMO
 .. _INPUTS_C1D_PAPA_v4.0.tar:     http://prodn.idris.fr/thredds/fileServer/ipsl_public/romr005/Online_forcing_archives/INPUTS_C1D_PAPA_v4.0.tar
 .. _Reffray 2015:                 http://www.geosci-model-dev.net/8/69/2015
 .. _COREII:                       http://prodn.idris.fr/thredds/catalog/ipsl_public/reee512/ORCA2_ONTHEFLY/FILLED_FILES/catalog.html

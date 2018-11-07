@@ -1,17 +1,12 @@
+**********************************
 On line biogeochemistry coarsening
-==================================
-
-.. include:: .global.rst
+**********************************
 
 .. contents::
    :local:
 
-.. role:: underline 
-   :class: underline
-
-------------
 Presentation
-------------
+============
 
 A capacity of coarsening physics to force a BGC model coupled to NEMO has been developed.
 This capacity allow to run 'online' a BGC model coupled to OCE-SI3 with a lower resolution,
@@ -19,31 +14,38 @@ to reduce the CPU cost of the BGC model, while preserving the effective resoluti
 
 A presentation is available [attachment:crs_wiki_1.1.pdf​ here], where the methodology is presented.
 
------------------------------------------------------
 What is available and working for now in this version
------------------------------------------------------
+=====================================================
 
 [To be completed]
 
-----------------------------------------------
 Description of the successful validation tests
-----------------------------------------------
+==============================================
 
 [To be completed]
 
-------------------------------------------------------------------
 What is not working yet with on line coarsening of biogeochemistry
-------------------------------------------------------------------
+==================================================================
 
 [To be completed]
 
 ''should include precise explanation on MPI decomposition problems too''
 
----------------------------------------------
 How to set up and use on line biogeochemistry
----------------------------------------------
+=============================================
 
-:underline:`How to activate coarsening?`
+Extract the on line biogeochemistry branch
+------------------------------------------
+
+To get the appropriate source code with the on line coarsening of biogeochemistry feature:
+
+.. code-block:: console
+
+	$ svn co https://forge.ipsl.jussieu.fr/nemo/browser/NEMO/branches/2018/dev_r5003_MERCATOR6_CRS
+
+
+How to activate coarsening?
+---------------------------
 
 To activate the coarsening, ``key_crs`` should be added to list of CPP keys.
 This key will only activate the coarsening of dynamics.
@@ -82,14 +84,16 @@ Some parameters are available in the namelist_cfg:
 - ``ln_crs_top = .true.``: should be activated to run BCG model in coarsened space;
   so only works when ``key_top`` is in the cpp list and eventually ``key_pisces`` or ``key_my_trc``.
 
-:underline:`Choice of operator to coarsene KZ`
+Choice of operator to coarsene KZ
+---------------------------------
 
 A sensiblity test has been done with an Age tracer to compare the different operators.
 The 3 and 4 options seems to provide the best results.
 
 Some results can be found [xxx here]
 
-:underline:`Example of xml files to output coarsened variables with XIOS`
+Example of xml files to output coarsened variables with XIOS
+------------------------------------------------------------
 
 In the [attachment:iodef.xml iodef.xml]  file, a "nemo" context is defined and
 some variable defined in [attachment:file_def.xml file_def.xml] are writted on the ocean-dynamic grid.  
@@ -97,7 +101,8 @@ To write variables on the coarsened grid, and in particular the passive tracers,
 a "nemo_crs" context should be defined in [attachment:iodef.xml iodef.xml] and
 the associated variable are listed in [attachment:file_crs_def.xml file_crs_def.xml ].
 
-:underline:`Passive tracers tracers initial conditions`
+Passive tracers tracers initial conditions
+------------------------------------------
 
 When initial conditions are provided in NetCDF files, the field might be:
 
@@ -131,11 +136,13 @@ When initial conditions are provided in NetCDF files, the field might be:
 		
 	   	cn_dir        =  './'      !  root directory for the location of the data files
 
-:underline:`PISCES forcing files`
+PISCES forcing files
+--------------------
 
 They might be on the coarsened grid.
 
-:underline:`Perspectives`
+Perspectives
+============
 
 For the future, a few options are on the table to implement coarsening for biogeochemistry in 4.0 and
 future releases.

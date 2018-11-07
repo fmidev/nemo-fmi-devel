@@ -1,8 +1,6 @@
-======================
+**********************
 What's new in NEMO 4.0
-======================
-
-.. include:: .global.rst
+**********************
 
 .. contents::
 	:local:
@@ -207,6 +205,7 @@ Environment
 .. _sea ice working group:       http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/SI3
 .. _TOP User Quick Guide:        http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/top-dg/TOP-UserQuickGuide
 
+.. The following references should be in the manual bibliographies and referenced via 'bibliography' directive
 .. _Brodeau 2017:                http://doi.org/10.1175/JPO-D-16-0169.1
 .. _Holland 2012:                http://doi.org/10.1175/JCLI-D-11-00078.1
 .. _Lupkes 2012:                 http://doi.org/10.1029/2012JD017630

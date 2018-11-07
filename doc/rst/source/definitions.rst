@@ -1,10 +1,8 @@
-===========
+***********
 Definitions
-===========
+***********
 
-.. include:: .global.rst
-
-AGRIF
+`AGRIF`_
 	*Adaptive Grid Refinement In Fortran*, 
 	package for the integration of full adaptive mesh refinement features within 
 	an existing multidimensional finite difference model
@@ -13,7 +11,7 @@ SI\ :sup:`3`\
 	*Sea Ice Integrated Initiative*, 
 	unified sea ice model merging functionalities from CICE, GELATO and LIM into the NEMO framework
 
-OASIS
+`OASIS`_
 	*Ocean Atmosphere Sea Ice Soil*, 
 	coupling software to synchronise numerical codes representing different components of the climate system
 
@@ -30,6 +28,6 @@ TOP
 	*Tracers in Ocean Paradigm*, 
 	on/off-line oceanic tracers transport and biogeochemistry models
 
-XIOS
+`XIOS`_
 	*XML Input Output Server*, 
 	library dedicated to input/output management of climate code

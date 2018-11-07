@@ -1,22 +1,21 @@
-Inputs-Outputs with XIOS
-========================
-
-.. include:: .global.rst
+******************
+Diagnostics (XIOS)
+******************
 
 .. contents::
+	:local:
 
 | Output of diagnostics in NEMO is usually done using XIOS.
   This is an efficient way of writing diagnostics because the time averaging, file writing and even
   some simple arithmetic or regridding is carried out in parallel to the NEMO model run.
 | This page gives a basic introduction to using XIOS with NEMO.
-  Much more information is available from the XIOS homepage above and from the `Reference Manual`_.
+  Much more information is available from the XIOS homepage above and from the `NEMO manual`_.
 
 Use of XIOS for diagnostics is activated using the pre-compiler key ``key_iomput``.
 The default version of XIOS is the 2.0 release. 
 
-------------------------------
 Extracting and installing XIOS
-------------------------------
+==============================
 
 1. Install the NetCDF4 library.
    If you want to use single file output you will need to compile the HDF & NetCDF libraries to allow parallel IO.
@@ -27,13 +26,13 @@ Extracting and installing XIOS
 
 		$ svn co ​http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/branchs/xios-2.0 xios-2.0
 
-   and follow the instructions in `XIOS documentation`_ to compile it.
-   If you find problems at this stage, support can be found by subscribing to the `XIOS users mailing list`_ and
-   sending a mail message to it. 
+	and follow the instructions in :xios:`XIOS documentation <wiki/documentation>` to compile it.
+	If you find problems at this stage, support can be found by subscribing to the `XIOS mailing list
+	<http://forge.ipsl.jussieu.fr/mailman/listinfo.cgi/xios-users>`_
+	and sending a mail message to it. 
 
----------
 Namelists
----------
+=========
 
 XIOS is controlled using xml input files that should be copied to your model run directory before
 running the model.
@@ -46,9 +45,8 @@ Also the definition of the output files has been moved from the ``iodef.xml`` fi
 separate ``file_definition.xml`` files which are included in the ``iodef.xml`` file.
 Note that the ``domain_def.xml`` file is also different for XIOS 2.0.
 
------
 Modes
------
+=====
 
 Detached Mode
 -------------
@@ -80,9 +78,8 @@ and don't allocate any cores to XIOS.
 Note that due to the different domain decompositions between XIOS and NEMO if
 the total number of cores is larger than the number of grid points in the j direction then the model run will fail.
 
-------------------------------
-Adding new diagnostics to NEMO
-------------------------------
+Adding new diagnostics
+======================
 
 If you want to add a NEMO diagnostic to the NEMO code you will need to do the following:
 

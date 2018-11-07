@@ -1,14 +1,12 @@
-Embedded zooms with AGRIF
-=========================
-
-.. include:: .global.rst
+**********************
+Embedded zooms (AGRIF)
+**********************
 
 .. contents::
    :local:
 
---------
 Overview
---------
+========
 
 AGRIF (Adaptive Grid Refinement In Fortran) is a library that allows the seamless space and time refinement over
 rectangular regions in NEMO.
@@ -18,9 +16,8 @@ the child grid provides volume averages of prognostic variables once a given num
 These pages provide guidelines how to use AGRIF in NEMO.
 For a more technical description of the library itself, please refer to http://agrif.imag.fr.
 
------------
 Compilation
------------
+===========
 
 Activating AGRIF requires to append the cpp key ``key_agrif`` at compilation time: 
 
@@ -33,9 +30,8 @@ the standard case:
 a preprocessing stage (the so called "conv" program) translates the actual code so that
 saved arrays may be switched in memory space from one domain to an other.
 
---------------------------------
 Definition of the grid hierarchy
---------------------------------
+================================
 
 An additional text file ``AGRIF_FixedGrids.in`` is required at run time.
 This is where the grid hierarchy is defined.
@@ -67,9 +63,8 @@ boundary data exchange and update being only performed between root and child gr
 Use of east-west periodic or north-fold boundary conditions is not allowed in child grids either.
 Defining for instance a circumpolar zoom in a global model is therefore not possible. 
 
--------------
 Preprocessing
--------------
+=============
 
 Knowing the refinement factors and area, a ``NESTING`` pre-processing tool may help to create needed input files
 (mesh file, restart, climatological and forcing files).
@@ -78,9 +73,8 @@ a step done by invoking the ``Agrif_create_bathy.exe`` program.
 You may use the namelists provided in the ``NESTING`` directory as a guide.
 These correspond to the namelists used to create ``AGRIF_DEMO`` inputs.
 
-----------------
 Namelist options
-----------------
+================
 
 Each child grid expects to read its own namelist so that different numerical choices can be made
 (these should be stored in the form ``1_namelist_cfg``, ``2_namelist_cfg``, etc... according to their rank in
@@ -103,10 +97,11 @@ where sponge layer coefficients have to be chosen according to the child grid me
 The sponge area is hard coded in NEMO and applies on the following grid points:
 2 x refinement factor (from i=1+nbghostcells+1 to i=1+nbghostcells+sponge_area) 
 
-----------
 References
-----------
+==========
 
 .. bibliography:: zooms.bib
 	:all:
 	:style: unsrt
+	:labelprefix: A
+	:keyprefix: a-
