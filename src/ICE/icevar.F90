@@ -48,10 +48,11 @@ MODULE icevar
    !!   ice_var_itd2      : convert N-cat to jpl-cat
    !!   ice_var_bv        : brine volume
    !!   ice_var_enthalpy  : compute ice and snow enthalpies from temperature
+   !!   ice_var_sshdyn    : compute equivalent ssh in lead
    !!----------------------------------------------------------------------
    USE dom_oce        ! ocean space and time domain
    USE phycst         ! physical constants (ocean directory) 
-   USE sbc_oce , ONLY : sss_m
+   USE sbc_oce , ONLY : sss_m, ln_ice_embd, nn_fsbc
    USE ice            ! sea-ice: variables
    USE ice1D          ! sea-ice: thermodynamics variables
    !
@@ -73,6 +74,7 @@ MODULE icevar
    PUBLIC   ice_var_itd2
    PUBLIC   ice_var_bv           
    PUBLIC   ice_var_enthalpy           
+   PUBLIC   ice_var_sshdyn
 
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
@@ -947,6 +949,54 @@ CONTAINS
       END DO
       !
    END SUBROUTINE ice_var_enthalpy
+
+   FUNCTION ice_var_sshdyn(pssh, psnwice_mass, psnwice_mass_b)
+      !!---------------------------------------------------------------------
+      !!                   ***  ROUTINE rhg_evp_rst  ***
+      !!                     
+      !! ** Purpose :  compute the equivalent ssh in lead when sea ice is embedded
+      !!
+      !! ** Method  :  ssh_lead = ssh + (Mice + Msnow) / rau0
+      !!
+      !! ** Reference : Jean-Michel Campin, John Marshall, David Ferreira,
+      !!                Sea ice-ocean coupling using a rescaled vertical coordinate z*, 
+      !!                Ocean Modelling, Volume 24, Issues 1-2, 2008
+      !!
+      !!----------------------------------------------------------------------
+      !
+      ! input
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(in) :: pssh            !: ssh [m]
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(in) :: psnwice_mass    !: mass of snow and ice at current  ice time step [Kg/m2]
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(in) :: psnwice_mass_b  !: mass of snow and ice at previous ice time step [Kg/m2]
+      !
+      ! output
+      REAL(wp), DIMENSION(jpi,jpj) :: ice_var_sshdyn  ! equivalent ssh in lead [m]
+      !
+      ! temporary
+      REAL(wp) :: zintn, zintb                     ! time interpolation weights []
+      REAL(wp), DIMENSION(jpi,jpj) :: zsnwiceload  ! snow and ice load [m]
+      !
+      ! compute ice load used to define the equivalent ssh in lead
+      IF( ln_ice_embd ) THEN
+         !                                            
+         ! average interpolation coeff as used in dynspg = (1/nn_fsbc)   * {SUM[n/nn_fsbc], n=0,nn_fsbc-1}
+         !                                               = (1/nn_fsbc)^2 * {SUM[n]        , n=0,nn_fsbc-1}
+         zintn = REAL( nn_fsbc - 1 ) / REAL( nn_fsbc ) * 0.5_wp
+         !
+         ! average interpolation coeff as used in dynspg = (1/nn_fsbc)   *    {SUM[1-n/nn_fsbc], n=0,nn_fsbc-1}
+         !                                               = (1/nn_fsbc)^2 * (nn_fsbc^2 - {SUM[n], n=0,nn_fsbc-1})
+         zintb = REAL( nn_fsbc + 1 ) / REAL( nn_fsbc ) * 0.5_wp
+         !
+         zsnwiceload(:,:) = ( zintn * psnwice_mass(:,:) + zintb * psnwice_mass_b(:,:) ) * r1_rau0
+         !
+      ELSE
+         zsnwiceload(:,:) = 0.0_wp
+      ENDIF
+      ! compute equivalent ssh in lead
+      ice_var_sshdyn(:,:) = pssh(:,:) + zsnwiceload(:,:)
+      !
+   END FUNCTION ice_var_sshdyn
+
 
 #else
    !!----------------------------------------------------------------------

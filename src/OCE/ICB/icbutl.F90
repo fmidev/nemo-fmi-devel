@@ -23,6 +23,8 @@ MODULE icbutl
    USE sbc_oce                             ! ocean surface boundary conditions
 #if defined key_si3
    USE ice,    ONLY: u_ice, v_ice, hm_i    ! SI3 variables
+   USE icevar                              ! ice_var_sshdyn
+   USE sbc_ice, ONLY: snwice_mass, snwice_mass_b
 #endif
 
    IMPLICIT NONE
@@ -59,7 +61,10 @@ CONTAINS
       !!
       !! ** Method  : - blah blah
       !!----------------------------------------------------------------------
-
+#if defined key_si3
+      REAL(wp), DIMENSION(jpi,jpj) :: zssh_lead_m    !    ocean surface (ssh_m) if ice is not embedded
+      !                                              !    ocean surface in leads if ice is embedded   
+#endif
       ! copy nemo forcing arrays into iceberg versions with extra halo
       ! only necessary for variables not on T points
       ! and ssh which is used to calculate gradients
@@ -83,16 +88,20 @@ CONTAINS
       hicth(:,:) = 0._wp ;  hicth(1:jpi,1:jpj) = hm_i (:,:)  
       ui_e(:,:) = 0._wp ;   ui_e(1:jpi, 1:jpj) = u_ice(:,:)
       vi_e(:,:) = 0._wp ;   vi_e(1:jpi, 1:jpj) = v_ice(:,:)
+      !      
+      ! compute ssh slope using ssh_lead if embedded
+      zssh_lead_m(:,:) = ice_var_sshdyn(ssh_m, snwice_mass, snwice_mass_b)
+      ssh_e(:,:) = 0._wp ;  ssh_e(1:jpi, 1:jpj) = zssh_lead_m(:,:) * tmask(:,:,1)
       !
       CALL lbc_lnk_icb( hicth, 'T', +1._wp, 1, 1 )
       CALL lbc_lnk_icb( ui_e , 'U', -1._wp, 1, 1 )
       CALL lbc_lnk_icb( vi_e , 'V', -1._wp, 1, 1 )
+#else
+      ssh_e(:,:) = 0._wp ;  ssh_e(1:jpi, 1:jpj) = ssh_m(:,:) * tmask(:,:,1)
 #endif
 
       !! special for ssh which is used to calculate slope
       !! so fudge some numbers all the way around the boundary
-
-      ssh_e(:,:) = 0._wp ;   ssh_e(1:jpi, 1:jpj) = ssh_m(:,:) * tmask(:,:,1)
       ssh_e(0    ,    :) = ssh_e(1  ,  :)
       ssh_e(jpi+1,    :) = ssh_e(jpi,  :)
       ssh_e(:    ,    0) = ssh_e(:  ,  1)

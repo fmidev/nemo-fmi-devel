@@ -25,6 +25,7 @@ MODULE icedyn_rhg_evp
    USE sbc_oce , ONLY : ln_ice_embd, nn_fsbc, ssh_m
    USE sbc_ice , ONLY : utau_ice, vtau_ice, snwice_mass, snwice_mass_b
    USE ice            ! sea-ice: ice variables
+   USE icevar         ! ice_var_sshdyn
    USE icedyn_rdgrft  ! sea-ice: ice strength
    USE bdy_oce , ONLY : ln_bdy 
    USE bdyice 
@@ -142,7 +143,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zds                             ! shear
       REAL(wp), DIMENSION(jpi,jpj) ::   zs1, zs2, zs12                  ! stress tensor components
       REAL(wp), DIMENSION(jpi,jpj) ::   zu_ice, zv_ice, zresr           ! check convergence
-      REAL(wp), DIMENSION(jpi,jpj) ::   zpice                           ! array used for the calculation of ice surface slope:
+      REAL(wp), DIMENSION(jpi,jpj) ::   zssh_lead_m                     ! array used for the calculation of ice surface slope:
       !                                                                 !    ocean surface (ssh_m) if ice is not embedded
       !                                                                 !    ice top surface if ice is embedded   
       REAL(wp), DIMENSION(jpi,jpj) ::   zCorx, zCory                    ! Coriolis stress array
@@ -260,21 +261,9 @@ CONTAINS
       ! 2) Wind / ocean stress, mass terms, coriolis terms
       !------------------------------------------------------------------------------!
 
-      IF( ln_ice_embd ) THEN             !== embedded sea ice: compute representative ice top surface ==!
-         !                                            
-         ! average interpolation coeff as used in dynspg = (1/nn_fsbc)   * {SUM[n/nn_fsbc], n=0,nn_fsbc-1}
-         !                                               = (1/nn_fsbc)^2 * {SUM[n]        , n=0,nn_fsbc-1}
-         zintn = REAL( nn_fsbc - 1 ) / REAL( nn_fsbc ) * 0.5_wp     
-         !
-         ! average interpolation coeff as used in dynspg = (1/nn_fsbc)   *    {SUM[1-n/nn_fsbc], n=0,nn_fsbc-1}
-         !                                               = (1/nn_fsbc)^2 * (nn_fsbc^2 - {SUM[n], n=0,nn_fsbc-1})
-         zintb = REAL( nn_fsbc + 1 ) / REAL( nn_fsbc ) * 0.5_wp
-         !
-         zpice(:,:) = ssh_m(:,:) + ( zintn * snwice_mass(:,:) + zintb * snwice_mass_b(:,:) ) * r1_rau0
-         !
-      ELSE                                    !== non-embedded sea ice: use ocean surface for slope calculation ==!
-         zpice(:,:) = ssh_m(:,:)
-      ENDIF
+      !== embedded sea ice: compute representative ice top surface      ==!
+      !== non-embedded sea ice: use ocean surface for slope calculation ==!
+      zssh_lead_m(:,:) = ice_var_sshdyn( ssh_m, snwice_mass, snwice_mass_b)
 
       DO jj = 2, jpjm1
          DO ji = fs_2, fs_jpim1
@@ -312,8 +301,8 @@ CONTAINS
             zTauV_ia(ji,jj) = zaV(ji,jj) * vtau_ice(ji,jj)
 
             ! Surface pressure gradient (- m*g*GRAD(ssh)) at U-V points
-            zspgU(ji,jj)    = - zmassU * grav * ( zpice(ji+1,jj) - zpice(ji,jj) ) * r1_e1u(ji,jj)
-            zspgV(ji,jj)    = - zmassV * grav * ( zpice(ji,jj+1) - zpice(ji,jj) ) * r1_e2v(ji,jj)
+            zspgU(ji,jj)    = - zmassU * grav * ( zssh_lead_m(ji+1,jj) - zssh_lead_m(ji,jj) ) * r1_e1u(ji,jj)
+            zspgV(ji,jj)    = - zmassV * grav * ( zssh_lead_m(ji,jj+1) - zssh_lead_m(ji,jj) ) * r1_e2v(ji,jj)
 
             ! masks
             zmaskU(ji,jj) = 1._wp - MAX( 0._wp, SIGN( 1._wp, -zmassU ) )  ! 0 if no ice
