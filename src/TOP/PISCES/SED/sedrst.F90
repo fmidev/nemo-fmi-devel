@@ -9,7 +9,8 @@ MODULE sedrst
    !! ==============
    USE sed
    USE sedarr
-   USE trc_oce, ONLY: l_offline         ! ocean space and time domain variables
+   USE trc_oce, ONLY : l_offline, nn_dttrc
+   USE phycst , ONLY : rday
    USE iom
    USE daymod
    USE lib_mpp         ! distribued memory computing library

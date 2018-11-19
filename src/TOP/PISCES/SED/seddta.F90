@@ -7,6 +7,7 @@ MODULE seddta
    !! * Modules used
    USE sed
    USE sedarr
+   USE phycst, ONLY : rday
    USE iom
    USE lib_mpp         ! distribued memory computing library
 

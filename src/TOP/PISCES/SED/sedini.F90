@@ -12,6 +12,7 @@ MODULE sedini
    USE sed_oce
    USE sedarr
    USE sedadv
+   USE trc_oce, ONLY : nn_dttrc
    USE trcdmp_sed
    USE trcdta
    USE iom
