@@ -274,13 +274,13 @@ CONTAINS
                !
                ! building the matrix
                zcof = rfact_tke * tmask(ji,jj,jk)
-               !                                               ! lower diagonal
+               !                                        ! lower diagonal, in fact not used for jk = 2 (see surface conditions)
                zd_lw(ji,jj,jk) = zcof * ( p_avm(ji,jj,jk  ) + p_avm(ji,jj,jk-1) ) / ( e3t_n(ji,jj,jk-1) * e3w_n(ji,jj,jk) )
-               !                                               ! upper diagonal
+               !                                        ! upper diagonal, in fact not used for jk = ibotm1 (see bottom conditions)
                zd_up(ji,jj,jk) = zcof * ( p_avm(ji,jj,jk+1) + p_avm(ji,jj,jk  ) ) / ( e3t_n(ji,jj,jk  ) * e3w_n(ji,jj,jk) )
-               !                                               ! diagonal
+               !                                        ! diagonal
                zdiag(ji,jj,jk) = 1._wp - zd_lw(ji,jj,jk) - zd_up(ji,jj,jk)  + rdt * zdiss * wmask(ji,jj,jk) 
-               !                                               ! right hand side in en
+               !                                        ! right hand side in en
                en(ji,jj,jk) = en(ji,jj,jk) + rdt * zesh2 * wmask(ji,jj,jk)
             END DO
          END DO
@@ -791,16 +791,25 @@ CONTAINS
 
       zstm(:,:,1) = zstm(:,:,2)
 
-      DO jj = 2, jpjm1
+      ! default value, in case jpk > mbkt(ji,jj)+1. Not needed but avoid a bug when looking for undefined values (-fpe0)
+      zstm(:,:,jpk) = 0.  
+      DO jj = 2, jpjm1                ! update bottom with good values
          DO ji = fs_2, fs_jpim1   ! vector opt.
             zstm(ji,jj,mbkt(ji,jj)+1) = zstm(ji,jj,mbkt(ji,jj))
          END DO
       END DO
+
+      zstt(:,:,  1) = wmask(:,:,  1)  ! default value not needed but avoid a bug when looking for undefined values (-fpe0)
+      zstt(:,:,jpk) = wmask(:,:,jpk)  ! default value not needed but avoid a bug when looking for undefined values (-fpe0)
+
 !!gm should be done for ISF (top boundary cond.)
 !!gm so, totally new staff needed!!gm
 
       ! Compute diffusivities/viscosities
       ! The computation below could be restrained to jk=2 to jpkm1 if GOTM style Dirichlet conditions are used
+      !  -> yes BUT p_avm(:,:1) and p_avm(:,:jpk) are used when we compute zd_lw(:,:2) and zd_up(:,:jpkm1). These values are
+      !     later overwritten by surface/bottom boundaries conditions, so we don't really care of p_avm(:,:1) and p_avm(:,:jpk)
+      !     for zd_lw and zd_up but they have to be defined to avoid a bug when looking for undefined values (-fpe0)
       DO jk = 1, jpk
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1   ! vector opt.
