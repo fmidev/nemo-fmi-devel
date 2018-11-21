@@ -245,9 +245,12 @@ CONTAINS
                DO jk = 1, jpkm1 ! Deal with isf separetely, as can be through depth too
                   DO jj = 1, jpj
                      DO ji = 1, jpi
-                        IF( misfkt(ji,jj) <= jk .AND. jk <= misfkb(ji,jj) ) THEN
-                           e3t_b(ji,jj,jk) =   e3t_b(ji,jj,jk) - zcoef *  ( fwfisf_b(ji,jj) - fwfisf(ji,jj) ) &
+                        IF( misfkt(ji,jj) <=jk .and. jk < misfkb(ji,jj)  ) THEN
+                           e3t_b(ji,jj,jk) = e3t_b(ji,jj,jk) - zcoef * ( fwfisf_b(ji,jj) - fwfisf(ji,jj) ) &
                                 &          * ( e3t_n(ji,jj,jk) * r1_hisf_tbl(ji,jj) ) * tmask(ji,jj,jk)
+                        ELSEIF ( jk==misfkb(ji,jj) ) THEN
+                           e3t_b(ji,jj,jk) = e3t_b(ji,jj,jk) - zcoef * ( fwfisf_b(ji,jj) - fwfisf(ji,jj) ) &
+                                &          * ( e3t_n(ji,jj,jk) * r1_hisf_tbl(ji,jj) ) * ralpha(ji,jj) * tmask(ji,jj,jk)
                         ENDIF
                      END DO
                   END DO
