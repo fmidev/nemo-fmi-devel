@@ -197,9 +197,13 @@ CONTAINS
       CASE ( 1:5 )                      ! 1st to 5th order ULTIMATE-MACHO scheme
          CALL macho( k_order, kt, pdt, ptc, puc, pvc, pubox, pvbox, zt_u, zt_v )
          !
-         DO jj = 1, jpjm1
+         DO jj = 2, jpjm1
             DO ji = 1, fs_jpim1   ! vector opt.
                zfu_ho(ji,jj) = puc(ji,jj) * zt_u(ji,jj)
+            END DO
+         END DO
+         DO jj = 1, jpjm1
+            DO ji = fs_2, fs_jpim1   ! vector opt.
                zfv_ho(ji,jj) = pvc(ji,jj) * zt_v(ji,jj)
             END DO
          END DO
@@ -208,9 +212,13 @@ CONTAINS
          
       ! antidiffusive flux : high order minus low order
       ! --------------------------------------------------
-      DO jj = 1, jpjm1
+      DO jj = 2, jpjm1
          DO ji = 1, fs_jpim1   ! vector opt.
             zfu_ho(ji,jj) = zfu_ho(ji,jj) - zfu_ups(ji,jj)
+         END DO
+      END DO
+      DO jj = 1, jpjm1
+         DO ji = fs_2, fs_jpim1   ! vector opt.
             zfv_ho(ji,jj) = zfv_ho(ji,jj) - zfv_ups(ji,jj)
          END DO
       END DO
