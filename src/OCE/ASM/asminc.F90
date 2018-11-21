@@ -910,7 +910,7 @@ CONTAINS
             !
             ! Nudge sea ice depth to bring it up to a required minimum depth
             WHERE( zseaicendg(:,:) > 0.0_wp .AND. hm_i(:,:) < zhicifmin ) 
-               zhicifinc(:,:) = (zhicifmin - hm_i(:,:)) * zincwgt    
+               zhicifinc(:,:) = zhicifmin - hm_i(:,:)
             ELSEWHERE
                zhicifinc(:,:) = 0.0_wp
             END WHERE
