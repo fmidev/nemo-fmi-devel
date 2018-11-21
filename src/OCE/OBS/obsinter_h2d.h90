@@ -1123,7 +1123,6 @@
             WRITE(numout,*)'Grid lats    : ',pphimm, pphimp, pphipm, pphipp
             WRITE(numout,*)'Grid lons    : ',plammm, plammp, plampm, plampp
             WRITE(numout,*)'Current i,j  : ',ziguess, zjguess
-            WRITE(numout,*)'Weights      : ',pbiwmm, pbiwmp, pbiwpm, pbiwpp
             WRITE(numout,*)'jiter        = ',jiter
             WRITE(numout,*)'zeps         = ',zeps
             WRITE(numout,*)'zdeli, zdelj = ',zdeli, zdelj
