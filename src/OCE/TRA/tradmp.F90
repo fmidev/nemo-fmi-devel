@@ -122,7 +122,7 @@ CONTAINS
          DO jk = 1, jpkm1
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1   ! vector opt.
-                  IF( avt(ji,jj,jk) <= 5.e-4_wp ) THEN
+                  IF( avt(ji,jj,jk) <= avt_c ) THEN
                      tsa(ji,jj,jk,jp_tem) = tsa(ji,jj,jk,jp_tem)   &
                         &                 + resto(ji,jj,jk) * ( zts_dta(ji,jj,jk,jp_tem) - tsb(ji,jj,jk,jp_tem) )
                      tsa(ji,jj,jk,jp_sal) = tsa(ji,jj,jk,jp_sal)   &

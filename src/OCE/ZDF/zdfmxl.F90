@@ -32,7 +32,7 @@ MODULE zdfmxl
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hmlpt   !: depth of the last T-point inside the mixed layer [m] (used by LDF)
 
    REAL(wp), PUBLIC ::   rho_c = 0.01_wp    !: density criterion for mixed layer depth
-   REAL(wp)         ::   avt_c = 5.e-4_wp   ! Kz criterion for the turbocline depth
+   REAL(wp), PUBLIC ::   avt_c = 5.e-4_wp   ! Kz criterion for the turbocline depth
 
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)

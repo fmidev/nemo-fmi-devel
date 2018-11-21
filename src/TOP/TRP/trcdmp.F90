@@ -121,7 +121,7 @@ CONTAINS
                   DO jk = 1, jpkm1
                      DO jj = 2, jpjm1
                         DO ji = fs_2, fs_jpim1   ! vector opt.
-                           IF( avs(ji,jj,jk) <= 5.e-4_wp )  THEN 
+                           IF( avt(ji,jj,jk) <= avt_c )  THEN 
                               tra(ji,jj,jk,jn) = tra(ji,jj,jk,jn) + restotr(ji,jj,jk) * ( ztrcdta(ji,jj,jk) - trb(ji,jj,jk,jn) )
                            ENDIF
                         END DO

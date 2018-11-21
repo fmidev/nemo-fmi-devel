@@ -86,12 +86,14 @@ MODULE oce_trc
 !!gm end
 
    !* vertical diffusion *
-   USE zdf_oce , ONLY :   avs        =>   avs         !: vert. diffusivity coef. for salinity (w-point)
+   USE zdf_oce , ONLY :   avs        =>   avs         !: vert. diffusivity coef. for salinity    (w-point)
+   USE zdf_oce , ONLY :   avt        =>   avt         !: vert. diffusivity coef. for temperature (w-point)
 
    !* mixing & mixed layer depth *
    USE zdfmxl , ONLY :   nmln        =>   nmln        !: number of level in the mixed layer
    USE zdfmxl , ONLY :   hmld        =>   hmld        !: mixing layer depth (turbocline)
    USE zdfmxl , ONLY :   hmlp        =>   hmlp        !: mixed layer depth  (rho=rho0+zdcrit) (m)
    USE zdfmxl , ONLY :   hmlpt       =>   hmlpt       !: mixed layer depth at t-points (m)
+   USE zdfmxl , ONLY :   avt_c       =>   avt_c       !: Kz criterion for the turbocline depth
 
 END MODULE oce_trc
