@@ -408,7 +408,7 @@ CONTAINS
       !                                      ! Active tracers
       IF( ln_traqsr    )   CALL tra_qsr_init      ! penetrative solar radiation qsr
                            CALL tra_bbc_init      ! bottom heat flux
-      IF( ln_trabbl    )   CALL tra_bbl_init      ! advective (and/or diffusive) bottom boundary layer scheme
+                           CALL tra_bbl_init      ! advective (and/or diffusive) bottom boundary layer scheme
                            CALL tra_dmp_init      ! internal tracer damping
                            CALL tra_adv_init      ! horizontal & vertical advection
                            CALL tra_ldf_init      ! lateral mixing
