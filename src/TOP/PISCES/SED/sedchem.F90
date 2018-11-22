@@ -677,6 +677,13 @@ CONTAINS
          &         + (-0.77712 + 0.00284263*ztkel + 178.34*ztr) * zsqrt  &
          &         - 0.07711*zsal + 0.0041249*zsal15
 
+         ! CONVERT FROM DIFFERENT PH SCALES
+         total2free  = 1.0/(1.0 + zst/zcks)
+         free2SWS    = 1. + zst/zcks + zft/(zckf*total2free)
+         total2SWS   = total2free * free2SWS
+         SWS2total   = 1.0 / total2SWS
+
+
          ! K1, K2 OF CARBONIC ACID, KB OF BORIC ACID, KW (H2O) (LIT.?)
          zak1    = 10**(zck1) * total2SWS
          zak2    = 10**(zck2) * total2SWS
@@ -741,12 +748,6 @@ CONTAINS
          zbuf1  =     - ( devk110 + devk210 * ztc + devk310 * ztc * ztc )
          zbuf2  = 0.5 * ( devk410 + devk510 * ztc )
          aksis(ji) = zaksi * EXP( zbuf1 * zcpexp + zbuf2 * zcpexp2 )
-
-         ! CONVERT FROM DIFFERENT PH SCALES
-         total2free  = 1.0/(1.0 + zst/aks3s(ji))
-         free2SWS    = 1. + zst/aks3s(ji) + zft/akf3s(ji)
-         total2SWS   = total2free * free2SWS
-         SWS2total   = 1.0 / total2SWS
 
          ! Convert to total scale
          ak1s(ji)  = ak1s(ji)  * SWS2total
