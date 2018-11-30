@@ -159,8 +159,9 @@ CONTAINS
       !<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                             CALL ssh_nxt       ( kstp )  ! after ssh (includes call to div_hor)
-      IF(.NOT.ln_linssh )   CALL dom_vvl_sf_nxt( kstp )  ! after vertical scale factors 
+      IF( .NOT.ln_linssh )  CALL dom_vvl_sf_nxt( kstp )  ! after vertical scale factors 
                             CALL wzv           ( kstp )  ! now cross-level velocity 
+      IF( ln_zad_Aimp )     CALL wAimp         ( kstp )  ! Adaptive-implicit vertical advection partitioning
                             CALL eos    ( tsn, rhd, rhop, gdept_n(:,:,:) )  ! now in situ density for hpg computation
                             
 !!jc: fs simplification
@@ -197,6 +198,7 @@ CONTAINS
                             CALL div_hor    ( kstp )              ! Horizontal divergence  (2nd call in time-split case)
          IF(.NOT.ln_linssh) CALL dom_vvl_sf_nxt( kstp, kcall=2 )  ! after vertical scale factors (update depth average component)
                             CALL wzv        ( kstp )              ! now cross-level velocity 
+         IF( ln_zad_Aimp )  CALL wAimp      ( kstp )  ! Adaptive-implicit vertical advection partitioning
       ENDIF
       
                          CALL dyn_zdf       ( kstp )  ! vertical diffusion

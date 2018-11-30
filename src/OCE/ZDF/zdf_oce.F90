@@ -17,6 +17,8 @@ MODULE zdf_oce
    PUBLIC  zdf_oce_alloc    ! Called in nemogcm.F90
 
    !                            !!* namelist namzdf: vertical physics *
+   !                             ! Adaptive-implicit vertical advection flag
+   LOGICAL , PUBLIC ::   ln_zad_Aimp !: adaptive (Courant number-based) implicit vertical advection
    !                             ! vertical closure scheme flags
    LOGICAL , PUBLIC ::   ln_zdfcst   !: constant coefficients
    LOGICAL , PUBLIC ::   ln_zdfric   !: Richardson depend coefficients

@@ -77,6 +77,12 @@
         <!-- variables available with MLE -->
         <field id="Lf_NHpf"      long_name="MLE: Lf = N H / f"   unit="m" />
 
+        <!-- next variables available with ln_zad_Aimp=.true. -->
+        <field id="Courant"      long_name="Courant number"                                                                 unit="#"   grid_ref="grid_T_3D" />
+        <field id="wimp"         long_name="Implicit vertical velocity"                                                     unit="m/s" grid_ref="grid_T_3D" />
+        <field id="wexp"         long_name="Explicit vertical velocity"                                                     unit="m/s" grid_ref="grid_T_3D" />
+        <field id="wi_cff"       long_name="Fraction of implicit vertical velocity"                                         unit="#"   grid_ref="grid_T_3D" />
+
         <!-- next variables available with key_diahth -->
         <field id="mlddzt"       long_name="Thermocline Depth (depth of max dT/dz)"         standard_name="depth_at_maximum_upward_derivative_of_sea_water_potential_temperature"             unit="m"                         />
         <field id="mldr10_3"     long_name="Mixed Layer Depth (dsigma = 0.03 wrt 10m)"      standard_name="ocean_mixed_layer_thickness_defined_by_sigma_theta"                                unit="m"                         />

@@ -70,6 +70,10 @@ CONTAINS
       INTEGER  ::   iku, ikv           ! local integers
       REAL(wp) ::   zzwi, ze3ua, zdt   ! local scalars
       REAL(wp) ::   zzws, ze3va        !   -      -
+      REAL(wp) ::   z1_e3ua, z1_e3va   !   -      -
+      REAL(wp) ::   zWu , zWv          !   -      -
+      REAL(wp) ::   zWui, zWvi         !   -      -
+      REAL(wp) ::   zWus, zWvs         !   -      -
       REAL(wp), DIMENSION(jpi,jpj,jpk)        ::  zwi, zwd, zws   ! 3D workspace 
       REAL(wp), DIMENSION(:,:,:), ALLOCATABLE ::   ztrdu, ztrdv   !  -      -
       !!---------------------------------------------------------------------
@@ -154,43 +158,90 @@ CONTAINS
       !
       !                    !* Matrix construction
       zdt = r2dt * 0.5
-      SELECT CASE( nldf_dyn )
-      CASE( np_lap_i )           ! rotated lateral mixing: add its vertical mixing (akzu)
-         DO jk = 1, jpkm1
-            DO jj = 2, jpjm1 
-               DO ji = fs_2, fs_jpim1   ! vector opt.
-                  ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,jk) + r_vvl * e3u_a(ji,jj,jk)   ! after scale factor at T-point
-                  zzwi = - zdt * ( avm(ji+1,jj,jk  ) + avm(ji,jj,jk  ) + akzu(ji,jj,jk  ) )   &
-                     &         / ( ze3ua * e3uw_n(ji,jj,jk  ) ) * wumask(ji,jj,jk  )
-                  zzws = - zdt * ( avm(ji+1,jj,jk+1) + avm(ji,jj,jk+1) + akzu(ji,jj,jk+1) )   &
-                     &         / ( ze3ua * e3uw_n(ji,jj,jk+1) ) * wumask(ji,jj,jk+1)
-                  zwi(ji,jj,jk) = zzwi
-                  zws(ji,jj,jk) = zzws
-                  zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+      IF( ln_zad_Aimp ) THEN   !!
+         SELECT CASE( nldf_dyn )
+         CASE( np_lap_i )           ! rotated lateral mixing: add its vertical mixing (akzu)
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1 
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,jk) + r_vvl * e3u_a(ji,jj,jk)   ! after scale factor at U-point
+                     zzwi = - zdt * ( avm(ji+1,jj,jk  ) + avm(ji,jj,jk  ) + akzu(ji,jj,jk  ) )   &
+                        &         / ( ze3ua * e3uw_n(ji,jj,jk  ) ) * wumask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji+1,jj,jk+1) + avm(ji,jj,jk+1) + akzu(ji,jj,jk+1) )   &
+                        &         / ( ze3ua * e3uw_n(ji,jj,jk+1) ) * wumask(ji,jj,jk+1)
+                     zWui = 0.5_wp * ( wi(ji,jj,jk  ) + wi(ji+1,jj,jk  ) )
+                     zWus = 0.5_wp * ( wi(ji,jj,jk+1) + wi(ji+1,jj,jk+1) )
+                     zwi(ji,jj,jk) = zzwi + zdt * MIN( zWui, 0._wp ) 
+                     zws(ji,jj,jk) = zzws - zdt * MAX( zWus, 0._wp )
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws + zdt * ( MAX( zWui, 0._wp ) - MIN( zWus, 0._wp ) )
+                  END DO
                END DO
             END DO
-         END DO
-      CASE DEFAULT               ! iso-level lateral mixing
-         DO jk = 1, jpkm1
-            DO jj = 2, jpjm1 
-               DO ji = fs_2, fs_jpim1   ! vector opt.
-                  ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,jk) + r_vvl * e3u_a(ji,jj,jk)   ! after scale factor at T-point
-                  zzwi = - zdt * ( avm(ji+1,jj,jk  ) + avm(ji,jj,jk  ) ) / ( ze3ua * e3uw_n(ji,jj,jk  ) ) * wumask(ji,jj,jk  )
-                  zzws = - zdt * ( avm(ji+1,jj,jk+1) + avm(ji,jj,jk+1) ) / ( ze3ua * e3uw_n(ji,jj,jk+1) ) * wumask(ji,jj,jk+1)
-                  zwi(ji,jj,jk) = zzwi
-                  zws(ji,jj,jk) = zzws
-                  zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+         CASE DEFAULT               ! iso-level lateral mixing
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1 
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,jk) + r_vvl * e3u_a(ji,jj,jk)   ! after scale factor at U-point
+                     zzwi = - zdt * ( avm(ji+1,jj,jk  ) + avm(ji,jj,jk  ) ) / ( ze3ua * e3uw_n(ji,jj,jk  ) ) * wumask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji+1,jj,jk+1) + avm(ji,jj,jk+1) ) / ( ze3ua * e3uw_n(ji,jj,jk+1) ) * wumask(ji,jj,jk+1)
+                     zWui = 0.5_wp * ( wi(ji,jj,jk  ) + wi(ji+1,jj,jk  ) )
+                     zWus = 0.5_wp * ( wi(ji,jj,jk+1) + wi(ji+1,jj,jk+1) )
+                     zwi(ji,jj,jk) = zzwi + zdt * MIN( zWui, 0._wp )
+                     zws(ji,jj,jk) = zzws - zdt * MAX( zWus, 0._wp )
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws + zdt * ( MAX( zWui, 0._wp ) - MIN( zWus, 0._wp ) )
+                  END DO
                END DO
             END DO
+         END SELECT
+         DO jj = 2, jpjm1     !* Surface boundary conditions
+            DO ji = fs_2, fs_jpim1   ! vector opt.
+               zwi(ji,jj,1) = 0._wp
+               ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,1) + r_vvl * e3u_a(ji,jj,1)
+               zzws = - zdt * ( avm(ji+1,jj,2) + avm(ji  ,jj,2) ) / ( ze3ua * e3uw_n(ji,jj,2) ) * wumask(ji,jj,2)
+               zWus = 0.5_wp * ( wi(ji  ,jj,2) +  wi(ji+1,jj,2) )
+               zws(ji,jj,1 ) = zzws - zdt * MAX( zWus, 0._wp )
+               zwd(ji,jj,1 ) = 1._wp - zzws - zdt * ( MIN( zWus, 0._wp ) )
+            END DO
          END DO
-      END SELECT
+      ELSE
+         SELECT CASE( nldf_dyn )
+         CASE( np_lap_i )           ! rotated lateral mixing: add its vertical mixing (akzu)
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1 
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,jk) + r_vvl * e3u_a(ji,jj,jk)   ! after scale factor at U-point
+                     zzwi = - zdt * ( avm(ji+1,jj,jk  ) + avm(ji,jj,jk  ) + akzu(ji,jj,jk  ) )   &
+                        &         / ( ze3ua * e3uw_n(ji,jj,jk  ) ) * wumask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji+1,jj,jk+1) + avm(ji,jj,jk+1) + akzu(ji,jj,jk+1) )   &
+                        &         / ( ze3ua * e3uw_n(ji,jj,jk+1) ) * wumask(ji,jj,jk+1)
+                     zwi(ji,jj,jk) = zzwi
+                     zws(ji,jj,jk) = zzws
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+                  END DO
+               END DO
+            END DO
+         CASE DEFAULT               ! iso-level lateral mixing
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1 
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3ua =  ( 1._wp - r_vvl ) * e3u_n(ji,jj,jk) + r_vvl * e3u_a(ji,jj,jk)   ! after scale factor at U-point
+                     zzwi = - zdt * ( avm(ji+1,jj,jk  ) + avm(ji,jj,jk  ) ) / ( ze3ua * e3uw_n(ji,jj,jk  ) ) * wumask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji+1,jj,jk+1) + avm(ji,jj,jk+1) ) / ( ze3ua * e3uw_n(ji,jj,jk+1) ) * wumask(ji,jj,jk+1)
+                     zwi(ji,jj,jk) = zzwi
+                     zws(ji,jj,jk) = zzws
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+                  END DO
+               END DO
+            END DO
+         END SELECT
+         DO jj = 2, jpjm1     !* Surface boundary conditions
+            DO ji = fs_2, fs_jpim1   ! vector opt.
+               zwi(ji,jj,1) = 0._wp
+               zwd(ji,jj,1) = 1._wp - zws(ji,jj,1)
+            END DO
+         END DO
+      ENDIF
       !
-      DO jj = 2, jpjm1     !* Surface boundary conditions
-         DO ji = fs_2, fs_jpim1   ! vector opt.
-            zwi(ji,jj,1) = 0._wp
-            zwd(ji,jj,1) = 1._wp - zws(ji,jj,1)
-         END DO
-      END DO
       !
       !              !==  Apply semi-implicit bottom friction  ==!
       !
@@ -273,43 +324,90 @@ CONTAINS
       !
       !                       !* Matrix construction
       zdt = r2dt * 0.5
-      SELECT CASE( nldf_dyn )
-      CASE( np_lap_i )           ! rotated lateral mixing: add its vertical mixing (akzu)
-         DO jk = 1, jpkm1
-            DO jj = 2, jpjm1   
-               DO ji = fs_2, fs_jpim1   ! vector opt.
-                  ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,jk) + r_vvl * e3v_a(ji,jj,jk)   ! after scale factor at T-point
-                  zzwi = - zdt * ( avm(ji,jj+1,jk  ) + avm(ji,jj,jk  ) + akzv(ji,jj,jk  ) )   &
-                     &         / ( ze3va * e3vw_n(ji,jj,jk  ) ) * wvmask(ji,jj,jk  )
-                  zzws = - zdt * ( avm(ji,jj+1,jk+1) + avm(ji,jj,jk+1) + akzv(ji,jj,jk+1) )   &
-                     &         / ( ze3va * e3vw_n(ji,jj,jk+1) ) * wvmask(ji,jj,jk+1)
-                  zwi(ji,jj,jk) = zzwi * wvmask(ji,jj,jk  )
-                  zws(ji,jj,jk) = zzws * wvmask(ji,jj,jk+1)
-                  zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+      IF( ln_zad_Aimp ) THEN   !!
+         SELECT CASE( nldf_dyn )
+         CASE( np_lap_i )           ! rotated lateral mixing: add its vertical mixing (akzv)
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1 
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,jk) + r_vvl * e3v_a(ji,jj,jk)   ! after scale factor at V-point
+                     zzwi = - zdt * ( avm(ji,jj+1,jk  ) + avm(ji,jj,jk  ) + akzv(ji,jj,jk  ) )   &
+                        &         / ( ze3va * e3vw_n(ji,jj,jk  ) ) * wvmask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji,jj+1,jk+1) + avm(ji,jj,jk+1) + akzv(ji,jj,jk+1) )   &
+                        &         / ( ze3va * e3vw_n(ji,jj,jk+1) ) * wvmask(ji,jj,jk+1)
+                     zWvi = 0.5_wp * ( wi(ji,jj,jk  ) + wi(ji,jj+1,jk  ) ) * wvmask(ji,jj,jk  )
+                     zWvs = 0.5_wp * ( wi(ji,jj,jk+1) + wi(ji,jj+1,jk+1) ) * wvmask(ji,jj,jk+1)
+                     zwi(ji,jj,jk) = zzwi + zdt * MIN( zWvi, 0._wp )
+                     zws(ji,jj,jk) = zzws - zdt * MAX( zWvs, 0._wp )
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws - zdt * ( - MAX( zWvi, 0._wp ) + MIN( zWvs, 0._wp ) )
+                  END DO
                END DO
             END DO
-         END DO
-      CASE DEFAULT               ! iso-level lateral mixing
-         DO jk = 1, jpkm1
-            DO jj = 2, jpjm1   
-               DO ji = fs_2, fs_jpim1   ! vector opt.
-                  ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,jk) + r_vvl * e3v_a(ji,jj,jk)   ! after scale factor at T-point
-                  zzwi = - zdt * ( avm(ji,jj+1,jk  ) + avm(ji,jj,jk  ) ) / ( ze3va * e3vw_n(ji,jj,jk  ) ) * wvmask(ji,jj,jk  )
-                  zzws = - zdt * ( avm(ji,jj+1,jk+1) + avm(ji,jj,jk+1) ) / ( ze3va * e3vw_n(ji,jj,jk+1) ) * wvmask(ji,jj,jk+1)
-                  zwi(ji,jj,jk) = zzwi * wvmask(ji,jj,jk  )
-                  zws(ji,jj,jk) = zzws * wvmask(ji,jj,jk+1)
-                  zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+         CASE DEFAULT               ! iso-level lateral mixing
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1 
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,jk) + r_vvl * e3v_a(ji,jj,jk)   ! after scale factor at V-point
+                     zzwi = - zdt * ( avm(ji,jj+1,jk  ) + avm(ji,jj,jk  ) ) / ( ze3va * e3vw_n(ji,jj,jk  ) ) * wvmask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji,jj+1,jk+1) + avm(ji,jj,jk+1) ) / ( ze3va * e3vw_n(ji,jj,jk+1) ) * wvmask(ji,jj,jk+1)
+                     zWvi = 0.5_wp * ( wi(ji,jj,jk  ) + wi(ji,jj+1,jk  ) ) * wvmask(ji,jj,jk  )
+                     zWvs = 0.5_wp * ( wi(ji,jj,jk+1) + wi(ji,jj+1,jk+1) ) * wvmask(ji,jj,jk+1)
+                     zwi(ji,jj,jk) = zzwi  + zdt * MIN( zWvi, 0._wp )
+                     zws(ji,jj,jk) = zzws  - zdt * MAX( zWvs, 0._wp )
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws - zdt * ( - MAX( zWvi, 0._wp ) + MIN( zWvs, 0._wp ) )
+                  END DO
                END DO
             END DO
+         END SELECT
+         DO jj = 2, jpjm1     !* Surface boundary conditions
+            DO ji = fs_2, fs_jpim1   ! vector opt.
+               zwi(ji,jj,1) = 0._wp
+               ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,1) + r_vvl * e3v_a(ji,jj,1)
+               zzws = - zdt * ( avm(ji,jj+1,2) + avm(ji,jj,2) ) / ( ze3va * e3vw_n(ji,jj,2) ) * wvmask(ji,jj,2)
+               zWvs = 0.5_wp * ( wi(ji,jj  ,2) +  wi(ji,jj+1,2) )
+               zws(ji,jj,1 ) = zzws - zdt * MAX( zWvs, 0._wp )
+               zwd(ji,jj,1 ) = 1._wp - zzws - zdt * ( MIN( zWvs, 0._wp ) )
+            END DO
          END DO
-      END SELECT
+      ELSE
+         SELECT CASE( nldf_dyn )
+         CASE( np_lap_i )           ! rotated lateral mixing: add its vertical mixing (akzu)
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1   
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,jk) + r_vvl * e3v_a(ji,jj,jk)   ! after scale factor at V-point
+                     zzwi = - zdt * ( avm(ji,jj+1,jk  ) + avm(ji,jj,jk  ) + akzv(ji,jj,jk  ) )   &
+                        &         / ( ze3va * e3vw_n(ji,jj,jk  ) ) * wvmask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji,jj+1,jk+1) + avm(ji,jj,jk+1) + akzv(ji,jj,jk+1) )   &
+                        &         / ( ze3va * e3vw_n(ji,jj,jk+1) ) * wvmask(ji,jj,jk+1)
+                     zwi(ji,jj,jk) = zzwi
+                     zws(ji,jj,jk) = zzws
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+                  END DO
+               END DO
+            END DO
+         CASE DEFAULT               ! iso-level lateral mixing
+            DO jk = 1, jpkm1
+               DO jj = 2, jpjm1   
+                  DO ji = fs_2, fs_jpim1   ! vector opt.
+                     ze3va =  ( 1._wp - r_vvl ) * e3v_n(ji,jj,jk) + r_vvl * e3v_a(ji,jj,jk)   ! after scale factor at V-point
+                     zzwi = - zdt * ( avm(ji,jj+1,jk  ) + avm(ji,jj,jk  ) ) / ( ze3va * e3vw_n(ji,jj,jk  ) ) * wvmask(ji,jj,jk  )
+                     zzws = - zdt * ( avm(ji,jj+1,jk+1) + avm(ji,jj,jk+1) ) / ( ze3va * e3vw_n(ji,jj,jk+1) ) * wvmask(ji,jj,jk+1)
+                     zwi(ji,jj,jk) = zzwi
+                     zws(ji,jj,jk) = zzws
+                     zwd(ji,jj,jk) = 1._wp - zzwi - zzws
+                  END DO
+               END DO
+            END DO
+         END SELECT
+         DO jj = 2, jpjm1        !* Surface boundary conditions
+            DO ji = fs_2, fs_jpim1   ! vector opt.
+               zwi(ji,jj,1) = 0._wp
+               zwd(ji,jj,1) = 1._wp - zws(ji,jj,1)
+            END DO
+         END DO
+      ENDIF
       !
-      DO jj = 2, jpjm1        !* Surface boundary conditions
-         DO ji = fs_2, fs_jpim1   ! vector opt.
-            zwi(ji,jj,1) = 0._wp
-            zwd(ji,jj,1) = 1._wp - zws(ji,jj,1)
-         END DO
-      END DO
       !              !==  Apply semi-implicit top/bottom friction  ==!
       !
       !     Only needed for semi-implicit bottom friction setup. The explicit

@@ -31,7 +31,7 @@ MODULE zdfosm
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
-   !!   'key_zdfosm'                                             OSMOSIS scheme
+   !!   'ln_zdfosm'                                             OSMOSIS scheme
    !!----------------------------------------------------------------------
    !!   zdf_osm       : update momentum and tracer Kz from osm scheme
    !!   zdf_osm_init  : initialization, namelist read, and parameters control

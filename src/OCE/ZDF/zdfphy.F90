@@ -79,6 +79,7 @@ CONTAINS
          &             ln_zdfddm, rn_avts, rn_hsbfr,                 &     ! double diffusion
          &             ln_zdfswm,                                    &     ! surface  wave-induced mixing
          &             ln_zdfiwm,                                    &     ! internal  -      -      -
+         &             ln_zad_Aimp,                                  &     ! apdative-implicit vertical advection
          &             rn_avm0, rn_avt0, nn_avb, nn_havtb                  ! coefficients
       !!----------------------------------------------------------------------
       !
@@ -100,6 +101,8 @@ CONTAINS
       !
       IF(lwp) THEN                      ! Parameter print
          WRITE(numout,*) '   Namelist namzdf : set vertical mixing mixing parameters'
+         WRITE(numout,*) '      adaptive-implicit vertical advection'
+         WRITE(numout,*) '         Courant number targeted application   ln_zad_Aimp = ', ln_zad_Aimp
          WRITE(numout,*) '      vertical closure scheme'
          WRITE(numout,*) '         constant vertical mixing coefficient    ln_zdfcst = ', ln_zdfcst
          WRITE(numout,*) '         Richardson number dependent closure     ln_zdfric = ', ln_zdfric
@@ -126,6 +129,11 @@ CONTAINS
          WRITE(numout,*) '         horizontal variation for avtb           nn_havtb  = ', nn_havtb
       ENDIF
 
+      IF( ln_zad_Aimp ) THEN
+         IF( zdf_phy_alloc() /= 0 )   &
+        &       CALL ctl_stop( 'STOP', 'zdf_phy_init : unable to allocate adaptive-implicit z-advection arrays' )
+         wi(:,:,:) = 0._wp
+      ENDIF
       !                          !==  Background eddy viscosity and diffusivity  ==!
       IF( nn_avb == 0 ) THEN             ! Define avmb, avtb from namelist parameter
          avmb(:) = rn_avm0
@@ -315,6 +323,15 @@ CONTAINS
       IF( ln_timing )   CALL timing_stop('zdf_phy')
       !
    END SUBROUTINE zdf_phy
+   INTEGER FUNCTION zdf_phy_alloc()
+      !!----------------------------------------------------------------------
+      !!                 ***  FUNCTION zdf_phy_alloc  ***
+      !!----------------------------------------------------------------------
+     ! Allocate wi array (declared in oce.F90) for use with the adaptive-implicit vertical velocity option
+     ALLOCATE(     wi(jpi,jpj,jpk), Cu_adv(jpi,jpj,jpk),  STAT= zdf_phy_alloc )
+     IF( zdf_phy_alloc /= 0 )   CALL ctl_warn('zdf_phy_alloc: failed to allocate ln_zad_Aimp=T required arrays')
+     IF( lk_mpp             )   CALL mpp_sum ( zdf_phy_alloc )
+   END FUNCTION zdf_phy_alloc
 
    !!======================================================================
 END MODULE zdfphy

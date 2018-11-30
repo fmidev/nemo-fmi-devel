@@ -27,6 +27,7 @@ MODULE sshwzv
    USE agrif_oce_interp
 #endif
    !
+   USE iom 
    USE in_out_manager ! I/O manager
    USE restart        ! only for lrst_oce
    USE prtctl         ! Print control
@@ -40,6 +41,7 @@ MODULE sshwzv
 
    PUBLIC   ssh_nxt    ! called by step.F90
    PUBLIC   wzv        ! called by step.F90
+   PUBLIC   wAimp      ! called by step.F90
    PUBLIC   ssh_swp    ! called by step.F90
 
    !! * Substitutions
@@ -264,5 +266,93 @@ CONTAINS
       !
    END SUBROUTINE ssh_swp
 
+   SUBROUTINE wAimp( kt )
+      !!----------------------------------------------------------------------
+      !!                ***  ROUTINE wAimp  ***
+      !!                   
+      !! ** Purpose :   compute the Courant number and partition vertical velocity
+      !!                if a proportion needs to be treated implicitly
+      !!
+      !! ** Method  : - 
+      !!
+      !! ** action  :   wn      : now vertical velocity (to be handled explicitly)
+      !!            :   wi      : now vertical velocity (for implicit treatment)
+      !!
+      !! Reference  : Leclair, M., and G. Madec, 2009, Ocean Modelling.
+      !!----------------------------------------------------------------------
+      INTEGER, INTENT(in) ::   kt   ! time step
+      !
+      INTEGER  ::   ji, jj, jk   ! dummy loop indices
+      REAL(wp)             ::   zCu, zcff, z1_e3w                     ! local scalars
+      REAL(wp) , PARAMETER ::   Cu_min = 0.15_wp                      ! local parameters
+      REAL(wp) , PARAMETER ::   Cu_max = 0.27                         ! local parameters
+      REAL(wp) , PARAMETER ::   Cu_cut = 2._wp*Cu_max - Cu_min        ! local parameters
+      REAL(wp) , PARAMETER ::   Fcu    = 4._wp*Cu_max*(Cu_max-Cu_min) ! local parameters
+      !!----------------------------------------------------------------------
+      !
+      IF( ln_timing )   CALL timing_start('wAimp')
+      !
+      IF( kt == nit000 ) THEN
+         IF(lwp) WRITE(numout,*)
+         IF(lwp) WRITE(numout,*) 'wAimp : Courant number-based partitioning of now vertical velocity '
+         IF(lwp) WRITE(numout,*) '~~~~~ '
+         !
+         Cu_adv(:,:,jpk) = 0._wp              ! bottom value : Cu_adv=0 (set once for all)
+      ENDIF
+      !
+      DO jk = 1, jpkm1            ! calculate Courant numbers
+         DO jj = 2, jpjm1
+            DO ji = 2, fs_jpim1   ! vector opt.
+               z1_e3w = 1._wp / e3w_n(ji,jj,jk)
+               Cu_adv(ji,jj,jk) = r2dt * ( ( MAX( wn(ji,jj,jk) , 0._wp ) - MIN( wn(ji,jj,jk+1) , 0._wp ) )    &
+                  &                      + ( MAX( e2u(ji  ,jj)*e3uw_n(ji  ,jj,jk)*un(ji  ,jj,jk), 0._wp ) -   &
+                  &                          MIN( e2u(ji-1,jj)*e3uw_n(ji-1,jj,jk)*un(ji-1,jj,jk), 0._wp ) )   &
+                  &                        * r1_e1e2t(ji,jj)                                                  &
+                  &                      + ( MAX( e1v(ji,jj  )*e3vw_n(ji,jj  ,jk)*vn(ji,jj  ,jk), 0._wp ) -   &
+                  &                          MIN( e1v(ji,jj-1)*e3vw_n(ji,jj-1,jk)*vn(ji,jj-1,jk), 0._wp ) )   &
+                  &                        * r1_e1e2t(ji,jj)                                                  &
+                  &                      ) * z1_e3w
+            END DO
+         END DO
+      END DO
+      !
+      CALL iom_put("Courant",Cu_adv)
+      !
+      wi(:,:,:) = 0._wp                                 ! Includes top and bottom values set to zero
+      IF( MAXVAL( Cu_adv(:,:,:) ) > Cu_min ) THEN       ! Quick check if any breaches anywhere
+         DO jk = 1, jpkm1                               ! or scan Courant criterion and partition
+            DO jj = 2, jpjm1                            ! w where necessary
+               DO ji = 2, fs_jpim1   ! vector opt.
+                  !
+                  zCu = MAX( Cu_adv(ji,jj,jk) , Cu_adv(ji,jj,jk+1) )
+                  !
+                  IF( zCu < Cu_min ) THEN               !<-- Fully explicit
+                     zcff = 0._wp
+                  ELSEIF( zCu < Cu_cut ) THEN           !<-- Mixed explicit
+                     zcff = ( zCu - Cu_min )**2
+                     zcff = zcff / ( Fcu + zcff )
+                  ELSE                                  !<-- Mostly implicit
+                     zcff = ( zCu - Cu_max )/ zCu
+                  ENDIF
+                  zcff = MIN(1._wp, zcff)
+                  !
+                  wi(ji,jj,jk) =           zcff   * wn(ji,jj,jk)
+                  wn(ji,jj,jk) = ( 1._wp - zcff ) * wn(ji,jj,jk)
+                  !
+                  Cu_adv(ji,jj,jk) = zcff               ! Reuse array to output coefficient
+               END DO
+            END DO
+         END DO
+      ELSE
+         ! Fully explicit everywhere
+         Cu_adv = 0.0_wp                                ! Reuse array to output coefficient
+      ENDIF
+      CALL iom_put("wimp",wi) 
+      CALL iom_put("wi_cff",Cu_adv)
+      CALL iom_put("wexp",wn)
+      !
+      IF( ln_timing )   CALL timing_stop('wAimp')
+      !
+   END SUBROUTINE wAimp
    !!======================================================================
 END MODULE sshwzv

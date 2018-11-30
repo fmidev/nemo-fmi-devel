@@ -23,6 +23,7 @@ MODULE stpctl
    USE in_out_manager  ! I/O manager
    USE lbclnk          ! ocean lateral boundary conditions (or mpp link)
    USE lib_mpp         ! distributed memory computing
+   USE zdf_oce ,  ONLY : ln_zad_Aimp       ! ocean vertical physics variables
    USE wet_dry,   ONLY : ll_wd, ssh_ref    ! reference depth for negative bathy
 
    USE netcdf          ! NetCDF library
@@ -31,7 +32,7 @@ MODULE stpctl
 
    PUBLIC stp_ctl           ! routine called by step.F90
 
-   INTEGER  ::   idrun, idtime, idssh, idu, ids1, ids2, istatus
+   INTEGER  ::   idrun, idtime, idssh, idu, ids1, ids2, idt1, idt2, idc1, idw1, istatus
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
@@ -67,7 +68,7 @@ CONTAINS
       REAL(wp) ::   zzz                    ! local real 
       INTEGER , DIMENSION(3) ::   ilocu, ilocs1, ilocs2
       INTEGER , DIMENSION(2) ::   iloch
-      REAL(wp), DIMENSION(5) ::   zmax
+      REAL(wp), DIMENSION(9) ::   zmax
       CHARACTER(len=20) :: clname
       !!----------------------------------------------------------------------
       !
@@ -89,8 +90,15 @@ CONTAINS
             istatus = NF90_DEF_VAR( idrun,   'abs_u_max', NF90_DOUBLE, (/ idtime /), idu   )
             istatus = NF90_DEF_VAR( idrun,       's_min', NF90_DOUBLE, (/ idtime /), ids1  )
             istatus = NF90_DEF_VAR( idrun,       's_max', NF90_DOUBLE, (/ idtime /), ids2  )
+            istatus = NF90_DEF_VAR( idrun,       't_min', NF90_DOUBLE, (/ idtime /), idt1  )
+            istatus = NF90_DEF_VAR( idrun,       't_max', NF90_DOUBLE, (/ idtime /), idt2  )
+            IF( ln_zad_Aimp ) THEN
+               istatus = NF90_DEF_VAR( idrun,   'abs_wi_max', NF90_DOUBLE, (/ idtime /), idw1  )
+               istatus = NF90_DEF_VAR( idrun,       'Cu_max', NF90_DOUBLE, (/ idtime /), idc1  )
+            ENDIF
             istatus = NF90_ENDDEF(idrun)
          ENDIF
+         zmax(8:9) = 0._wp    ! initialise to zero in case ln_zad_Aimp option is not in use
          
       ENDIF
       !
@@ -108,12 +116,18 @@ CONTAINS
       zmax(2) = MAXVAL(  ABS( un(:,:,:) )  )                                  ! velocity max (zonal only)
       zmax(3) = MAXVAL( -tsn(:,:,:,jp_sal) , mask = tmask(:,:,:) == 1._wp )   ! minus salinity max
       zmax(4) = MAXVAL(  tsn(:,:,:,jp_sal) , mask = tmask(:,:,:) == 1._wp )   !       salinity max
-      zmax(5) = REAL( nstop , wp )                                            ! stop indicator
+      zmax(5) = MAXVAL( -tsn(:,:,:,jp_tem) , mask = tmask(:,:,:) == 1._wp )   ! minus temperature max
+      zmax(6) = MAXVAL(  tsn(:,:,:,jp_tem) , mask = tmask(:,:,:) == 1._wp )   !       temperature max
+      zmax(7) = REAL( nstop , wp )                                            ! stop indicator
+      IF( ln_zad_Aimp ) THEN
+         zmax(8) = MAXVAL(  ABS( wi(:,:,:) ) , mask = wmask(:,:,:) == 1._wp ) ! implicit vertical vel. max
+         zmax(9) = MAXVAL(   Cu_adv(:,:,:)   , mask = tmask(:,:,:) == 1._wp ) !       cell Courant no. max
+      ENDIF
       !
       IF( lk_mpp ) THEN
-         CALL mpp_max_multiple( zmax(:), 5 )    ! max over the global domain
+         CALL mpp_max_multiple( zmax(:), 9 )    ! max over the global domain
          !
-         nstop = NINT( zmax(5) )                 ! nstop indicator sheared among all local domains
+         nstop = NINT( zmax(7) )                 ! nstop indicator sheared among all local domains
       ENDIF
       !
       IF( MOD( kt, nwrite ) == 1 .AND. lwp ) THEN
@@ -171,6 +185,12 @@ CONTAINS
          istatus = NF90_PUT_VAR( idrun,   idu, (/ zmax(2)/), (/kt/), (/1/) )
          istatus = NF90_PUT_VAR( idrun,  ids1, (/-zmax(3)/), (/kt/), (/1/) )
          istatus = NF90_PUT_VAR( idrun,  ids2, (/ zmax(4)/), (/kt/), (/1/) )
+         istatus = NF90_PUT_VAR( idrun,  idt1, (/-zmax(5)/), (/kt/), (/1/) )
+         istatus = NF90_PUT_VAR( idrun,  idt2, (/ zmax(6)/), (/kt/), (/1/) )
+         IF( ln_zad_Aimp ) THEN
+            istatus = NF90_PUT_VAR( idrun,  idw1, (/ zmax(8)/), (/kt/), (/1/) )
+            istatus = NF90_PUT_VAR( idrun,  idc1, (/ zmax(9)/), (/kt/), (/1/) )
+         ENDIF
          IF( MOD( kt , 100 ) == 0 ) istatus = NF90_SYNC(idrun)
          IF( kt == nitend         ) istatus = NF90_CLOSE(idrun)
       END IF
