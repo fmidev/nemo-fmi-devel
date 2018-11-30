@@ -208,10 +208,10 @@ CONTAINS
           zw_bnds(1,:        ) = gdepw_1d(:)
           zw_bnds(2,1:jpkm1  ) = gdepw_1d(jkmin:jpk)
           zw_bnds(2,jpk:     ) = gdepw_1d(jpk) + e3t_1d(jpk)
-          CALL iom_set_axis_attr( "deptht", bounds=zt_bnds )
-          CALL iom_set_axis_attr( "depthu", bounds=zt_bnds )
-          CALL iom_set_axis_attr( "depthv", bounds=zt_bnds )
-          CALL iom_set_axis_attr( "depthw", bounds=zw_bnds )
+          CALL iom_set_axis_attr( "deptht", bounds=zw_bnds )
+          CALL iom_set_axis_attr( "depthu", bounds=zw_bnds )
+          CALL iom_set_axis_attr( "depthv", bounds=zw_bnds )
+          CALL iom_set_axis_attr( "depthw", bounds=zt_bnds )
           !
 # if defined key_floats
           CALL iom_set_axis_attr( "nfloat", (/ (REAL(ji,wp), ji=1,jpnfl) /) )
