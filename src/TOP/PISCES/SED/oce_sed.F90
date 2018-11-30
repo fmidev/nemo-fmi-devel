@@ -10,7 +10,6 @@ MODULE oce_sed
    USE timing
    USE par_trc
 
-   USE dom_oce , ONLY :   nidom     =>   nidom          !:
    USE dom_oce , ONLY :   glamt     =>   glamt          !: longitude of t-point (degre)
    USE dom_oce , ONLY :   gphit     =>   gphit          !: latitude  of t-point (degre)
    USE dom_oce , ONLY :   e3t_n     =>   e3t_n          !: latitude  of t-point (degre)
@@ -20,10 +19,7 @@ MODULE oce_sed
    USE dom_oce , ONLY :   tmask     =>   tmask          !: land/ocean mask at t-points
    USE dom_oce , ONLY :   rdt       =>   rdt            !: time step for the dynamics
    USE dom_oce , ONLY :   nyear     =>   nyear          !: Current year
-   USE dom_oce , ONLY :   nmonth    =>   nmonth         !: Current month
-   USE dom_oce , ONLY :   nday      =>   nday           !: Current day
    USE dom_oce , ONLY :   ndastp    =>   ndastp         !: time step date in year/month/day aammjj
-   USE dom_oce , ONLY :   nday_year =>   nday_year      !: curent day counted from jan 1st of the current year
    USE dom_oce , ONLY :   adatrj    =>   adatrj         !: number of elapsed days since the begining of the run
    USE trc     , ONLY :  nittrc000  =>   nittrc000
    !                                !: it is the accumulated duration of previous runs
@@ -34,9 +30,9 @@ MODULE oce_sed
 
    USE sms_pisces, ONLY : wsbio4    =>   wsbio4          !: sinking flux for POC
    USE sms_pisces, ONLY : wsbio3    =>   wsbio3          !: sinking flux for GOC
-   USE sms_pisces, ONLY : wscal     =>   wscal           !: sinking flux for calcite
    USE sms_pisces, ONLY : wsbio2    =>   wsbio2           !: sinking flux for calcite
    USE sms_pisces, ONLY : wsbio     =>   wsbio           !: sinking flux for calcite
+   USE sms_pisces, ONLY : ln_p5z    =>   ln_p5z          !: PISCES-QUOTA flag
    USE p4zche, ONLY     : akb3      =>   akb3            !: Chemical constants  
    USE sms_pisces, ONLY : ak13      =>   ak13            !: Chemical constants  
    USE sms_pisces, ONLY : ak23      =>   ak23            !: Chemical constants  

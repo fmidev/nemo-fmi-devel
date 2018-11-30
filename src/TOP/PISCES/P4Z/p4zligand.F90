@@ -12,6 +12,7 @@ MODULE p4zligand
    USE trc             ! passive tracers common variables 
    USE sms_pisces      ! PISCES Source Minus Sink variables
    USE prtctl_trc      ! print control for debugging
+   USE iom             !  I/O manager
 
    IMPLICIT NONE
    PRIVATE
@@ -42,6 +43,8 @@ CONTAINS
       !
       INTEGER  ::   ji, jj, jk
       REAL(wp) ::   zlgwp, zlgwpr, zlgwr, zlablgw, zrfepa, zfepr
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zligrem, zligpr, zrligprod
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) ::   zw3d
       CHARACTER (len=25) ::   charout
       !!---------------------------------------------------------------------
       !
@@ -55,15 +58,18 @@ CONTAINS
                ! Remineralization of iron ligands
                ! ------------------------------------------------------------------
                ! production from remineralisation of organic matter
-               zlgwp  = orem(ji,jj,jk) * rlig
+               zlgwp = orem(ji,jj,jk) * rlig
                ! decay of weak ligand
                ! This is based on the idea that as LGW is lower
                ! there is a larger fraction of refractory OM
                zlgwr = max( rlgs , rlgw * exp( -2 * (trb(ji,jj,jk,jplgw)*1e9) ) ) ! years
-               zlgwr = 1. / zlgwr * tgfunc(ji,jj,jk) * ( xstep / nyear_len(1) ) * trb(ji,jj,jk,jplgw)
+               zlgwr = 1. / zlgwr * tgfunc(ji,jj,jk) * ( xstep / nyear_len(1) ) * blim(ji,jj,jk) * trb(ji,jj,jk,jplgw)
                ! photochem loss of weak ligand
                zlgwpr = prlgw * xstep * etot(ji,jj,jk) * trb(ji,jj,jk,jplgw) * (1. - fr_i(ji,jj))
                tra(ji,jj,jk,jplgw) = tra(ji,jj,jk,jplgw) + zlgwp - zlgwr - zlgwpr
+               zligrem(ji,jj,jk)   = zlgwr
+               zligpr(ji,jj,jk)    = zlgwpr
+               zrligprod(ji,jj,jk) = zlgwp
                !
                ! ----------------------------------------------------------
                ! Dissolution of nanoparticle Fe
@@ -73,13 +79,32 @@ CONTAINS
                ! ! 25 Wm-2 constant
                zrfepa = rfep * ( 1. - EXP( -1. * etot(ji,jj,jk) / 25. ) ) * (1.- fr_i(ji,jj))
                zrfepa = MAX( (zrfepa / 10.0), zrfepa ) ! min of 10 days lifetime
-               zfepr = rfep * xstep * trb(ji,jj,jk,jpfep)
+               zfepr  = rfep * xstep * trb(ji,jj,jk,jpfep)
                tra(ji,jj,jk,jpfep) = tra(ji,jj,jk,jpfep) - zfepr
                tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zfepr
                !
             END DO
          END DO
       END DO
+      !
+      !  Output of some diagnostics variables
+      !     ---------------------------------
+      IF( lk_iomput .AND. knt == nrdttrc ) THEN
+         ALLOCATE( zw3d(jpi,jpj,jpk) )
+         IF( iom_use( "LIGREM" ) ) THEN
+            zw3d(:,:,:) = zligrem(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:)
+            CALL iom_put( "LIGREM", zw3d )
+         ENDIF
+         IF( iom_use( "LIGPR" ) ) THEN
+            zw3d(:,:,:) = zligpr(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:) 
+            CALL iom_put( "LIGPR", zw3d )
+         ENDIF
+         IF( iom_use( "LPRODR" ) ) THEN
+            zw3d(:,:,:) = zrligprod(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:) 
+            CALL iom_put( "LPRODR", zw3d )
+         ENDIF
+         DEALLOCATE( zw3d )
+      ENDIF
       !
       IF(ln_ctl)   THEN  ! print mean trends (used for debugging)
          WRITE(charout, FMT="('ligand1')")

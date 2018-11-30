@@ -142,8 +142,6 @@ CONTAINS
          END DO
       END DO
 
-      wscal (:,:,:) = wsbio4(:,:,:)
-
       !  Initializa to zero all the sinking arrays 
       !   -----------------------------------------
       sinking (:,:,:) = 0.e0
@@ -164,7 +162,7 @@ CONTAINS
         CALL p4z_sink2( wsbio4, sinking2, jpgoc, iiter2 )
         CALL p4z_sink2( wsbio4, sinkfer2, jpbfe, iiter2 )
         CALL p4z_sink2( wsbio4, sinksil , jpgsi, iiter2 )
-        CALL p4z_sink2( wscal , sinkcal , jpcal, iiter2 )
+        CALL p4z_sink2( wsbio4, sinkcal , jpcal, iiter2 )
       END DO
 
       IF( ln_p5z ) THEN

@@ -26,7 +26,7 @@ MODULE p5zmeso
    !! * Shared module variables
    REAL(wp), PUBLIC ::  part2        !: part of calcite not dissolved in mesozoo guts
    REAL(wp), PUBLIC ::  xpref2c      !: mesozoo preference for POC 
-   REAL(wp), PUBLIC ::  xpref2p      !: mesozoo preference for nanophyto
+   REAL(wp), PUBLIC ::  xpref2n      !: mesozoo preference for nanophyto
    REAL(wp), PUBLIC ::  xpref2z      !: mesozoo preference for zooplankton
    REAL(wp), PUBLIC ::  xpref2d      !: mesozoo preference for Diatoms 
    REAL(wp), PUBLIC ::  xpref2m      !: mesozoo preference for mesozoo
@@ -39,11 +39,12 @@ MODULE p5zmeso
    REAL(wp), PUBLIC ::  resrat2      !: exsudation rate of mesozooplankton
    REAL(wp), PUBLIC ::  mzrat2       !: microzooplankton mortality rate 
    REAL(wp), PUBLIC ::  grazrat2     !: maximal mesozoo grazing rate
-   REAL(wp), PUBLIC ::  xkgraz2      !: non assimilated fraction of P by mesozoo
-   REAL(wp), PUBLIC ::  unass2c      !: Efficicency of mesozoo growth 
-   REAL(wp), PUBLIC ::  unass2n      !: Efficicency of mesozoo growth 
-   REAL(wp), PUBLIC ::  unass2p      !: Efficicency of mesozoo growth 
-   REAL(wp), PUBLIC ::  epsher2      !: half sturation constant for grazing 2
+   REAL(wp), PUBLIC ::  xkgraz2      !: Half-saturation constant of assimilation
+   REAL(wp), PUBLIC ::  unass2c      !: Non-assimilated fraction of food
+   REAL(wp), PUBLIC ::  unass2n      !: Non-assimilated fraction of food
+   REAL(wp), PUBLIC ::  unass2p      !: Non-assimilated fraction of food
+   REAL(wp), PUBLIC ::  epsher2      !: Growth efficiency of mesozoo
+   REAL(wp), PUBLIC ::  epsher2min   !: Minimum growth efficiency of mesozoo
    REAL(wp), PUBLIC ::  ssigma2      !: Fraction excreted as semi-labile DOM
    REAL(wp), PUBLIC ::  srespir2     !: Active respiration
    REAL(wp), PUBLIC ::  grazflux     !: mesozoo flux feeding rate
@@ -84,14 +85,21 @@ CONTAINS
       REAL(wp) :: zgrazffnp, zgrazffng, zgrazffpp, zgrazffpg
       CHARACTER (len=25) :: charout
       REAL(wp) :: zrfact2, zmetexcess
-      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zgrazing
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: zw3d
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zgrazing, zfezoo2
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: zw3d, zz2ligprod
 
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('p5z_meso')
       !
+
       zgrazing(:,:,:) = 0._wp
+      zfezoo2 (:,:,:) = 0._wp
+      !
+      IF (ln_ligand) THEN
+         ALLOCATE( zz2ligprod(jpi,jpj,jpk) )
+         zz2ligprod(:,:,:) = 0._wp
+      ENDIF
 
       zmetexcess = 0.0
       IF ( bmetexc2 ) zmetexcess = 1.0
@@ -110,7 +118,7 @@ CONTAINS
                !   Zooplankton mortality. A square function has been selected with
                !   no real reason except that it seems to be more stable and may mimic predation
                !   ---------------------------------------------------------------
-               ztortz   = mzrat2 * 1.e6 * zfact * trb(ji,jj,jk,jpmes)
+               ztortz   = mzrat2 * 1.e6 * zfact * trb(ji,jj,jk,jpmes) * (1. - nitrfac(ji,jj,jk))
 
                !   Computation of the abundance of the preys
                !   A threshold can be specified in the namelist
@@ -123,11 +131,11 @@ CONTAINS
 
                !   Mesozooplankton grazing
                !   ------------------------
-               zfood     = xpref2d * zcompadi + xpref2z * zcompaz + xpref2p * zcompaph + xpref2c * zcompapoc   &
+               zfood     = xpref2d * zcompadi + xpref2z * zcompaz + xpref2n * zcompaph + xpref2c * zcompapoc   &
                &           + xpref2m * zcompames 
                zfoodlim  = MAX( 0., zfood - MIN( 0.5 * zfood, xthresh2 ) )
                zdenom    = zfoodlim / ( xkgraz2 + zfoodlim )
-               zgraze2   = grazrat2 * xstep * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpmes) 
+               zgraze2   = grazrat2 * xstep * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpmes) * (1. - nitrfac(ji,jj,jk)) 
 
                !   An active switching parameterization is used here.
                !   We don't use the KTW parameterization proposed by 
@@ -137,7 +145,7 @@ CONTAINS
                !   a 1.5 power value is used which decreases the pressure on the
                !   most abundant species
                !   ------------------------------------------------------------  
-               ztmp1 = xpref2p * zcompaph**1.5
+               ztmp1 = xpref2n * zcompaph**1.5
                ztmp2 = xpref2m * zcompames**1.5
                ztmp3 = xpref2c * zcompapoc**1.5
                ztmp4 = xpref2d * zcompadi**1.5
@@ -169,12 +177,14 @@ CONTAINS
                !   Mesozooplankton flux feeding on GOC
                !   ----------------------------------
                zgrazffeg = grazflux  * xstep * wsbio4(ji,jj,jk)      &
-               &           * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpgoc) * trb(ji,jj,jk,jpmes)
+               &           * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpgoc) * trb(ji,jj,jk,jpmes)  &
+               &           * (1. - nitrfac(ji,jj,jk))
                zgrazfffg = zgrazffeg * trb(ji,jj,jk,jpbfe) / (trb(ji,jj,jk,jpgoc) + rtrn)
                zgrazffng = zgrazffeg * trb(ji,jj,jk,jpgon) / (trb(ji,jj,jk,jpgoc) + rtrn)
                zgrazffpg = zgrazffeg * trb(ji,jj,jk,jpgop) / (trb(ji,jj,jk,jpgoc) + rtrn)
                zgrazffep = grazflux  * xstep *  wsbio3(ji,jj,jk)     &
-               &           * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jppoc) * trb(ji,jj,jk,jpmes)
+               &           * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jppoc) * trb(ji,jj,jk,jpmes)   &
+               &           * (1. - nitrfac(ji,jj,jk))
                zgrazfffp = zgrazffep * trb(ji,jj,jk,jpsfe) / (trb(ji,jj,jk,jppoc) + rtrn)
                zgrazffnp = zgrazffep * trb(ji,jj,jk,jppon) / (trb(ji,jj,jk,jppoc) + rtrn)
                zgrazffpp = zgrazffep * trb(ji,jj,jk,jppop) / (trb(ji,jj,jk,jppoc) + rtrn)
@@ -225,8 +235,8 @@ CONTAINS
                !   and the quantity of the preys
                !   ---------------------------------------------------
                zepshert  = MIN( 1., zgrasratn/ no3rat3, zgrasratp/ po4rat3, zgrasratf / ferat3)
-               zbeta = 1./ (epsher2 - 0.2)
-               zepsherf = 0.2 + 1./ (zbeta + 0.04 * 12. * zfood *1E6 )
+               zbeta     = MAX(0., (epsher2 - epsher2min) )
+               zepsherf  = epsher2min + zbeta / ( 1.0 + 0.04E6 * 12. * zfood * zbeta )
                zepsherv  = zepsherf * zepshert
 
                !   Respiration of mesozooplankton
@@ -289,12 +299,16 @@ CONTAINS
                tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zgraren
                tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) + zgradoc
                !
-               IF( ln_ligand ) tra(ji,jj,jk,jplgw) = tra(ji,jj,jk,jplgw) + zgradoc * ldocz
+               IF( ln_ligand ) THEN
+                  tra(ji,jj,jk,jplgw)  = tra(ji,jj,jk,jplgw) + zgradoc * ldocz
+                  zz2ligprod(ji,jj,jk) = zgradoc * ldocz
+               ENDIF
                !
                tra(ji,jj,jk,jpdon) = tra(ji,jj,jk,jpdon) + zgradon
                tra(ji,jj,jk,jpdop) = tra(ji,jj,jk,jpdop) + zgradop
                tra(ji,jj,jk,jpoxy) = tra(ji,jj,jk,jpoxy) - o2ut * zgrarem
                tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zgraref
+               zfezoo2(ji,jj,jk)   = zgraref
                tra(ji,jj,jk,jpdic) = tra(ji,jj,jk,jpdic) + zgrarem
                tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3 * zgraren
                tra(ji,jj,jk,jpmes) = tra(ji,jj,jk,jpmes) + zepsherv * zgraztotc - zrespirc   &
@@ -350,6 +364,14 @@ CONTAINS
             zw3d(:,:,:) = prodcal(:,:,:) * 1.e+3 * rfact2r * tmask(:,:,:)   !  Calcite production
             CALL iom_put( "PCAL", zw3d )
          ENDIF
+         IF( iom_use( "FEZOO2" ) ) THEN
+            zw3d(:,:,:) = zfezoo2(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:)   !
+            CALL iom_put( "FEZOO2", zw3d )
+         ENDIF
+         IF( iom_use( "LPRODZ2" ) .AND. ln_ligand )  THEN
+            zw3d(:,:,:) = zz2ligprod(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:)
+            CALL iom_put( "LPRODZ2"  , zw3d )
+         ENDIF
          DEALLOCATE( zw3d )
       ENDIF
       !
@@ -378,9 +400,9 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER :: ios                 ! Local integer output status for namelist read
       !!
-      NAMELIST/namp5zmes/part2, bmetexc2, grazrat2, resrat2, mzrat2, xpref2c, xpref2p, xpref2z, &
+      NAMELIST/namp5zmes/part2, bmetexc2, grazrat2, resrat2, mzrat2, xpref2c, xpref2n, xpref2z, &
          &                xpref2m, xpref2d, xthresh2dia, xthresh2phy, xthresh2zoo, xthresh2poc, &
-         &                xthresh2mes, xthresh2, xkgraz2, epsher2, ssigma2, unass2c, &
+         &                xthresh2mes, xthresh2, xkgraz2, epsher2, epsher2min, ssigma2, unass2c, &
          &                unass2n, unass2p, srespir2, grazflux
       !!----------------------------------------------------------------------
       !
@@ -398,7 +420,7 @@ CONTAINS
          WRITE(numout,*) ' Namelist parameters for mesozooplankton, namp5zmes'
          WRITE(numout,*) ' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
          WRITE(numout,*) '    part of calcite not dissolved in mesozoo guts  part2       = ', part2
-         WRITE(numout,*) '    mesozoo preference for nano.                   xpref2p     = ', xpref2p
+         WRITE(numout,*) '    mesozoo preference for nano.                   xpref2n     = ', xpref2n
          WRITE(numout,*) '    mesozoo preference for diatoms                 xpref2d     = ', xpref2d
          WRITE(numout,*) '    mesozoo preference for zoo                     xpref2z     = ', xpref2z
          WRITE(numout,*) '    mesozoo preference for mesozoo                 xpref2m     = ', xpref2m
@@ -414,9 +436,10 @@ CONTAINS
          WRITE(numout,*) '    maximal mesozoo grazing rate                   grazrat2    = ', grazrat2
          WRITE(numout,*) '    mesozoo flux feeding rate                      grazflux    = ', grazflux
          WRITE(numout,*) '    C egested fraction of food by mesozoo          unass2c     = ', unass2c
-         WRITE(numout,*) '    C egested fraction of food by mesozoo          unass2n     = ', unass2n
-         WRITE(numout,*) '    C egested fraction of food by mesozoo          unass2p     = ', unass2p
+         WRITE(numout,*) '    N egested fraction of food by mesozoo          unass2n     = ', unass2n
+         WRITE(numout,*) '    P egested fraction of food by mesozoo          unass2p     = ', unass2p
          WRITE(numout,*) '    Efficicency of Mesozoo growth                  epsher2     = ', epsher2
+         WRITE(numout,*) '    Minimum Efficiency of Mesozoo growth           epsher2min  =', epsher2min
          WRITE(numout,*) '    Fraction excreted as semi-labile DOM           ssigma2     = ', ssigma2
          WRITE(numout,*) '    Active respiration                             srespir2    = ', srespir2
          WRITE(numout,*) '    half sturation constant for grazing 2          xkgraz2     = ', xkgraz2

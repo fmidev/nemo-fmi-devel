@@ -30,6 +30,7 @@ MODULE p4zsbc
    REAL(wp), PUBLIC ::   sedfeinput   !: Coastal release of Iron
    REAL(wp), PUBLIC ::   dustsolub    !: Solubility of the dust
    REAL(wp), PUBLIC ::   mfrac        !: Mineral Content of the dust
+   REAL(wp), PUBLIC ::   rdustfep     !: Fraction of dust that is dissolvable
    REAL(wp), PUBLIC ::   icefeinput   !: Iron concentration in sea ice
    REAL(wp), PUBLIC ::   wdust        !: Sinking speed of the dust 
    REAL(wp), PUBLIC ::   nitrfix      !: Nitrogen fixation rate   
@@ -133,16 +134,18 @@ CONTAINS
                DO jj = 1, jpj
                   DO ji = 1, jpi
                      zcoef = ryyss * e1e2t(ji,jj) * h_rnf(ji,jj) 
-                     rivalk(ji,jj) =   sf_river(jr_dic)%fnow(ji,jj,1)                                    &
+                     rivalk(ji,jj) =   sf_river(jr_dic)%fnow(ji,jj,1)  &
                         &              * 1.E3        / ( 12. * zcoef + rtrn )
-                     rivdic(ji,jj) = ( sf_river(jr_dic)%fnow(ji,jj,1) + sf_river(jr_doc)%fnow(ji,jj,1) ) &
+                     rivdic(ji,jj) =   sf_river(jr_dic)%fnow(ji,jj,1)  &
                         &              * 1.E3         / ( 12. * zcoef + rtrn )
-                     rivdin(ji,jj) = ( sf_river(jr_din)%fnow(ji,jj,1) + sf_river(jr_don)%fnow(ji,jj,1) ) &
+                     rivdin(ji,jj) =   sf_river(jr_din)%fnow(ji,jj,1)  &
                         &              * 1.E3 / rno3 / ( 14. * zcoef + rtrn )
-                     rivdip(ji,jj) = ( sf_river(jr_dip)%fnow(ji,jj,1) + sf_river(jr_dop)%fnow(ji,jj,1) ) &
+                     rivdip(ji,jj) =   sf_river(jr_dip)%fnow(ji,jj,1)  &
                         &              * 1.E3 / po4r / ( 31. * zcoef + rtrn )
-                     rivdsi(ji,jj) =   sf_river(jr_dsi)%fnow(ji,jj,1)                                    &
+                     rivdsi(ji,jj) =   sf_river(jr_dsi)%fnow(ji,jj,1)  &
                         &              * 1.E3        / ( 28.1 * zcoef + rtrn )
+                     rivdoc(ji,jj) =   sf_river(jr_doc)%fnow(ji,jj,1)  &
+                        &              * 1.E3        / ( 12. * zcoef + rtrn ) 
                   END DO
                END DO
             ELSE    !  ln_p5z
@@ -157,12 +160,14 @@ CONTAINS
                         &              * 1.E3 / rno3 / ( 14. * zcoef + rtrn ) * tmask(ji,jj,1)
                      rivdip(ji,jj) = ( sf_river(jr_dip)%fnow(ji,jj,1) ) &
                         &              * 1.E3 / po4r / ( 31. * zcoef + rtrn ) * tmask(ji,jj,1)
-                     rivdoc(ji,jj) = ( sf_river(jr_doc)%fnow(ji,jj,1) ) &
-                        &              * 1.E3 / ( 12. * zcoef + rtrn ) * tmask(ji,jj,1)
                      rivdon(ji,jj) = ( sf_river(jr_don)%fnow(ji,jj,1) ) &
                         &              * 1.E3 / rno3 / ( 14. * zcoef + rtrn ) * tmask(ji,jj,1)
                      rivdop(ji,jj) = ( sf_river(jr_dop)%fnow(ji,jj,1) ) &
                         &              * 1.E3 / po4r / ( 31. * zcoef + rtrn ) * tmask(ji,jj,1)
+                     rivdsi(ji,jj) =   sf_river(jr_dsi)%fnow(ji,jj,1)  &
+                        &              * 1.E3        / ( 28.1 * zcoef + rtrn )
+                     rivdoc(ji,jj) =   sf_river(jr_doc)%fnow(ji,jj,1)  &
+                        &              * 1.E3        / ( 12. * zcoef + rtrn )
                   END DO
                END DO
             ENDIF
@@ -222,7 +227,7 @@ CONTAINS
         &                sn_riverdip, sn_riverdop, sn_riverdsi, sn_ndepo, sn_ironsed, sn_hydrofe, &
         &                ln_dust, ln_solub, ln_river, ln_ndepo, ln_ironsed, ln_ironice, ln_hydrofe,    &
         &                sedfeinput, distcoast, dustsolub, icefeinput, wdust, mfrac, nitrfix, diazolight, concfediaz, &
-        &                hratio, fep_rats, fep_rath, lgw_rath
+        &                hratio, fep_rats, fep_rath, rdustfep, lgw_rath
       !!----------------------------------------------------------------------
       !
       IF(lwp) THEN
@@ -261,6 +266,7 @@ CONTAINS
          IF( ln_ligand ) THEN
             WRITE(numout,*) '      Fep/Fer ratio from sed sources            fep_rats   = ', fep_rats
             WRITE(numout,*) '      Fep/Fer ratio from sed hydro sources      fep_rath   = ', fep_rath
+            WRITE(numout,*) '      Fraction of dust that is dissolvable      rdustfep   = ', rdustfep
             WRITE(numout,*) '      Weak ligand ratio from sed hydro sources  lgw_rath   = ', lgw_rath
          ENDIF
       END IF
@@ -342,8 +348,8 @@ CONTAINS
          slf_river(jr_don) = sn_riverdon   ;   slf_river(jr_dip) = sn_riverdip   ;   slf_river(jr_dop) = sn_riverdop
          slf_river(jr_dsi) = sn_riverdsi  
          !
-         ALLOCATE( rivdic(jpi,jpj), rivalk(jpi,jpj), rivdin(jpi,jpj), rivdip(jpi,jpj), rivdsi(jpi,jpj) ) 
-         IF( ln_p5z )  ALLOCATE( rivdon(jpi,jpj), rivdop(jpi,jpj), rivdoc(jpi,jpj) )
+         ALLOCATE( rivdic(jpi,jpj), rivalk(jpi,jpj), rivdin(jpi,jpj), rivdip(jpi,jpj), rivdsi(jpi,jpj), rivdoc(jpi,jpj) ) 
+         IF( ln_p5z )  ALLOCATE( rivdon(jpi,jpj), rivdop(jpi,jpj) )
          !
          ALLOCATE( sf_river(jpriv), rivinput(jpriv), STAT=ierr1 )    !* allocate and fill sf_river (forcing structure) with sn_river_
          rivinput(:) = 0._wp

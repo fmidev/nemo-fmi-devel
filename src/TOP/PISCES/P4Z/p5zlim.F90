@@ -13,6 +13,7 @@ MODULE p5zlim
    !!----------------------------------------------------------------------
    USE oce_trc         ! Shared ocean-passive tracers variables
    USE trc             ! Tracers defined
+   USE p4zlim
    USE sms_pisces      ! PISCES variables
    USE iom             !  I/O manager
 
@@ -24,36 +25,18 @@ MODULE p5zlim
    PUBLIC p5z_lim_alloc
 
    !! * Shared module variables
-   REAL(wp), PUBLIC ::  concnno3    !:  NO3, PO4 half saturation   
    REAL(wp), PUBLIC ::  concpno3    !:  NO3, PO4 half saturation   
-   REAL(wp), PUBLIC ::  concdno3    !:  Phosphate half saturation for diatoms  
-   REAL(wp), PUBLIC ::  concnnh4    !:  NH4 half saturation for phyto  
    REAL(wp), PUBLIC ::  concpnh4    !:  NH4 half saturation for phyto  
-   REAL(wp), PUBLIC ::  concdnh4    !:  NH4 half saturation for diatoms
    REAL(wp), PUBLIC ::  concnpo4    !:  NH4 half saturation for diatoms
    REAL(wp), PUBLIC ::  concppo4    !:  NH4 half saturation for diatoms
    REAL(wp), PUBLIC ::  concdpo4    !:  NH4 half saturation for diatoms
-   REAL(wp), PUBLIC ::  concnfer    !:  Iron half saturation for nanophyto 
    REAL(wp), PUBLIC ::  concpfer    !:  Iron half saturation for nanophyto 
-   REAL(wp), PUBLIC ::  concdfer    !:  Iron half saturation for diatoms  
-   REAL(wp), PUBLIC ::  concbno3    !:  NO3 half saturation  for bacteria 
-   REAL(wp), PUBLIC ::  concbnh4    !:  NH4 half saturation for bacteria
    REAL(wp), PUBLIC ::  concbpo4    !:  PO4 half saturation for bacteria
-   REAL(wp), PUBLIC ::  xsizedia    !:  Minimum size criteria for diatoms
    REAL(wp), PUBLIC ::  xsizepic    !:  Minimum size criteria for diatoms
-   REAL(wp), PUBLIC ::  xsizephy    !:  Minimum size criteria for nanophyto
-   REAL(wp), PUBLIC ::  xsizern     !:  Size ratio for nanophytoplankton
    REAL(wp), PUBLIC ::  xsizerp     !:  Size ratio for nanophytoplankton
-   REAL(wp), PUBLIC ::  xsizerd     !:  Size ratio for diatoms
-   REAL(wp), PUBLIC ::  xksi1       !:  half saturation constant for Si uptake 
-   REAL(wp), PUBLIC ::  xksi2       !:  half saturation constant for Si/C 
-   REAL(wp), PUBLIC ::  xkdoc       !:  2nd half-sat. of DOC remineralization  
-   REAL(wp), PUBLIC ::  concbfe     !:  Fe half saturation for bacteria 
-   REAL(wp), PUBLIC ::  oxymin      !:  half saturation constant for anoxia
    REAL(wp), PUBLIC ::  qfnopt      !:  optimal Fe quota for nanophyto
    REAL(wp), PUBLIC ::  qfpopt      !:  optimal Fe quota for nanophyto
    REAL(wp), PUBLIC ::  qfdopt      !:  optimal Fe quota for diatoms
-   REAL(wp), PUBLIC ::  caco3r      !:  mean rainratio 
    REAL(wp), PUBLIC ::  qnnmin      !:  optimal Fe quota for diatoms
    REAL(wp), PUBLIC ::  qnnmax      !:  optimal Fe quota for diatoms
    REAL(wp), PUBLIC ::  qpnmin      !:  optimal Fe quota for diatoms
@@ -88,19 +71,6 @@ MODULE p5zlim
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE,   DIMENSION(:,:,:)  ::   xqpdmax    !: ???
 
    !!* Phytoplankton limitation terms
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xnanono3   !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xdiatno3   !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xnanonh4   !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xdiatnh4   !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xnanopo4   !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xdiatpo4   !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimphy    !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimdia    !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimnfe    !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimdfe    !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimsi     !: ???
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimbac    !: ??
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xlimbacl   !: ??
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xpicono3   !: ???
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xpiconh4   !: ???
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:)  ::   xpicopo4   !: ???
@@ -573,17 +543,10 @@ CONTAINS
       ALLOCATE( xpicono3(jpi,jpj,jpk), xpiconh4(jpi,jpj,jpk),       &
          &      xpicopo4(jpi,jpj,jpk), xpicodop(jpi,jpj,jpk),       &
          &      xnanodop(jpi,jpj,jpk), xdiatdop(jpi,jpj,jpk),       &
-         &      xnanono3(jpi,jpj,jpk), xdiatno3(jpi,jpj,jpk),       &
-         &      xnanonh4(jpi,jpj,jpk), xdiatnh4(jpi,jpj,jpk),       &
-         &      xnanopo4(jpi,jpj,jpk), xdiatpo4(jpi,jpj,jpk),       &
-         &      xlimphy (jpi,jpj,jpk), xlimdia (jpi,jpj,jpk),       &
-         &      xlimnfe (jpi,jpj,jpk), xlimdfe (jpi,jpj,jpk),       &
-         &      xlimbac (jpi,jpj,jpk), xlimbacl(jpi,jpj,jpk),       &
          &      xnanofer(jpi,jpj,jpk), xdiatfer(jpi,jpj,jpk),       &
          &      xpicofer(jpi,jpj,jpk), xlimpfe (jpi,jpj,jpk),       &
          &      fvnuptk (jpi,jpj,jpk), fvduptk (jpi,jpj,jpk),       &
-         &      fvpuptk (jpi,jpj,jpk), xlimpic (jpi,jpj,jpk),       &
-         &      xlimsi  (jpi,jpj,jpk), STAT=ierr(1) )
+         &      fvpuptk (jpi,jpj,jpk), xlimpic (jpi,jpj,jpk),    STAT=ierr(1) )
          !
       !*  Minimum/maximum quotas of phytoplankton
       ALLOCATE( xqnnmin (jpi,jpj,jpk), xqnnmax(jpi,jpj,jpk),       &

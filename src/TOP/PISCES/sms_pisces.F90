@@ -75,7 +75,9 @@ MODULE sms_pisces
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  etot  !: par (photosynthetic available radiation)
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  etot_ndcy      !: PAR over 24h in case of diurnal cycle
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  enano, ediat   !: PAR for phyto, nano and diat 
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  enanom, ediatm !: PAR for phyto, nano and diat 
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  epico          !: PAR for pico
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  epicom         !: PAR for pico
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::  emoy           !: averaged PAR in the mixed layer
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::  heup_01 !: Absolute euphotic layer depth
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::  xksi  !:  LOBSTER : zooplakton closure
@@ -88,7 +90,6 @@ MODULE sms_pisces
    !!*  Sinking speed
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wsbio3   !: POC sinking speed 
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wsbio4   !: GOC sinking speed
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wscal    !: Calcite and BSi sinking speeds
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wsfep
 
 
@@ -104,7 +105,7 @@ MODULE sms_pisces
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   conspoc    !: Calcite production
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   prodgoc    !: Calcite production
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   consgoc    !: Calcite production
-
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   blim       !: bacterial production factor
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sizen      !: size of diatoms 
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sizep      !: size of diatoms 
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sized      !: size of diatoms 
@@ -146,6 +147,7 @@ CONTAINS
       IF( ln_p4z .OR. ln_p5z ) THEN
          !*  Biological fluxes for light 
          ALLOCATE(  enano(jpi,jpj,jpk)    , ediat(jpi,jpj,jpk) ,   &
+           &        enanom(jpi,jpj,jpk)   , ediatm(jpi,jpj,jpk),   &
            &        etot_ndcy(jpi,jpj,jpk), emoy(jpi,jpj,jpk)  ,  STAT=ierr(2) ) 
 
          !*  Biological fluxes for primary production
@@ -156,7 +158,8 @@ CONTAINS
             &      nitrfac(jpi,jpj,jpk), nitrfac2(jpi,jpj,jpk) ,    &
             &      prodcal(jpi,jpj,jpk) , xdiss   (jpi,jpj,jpk),    &
             &      prodpoc(jpi,jpj,jpk) , conspoc(jpi,jpj,jpk) ,    &
-            &      prodgoc(jpi,jpj,jpk) , consgoc(jpi,jpj,jpk) ,  STAT=ierr(4) )
+            &      prodgoc(jpi,jpj,jpk) , consgoc(jpi,jpj,jpk) ,    &
+            &      blim   (jpi,jpj,jpk) ,                         STAT=ierr(4) )
 
          !* Variable for chemistry of the CO2 cycle
          ALLOCATE( ak13  (jpi,jpj,jpk) ,                            &
@@ -169,7 +172,7 @@ CONTAINS
          !
          !* Sinkong speed
          ALLOCATE( wsbio3 (jpi,jpj,jpk) , wsbio4 (jpi,jpj,jpk),     &
-            &      wscal(jpi,jpj,jpk)                         ,   STAT=ierr(7) )   
+            &                             STAT=ierr(7) )   
          ! 
          IF( ln_ligand ) THEN
            ALLOCATE( plig(jpi,jpj,jpk)  , wsfep(jpi,jpj,jpk)  ,   STAT=ierr(8) )
@@ -179,7 +182,7 @@ CONTAINS
       !
       IF( ln_p5z ) THEN
          !       
-         ALLOCATE( epico(jpi,jpj,jpk)                         ,   STAT=ierr(9) ) 
+         ALLOCATE( epico(jpi,jpj,jpk)   , epicom(jpi,jpj,jpk) ,   STAT=ierr(9) ) 
 
          !*  Size of phytoplankton cells
          ALLOCATE( sizen(jpi,jpj,jpk), sizep(jpi,jpj,jpk),         &

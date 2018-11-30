@@ -63,7 +63,7 @@ CONTAINS
       !
       CHARACTER (len=25) :: charout
       REAL(wp), DIMENSION(jpi,jpj    ) :: zdenit2d, zbureff, zwork
-      REAL(wp), DIMENSION(jpi,jpj    ) :: zwsbio3, zwsbio4, zwscal
+      REAL(wp), DIMENSION(jpi,jpj    ) :: zwsbio3, zwsbio4
       REAL(wp), DIMENSION(jpi,jpj    ) :: zsedcal, zsedsi, zsedc
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: zsoufer, zlight
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: ztrpo4, ztrdop, zirondep, zpdep
@@ -84,9 +84,9 @@ CONTAINS
       IF( kt == nittrc000 .AND. knt == 1 )   r1_rday  = 1. / rday
       !
       ! Allocate temporary workspace
-      IF( ln_p5z )    ALLOCATE( ztrpo4(jpi,jpj,jpk), ztrdop(jpi,jpj,jpk) )
+      ALLOCATE( ztrpo4(jpi,jpj,jpk) )
+      IF( ln_p5z )    ALLOCATE( ztrdop(jpi,jpj,jpk) )
       IF( ln_ligand ) ALLOCATE( zwsfep(jpi,jpj) )
-
 
       zdenit2d(:,:) = 0.e0
       zbureff (:,:) = 0.e0
@@ -94,7 +94,6 @@ CONTAINS
       zsedsi  (:,:) = 0.e0
       zsedcal (:,:) = 0.e0
       zsedc   (:,:) = 0.e0
-
 
       ! Iron input/uptake due to sea ice : Crude parameterization based on Lancelot et al.
       ! ----------------------------------------------------
@@ -131,6 +130,13 @@ CONTAINS
             zirondep(:,:,1) = solub(:,:) * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85 + 3.e-10 * r1_ryyss 
          ELSE
             zirondep(:,:,1) = dustsolub  * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85 + 3.e-10 * r1_ryyss 
+         ENDIF
+         IF ( ln_ligand ) THEN
+            IF( ln_solub ) THEN
+               tra(:,:,1,jpfep) = tra(:,:,1,jpfep) + rdustfep * (1.0 - solub(:,:)) * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85
+            ELSE
+               tra(:,:,1,jpfep) = tra(:,:,1,jpfep) + rdustfep * (1.0 - dustsolub) * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85
+            ENDIF
          ENDIF
          zsidep(:,:)   = 8.8 * 0.075 * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 28.1 
          zpdep (:,:,1) = 0.1 * 0.021 * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 31. / po4r 
@@ -172,16 +178,25 @@ CONTAINS
                   tra(ji,jj,jk,jpsil) = tra(ji,jj,jk,jpsil) +  rivdsi(ji,jj) * rfact2
                   tra(ji,jj,jk,jpdic) = tra(ji,jj,jk,jpdic) +  rivdic(ji,jj) * rfact2
                   tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) +  ( rivalk(ji,jj) - rno3 * rivdin(ji,jj) ) * rfact2
+                  tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) +  rivdoc(ji,jj) * rfact2
                ENDDO
             ENDDO
          ENDDO
+         IF (ln_ligand) THEN
+            DO jj = 1, jpj
+               DO ji = 1, jpi
+                  DO jk = 1, nk_rnf(ji,jj)
+                     tra(ji,jj,jk,jplgw) = tra(ji,jj,jk,jplgw) +  rivdic(ji,jj) * 5.e-5 * rfact2
+                  ENDDO
+               ENDDO
+            ENDDO
+         ENDIF
          IF( ln_p5z ) THEN
             DO jj = 1, jpj
                DO ji = 1, jpi
                   DO jk = 1, nk_rnf(ji,jj)
                      tra(ji,jj,jk,jpdop) = tra(ji,jj,jk,jpdop) + rivdop(ji,jj) * rfact2
                      tra(ji,jj,jk,jpdon) = tra(ji,jj,jk,jpdon) + rivdon(ji,jj) * rfact2
-                     tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) + rivdoc(ji,jj) * rfact2
                   ENDDO
                ENDDO
             ENDDO
@@ -215,7 +230,6 @@ CONTAINS
             ikt  = mbkt(ji,jj)
             zdep = e3t_n(ji,jj,ikt) / xstep
             zwsbio4(ji,jj) = MIN( 0.99 * zdep, wsbio4(ji,jj,ikt) )
-            zwscal (ji,jj) = MIN( 0.99 * zdep, wscal (ji,jj,ikt) )
             zwsbio3(ji,jj) = MIN( 0.99 * zdep, wsbio3(ji,jj,ikt) )
          END DO
       END DO
@@ -277,7 +291,7 @@ CONTAINS
          DO ji = 1, jpi
             ikt  = mbkt(ji,jj)
             zdep = xstep / e3t_n(ji,jj,ikt) 
-            zwsc = zwscal (ji,jj) * zdep
+            zwsc = zwsbio4(ji,jj) * zdep
             zsiloss = trb(ji,jj,ikt,jpgsi) * zwsc
             zcaloss = trb(ji,jj,ikt,jpcal) * zwsc
             !
@@ -291,7 +305,7 @@ CONTAINS
             DO ji = 1, jpi
                ikt  = mbkt(ji,jj)
                zdep = xstep / e3t_n(ji,jj,ikt) 
-               zwsc = zwscal (ji,jj) * zdep
+               zwsc = zwsbio4(ji,jj) * zdep
                zsiloss = trb(ji,jj,ikt,jpgsi) * zwsc
                zcaloss = trb(ji,jj,ikt,jpcal) * zwsc
                tra(ji,jj,ikt,jpsil) = tra(ji,jj,ikt,jpsil) + zsiloss * zrivsil 
@@ -392,14 +406,18 @@ CONTAINS
             DO jj = 1, jpj
                DO ji = 1, jpi
                   !                      ! Potential nitrogen fixation dependant on temperature and iron
-                  zlim = ( 1.- xnanono3(ji,jj,jk) - xnanonh4(ji,jj,jk) )
-                  IF( zlim <= 0.2 )   zlim = 0.01
+                  ztemp = tsn(ji,jj,jk,jp_tem)
+                  zmudia = MAX( 0.,-0.001096*ztemp**2 + 0.057*ztemp -0.637 ) * 7.625
+                  !       Potential nitrogen fixation dependant on temperature and iron
+                  xdianh4 = trb(ji,jj,jk,jpnh4) / ( concnnh4 + trb(ji,jj,jk,jpnh4) )
+                  xdiano3 = trb(ji,jj,jk,jpno3) / ( concnno3 + trb(ji,jj,jk,jpno3) ) * (1. - xdianh4)
+                  zlim = ( 1.- xdiano3 - xdianh4 )
+                  IF( zlim <= 0.1 )   zlim = 0.01
                   zfact = zlim * rfact2
-
-                  ztrfer  = biron(ji,jj,jk)       / ( concfediaz + biron(ji,jj,jk)       )
-                  ztrpo4s = trb  (ji,jj,jk,jppo4) / ( concnnh4   + trb  (ji,jj,jk,jppo4) ) 
-                  nitrpot(ji,jj,jk) =  MAX( 0.e0, ( 0.6 * tgfunc(ji,jj,jk) - 2.15 ) * r1_rday ) &
-                    &                *  zfact * MIN( ztrfer, ztrpo4s ) * zlight(ji,jj,jk)
+                  ztrfer = biron(ji,jj,jk) / ( concfediaz + biron(ji,jj,jk) )
+                  ztrpo4(ji,jj,jk) = trb(ji,jj,jk,jppo4) / ( 1E-6 + trb(ji,jj,jk,jppo4) )
+                  ztrdp = ztrpo4(ji,jj,jk)
+                  nitrpot(ji,jj,jk) =  zmudia * r1_rday * zfact * MIN( ztrfer, ztrdp ) * zlight(ji,jj,jk)
                END DO
             END DO
          END DO
@@ -433,12 +451,19 @@ CONTAINS
             DO jj = 1, jpj
                DO ji = 1, jpi
                   zfact = nitrpot(ji,jj,jk) * nitrfix
-                  tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) +             zfact
-                  tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3      * zfact
-                  tra(ji,jj,jk,jpoxy) = tra(ji,jj,jk,jpoxy) + o2nit     * zfact 
+                  tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zfact / 3.0
+                  tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3 * zfact / 3.0
+                  tra(ji,jj,jk,jppo4) = tra(ji,jj,jk,jppo4) - zfact * 2.0 / 3.0
+                  tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) + zfact * 1.0 / 3.0
+                  tra(ji,jj,jk,jppoc) = tra(ji,jj,jk,jppoc) + zfact * 1.0 / 3.0 * 2.0 / 3.0
+                  tra(ji,jj,jk,jpgoc) = tra(ji,jj,jk,jpgoc) + zfact * 1.0 / 3.0 * 1.0 / 3.0
+                  tra(ji,jj,jk,jpoxy) = tra(ji,jj,jk,jpoxy) + ( o2ut + o2nit ) * zfact * 2.0 / 3.0 + o2nit * zfact / 3.0
+                  tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) - 30E-6 * zfact * 1.0 / 3.0
+                  tra(ji,jj,jk,jpsfe) = tra(ji,jj,jk,jpsfe) + 30E-6 * zfact * 1.0 / 3.0 * 2.0 / 3.0
+                  tra(ji,jj,jk,jpbfe) = tra(ji,jj,jk,jpbfe) + 30E-6 * zfact * 1.0 / 3.0 * 1.0 / 3.0
+                  tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + 0.002 * 4E-10 * zsoufer(ji,jj,jk) * rfact2 / rday
                   tra(ji,jj,jk,jppo4) = tra(ji,jj,jk,jppo4) + concdnh4 / ( concdnh4 + trb(ji,jj,jk,jppo4) ) &
-                  &                     * 0.002 * trb(ji,jj,jk,jpdoc) * xstep
-                  tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + 0.002 * 4E-10 * zsoufer(ji,jj,jk) * xstep
+                  &                     * 0.001 * trb(ji,jj,jk,jpdoc) * xstep
               END DO
             END DO 
          END DO

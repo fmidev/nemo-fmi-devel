@@ -108,14 +108,14 @@ CONTAINS
       ierr = ierr +  p4z_opt_alloc()
       ierr = ierr +  p4z_flx_alloc()
       ierr = ierr +  p4z_sed_alloc()
-      ierr = ierr +  p4z_rem_alloc()
+      ierr = ierr +  p4z_lim_alloc()
       IF( ln_p4z ) THEN
-         ierr = ierr +  p4z_lim_alloc()
          ierr = ierr +  p4z_prod_alloc()
       ELSE
          ierr = ierr +  p5z_lim_alloc()
          ierr = ierr +  p5z_prod_alloc()
       ENDIF
+      ierr = ierr +  p4z_rem_alloc()
       !
       IF( lk_mpp    )   CALL mpp_sum( ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'pisces_alloc: unable to allocate PISCES arrays' )
@@ -164,6 +164,7 @@ CONTAINS
         IF( cltra == 'PIC'      )   jppic = jn      !: Picophytoplankton C biomass
         IF( cltra == 'PICN'     )   jpnpi = jn      !: Picophytoplankton N biomass
         IF( cltra == 'PICP'     )   jpppi = jn      !: Picophytoplankton P biomass
+        IF( cltra == 'PCHL'     )   jppch = jn      !: Diatoms Chlorophyll Concentration
         IF( cltra == 'PFe'      )   jppfe = jn      !: Picophytoplankton Fe biomass
         IF( cltra == 'LGW'      )   jplgw = jn      !: Weak ligands
         IF( cltra == 'LFe'      )   jpfep = jn      !: Fe nanoparticle
@@ -237,6 +238,11 @@ CONTAINS
          ! ----------------------------------------------------
          xksi(:,:)    = 2.e-6
          xksimax(:,:) = xksi(:,:)
+         IF( ln_p5z ) THEN
+            sized(:,:,:) = 1.0
+            sizen(:,:,:) = 1.0
+            sized(:,:,:) = 1.0
+         ENDIF
       END IF
 
 

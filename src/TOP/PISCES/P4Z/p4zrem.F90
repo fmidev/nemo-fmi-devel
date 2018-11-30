@@ -62,11 +62,11 @@ CONTAINS
       REAL(wp) ::   zremik, zremikc, zremikn, zremikp, zsiremin, zfact 
       REAL(wp) ::   zsatur, zsatur2, znusil, znusil2, zdep, zdepmin, zfactdep
       REAL(wp) ::   zbactfer, zolimit, zonitr, zrfact2
-      REAL(wp) ::   zammonic, zoxyrem
+      REAL(wp) ::   zammonic, zoxyremc, zoxyremn, zoxyremp
       REAL(wp) ::   zosil, ztem, zdenitnh4, zolimic, zolimin, zolimip, zdenitrn, zdenitrp
       CHARACTER (len=25) :: charout
       REAL(wp), DIMENSION(jpi,jpj    ) :: ztempbac
-      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zdepbac, zolimi, zdepprod, zfacsi, zfacsib
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zdepbac, zolimi, zdepprod, zfacsi, zfacsib, zdepeff, zfebact
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: zw3d
       !!---------------------------------------------------------------------
       !
@@ -74,8 +74,10 @@ CONTAINS
       !
       ! Initialisation of arrys
       zdepprod(:,:,:) = 1._wp
+      zdepeff (:,:,:) = 0.3_wp
       ztempbac(:,:)   = 0._wp
       zfacsib(:,:,:)  = xsilab / ( 1.0 - xsilab )
+      zfebact(:,:,:)  = 0._wp
       zfacsi(:,:,:)   = xsilab
 
       ! Computation of the mean phytoplankton concentration as
@@ -94,6 +96,7 @@ CONTAINS
                   zdepmin = MIN( 1., zdep / gdept_n(ji,jj,jk) )
                   zdepbac (ji,jj,jk) = zdepmin**0.683 * ztempbac(ji,jj)
                   zdepprod(ji,jj,jk) = zdepmin**0.273
+                  zdepeff (ji,jj,jk) = zdepeff(ji,jj,jk) * zdepmin**0.3
                ENDIF
             END DO
          END DO
@@ -116,20 +119,20 @@ CONTAINS
                   zammonic = zremik * nitrfac(ji,jj,jk) * trb(ji,jj,jk,jpdoc)
                   denitr(ji,jj,jk)  = zammonic * ( 1. - nitrfac2(ji,jj,jk) )
                   denitr(ji,jj,jk)  = MIN( ( trb(ji,jj,jk,jpno3) - rtrn ) / rdenit, denitr(ji,jj,jk) )
-                  zoxyrem           = zammonic - denitr(ji,jj,jk)
+                  zoxyremc          = zammonic - denitr(ji,jj,jk)
                   !
                   zolimi (ji,jj,jk) = MAX( 0.e0, zolimi (ji,jj,jk) )
                   denitr (ji,jj,jk) = MAX( 0.e0, denitr (ji,jj,jk) )
-                  zoxyrem           = MAX( 0.e0, zoxyrem  )
+                  zoxyremc          = MAX( 0.e0, zoxyremc )
 
                   !
-                  tra(ji,jj,jk,jppo4) = tra(ji,jj,jk,jppo4) + zolimi (ji,jj,jk) + denitr(ji,jj,jk) + zoxyrem
-                  tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zolimi (ji,jj,jk) + denitr(ji,jj,jk) + zoxyrem
+                  tra(ji,jj,jk,jppo4) = tra(ji,jj,jk,jppo4) + zolimi (ji,jj,jk) + denitr(ji,jj,jk) + zoxyremc
+                  tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zolimi (ji,jj,jk) + denitr(ji,jj,jk) + zoxyremc
                   tra(ji,jj,jk,jpno3) = tra(ji,jj,jk,jpno3) - denitr (ji,jj,jk) * rdenit
-                  tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) - zolimi (ji,jj,jk) - denitr(ji,jj,jk) - zoxyrem
+                  tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) - zolimi (ji,jj,jk) - denitr(ji,jj,jk) - zoxyremc
                   tra(ji,jj,jk,jpoxy) = tra(ji,jj,jk,jpoxy) - zolimi (ji,jj,jk) * o2ut
-                  tra(ji,jj,jk,jpdic) = tra(ji,jj,jk,jpdic) + zolimi (ji,jj,jk) + denitr(ji,jj,jk) + zoxyrem
-                  tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3 * ( zolimi(ji,jj,jk) + zoxyrem    &
+                  tra(ji,jj,jk,jpdic) = tra(ji,jj,jk,jpdic) + zolimi (ji,jj,jk) + denitr(ji,jj,jk) + zoxyremc
+                  tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3 * ( zolimi(ji,jj,jk) + zoxyremc    &
                   &                     + ( rdenit + 1.) * denitr(ji,jj,jk) )
                END DO
             END DO
@@ -158,21 +161,24 @@ CONTAINS
 
                   ! Ammonification in suboxic waters with denitrification
                   ! -------------------------------------------------------
-                  zolimit = zremikc * nitrfac(ji,jj,jk) * trb(ji,jj,jk,jpdoc)
-                  denitr(ji,jj,jk)  = MIN(  ( trb(ji,jj,jk,jpno3) - rtrn ) / rdenit, zolimit )
-                  denitr(ji,jj,jk) = MAX( 0.e0, denitr(ji,jj,jk) )
+                  zammonic = zremikc * nitrfac(ji,jj,jk) * trb(ji,jj,jk,jpdoc)
+                  denitr(ji,jj,jk)  = zammonic * ( 1. - nitrfac2(ji,jj,jk) )
+                  denitr(ji,jj,jk)  = MAX(0., MIN(  ( trb(ji,jj,jk,jpno3) - rtrn ) / rdenit, denitr(ji,jj,jk) ) )
+                  zoxyremc          = MAX(0., zammonic - denitr(ji,jj,jk))
                   zdenitrn  = zremikn * denitr(ji,jj,jk) * trb(ji,jj,jk,jpdon) / ( trb(ji,jj,jk,jpdoc) + rtrn )
                   zdenitrp  = zremikp * denitr(ji,jj,jk) * trb(ji,jj,jk,jpdop) / ( trb(ji,jj,jk,jpdoc) + rtrn )
+                  zoxyremn  = zremikn * zoxyremc * trb(ji,jj,jk,jpdon) / ( trb(ji,jj,jk,jpdoc) + rtrn )
+                  zoxyremp  = zremikp * zoxyremc * trb(ji,jj,jk,jpdop) / ( trb(ji,jj,jk,jpdoc) + rtrn )
 
-                  tra(ji,jj,jk,jppo4) = tra(ji,jj,jk,jppo4) + zolimip + zdenitrp
-                  tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zolimin + zdenitrn
+                  tra(ji,jj,jk,jppo4) = tra(ji,jj,jk,jppo4) + zolimip + zdenitrp + zoxyremp
+                  tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zolimin + zdenitrn + zoxyremn
                   tra(ji,jj,jk,jpno3) = tra(ji,jj,jk,jpno3) - denitr(ji,jj,jk) * rdenit
-                  tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) - zolimic - denitr(ji,jj,jk)
-                  tra(ji,jj,jk,jpdon) = tra(ji,jj,jk,jpdon) - zolimin - zdenitrn
-                  tra(ji,jj,jk,jpdop) = tra(ji,jj,jk,jpdop) - zolimip - zdenitrp
+                  tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) - zolimic - denitr(ji,jj,jk) - zoxyremc
+                  tra(ji,jj,jk,jpdon) = tra(ji,jj,jk,jpdon) - zolimin - zdenitrn - zoxyremn
+                  tra(ji,jj,jk,jpdop) = tra(ji,jj,jk,jpdop) - zolimip - zdenitrp - zoxyremp
                   tra(ji,jj,jk,jpoxy) = tra(ji,jj,jk,jpoxy) - zolimic * o2ut
-                  tra(ji,jj,jk,jpdic) = tra(ji,jj,jk,jpdic) + zolimic + denitr(ji,jj,jk)
-                  tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3 * ( zolimin + ( rdenit + 1.) * zdenitrn )
+                  tra(ji,jj,jk,jpdic) = tra(ji,jj,jk,jpdic) + zolimic + denitr(ji,jj,jk) + zoxyremc
+                  tra(ji,jj,jk,jptal) = tra(ji,jj,jk,jptal) + rno3 * ( zolimin + zoxyremn + ( rdenit + 1.) * zdenitrn )
                END DO
             END DO
          END DO
@@ -214,12 +220,14 @@ CONTAINS
                ! Bacteries are obliged to take up iron from the water. Some
                ! studies (especially at Papa) have shown this uptake to be significant
                ! ----------------------------------------------------------
-               zbactfer = feratb *  rfact2 * prmax(ji,jj,jk) * xlimbacl(ji,jj,jk)             &
+               zbactfer = feratb *  rfact2 * 0.6_wp / rday * tgfunc(ji,jj,jk) * xlimbacl(ji,jj,jk)     &
                   &              * trb(ji,jj,jk,jpfer) / ( xkferb + trb(ji,jj,jk,jpfer) )    &
-                  &              * zdepprod(ji,jj,jk) * zdepbac(ji,jj,jk)
-               tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) - zbactfer*0.16
-               tra(ji,jj,jk,jpsfe) = tra(ji,jj,jk,jpsfe) + zbactfer*0.12
-               tra(ji,jj,jk,jpbfe) = tra(ji,jj,jk,jpbfe) + zbactfer*0.04
+                  &              * zdepprod(ji,jj,jk) * zdepeff(ji,jj,jk) * zdepbac(ji,jj,jk)
+               tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) - zbactfer*0.33
+               tra(ji,jj,jk,jpsfe) = tra(ji,jj,jk,jpsfe) + zbactfer*0.25
+               tra(ji,jj,jk,jpbfe) = tra(ji,jj,jk,jpbfe) + zbactfer*0.08
+               zfebact(ji,jj,jk)   = zbactfer * 0.33
+               blim(ji,jj,jk)      = xlimbacl(ji,jj,jk)  * zdepbac(ji,jj,jk) / 1.e-6 * zdepprod(ji,jj,jk)
             END DO
          END DO
       END DO
@@ -255,7 +263,6 @@ CONTAINS
                !
                tra(ji,jj,jk,jpgsi) = tra(ji,jj,jk,jpgsi) - zosil
                tra(ji,jj,jk,jpsil) = tra(ji,jj,jk,jpsil) + zosil
-               !
             END DO
          END DO
       END DO
@@ -267,6 +274,7 @@ CONTAINS
        ENDIF
 
       IF( knt == nrdttrc ) THEN
+          zrfact2 = 1.e3 * rfact2r
           ALLOCATE( zw3d(jpi,jpj,jpk) )
           zfact = 1.e+3 * rfact2r  !  conversion from mol/l/kt to  mol/m3/s
           !
@@ -277,6 +285,14 @@ CONTAINS
           IF( iom_use( "DENIT" ) )  THEN
               zw3d(:,:,:) = denitr(:,:,:) * rdenit * rno3 * tmask(:,:,:) * zfact ! Denitrification
               CALL iom_put( "DENIT"  , zw3d )
+          ENDIF
+          IF( iom_use( "BACT" ) )  THEN
+               zw3d(:,:,:) = zdepbac(:,:,:) * 1.E6 * tmask(:,:,:)  ! Bacterial biomass
+               CALL iom_put( "BACT", zw3d )
+          ENDIF
+          IF( iom_use( "FEBACT" ) )  THEN
+               zw3d(:,:,:) = zfebact(:,:,:) * 1E9 * tmask(:,:,:) * zrfact2   ! Bacterial iron consumption
+               CALL iom_put( "FEBACT" , zw3d )
           ENDIF
           !
           DEALLOCATE( zw3d )

@@ -108,12 +108,12 @@ CONTAINS
          !
          DO jk = 1, nksrp      
             etot_ndcy(:,:,jk) =        ze1(:,:,jk) +        ze2(:,:,jk) +       ze3(:,:,jk)
-            enano    (:,:,jk) =  2.1 * ze1(:,:,jk) + 0.42 * ze2(:,:,jk) + 0.4 * ze3(:,:,jk)
-            ediat    (:,:,jk) =  1.6 * ze1(:,:,jk) + 0.69 * ze2(:,:,jk) + 0.7 * ze3(:,:,jk)
+            enano    (:,:,jk) =  1.85 * ze1(:,:,jk) + 0.69 * ze2(:,:,jk) + 0.46 * ze3(:,:,jk)
+            ediat    (:,:,jk) =  1.62 * ze1(:,:,jk) + 0.74 * ze2(:,:,jk) + 0.63 * ze3(:,:,jk)
          END DO
          IF( ln_p5z ) THEN
             DO jk = 1, nksrp      
-              epico  (:,:,jk) =  2.1 * ze1(:,:,jk) + 0.42 * ze2(:,:,jk) + 0.4 * ze3(:,:,jk)
+              epico  (:,:,jk) =  1.94 * ze1(:,:,jk) + 0.66 * ze2(:,:,jk) + 0.4 * ze3(:,:,jk)
             END DO
          ENDIF
          !
@@ -133,12 +133,12 @@ CONTAINS
          !
          DO jk = 1, nksrp      
             etot (:,:,jk) =        ze1(:,:,jk) +        ze2(:,:,jk) +       ze3(:,:,jk)
-            enano(:,:,jk) =  2.1 * ze1(:,:,jk) + 0.42 * ze2(:,:,jk) + 0.4 * ze3(:,:,jk)
-            ediat(:,:,jk) =  1.6 * ze1(:,:,jk) + 0.69 * ze2(:,:,jk) + 0.7 * ze3(:,:,jk)
+            enano(:,:,jk) =  1.85 * ze1(:,:,jk) + 0.69 * ze2(:,:,jk) + 0.46 * ze3(:,:,jk)
+            ediat(:,:,jk) =  1.62 * ze1(:,:,jk) + 0.74 * ze2(:,:,jk) + 0.63 * ze3(:,:,jk)
          END DO
          IF( ln_p5z ) THEN
             DO jk = 1, nksrp      
-              epico(:,:,jk) =  2.1 * ze1(:,:,jk) + 0.42 * ze2(:,:,jk) + 0.4 * ze3(:,:,jk)
+              epico(:,:,jk) =  1.94 * ze1(:,:,jk) + 0.66 * ze2(:,:,jk) + 0.4 * ze3(:,:,jk)
             END DO
          ENDIF
          etot_ndcy(:,:,:) =  etot(:,:,:) 
@@ -181,8 +181,6 @@ CONTAINS
       zdepmoy(:,:)   = 0.e0                    !  -------------------------------
       zetmp1 (:,:)   = 0.e0
       zetmp2 (:,:)   = 0.e0
-      zetmp3 (:,:)   = 0.e0
-      zetmp4 (:,:)   = 0.e0
 
       DO jk = 1, nksrp
          DO jj = 1, jpj
@@ -190,8 +188,6 @@ CONTAINS
                IF( gdepw_n(ji,jj,jk+1) <= hmld(ji,jj) ) THEN
                   zetmp1 (ji,jj) = zetmp1 (ji,jj) + etot     (ji,jj,jk) * e3t_n(ji,jj,jk) ! remineralisation
                   zetmp2 (ji,jj) = zetmp2 (ji,jj) + etot_ndcy(ji,jj,jk) * e3t_n(ji,jj,jk) ! production
-                  zetmp3 (ji,jj) = zetmp3 (ji,jj) + enano    (ji,jj,jk) * e3t_n(ji,jj,jk) ! production
-                  zetmp4 (ji,jj) = zetmp4 (ji,jj) + ediat    (ji,jj,jk) * e3t_n(ji,jj,jk) ! production
                   zdepmoy(ji,jj) = zdepmoy(ji,jj) +                       e3t_n(ji,jj,jk)
                ENDIF
             END DO
@@ -208,8 +204,36 @@ CONTAINS
                   z1_dep = 1. / ( zdepmoy(ji,jj) + rtrn )
                   emoy (ji,jj,jk) = zetmp1(ji,jj) * z1_dep
                   zpar (ji,jj,jk) = zetmp2(ji,jj) * z1_dep
-                  enano(ji,jj,jk) = zetmp3(ji,jj) * z1_dep
-                  ediat(ji,jj,jk) = zetmp4(ji,jj) * z1_dep
+               ENDIF
+            END DO
+         END DO
+      END DO
+      !
+      zdepmoy(:,:)   = 0.e0
+      zetmp3 (:,:)   = 0.e0
+      zetmp4 (:,:)   = 0.e0
+      !
+      DO jk = 1, nksrp
+         DO jj = 1, jpj
+            DO ji = 1, jpi
+               IF( gdepw_n(ji,jj,jk+1) <= MIN(hmld(ji,jj), heup_01(ji,jj)) ) THEN
+                  zetmp3 (ji,jj) = zetmp3 (ji,jj) + enano    (ji,jj,jk) * e3t_n(ji,jj,jk) ! production
+                  zetmp4 (ji,jj) = zetmp4 (ji,jj) + ediat    (ji,jj,jk) * e3t_n(ji,jj,jk) ! production
+                  zdepmoy(ji,jj) = zdepmoy(ji,jj) +                       e3t_n(ji,jj,jk)
+               ENDIF
+            END DO
+         END DO
+      END DO
+      enanom(:,:,:) = enano(:,:,:)
+      ediatm(:,:,:) = ediat(:,:,:)
+      !
+      DO jk = 1, nksrp
+         DO jj = 1, jpj
+            DO ji = 1, jpi
+               IF( gdepw_n(ji,jj,jk+1) <= hmld(ji,jj) ) THEN
+                  z1_dep = 1. / ( zdepmoy(ji,jj) + rtrn )
+                  enanom(ji,jj,jk) = zetmp3(ji,jj) * z1_dep
+                  ediatm(ji,jj,jk) = zetmp4(ji,jj) * z1_dep
                ENDIF
             END DO
          END DO
@@ -220,10 +244,21 @@ CONTAINS
          DO jk = 1, nksrp
             DO jj = 1, jpj
                DO ji = 1, jpi
-                  IF( gdepw_n(ji,jj,jk+1) <= hmld(ji,jj) ) THEN 
-                     z1_dep = 1. / ( zdepmoy(ji,jj) + rtrn )
+                  IF( gdepw_n(ji,jj,jk+1) <= MIN(hmld(ji,jj), heup_01(ji,jj)) ) THEN
                      zetmp5(ji,jj)  = zetmp5 (ji,jj) + epico(ji,jj,jk) * e3t_n(ji,jj,jk) ! production
-                     epico(ji,jj,jk) = zetmp5(ji,jj) * z1_dep
+                  ENDIF
+               END DO
+            END DO
+         END DO
+         !
+         epicom(:,:,:) = epico(:,:,:)
+         !
+         DO jk = 1, nksrp
+            DO jj = 1, jpj
+               DO ji = 1, jpi
+                  IF( gdepw_n(ji,jj,jk+1) <= hmld(ji,jj) ) THEN
+                     z1_dep = 1. / ( zdepmoy(ji,jj) + rtrn )
+                     epicom(ji,jj,jk) = zetmp5(ji,jj) * z1_dep
                   ENDIF
                END DO
             END DO

@@ -471,6 +471,8 @@ CONTAINS
          WRITE(numsed,*) ' 2-way coupling between PISCES and Sed ln_sed_2way = ', ln_sed_2way
       ENDIF
 
+      IF ( ln_p5z .AND. ln_sed_2way ) CALL ctl_stop( '2 ways coupling with sediment cannot be activated with PISCES-QUOTA' )
+
       REWIND( numnamsed_ref )              ! Namelist nam_geom in reference namelist : Pisces variables
       READ  ( numnamsed_ref, nam_geom, IOSTAT = ios, ERR = 903)
 903   IF( ios /= 0 ) CALL ctl_nam ( ios , 'nam_geom in reference namelist', lwp )

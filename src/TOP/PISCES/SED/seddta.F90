@@ -48,7 +48,7 @@ CONTAINS
       INTEGER  ::  ji, jj, js, jw, ikt
 
       REAL(wp), DIMENSION(jpoce) :: zdtap, zdtag
-      REAL(wp), DIMENSION(jpi,jpj) :: zwsbio4, zwsbio3, zwscal
+      REAL(wp), DIMENSION(jpi,jpj) :: zwsbio4, zwsbio3
       REAL(wp) :: zf0, zf1, zf2, zkapp, zratio, zdep
 
       !----------------------------------------------------------------------
@@ -96,7 +96,6 @@ CONTAINS
                ikt = mbkt(ji,jj)
                zwsbio4(ji,jj) = wsbio2 / rday
                zwsbio3(ji,jj) = wsbio  / rday
-               zwscal (ji,jj) = wsbio2 / rday
             END DO
          END DO
       ELSE
@@ -105,7 +104,6 @@ CONTAINS
                ikt = mbkt(ji,jj)
                zdep = e3t_n(ji,jj,ikt) / r2dttrc
                zwsbio4(ji,jj) = MIN( 0.99 * zdep, wsbio4(ji,jj,ikt) / rday )
-               zwscal (ji,jj) = MIN( 0.99 * zdep, wscal (ji,jj,ikt) / rday )
                zwsbio3(ji,jj) = MIN( 0.99 * zdep, wsbio3(ji,jj,ikt) / rday )
             END DO
          END DO
@@ -129,7 +127,7 @@ CONTAINS
                trc_data(ji,jj,11 ) = MIN(trb(ji,jj,ikt,jpgsi), 1E-4) * zwsbio4(ji,jj) * 1E3
                trc_data(ji,jj,12 ) = MIN(trb(ji,jj,ikt,jppoc), 1E-4) * zwsbio3(ji,jj) * 1E3
                trc_data(ji,jj,13 ) = MIN(trb(ji,jj,ikt,jpgoc), 1E-4) * zwsbio4(ji,jj) * 1E3
-               trc_data(ji,jj,14)  = MIN(trb(ji,jj,ikt,jpcal), 1E-4) * zwscal (ji,jj) * 1E3
+               trc_data(ji,jj,14)  = MIN(trb(ji,jj,ikt,jpcal), 1E-4) * zwsbio4(ji,jj) * 1E3
                trc_data(ji,jj,15)  = tsn(ji,jj,ikt,jp_tem)
                trc_data(ji,jj,16)  = tsn(ji,jj,ikt,jp_sal)
                trc_data(ji,jj,17 ) = ( trb(ji,jj,ikt,jpsfe) * zwsbio3(ji,jj) + trb(ji,jj,ikt,jpbfe)  &

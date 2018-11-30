@@ -14,6 +14,7 @@ MODULE p5zmicro
    USE oce_trc         !  shared variables between ocean and passive tracers
    USE trc             !  passive tracers common variables 
    USE sms_pisces      !  PISCES Source Minus Sink variables
+   USE p4zlim
    USE p5zlim          !  Phytoplankton limitation terms
    USE iom             !  I/O manager
    USE prtctl_trc      !  print control for debugging
@@ -40,11 +41,12 @@ MODULE p5zmicro
    REAL(wp), PUBLIC ::  resrat      !: exsudation rate of microzooplankton
    REAL(wp), PUBLIC ::  mzrat       !: microzooplankton mortality rate 
    REAL(wp), PUBLIC ::  grazrat     !: maximal microzoo grazing rate
-   REAL(wp), PUBLIC ::  xkgraz      !: non assimilated fraction of P by microzoo
-   REAL(wp), PUBLIC ::  unassc      !: Efficicency of microzoo growth 
-   REAL(wp), PUBLIC ::  unassn      !: Efficicency of microzoo growth 
-   REAL(wp), PUBLIC ::  unassp      !: Efficicency of microzoo growth 
-   REAL(wp), PUBLIC ::  epsher      !: half sturation constant for grazing 1 
+   REAL(wp), PUBLIC ::  xkgraz      !: Half-saturation constant of assimilation
+   REAL(wp), PUBLIC ::  unassc      !: Non-assimilated part of food
+   REAL(wp), PUBLIC ::  unassn      !: Non-assimilated part of food
+   REAL(wp), PUBLIC ::  unassp      !: Non-assimilated part of food
+   REAL(wp), PUBLIC ::  epsher      !: Growth efficiency for microzoo
+   REAL(wp), PUBLIC ::  epshermin   !: Minimum growth efficiency for microzoo
    REAL(wp), PUBLIC ::  srespir     !: half sturation constant for grazing 1 
    REAL(wp), PUBLIC ::  ssigma      !: Fraction excreted as semi-labile DOM
    LOGICAL,  PUBLIC ::  bmetexc     !: Use of excess carbon for respiration
@@ -81,12 +83,17 @@ CONTAINS
       REAL(wp) :: zgraznc, zgraznn, zgraznp, zgrazpoc, zgrazpon, zgrazpop, zgrazpof
       REAL(wp) :: zgrazdc, zgrazdn, zgrazdp, zgrazdf, zgraznf, zgrazz
       REAL(wp) :: zgrazpc, zgrazpn, zgrazpp, zgrazpf, zbeta, zrfact2, zmetexcess
-      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zgrazing
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: zw3d
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zgrazing, zfezoo
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: zw3d, zzligprod
       CHARACTER (len=25) :: charout
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('p5z_micro')
+      !
+      IF (ln_ligand) THEN
+         ALLOCATE( zzligprod(jpi,jpj,jpk) )
+         zzligprod(:,:,:) = 0._wp
+      ENDIF
       !
       zmetexcess = 0.0
       IF ( bmetexc ) zmetexcess = 1.0
@@ -105,7 +112,7 @@ CONTAINS
                !   Zooplankton mortality. A square function has been selected with
                !   no real reason except that it seems to be more stable and may mimic predation.
                !   ------------------------------------------------------------------------------
-               ztortz = mzrat * 1.e6 * zfact * trb(ji,jj,jk,jpzoo)
+               ztortz = mzrat * 1.e6 * zfact * trb(ji,jj,jk,jpzoo) * (1. - nitrfac(ji,jj,jk))
 
                !   Computation of the abundance of the preys
                !   A threshold can be specified in the namelist
@@ -122,7 +129,7 @@ CONTAINS
                &           + xprefz * zcompaz + xprefp * zcompapi
                zfoodlim  = MAX( 0. , zfood - min(xthresh,0.5*zfood) )
                zdenom    = zfoodlim / ( xkgraz + zfoodlim )
-               zgraze    = grazrat * xstep * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpzoo) 
+               zgraze    = grazrat * xstep * tgfunc2(ji,jj,jk) * trb(ji,jj,jk,jpzoo) * (1. - nitrfac(ji,jj,jk)) 
 
                !   An active switching parameterization is used here.
                !   We don't use the KTW parameterization proposed by 
@@ -182,8 +189,8 @@ CONTAINS
                !   and the quantity of the preys
                !   ---------------------------------------------------
                zepshert  = MIN( 1., zgrasratn/ no3rat3, zgrasratp/ po4rat3, zgrasratf / ferat3)
-               zbeta = 1./ (epsher - 0.2)
-               zepsherf = 0.2 + 1./ (zbeta + 0.04 * 12. * zfood * 1E6 )
+               zbeta     = MAX( 0., (epsher - epshermin) )
+               zepsherf  = epshermin + zbeta / ( 1.0 + 0.04E6 * 12. * zfood * zbeta )
                zepsherv  = zepsherf * zepshert
 
                !   Respiration of microzooplankton
@@ -243,12 +250,16 @@ CONTAINS
                tra(ji,jj,jk,jpnh4) = tra(ji,jj,jk,jpnh4) + zgraren
                tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) + zgradoc
                !
-               IF( ln_ligand ) tra(ji,jj,jk,jplgw) = tra(ji,jj,jk,jplgw) + zgradoc * ldocz
+               IF( ln_ligand ) THEN 
+                  tra(ji,jj,jk,jplgw) = tra(ji,jj,jk,jplgw) + zgradoc * ldocz
+                  zzligprod(ji,jj,jk) = zgradoc * ldocz
+               ENDIF
                !
                tra(ji,jj,jk,jpdon) = tra(ji,jj,jk,jpdon) + zgradon
                tra(ji,jj,jk,jpdop) = tra(ji,jj,jk,jpdop) + zgradop
                tra(ji,jj,jk,jpoxy) = tra(ji,jj,jk,jpoxy) - o2ut * zgrarem 
                tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zgraref
+               zfezoo(ji,jj,jk)    = zgraref
                tra(ji,jj,jk,jpzoo) = tra(ji,jj,jk,jpzoo) + zepsherv * zgraztotc - zrespirc - ztortz - zgrazz
                tra(ji,jj,jk,jpphy) = tra(ji,jj,jk,jpphy) - zgraznc
                tra(ji,jj,jk,jpnph) = tra(ji,jj,jk,jpnph) - zgraznn
@@ -287,13 +298,23 @@ CONTAINS
          END DO
       END DO
       !
-      IF( lk_iomput .AND. knt == nrdttrc ) THEN
-         ALLOCATE( zw3d(jpi,jpj,jpk) )
-         IF( iom_use( "GRAZ1" ) ) THEN
-            zw3d(:,:,:) = zgrazing(:,:,:) * 1.e+3 * rfact2r * tmask(:,:,:)  !  Total grazing of phyto by zooplankton
-            CALL iom_put( "GRAZ1", zw3d )
+      IF( lk_iomput ) THEN
+         IF( knt == nrdttrc ) THEN
+            ALLOCATE( zw3d(jpi,jpj,jpk) )
+            IF( iom_use( "GRAZ1" ) ) THEN
+               zw3d(:,:,:) = zgrazing(:,:,:) * 1.e+3 * rfact2r * tmask(:,:,:)  !  Total grazing of phyto by zooplankton
+               CALL iom_put( "GRAZ1", zw3d )
+            ENDIF
+            IF( iom_use( "FEZOO" ) ) THEN
+               zw3d(:,:,:) = zfezoo(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:)   !
+               CALL iom_put( "FEZOO", zw3d )
+            ENDIF
+            IF( iom_use( "LPRODZ" ) .AND. ln_ligand )  THEN
+               zw3d(:,:,:) = zzligprod(:,:,:) * 1e9 * 1.e+3 * rfact2r * tmask(:,:,:)
+               CALL iom_put( "LPRODZ"  , zw3d )
+            ENDIF
+            DEALLOCATE( zw3d )
          ENDIF
-         DEALLOCATE( zw3d )
       ENDIF
       !
       IF(ln_ctl)   THEN  ! print mean trends (used for debugging)
@@ -324,7 +345,7 @@ CONTAINS
       NAMELIST/namp5zzoo/ part, grazrat, bmetexc, resrat, mzrat, xprefc, xprefn, &
          &                xprefp, xprefd, xprefz, xthreshdia, xthreshphy, &
          &                xthreshpic, xthreshpoc, xthreshzoo, xthresh, xkgraz, &
-         &                epsher, ssigma, srespir, unassc, unassn, unassp
+         &                epsher, epshermin, ssigma, srespir, unassc, unassn, unassp
       !!----------------------------------------------------------------------
       !
       REWIND( numnatp_ref )              ! Namelist nampiszoo in reference namelist : Pisces microzooplankton
@@ -359,6 +380,7 @@ CONTAINS
          WRITE(numout,*) '    N egested fraction of fodd by microzoo          unassn      =', unassn
          WRITE(numout,*) '    P egested fraction of fodd by microzoo          unassp      =', unassp
          WRITE(numout,*) '    Efficicency of microzoo growth                  epsher      =', epsher
+         WRITE(numout,*) '    Minimum Efficiency of Microzoo growth           epshermin   =', epshermin
          WRITE(numout,*) '    Fraction excreted as semi-labile DOM            ssigma      =', ssigma
          WRITE(numout,*) '    Active respiration                              srespir     =', srespir
          WRITE(numout,*) '    half sturation constant for grazing 1           xkgraz      =', xkgraz

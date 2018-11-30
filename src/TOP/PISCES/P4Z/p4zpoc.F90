@@ -61,7 +61,7 @@ CONTAINS
       REAL(wp) ::   zrfact2
       CHARACTER (len=25) :: charout
       REAL(wp), DIMENSION(jpi,jpj  )   :: totprod, totthick, totcons 
-      REAL(wp), DIMENSION(jpi,jpj,jpk)   :: zremipoc, zremigoc, zorem3, ztremint
+      REAL(wp), DIMENSION(jpi,jpj,jpk)   :: zremipoc, zremigoc, zorem3, ztremint, zfolimi
       REAL(wp), DIMENSION(jpi,jpj,jpk,jcpoc) :: alphag
       !!---------------------------------------------------------------------
       !
@@ -89,6 +89,7 @@ CONTAINS
       zorem3(:,:,:)   = 0.
       orem  (:,:,:)   = 0.
       ztremint(:,:,:) = 0.
+      zfolimi (:,:,:) = 0.
 
       DO jn = 1, jcpoc
         alphag(:,:,:,jn) = alphan(jn)
@@ -208,6 +209,7 @@ CONTAINS
                   tra(ji,jj,jk,jpbfe) = tra(ji,jj,jk,jpbfe) - zofer2 - zofer3
                   tra(ji,jj,jk,jpdoc) = tra(ji,jj,jk,jpdoc) + zorem2
                   tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zofer2
+                  zfolimi(ji,jj,jk)   = zofer2
                END DO
             END DO
          END DO
@@ -238,6 +240,7 @@ CONTAINS
                   tra(ji,jj,jk,jpgon) = tra(ji,jj,jk,jpgon) - zopon2 * (1. + solgoc)
                   tra(ji,jj,jk,jpgop) = tra(ji,jj,jk,jpgop) - zopop2 * (1. + solgoc)
                   tra(ji,jj,jk,jpbfe) = tra(ji,jj,jk,jpbfe) - zofer2 * (1. + solgoc)
+                  zfolimi(ji,jj,jk)   = zofer2
                END DO
             END DO
          END DO
@@ -413,6 +416,7 @@ CONTAINS
                     tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zofer
                     tra(ji,jj,jk,jppoc) = tra(ji,jj,jk,jppoc) - zorem
                     tra(ji,jj,jk,jpsfe) = tra(ji,jj,jk,jpsfe) - zofer
+                    zfolimi(ji,jj,jk)   = zfolimi(ji,jj,jk) + zofer
                   ENDIF
                END DO
             END DO
@@ -438,6 +442,7 @@ CONTAINS
                 tra(ji,jj,jk,jpdon) = tra(ji,jj,jk,jpdon) + zopon 
                 tra(ji,jj,jk,jpdop) = tra(ji,jj,jk,jpdop) + zopop 
                 tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zofer 
+                zfolimi(ji,jj,jk)   = zfolimi(ji,jj,jk) + zofer
              END DO
            END DO
         END DO
@@ -448,6 +453,7 @@ CONTAINS
           zrfact2 = 1.e3 * rfact2r
           CALL iom_put( "REMINP" , zremipoc(:,:,:) * tmask(:,:,:) )  ! Remineralisation rate
           CALL iom_put( "REMING" , zremigoc(:,:,:) * tmask(:,:,:) )  ! Remineralisation rate
+          CALL iom_put( "REMINF" , zfolimi(:,:,:)  * tmask(:,:,:)  * 1.e+9 * zrfact2 )  ! Remineralisation rate
         ENDIF
      ENDIF
 

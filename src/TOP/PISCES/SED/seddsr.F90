@@ -590,8 +590,12 @@ jflag4:     DO jn = 1, 10
             zbeta  = zsedtra(4) + zsedtra(5) 
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
             zdelta = pwcp(ji,jk,jwpo4) - redfep * zsedtra(4)
-            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( 0.25 * zsedtra(4) * ( exp( reac_fe2 * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_fe2 * zalpha * dtsed2 / 2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(4) = zsedtra(4) / ( 1.0 + zsedtra(4) * reac_fe2 * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(4) = ( zsedtra(4) * zalpha ) / ( 0.25 * zsedtra(4) * ( exp( reac_fe2 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_fe2 * zalpha * dtsed2 / 2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 0.25 * zsedtra(4) 
             zsedtra(5) = zbeta  - zsedtra(4)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
@@ -600,24 +604,36 @@ jflag4:     DO jn = 1, 10
             zalpha = zsedtra(1) - 2.0 * zsedtra(2)
             zbeta  = pwcp(ji,jk,jwso4) + zsedtra(2)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(2)
-            zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_h2s * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_h2s * zalpha * dtsed2 / 2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(2) = zsedtra(2) / ( 1.0 + zsedtra(2) * reac_h2s * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_h2s * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_h2s * zalpha * dtsed2 / 2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 2.0 * zsedtra(2)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(2)
             pwcp(ji,jk,jwso4) = zbeta - zsedtra(2)
             ! NH4 + O2
             zalpha = zsedtra(1) - 2.0 * zsedtra(3)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(3)
-            zsedtra(3) = ( zsedtra(3) * zalpha ) / ( 2.0 * zsedtra(3) * ( exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 /2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(3) = zsedtra(3) / ( 1.0 + zsedtra(3) * reac_nh4 * zadsnh4 * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(3) = ( zsedtra(3) * zalpha ) / ( 2.0 * zsedtra(3) * ( exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 /2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 2.0 * zsedtra(3)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(3)
             ! FeS - O2
             zalpha = zsedtra(1) - 2.0 * zsedtra(6)
             zbeta  = zsedtra(4) + zsedtra(6)
             zgamma = pwcp(ji,jk,jwso4) + zsedtra(6)
-            zsedtra(6) = ( zsedtra(6) * zalpha ) / ( 2.0 * zsedtra(6) * ( exp( reac_feso * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_feso * zalpha * dtsed2 /2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(6) = zsedtra(6) / ( 1.0 + zsedtra(6) * reac_feso * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(6) = ( zsedtra(6) * zalpha ) / ( 2.0 * zsedtra(6) * ( exp( reac_feso * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_feso * zalpha * dtsed2 /2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 2.0 * zsedtra(6)
             zsedtra(4) = zbeta  - zsedtra(6)
             pwcp(ji,jk,jwso4) = zgamma - zsedtra(6)
@@ -625,8 +641,12 @@ jflag4:     DO jn = 1, 10
             zalpha = zsedtra(2) - zsedtra(4)
             zbeta  = zsedtra(4) + zsedtra(6)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
-            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( zsedtra(4) * ( exp( reac_fes * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_fes * zalpha * dtsed2 /2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(4) = zsedtra(4) / ( 1.0 + zsedtra(4) * reac_fes * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(4) = ( zsedtra(4) * zalpha ) / ( zsedtra(4) * ( exp( reac_fes * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_fes * zalpha * dtsed2 /2. ) )
+            ENDIF
             zsedtra(2) = zalpha + zsedtra(4)
             zsedtra(6) = zbeta  - zsedtra(4)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
@@ -636,8 +656,12 @@ jflag4:     DO jn = 1, 10
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
             zdelta = pwcp(ji,jk,jwso4) + zsedtra(2)
             zepsi  = pwcp(ji,jk,jwpo4) + redfep * zsedtra(5)
-            zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_feh2s * zalpha * dtsed2 ) - 1.0 )  &
-            &            + zalpha * exp( reac_feh2s * zalpha * dtsed2 ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(2) = zsedtra(2) / ( 1.0 + zsedtra(2) * reac_feh2s * dtsed2 )
+            ELSE
+               zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_feh2s * zalpha * dtsed2 ) - 1.0 )  &
+               &            + zalpha * exp( reac_feh2s * zalpha * dtsed2 ) )
+            ENDIF
             zsedtra(5) = zalpha + 2.0 * zsedtra(2)
             zsedtra(4) = zbeta  - zsedtra(5)
             pwcp(ji,jk,jwso4) = zdelta - zsedtra(2)
@@ -647,8 +671,12 @@ jflag4:     DO jn = 1, 10
             zalpha = zsedtra(2) - zsedtra(4)
             zbeta  = zsedtra(4) + zsedtra(6)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
-            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( zsedtra(4) * ( exp( reac_fes * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_fes * zalpha * dtsed2 /2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(4) = zsedtra(4) / ( 1.0 + zsedtra(4) * reac_fes * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(4) = ( zsedtra(4) * zalpha ) / ( zsedtra(4) * ( exp( reac_fes * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_fes * zalpha * dtsed2 /2. ) )
+            ENDIF
             zsedtra(2) = zalpha + zsedtra(4)
             zsedtra(6) = zbeta  - zsedtra(4)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(4)
@@ -656,24 +684,36 @@ jflag4:     DO jn = 1, 10
             zalpha = zsedtra(1) - 2.0 * zsedtra(6)
             zbeta  = zsedtra(4) + zsedtra(6)
             zgamma = pwcp(ji,jk,jwso4) + zsedtra(6)
-            zsedtra(6) = ( zsedtra(6) * zalpha ) / ( 2.0 * zsedtra(6) * ( exp( reac_feso * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_feso * zalpha * dtsed2 /2. ) + rtrn )
+            IF (zalpha == 0.) THEN
+               zsedtra(6) = zsedtra(6) / ( 1.0 + zsedtra(6) * reac_feso * dtsed2 / 2. )
+            ELSE
+               zsedtra(6) = ( zsedtra(6) * zalpha ) / ( 2.0 * zsedtra(6) * ( exp( reac_feso * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_feso * zalpha * dtsed2 /2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 2.0 * zsedtra(6)
             zsedtra(4) = zbeta  - zsedtra(6)
             pwcp(ji,jk,jwso4) = zgamma - zsedtra(6)
             ! NH4 + O2
             zalpha = zsedtra(1) - 2.0 * zsedtra(3)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(3)
-            zsedtra(3) = ( zsedtra(3) * zalpha ) / ( 2.0 * zsedtra(3) * ( exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 /2. ) + rtrn )
+            IF (zalpha == 0.) THEN
+               zsedtra(3) = zsedtra(3) / ( 1.0 + zsedtra(3) * reac_nh4 * zadsnh4 * dtsed2 / 2.0) 
+            ELSE
+               zsedtra(3) = ( zsedtra(3) * zalpha ) / ( 2.0 * zsedtra(3) * ( exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_nh4 * zadsnh4 * zalpha * dtsed2 /2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 2.0 * zsedtra(3)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(3)
             ! H2S + O2
             zalpha = zsedtra(1) - 2.0 * zsedtra(2)
             zbeta  = pwcp(ji,jk,jwso4) + zsedtra(2)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(2)
-            zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_h2s * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_h2s * zalpha * dtsed2 / 2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(2) = zsedtra(2) / ( 1.0 + zsedtra(2) * reac_h2s * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(2) = ( zsedtra(2) * zalpha ) / ( 2.0 * zsedtra(2) * ( exp( reac_h2s * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_h2s * zalpha * dtsed2 / 2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 2.0 * zsedtra(2)
             pwcp(ji,jk,jwso4) = zbeta - zsedtra(2)
             pwcp(ji,jk,jwalk) = zgamma + 2.0 * zsedtra(2)
@@ -682,8 +722,12 @@ jflag4:     DO jn = 1, 10
             zbeta  = zsedtra(4) + zsedtra(5)
             zgamma = pwcp(ji,jk,jwalk) - 2.0 * zsedtra(4)
             zdelta = pwcp(ji,jk,jwpo4) - redfep * zsedtra(4)
-            zsedtra(4) = ( zsedtra(4) * zalpha ) / ( 0.25 * zsedtra(4) * ( exp( reac_fe2 * zalpha * dtsed2 / 2. ) - 1.0 )  &
-            &            + zalpha * exp( reac_fe2 * zalpha * dtsed2 / 2. ) + rtrn )
+            IF ( zalpha == 0. ) THEN
+               zsedtra(4) = zsedtra(4) / ( 1.0 + zsedtra(4) * reac_fe2 * dtsed2 / 2.0 )
+            ELSE
+               zsedtra(4) = ( zsedtra(4) * zalpha ) / ( 0.25 * zsedtra(4) * ( exp( reac_fe2 * zalpha * dtsed2 / 2. ) - 1.0 )  &
+               &            + zalpha * exp( reac_fe2 * zalpha * dtsed2 / 2. ) )
+            ENDIF
             zsedtra(1) = zalpha + 0.25 * zsedtra(4)
             zsedtra(5) = zbeta  - zsedtra(4)
             pwcp(ji,jk,jwpo4) = zdelta + redfep * zsedtra(4)
