@@ -54,8 +54,8 @@
    niter2max  =  2        ! Maximum number of iterations for GOC
 !                         !  ln_ligand enabled
    wfep       =  0.2      ! FeP sinking speed 
-   ldocp      =  1.E-5    ! Phyto ligand production per unit doc 
-   ldocz      =  1.E-5    ! Zoo ligand production per unit doc 
+   ldocp      =  1.E-4    ! Phyto ligand production per unit doc 
+   ldocz      =  1.E-4    ! Zoo ligand production per unit doc 
    lthet      =  0.5      ! Proportional loss of ligands due to Fe uptake 
 !                         !  ln_p5z enabled
    no3rat3    =  0.182    ! N/C ratio in zooplankton
@@ -209,10 +209,10 @@
    grazrat2   =  0.75     ! maximal mesozoo grazing rate
    resrat2    =  0.005    ! exsudation rate of mesozooplankton
    mzrat2     =  0.03     ! mesozooplankton mortality rate
-   xprefc     =  1.       ! mesozoo preference for diatoms
-   xprefp     =  0.3      ! mesozoo preference for nanophyto.
-   xprefz     =  1.       ! mesozoo preference for microzoo.
-   xprefpoc   =  0.3      ! mesozoo preference for poc
+   xpref2d    =  1.       ! mesozoo preference for diatoms
+   xpref2n    =  0.3      ! mesozoo preference for nanophyto.
+   xpref2z    =  1.       ! mesozoo preference for microzoo.
+   xpref2c    =  0.3      ! mesozoo preference for poc
    xthresh2zoo = 1E-8     ! zoo feeding threshold for mesozooplankton 
    xthresh2dia = 1E-8     ! diatoms feeding threshold for mesozooplankton 
    xthresh2phy = 1E-8     ! nanophyto feeding threshold for mesozooplankton 
@@ -220,6 +220,7 @@
    xthresh2   =  3E-7     ! Food threshold for grazing
    xkgraz2    =  20.E-6   ! half saturation constant for meso grazing
    epsher2    =  0.35     ! Efficicency of Mesozoo growth
+   epsher2min =  0.35     ! Minimum efficiency of mesozoo growth
    sigma2     =  0.6      ! Fraction of mesozoo excretion as DOM
    unass2     =  0.3      ! non assimilated fraction of P by mesozoo
    grazflux   =  2.e3     ! flux-feeding rate
@@ -245,6 +246,7 @@
    xthresh2    =  3E-7     ! Food threshold for grazing
    xkgraz2     =  20.E-6   ! half sturation constant for meso grazing
    epsher2     =  0.5      ! Efficicency of Mesozoo growth
+   epsher2min  =  0.2     ! Minimum efficiency of mesozoo growth
    ssigma2     =  0.5     ! Fraction excreted as semi-labile DOM
    srespir2    =  0.2     ! Active respiration
    unass2c     =  0.3     ! non assimilated fraction of P by mesozoo
@@ -259,15 +261,16 @@
    grazrat    =  3.0      ! maximal zoo grazing rate
    resrat     =  0.03     ! exsudation rate of zooplankton
    mzrat      =  0.004    ! zooplankton mortality rate
-   xpref2c    =  0.1      ! Microzoo preference for POM
-   xpref2p    =  1.       ! Microzoo preference for Nanophyto
-   xpref2d    =  0.5      ! Microzoo preference for Diatoms
+   xprefc     =  0.1      ! Microzoo preference for POM
+   xprefn     =  1.       ! Microzoo preference for Nanophyto
+   xprefd     =  0.6      ! Microzoo preference for Diatoms
    xthreshdia =  1.E-8    ! Diatoms feeding threshold for microzooplankton 
    xthreshphy =  1.E-8    ! Nanophyto feeding threshold for microzooplankton 
    xthreshpoc =  1.E-8    ! POC feeding threshold for microzooplankton 
    xthresh    =  3.E-7    ! Food threshold for feeding
    xkgraz     =  20.E-6   ! half sturation constant for grazing
    epsher     =  0.3      ! Efficiency of microzoo growth
+   epshermin  =  0.3      ! Minimum efficiency of microzoo growth
    sigma1     =  0.6      ! Fraction of microzoo excretion as DOM
    unass      =  0.3      ! non assimilated fraction of phyto by zoo
 /
@@ -292,6 +295,7 @@
    xthresh    =  3.E-7    ! Food threshold for feeding
    xkgraz     =  20.E-6   ! half sturation constant for grazing
    epsher     =  0.5      ! Efficiency of microzoo growth
+   epshermin  =  0.2      ! Minimum efficiency of microzoo growth
    ssigma     =  0.5      ! Fraction excreted as semi-labile DOM
    srespir    =  0.2      ! Active respiration
    unassc     =  0.3      ! non assimilated fraction of C by zoo
@@ -303,11 +307,10 @@
 !-----------------------------------------------------------------------
    ln_fechem =  .false.   ! complex iron chemistry ( T/F )
    ln_ligvar =  .false.   ! variable ligand concentration
-   ln_fecolloid = .false. ! variable colloidal fraction
    xlam1        =  0.005  ! scavenging rate of Iron
    xlamdust     =  150.0  ! Scavenging rate of dust
    ligand       =  0.6E-9 ! Ligands concentration 
-   kfep         =  0.     ! Nanoparticle formation rate constant
+   kfep         =  0.01   ! Nanoparticle formation rate constant
 /
 !-----------------------------------------------------------------------  
 &nampisrem     !   parameters for remineralization
@@ -382,16 +385,17 @@
 !                          ! ln_ligand
    fep_rats    =  1.       ! Fep/Fer ratio from sed sources 
    fep_rath    =  1.       ! Fep/Fer ratio from sed hydro sources 
+   rdustfep    =  0.0      ! Fraction of dust that is FeP
    lgw_rath    =  0.5      ! Weak ligand ratio from sed hydro sources 
 /
 !-----------------------------------------------------------------------
 &nampislig     !   Namelist parameters for ligands, nampislig
 !-----------------------------------------------------------------------
    rfep        =  0.001    ! Dissolution rate of FeP
-   rlgw        =  1.       ! Lifetime (years) of weak ligands
+   rlgw        =  100.     ! Lifetime (years) of weak ligands
    rlig        =  1.E-4    ! Remin ligand production per unit C
    prlgw       =  1.E-4    ! Photolysis of weak ligand
-   rlgs        =  1000.    ! Lifetime (years) of strong ligands
+   rlgs        =  1.       ! Lifetime (years) of strong ligands
 /
 !-----------------------------------------------------------------------
 &nampisice     !   Prescribed sea ice tracers

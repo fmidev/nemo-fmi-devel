@@ -239,6 +239,21 @@
        <field id="Heup"        long_name="Euphotic layer depth"                    unit="m"                               />
        <field id="Irondep"     long_name="Iron deposition from dust"               unit="mol/m2/s"                        />
        <field id="Ironsed"     long_name="Iron deposition from sediment"           unit="mol/m2/s"   grid_ref="grid_T_3D" />
+      <field id="FESCAV"      long_name="Scavenging of Iron"                      unit="mmol-Fe/m3/s"   grid_ref="grid_T_3D" />
+       <field id="FECOLL"      long_name="Colloidal Pumping of FeL"                unit="mmol-FeL/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LGWCOLL"     long_name="Coagulation loss of ligands"             unit="mmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="REMINF"      long_name="Oxic remineralization suppy of Fe"       unit="mmol-Fe/m3/s"  grid_ref="grid_T_3D" />
+       <field id="BACT"        long_name="Bacterial Biomass"                       unit="mmol/m3"  grid_ref="grid_T_3D" />
+       <field id="FEBACT"      long_name="Bacterial uptake of Fe"                  unit="molFe/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LPRODR"      long_name="OM remineralisation ligand production rate" unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LPRODP"      long_name="phytoplankton ligand production rate"    unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LIGREM"      long_name="Remineralisation loss of ligands"        unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LIGPR"       long_name="Photochemical loss of ligands"           unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LDETP"       long_name="Ligand destruction during phytoplankton uptake" unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LPRODZ2"     long_name="mesozooplankton ligand production rate"  unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="LPRODZ"      long_name="microzooplankton ligand production rate" unit="nmol-L/m3/s"  grid_ref="grid_T_3D" />
+       <field id="FEZOO"       long_name="microzooplankton iron recycling rate"    unit="nmol-FeL/m3/s"  grid_ref="grid_T_3D" />
+       <field id="FEZOO2"      long_name="mesozooplankton iron recycling rate"     unit="nmol-FeL/m3/s"  grid_ref="grid_T_3D" />
 
        <!-- dbio_T on T grid : variables available with diaar5 -->
        <field id="TPP"         long_name="Total Primary production of phyto"                   unit="mol/m3/s"  grid_ref="grid_T_3D" />
