@@ -9,14 +9,6 @@ MODULE geo2ocean
    !!            3.0  !  07-2008  (G. Madec)  geo2oce suppress lon/lat agruments
    !!            3.7  !  11-2015  (G. Madec)  remove the unused repere and repcmo routines
    !!----------------------------------------------------------------------
-#if defined key_agrif
-!clem: these lines do not seem necessary anymore
-!!DIR$ OPTIMIZE (-O 1)  ! cray formulation
-# if defined __INTEL_COMPILER
-!acc: still breaks on at least one Ivybridge cluster with ifort 17.0.4 without this directive
-!DIR$ OPTIMIZE:1        ! intel formulation
-# endif
-#endif
    !!----------------------------------------------------------------------
    !!   rot_rep       : Rotate the Repere: geographic grid <==> stretched coordinates grid
    !!   angle         :
@@ -80,7 +72,7 @@ CONTAINS
          IF(lwp) WRITE(numout,*) ' rot_rep: coordinate transformation : geographic <==> model (i,j)-components'
          IF(lwp) WRITE(numout,*) ' ~~~~~~~~    '
          !
-         CALL angle       ! initialization of the transformation
+         CALL angle( glamt, gphit, glamu, gphiu, glamv, gphiv, glamf, gphif )       ! initialization of the transformation
          lmust_init = .FALSE.
       ENDIF
       !
@@ -125,7 +117,7 @@ CONTAINS
    END SUBROUTINE rot_rep
 
 
-   SUBROUTINE angle
+   SUBROUTINE angle( plamt, pphit, plamu, pphiu, plamv, pphiv, plamf, pphif )
       !!----------------------------------------------------------------------
       !!                  ***  ROUTINE angle  ***
       !! 
@@ -137,6 +129,10 @@ CONTAINS
       !!
       !! ** Action  : - gsint, gcost, gsinu, gcosu, gsinv, gcosv, gsinf, gcosf
       !!----------------------------------------------------------------------
+      ! WARNING: for an unexplained reason, we need to pass all glam, gphi arrays as input parameters in
+      !          order to get AGRIF working with -03 compilation option
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(in   ) :: plamt, pphit, plamu, pphiu, plamv, pphiv, plamf, pphif  
+      !
       INTEGER  ::   ji, jj   ! dummy loop indices
       INTEGER  ::   ierr     ! local integer
       REAL(wp) ::   zlam, zphi            ! local scalars
@@ -166,34 +162,34 @@ CONTAINS
       DO jj = 2, jpjm1
          DO ji = fs_2, jpi   ! vector opt.
             !                  
-            zlam = glamt(ji,jj)     ! north pole direction & modulous (at t-point)
-            zphi = gphit(ji,jj)
+            zlam = plamt(ji,jj)     ! north pole direction & modulous (at t-point)
+            zphi = pphit(ji,jj)
             zxnpt = 0. - 2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             zynpt = 0. - 2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             znnpt = zxnpt*zxnpt + zynpt*zynpt
             !
-            zlam = glamu(ji,jj)     ! north pole direction & modulous (at u-point)
-            zphi = gphiu(ji,jj)
+            zlam = plamu(ji,jj)     ! north pole direction & modulous (at u-point)
+            zphi = pphiu(ji,jj)
             zxnpu = 0. - 2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             zynpu = 0. - 2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             znnpu = zxnpu*zxnpu + zynpu*zynpu
             !
-            zlam = glamv(ji,jj)     ! north pole direction & modulous (at v-point)
-            zphi = gphiv(ji,jj)
+            zlam = plamv(ji,jj)     ! north pole direction & modulous (at v-point)
+            zphi = pphiv(ji,jj)
             zxnpv = 0. - 2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             zynpv = 0. - 2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             znnpv = zxnpv*zxnpv + zynpv*zynpv
             !
-            zlam = glamf(ji,jj)     ! north pole direction & modulous (at f-point)
-            zphi = gphif(ji,jj)
+            zlam = plamf(ji,jj)     ! north pole direction & modulous (at f-point)
+            zphi = pphif(ji,jj)
             zxnpf = 0. - 2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             zynpf = 0. - 2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )
             znnpf = zxnpf*zxnpf + zynpf*zynpf
             !
-            zlam = glamv(ji,jj  )   ! j-direction: v-point segment direction (around t-point)
-            zphi = gphiv(ji,jj  )
-            zlan = glamv(ji,jj-1)
-            zphh = gphiv(ji,jj-1)
+            zlam = plamv(ji,jj  )   ! j-direction: v-point segment direction (around t-point)
+            zphi = pphiv(ji,jj  )
+            zlan = plamv(ji,jj-1)
+            zphh = pphiv(ji,jj-1)
             zxvvt =  2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
                &  -  2. * COS( rad*zlan ) * TAN( rpi/4. - rad*zphh/2. )
             zyvvt =  2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
@@ -201,10 +197,10 @@ CONTAINS
             znvvt = SQRT( znnpt * ( zxvvt*zxvvt + zyvvt*zyvvt )  )
             znvvt = MAX( znvvt, 1.e-14 )
             !
-            zlam = glamf(ji,jj  )   ! j-direction: f-point segment direction (around u-point)
-            zphi = gphif(ji,jj  )
-            zlan = glamf(ji,jj-1)
-            zphh = gphif(ji,jj-1)
+            zlam = plamf(ji,jj  )   ! j-direction: f-point segment direction (around u-point)
+            zphi = pphif(ji,jj  )
+            zlan = plamf(ji,jj-1)
+            zphh = pphif(ji,jj-1)
             zxffu =  2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
                &  -  2. * COS( rad*zlan ) * TAN( rpi/4. - rad*zphh/2. )
             zyffu =  2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
@@ -212,10 +208,10 @@ CONTAINS
             znffu = SQRT( znnpu * ( zxffu*zxffu + zyffu*zyffu )  )
             znffu = MAX( znffu, 1.e-14 )
             !
-            zlam = glamf(ji  ,jj)   ! i-direction: f-point segment direction (around v-point)
-            zphi = gphif(ji  ,jj)
-            zlan = glamf(ji-1,jj)
-            zphh = gphif(ji-1,jj)
+            zlam = plamf(ji  ,jj)   ! i-direction: f-point segment direction (around v-point)
+            zphi = pphif(ji  ,jj)
+            zlan = plamf(ji-1,jj)
+            zphh = pphif(ji-1,jj)
             zxffv =  2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
                &  -  2. * COS( rad*zlan ) * TAN( rpi/4. - rad*zphh/2. )
             zyffv =  2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
@@ -223,10 +219,10 @@ CONTAINS
             znffv = SQRT( znnpv * ( zxffv*zxffv + zyffv*zyffv )  )
             znffv = MAX( znffv, 1.e-14 )
             !
-            zlam = glamu(ji,jj+1)   ! j-direction: u-point segment direction (around f-point)
-            zphi = gphiu(ji,jj+1)
-            zlan = glamu(ji,jj  )
-            zphh = gphiu(ji,jj  )
+            zlam = plamu(ji,jj+1)   ! j-direction: u-point segment direction (around f-point)
+            zphi = pphiu(ji,jj+1)
+            zlan = plamu(ji,jj  )
+            zphh = pphiu(ji,jj  )
             zxuuf =  2. * COS( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
                &  -  2. * COS( rad*zlan ) * TAN( rpi/4. - rad*zphh/2. )
             zyuuf =  2. * SIN( rad*zlam ) * TAN( rpi/4. - rad*zphi/2. )   &
@@ -256,19 +252,19 @@ CONTAINS
 
       DO jj = 2, jpjm1
          DO ji = fs_2, jpi   ! vector opt.
-            IF( MOD( ABS( glamv(ji,jj) - glamv(ji,jj-1) ), 360. ) < 1.e-8 ) THEN
+            IF( MOD( ABS( plamv(ji,jj) - plamv(ji,jj-1) ), 360. ) < 1.e-8 ) THEN
                gsint(ji,jj) = 0.
                gcost(ji,jj) = 1.
             ENDIF
-            IF( MOD( ABS( glamf(ji,jj) - glamf(ji,jj-1) ), 360. ) < 1.e-8 ) THEN
+            IF( MOD( ABS( plamf(ji,jj) - plamf(ji,jj-1) ), 360. ) < 1.e-8 ) THEN
                gsinu(ji,jj) = 0.
                gcosu(ji,jj) = 1.
             ENDIF
-            IF(      ABS( gphif(ji,jj) - gphif(ji-1,jj) )         < 1.e-8 ) THEN
+            IF(      ABS( pphif(ji,jj) - pphif(ji-1,jj) )         < 1.e-8 ) THEN
                gsinv(ji,jj) = 0.
                gcosv(ji,jj) = 1.
             ENDIF
-            IF( MOD( ABS( glamu(ji,jj) - glamu(ji,jj+1) ), 360. ) < 1.e-8 ) THEN
+            IF( MOD( ABS( plamu(ji,jj) - plamu(ji,jj+1) ), 360. ) < 1.e-8 ) THEN
                gsinf(ji,jj) = 0.
                gcosf(ji,jj) = 1.
             ENDIF
@@ -456,7 +452,7 @@ CONTAINS
          IF(lwp) WRITE(numout,*)
          IF(lwp) WRITE(numout,*) ' obs_rot : geographic <--> stretched'
          IF(lwp) WRITE(numout,*) ' ~~~~~~~   coordinate transformation'
-         CALL angle       ! initialization of the transformation
+         CALL angle( glamt, gphit, glamu, gphiu, glamv, gphiv, glamf, gphif )       ! initialization of the transformation
          lmust_init = .FALSE.
       ENDIF
       !
