@@ -204,7 +204,7 @@ CONTAINS
          ENDIF
       ENDIF
       !
-      IF (ln_ligand)  DEALLOCATE( zz2ligprod )
+      IF (ln_ligand)  DEALLOCATE( zzligprod )
       !
       IF(ln_ctl) THEN      ! print mean trends (used for debugging)
          WRITE(charout, FMT="('micro')")
