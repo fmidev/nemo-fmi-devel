@@ -35,7 +35,6 @@ MODULE sms_pisces
 
 
    !!*  Biological parameters 
-   INTEGER  ::   niter1max, niter2max   !: Maximum number of iterations for sinking
    REAL(wp) ::   rno3              !: ???
    REAL(wp) ::   o2ut              !: ???
    REAL(wp) ::   po4r              !: ???

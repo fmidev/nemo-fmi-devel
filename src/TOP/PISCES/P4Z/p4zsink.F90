@@ -15,6 +15,7 @@ MODULE p4zsink
    USE oce_trc         !  shared variables between ocean and passive tracers
    USE trc             !  passive tracers common variables 
    USE sms_pisces      !  PISCES Source Minus Sink variables
+   USE trcsink         !  General routine to compute sedimentation
    USE prtctl_trc      !  print control for debugging
    USE iom             !  I/O manager
    USE lib_mpp
@@ -58,18 +59,14 @@ CONTAINS
       !! ** Method  : - ???
       !!---------------------------------------------------------------------
       INTEGER, INTENT(in) :: kt, knt
-      INTEGER  ::   ji, jj, jk, jit
-      INTEGER  ::   iiter1, iiter2
-      REAL(wp) ::   zagg1, zagg2, zagg3, zagg4
-      REAL(wp) ::   zagg , zaggfe, zaggdoc, zaggdoc2, zaggdoc3
-      REAL(wp) ::   zfact, zwsmax, zmax
+      INTEGER  ::   ji, jj, jk
       CHARACTER (len=25) :: charout
+      REAL(wp) :: zmax, zfact
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: zw3d
       REAL(wp), ALLOCATABLE, DIMENSION(:,:  ) :: zw2d
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('p4z_sink')
-
 
       ! Initialization of some global variables
       ! ---------------------------------------
@@ -96,52 +93,6 @@ CONTAINS
       wsbio3(:,:,:) = wsbio
 
       !
-      ! OA This is (I hope) a temporary solution for the problem that may 
-      ! OA arise in specific situation where the CFL criterion is broken 
-      ! OA for vertical sedimentation of particles. To avoid this, a time
-      ! OA splitting algorithm has been coded. A specific maximum
-      ! OA iteration number is provided and may be specified in the namelist 
-      ! OA This is to avoid very large iteration number when explicit free
-      ! OA surface is used (for instance). When niter?max is set to 1, 
-      ! OA this computation is skipped. The crude old threshold method is 
-      ! OA then applied. This also happens when niter exceeds nitermax.
-      IF( MAX( niter1max, niter2max ) == 1 ) THEN
-        iiter1 = 1
-        iiter2 = 1
-      ELSE
-        iiter1 = 1
-        iiter2 = 1
-        DO jk = 1, jpkm1
-          DO jj = 1, jpj
-             DO ji = 1, jpi
-                IF( tmask(ji,jj,jk) == 1) THEN
-                   zwsmax =  0.5 * e3t_n(ji,jj,jk) / xstep
-                   iiter1 =  MAX( iiter1, INT( wsbio3(ji,jj,jk) / zwsmax ) )
-                   iiter2 =  MAX( iiter2, INT( wsbio4(ji,jj,jk) / zwsmax ) )
-                ENDIF
-             END DO
-          END DO
-        END DO
-        IF( lk_mpp ) THEN
-           CALL mpp_max( iiter1 )
-           CALL mpp_max( iiter2 )
-        ENDIF
-        iiter1 = MIN( iiter1, niter1max )
-        iiter2 = MIN( iiter2, niter2max )
-      ENDIF
-
-      DO jk = 1,jpkm1
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               IF( tmask(ji,jj,jk) == 1 ) THEN
-                 zwsmax = 0.5 * e3t_n(ji,jj,jk) / xstep
-                 wsbio3(ji,jj,jk) = MIN( wsbio3(ji,jj,jk), zwsmax * REAL( iiter1, wp ) )
-                 wsbio4(ji,jj,jk) = MIN( wsbio4(ji,jj,jk), zwsmax * REAL( iiter2, wp ) )
-               ENDIF
-            END DO
-         END DO
-      END DO
-
       !  Initializa to zero all the sinking arrays 
       !   -----------------------------------------
       sinking (:,:,:) = 0.e0
@@ -153,17 +104,12 @@ CONTAINS
 
       !   Compute the sedimentation term using p4zsink2 for all the sinking particles
       !   -----------------------------------------------------
-      DO jit = 1, iiter1
-        CALL p4z_sink2( wsbio3, sinking , jppoc, iiter1 )
-        CALL p4z_sink2( wsbio3, sinkfer , jpsfe, iiter1 )
-      END DO
-
-      DO jit = 1, iiter2
-        CALL p4z_sink2( wsbio4, sinking2, jpgoc, iiter2 )
-        CALL p4z_sink2( wsbio4, sinkfer2, jpbfe, iiter2 )
-        CALL p4z_sink2( wsbio4, sinksil , jpgsi, iiter2 )
-        CALL p4z_sink2( wsbio4, sinkcal , jpcal, iiter2 )
-      END DO
+      CALL trc_sink( kt, wsbio3, sinking , jppoc, rfact2 )
+      CALL trc_sink( kt, wsbio3, sinkfer , jpsfe, rfact2 )
+      CALL trc_sink( kt, wsbio4, sinking2, jpgoc, rfact2 )
+      CALL trc_sink( kt, wsbio4, sinkfer2, jpbfe, rfact2 )
+      CALL trc_sink( kt, wsbio4, sinksil , jpgsi, rfact2 )
+      CALL trc_sink( kt, wsbio4, sinkcal , jpcal, rfact2 )
 
       IF( ln_p5z ) THEN
          sinkingn (:,:,:) = 0.e0
@@ -173,34 +119,17 @@ CONTAINS
 
          !   Compute the sedimentation term using p4zsink2 for all the sinking particles
          !   -----------------------------------------------------
-         DO jit = 1, iiter1
-           CALL p4z_sink2( wsbio3, sinkingn , jppon, iiter1 )
-           CALL p4z_sink2( wsbio3, sinkingp , jppop, iiter1 )
-         END DO
-
-         DO jit = 1, iiter2
-           CALL p4z_sink2( wsbio4, sinking2n, jpgon, iiter2 )
-           CALL p4z_sink2( wsbio4, sinking2p, jpgop, iiter2 )
-         END DO
+         CALL trc_sink( kt, wsbio3, sinkingn , jppon, rfact2 )
+         CALL trc_sink( kt, wsbio3, sinkingp , jppop, rfact2 )
+         CALL trc_sink( kt, wsbio4, sinking2n, jpgon, rfact2 )
+         CALL trc_sink( kt, wsbio4, sinking2p, jpgop, rfact2 )
       ENDIF
 
       IF( ln_ligand ) THEN
          wsfep (:,:,:) = wfep
-         DO jk = 1,jpkm1
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  IF( tmask(ji,jj,jk) == 1 ) THEN
-                    zwsmax = 0.5 * e3t_n(ji,jj,jk) / xstep
-                    wsfep(ji,jj,jk) = MIN( wsfep(ji,jj,jk), zwsmax * REAL( iiter1, wp ) )
-                  ENDIF
-               END DO
-            END DO
-         END DO
          !
          sinkfep(:,:,:) = 0.e0
-         DO jit = 1, iiter1
-           CALL p4z_sink2( wsfep, sinkfep , jpfep, iiter1 )
-         END DO
+         CALL trc_sink( kt, wsfep, sinkfep , jpfep, rfact2 )
       ENDIF
 
      ! Total carbon export per year
@@ -279,114 +208,6 @@ CONTAINS
       t_oce_co2_exp = 0._wp
       !
    END SUBROUTINE p4z_sink_init
-
-
-   SUBROUTINE p4z_sink2( pwsink, psinkflx, jp_tra, kiter )
-      !!---------------------------------------------------------------------
-      !!                     ***  ROUTINE p4z_sink2  ***
-      !!
-      !! ** Purpose :   Compute the sedimentation terms for the various sinking
-      !!     particles. The scheme used to compute the trends is based
-      !!     on MUSCL.
-      !!
-      !! ** Method  : - this ROUTINE compute not exactly the advection but the
-      !!      transport term, i.e.  div(u*tra).
-      !!---------------------------------------------------------------------
-      INTEGER , INTENT(in   )                         ::   jp_tra    ! tracer index index      
-      INTEGER , INTENT(in   )                         ::   kiter     ! number of iterations for time-splitting 
-      REAL(wp), INTENT(in   ), DIMENSION(jpi,jpj,jpk) ::   pwsink    ! sinking speed
-      REAL(wp), INTENT(inout), DIMENSION(jpi,jpj,jpk) ::   psinkflx  ! sinking fluxe
-      !
-      INTEGER  ::   ji, jj, jk, jn
-      REAL(wp) ::   zigma,zew,zign, zflx, zstep
-      REAL(wp), DIMENSION(jpi,jpj,jpk) :: ztraz, zakz, zwsink2, ztrb 
-      !!---------------------------------------------------------------------
-      !
-      IF( ln_timing )   CALL timing_start('p4z_sink2')
-      !
-      zstep = rfact2 / REAL( kiter, wp ) / 2.
-
-      ztraz(:,:,:) = 0.e0
-      zakz (:,:,:) = 0.e0
-      ztrb (:,:,:) = trb(:,:,:,jp_tra)
-
-      DO jk = 1, jpkm1
-         zwsink2(:,:,jk+1) = -pwsink(:,:,jk) / rday * tmask(:,:,jk+1) 
-      END DO
-      zwsink2(:,:,1) = 0.e0
-
-
-      ! Vertical advective flux
-      DO jn = 1, 2
-         !  first guess of the slopes interior values
-         DO jk = 2, jpkm1
-            ztraz(:,:,jk) = ( trb(:,:,jk-1,jp_tra) - trb(:,:,jk,jp_tra) ) * tmask(:,:,jk)
-         END DO
-         ztraz(:,:,1  ) = 0.0
-         ztraz(:,:,jpk) = 0.0
-
-         ! slopes
-         DO jk = 2, jpkm1
-            DO jj = 1,jpj
-               DO ji = 1, jpi
-                  zign = 0.25 + SIGN( 0.25, ztraz(ji,jj,jk) * ztraz(ji,jj,jk+1) )
-                  zakz(ji,jj,jk) = ( ztraz(ji,jj,jk) + ztraz(ji,jj,jk+1) ) * zign
-               END DO
-            END DO
-         END DO
-         
-         ! Slopes limitation
-         DO jk = 2, jpkm1
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  zakz(ji,jj,jk) = SIGN( 1., zakz(ji,jj,jk) ) *        &
-                     &             MIN( ABS( zakz(ji,jj,jk) ), 2. * ABS(ztraz(ji,jj,jk+1)), 2. * ABS(ztraz(ji,jj,jk) ) )
-               END DO
-            END DO
-         END DO
-         
-         ! vertical advective flux
-         DO jk = 1, jpkm1
-            DO jj = 1, jpj      
-               DO ji = 1, jpi    
-                  zigma = zwsink2(ji,jj,jk+1) * zstep / e3w_n(ji,jj,jk+1)
-                  zew   = zwsink2(ji,jj,jk+1)
-                  psinkflx(ji,jj,jk+1) = -zew * ( trb(ji,jj,jk,jp_tra) - 0.5 * ( 1 + zigma ) * zakz(ji,jj,jk) ) * zstep
-               END DO
-            END DO
-         END DO
-         !
-         ! Boundary conditions
-         psinkflx(:,:,1  ) = 0.e0
-         psinkflx(:,:,jpk) = 0.e0
-         
-         DO jk=1,jpkm1
-            DO jj = 1,jpj
-               DO ji = 1, jpi
-                  zflx = ( psinkflx(ji,jj,jk) - psinkflx(ji,jj,jk+1) ) / e3t_n(ji,jj,jk)
-                  trb(ji,jj,jk,jp_tra) = trb(ji,jj,jk,jp_tra) + zflx
-               END DO
-            END DO
-         END DO
-
-      ENDDO
-
-      DO jk = 1,jpkm1
-         DO jj = 1,jpj
-            DO ji = 1, jpi
-               zflx = ( psinkflx(ji,jj,jk) - psinkflx(ji,jj,jk+1) ) / e3t_n(ji,jj,jk)
-               ztrb(ji,jj,jk) = ztrb(ji,jj,jk) + 2. * zflx
-            END DO
-         END DO
-      END DO
-
-      trb(:,:,:,jp_tra) = ztrb(:,:,:)
-      psinkflx(:,:,:)   = 2. * psinkflx(:,:,:)
-      !
-      IF( ln_timing )  CALL timing_stop('p4z_sink2')
-      !
-   END SUBROUTINE p4z_sink2
-
 
    INTEGER FUNCTION p4z_sink_alloc()
       !!----------------------------------------------------------------------

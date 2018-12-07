@@ -50,13 +50,11 @@
    wsbio2     =  50.      ! Big particles sinking speed
    wsbio2max  =  50.      ! Big particles maximum sinking speed
    wsbio2scale =  5000.    ! Big particles length scale of sinking
-   niter1max  =  1        ! Maximum number of iterations for POC
-   niter2max  =  2        ! Maximum number of iterations for GOC
 !                         !  ln_ligand enabled
    wfep       =  0.2      ! FeP sinking speed 
    ldocp      =  1.E-4    ! Phyto ligand production per unit doc 
    ldocz      =  1.E-4    ! Zoo ligand production per unit doc 
-   lthet      =  0.5      ! Proportional loss of ligands due to Fe uptake 
+   lthet      =  1.0      ! Proportional loss of ligands due to Fe uptake 
 !                         !  ln_p5z enabled
    no3rat3    =  0.182    ! N/C ratio in zooplankton
    po4rat3    =  0.0094   ! P/C ratio in zooplankton
@@ -309,7 +307,7 @@
    ln_ligvar =  .false.   ! variable ligand concentration
    xlam1        =  0.005  ! scavenging rate of Iron
    xlamdust     =  150.0  ! Scavenging rate of dust
-   ligand       =  0.6E-9 ! Ligands concentration 
+   ligand       =  0.7E-9 ! Ligands concentration 
    kfep         =  0.01   ! Nanoparticle formation rate constant
 /
 !-----------------------------------------------------------------------  
@@ -321,7 +319,7 @@
    xsiremlab =  0.03      ! fast remineralization rate of Si
    xsilab    =  0.5       ! Fraction of labile biogenic silica
    feratb    =  10.E-6    ! Fe/C quota in bacteria
-   xkferb    =  2.5E-10   ! Half-saturation constant for bacteria Fe/C
+   xkferb    =  3E-10     ! Half-saturation constant for bacteria Fe/C
 !                         ! ln_p5z
    xremikc   =  0.25      ! remineralization rate of DOC
    xremikn   =  0.35      ! remineralization rate of DON
@@ -371,7 +369,7 @@
    ln_ndepo    =  .true.   ! boolean for atmospheric deposition of N
    ln_ironsed  =  .true.   ! boolean for Fe input from sediments
    ln_ironice  =  .true.   ! boolean for Fe input from sea ice
-   ln_hydrofe  =  .false.  ! boolean for from hydrothermal vents
+   ln_hydrofe  =  .true.   ! boolean for from hydrothermal vents
    sedfeinput  =  2.e-9    ! Coastal release of Iron
    distcoast   =  5.e3     ! Distance off the coast for Iron from sediments
    dustsolub   =  0.02     ! Solubility of the dusta

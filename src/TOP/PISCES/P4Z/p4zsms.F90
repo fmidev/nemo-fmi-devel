@@ -73,7 +73,6 @@ CONTAINS
         IF( .NOT. ln_rsttr ) THEN
             CALL p4z_che                              ! initialize the chemical constants
             CALL ahini_for_at(hi)   !  set PH at kt=nit000
-            t_oce_co2_flx_cum = 0._wp
         ELSE
             CALL p4z_rst( nittrc000, 'READ' )  !* read or initialize all required fields
         ENDIF
@@ -188,7 +187,7 @@ CONTAINS
       INTEGER :: ios                 ! Local integer output status for namelist read
       !!
       NAMELIST/nampisbio/ nrdttrc, wsbio, xkmort, ferat3, wsbio2, wsbio2max, wsbio2scale,    &
-         &                   niter1max, niter2max, wfep, ldocp, ldocz, lthet,  &
+         &                   wfep, ldocp, ldocz, lthet,  &
          &                   no3rat3, po4rat3
          !
       NAMELIST/nampisdmp/ ln_pisdmp, nn_pisdmp
@@ -222,8 +221,6 @@ CONTAINS
          WRITE(numout,*) '      Big particles sinking speed               wsbio2      =', wsbio2
          WRITE(numout,*) '      Big particles maximum sinking speed       wsbio2max   =', wsbio2max
          WRITE(numout,*) '      Big particles sinking speed length scale  wsbio2scale =', wsbio2scale
-         WRITE(numout,*) '      Maximum number of iterations for POC      niter1max   =', niter1max
-         WRITE(numout,*) '      Maximum number of iterations for GOC      niter2max   =', niter2max
          IF( ln_ligand ) THEN
             WRITE(numout,*) '      FeP sinking speed                              wfep   =', wfep
             IF( ln_p4z ) THEN

@@ -94,6 +94,11 @@
    ln_trcrad     =  .true.   !  artificially correct negative concentrations (T) or not (F)
 /
 !-----------------------------------------------------------------------
+&namtrc_snk      !  Sedimentation of particles
+!-----------------------------------------------------------------------
+   nitermax      =  2   !  number of iterations for sedimentation
+/
+!-----------------------------------------------------------------------
 &namtrc_dmp      !   passive tracer newtonian damping                   (ln_trcdmp=T)
 !-----------------------------------------------------------------------
    nn_zdmp_tr    =    1      !  vertical   shape =0    damping throughout the water column

@@ -204,6 +204,7 @@ CONTAINS
       USE trcadv , ONLY:  trc_adv_ini
       USE trcldf , ONLY:  trc_ldf_ini
       USE trcrad , ONLY:  trc_rad_ini
+      USE trcsink, ONLY:  trc_sink_ini
       !
       INTEGER :: ierr
       !!----------------------------------------------------------------------
@@ -213,6 +214,7 @@ CONTAINS
                        CALL  trc_ldf_ini          ! lateral diffusion
                        !                          ! vertical diffusion: always implicit time stepping scheme
                        CALL  trc_rad_ini          ! positivity of passive tracers 
+                       CALL  trc_sink_ini         ! Vertical sedimentation of particles
       !
    END SUBROUTINE trc_ini_trp
 
