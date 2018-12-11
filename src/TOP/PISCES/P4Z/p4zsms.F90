@@ -73,6 +73,7 @@ CONTAINS
         IF( .NOT. ln_rsttr ) THEN
             CALL p4z_che                              ! initialize the chemical constants
             CALL ahini_for_at(hi)   !  set PH at kt=nit000
+            t_oce_co2_flx_cum = 0._wp
         ELSE
             CALL p4z_rst( nittrc000, 'READ' )  !* read or initialize all required fields
         ENDIF
