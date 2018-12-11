@@ -828,6 +828,8 @@ CONTAINS
          CALL prt_ctl( tab3d_1=p_avm, clinfo1=' gls  - m: ', kdim=jpk )
       ENDIF
       !
+      CALL iom_put("tke", en)
+      CALL iom_put("dtke", eps)
    END SUBROUTINE zdf_gls
 
 
