@@ -25,7 +25,6 @@ MODULE p4zprod
    PUBLIC   p4z_prod_init    ! called in trcsms_pisces.F90
    PUBLIC   p4z_prod_alloc
 
-   LOGICAL , PUBLIC ::   ln_newprod   !:
    REAL(wp), PUBLIC ::   pislopen     !:
    REAL(wp), PUBLIC ::   pisloped     !:
    REAL(wp), PUBLIC ::   xadap        !:
@@ -155,51 +154,28 @@ CONTAINS
          END DO
       END DO
 
-      IF( ln_newprod ) THEN
-         DO jk = 1, jpkm1
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  IF( etot_ndcy(ji,jj,jk) > 1.E-3 ) THEN
-                      ! Computation of production function for Carbon
-                      !  ---------------------------------------------
-                      zpislopen = zpislopeadn(ji,jj,jk) / ( ( r1_rday + bresp * r1_rday ) &
-                      &            * zmxl_fac(ji,jj,jk) * rday + rtrn)
-                      zpisloped = zpislopeadd(ji,jj,jk) / ( ( r1_rday + bresp * r1_rday ) &
-                      &            * zmxl_fac(ji,jj,jk) * rday + rtrn)
-                      zprbio(ji,jj,jk) = zprbio(ji,jj,jk) * ( 1.- EXP( -zpislopen * enano(ji,jj,jk) )  )
-                      zprdia(ji,jj,jk) = zprdia(ji,jj,jk) * ( 1.- EXP( -zpisloped * ediat(ji,jj,jk) )  )
-                      !  Computation of production function for Chlorophyll
-                      !--------------------------------------------------
-                      zpislopen = zpislopeadn(ji,jj,jk) / ( zprmaxn(ji,jj,jk) * zmxl_chl(ji,jj,jk) * rday + rtrn )
-                      zpisloped = zpislopeadd(ji,jj,jk) / ( zprmaxd(ji,jj,jk) * zmxl_chl(ji,jj,jk) * rday + rtrn )
-                      zprnch(ji,jj,jk) = zprmaxn(ji,jj,jk) * ( 1.- EXP( -zpislopen * enanom(ji,jj,jk) ) )
-                      zprdch(ji,jj,jk) = zprmaxd(ji,jj,jk) * ( 1.- EXP( -zpisloped * ediatm(ji,jj,jk) ) )
-                  ENDIF
-               END DO
+      DO jk = 1, jpkm1
+         DO jj = 1, jpj
+            DO ji = 1, jpi
+               IF( etot_ndcy(ji,jj,jk) > 1.E-3 ) THEN
+                   ! Computation of production function for Carbon
+                   !  ---------------------------------------------
+                   zpislopen = zpislopeadn(ji,jj,jk) / ( ( r1_rday + bresp * r1_rday ) &
+                   &            * zmxl_fac(ji,jj,jk) * rday + rtrn)
+                   zpisloped = zpislopeadd(ji,jj,jk) / ( ( r1_rday + bresp * r1_rday ) &
+                   &            * zmxl_fac(ji,jj,jk) * rday + rtrn)
+                   zprbio(ji,jj,jk) = zprbio(ji,jj,jk) * ( 1.- EXP( -zpislopen * enano(ji,jj,jk) )  )
+                   zprdia(ji,jj,jk) = zprdia(ji,jj,jk) * ( 1.- EXP( -zpisloped * ediat(ji,jj,jk) )  )
+                   !  Computation of production function for Chlorophyll
+                   !--------------------------------------------------
+                   zpislopen = zpislopeadn(ji,jj,jk) / ( zprmaxn(ji,jj,jk) * zmxl_chl(ji,jj,jk) * rday + rtrn )
+                   zpisloped = zpislopeadd(ji,jj,jk) / ( zprmaxd(ji,jj,jk) * zmxl_chl(ji,jj,jk) * rday + rtrn )
+                   zprnch(ji,jj,jk) = zprmaxn(ji,jj,jk) * ( 1.- EXP( -zpislopen * enanom(ji,jj,jk) ) )
+                   zprdch(ji,jj,jk) = zprmaxd(ji,jj,jk) * ( 1.- EXP( -zpisloped * ediatm(ji,jj,jk) ) )
+               ENDIF
             END DO
          END DO
-      ELSE
-         DO jk = 1, jpkm1
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  IF( etot_ndcy(ji,jj,jk) > 1.E-3 ) THEN
-                      ! Computation of production function for Carbon
-                      !  ---------------------------------------------
-                      zpislopen = zpislopeadn(ji,jj,jk)  / ( zprbio(ji,jj,jk) * rday * xlimphy(ji,jj,jk) + rtrn )
-                      zpisloped = zpislopeadd(ji,jj,jk) / ( zprdia(ji,jj,jk) * rday * xlimdia(ji,jj,jk) + rtrn )
-                      zprbio(ji,jj,jk) = zprbio(ji,jj,jk) * ( 1.- EXP( -zpislopen * enano(ji,jj,jk) ) )
-                      zprdia(ji,jj,jk) = zprdia(ji,jj,jk) * ( 1.- EXP( -zpisloped * ediat(ji,jj,jk) ) )
-                      !  Computation of production function for Chlorophyll
-                      !--------------------------------------------------
-                      zpislopen = zpislopen * zmxl_fac(ji,jj,jk) / ( zmxl_chl(ji,jj,jk) + rtrn )
-                      zpisloped = zpisloped * zmxl_fac(ji,jj,jk) / ( zmxl_chl(ji,jj,jk) + rtrn )
-                      zprnch(ji,jj,jk) = zprmaxn(ji,jj,jk) * ( 1.- EXP( -zpislopen * enanom(ji,jj,jk) ) )
-                      zprdch(ji,jj,jk) = zprmaxd(ji,jj,jk) * ( 1.- EXP( -zpisloped * ediatm(ji,jj,jk) ) )
-                  ENDIF
-               END DO
-            END DO
-         END DO
-      ENDIF
+      END DO
 
       !  Computation of a proxy of the N/C ratio
       !  ---------------------------------------
@@ -504,7 +480,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER ::   ios   ! Local integer
       !
-      NAMELIST/namp4zprod/ pislopen, pisloped, xadap, ln_newprod, bresp, excretn, excretd,  &
+      NAMELIST/namp4zprod/ pislopen, pisloped, xadap, bresp, excretn, excretd,  &
          &                 chlcnm, chlcdm, chlcmin, fecnm, fecdm, grosip
       !!----------------------------------------------------------------------
       !
@@ -524,16 +500,13 @@ CONTAINS
 
       IF(lwp) THEN                         ! control print
          WRITE(numout,*) '   Namelist : namp4zprod'
-         WRITE(numout,*) '      Enable new parame. of production (T/F)   ln_newprod    =', ln_newprod
          WRITE(numout,*) '      mean Si/C ratio                           grosip       =', grosip
          WRITE(numout,*) '      P-I slope                                 pislopen     =', pislopen
          WRITE(numout,*) '      Acclimation factor to low light           xadap        =', xadap
          WRITE(numout,*) '      excretion ratio of nanophytoplankton      excretn      =', excretn
          WRITE(numout,*) '      excretion ratio of diatoms                excretd      =', excretd
-         IF( ln_newprod )  THEN
-            WRITE(numout,*) '      basal respiration in phytoplankton        bresp        =', bresp
-            WRITE(numout,*) '      Maximum Chl/C in phytoplankton            chlcmin      =', chlcmin
-         ENDIF
+         WRITE(numout,*) '      basal respiration in phytoplankton        bresp        =', bresp
+         WRITE(numout,*) '      Maximum Chl/C in phytoplankton            chlcmin      =', chlcmin
          WRITE(numout,*) '      P-I slope  for diatoms                    pisloped     =', pisloped
          WRITE(numout,*) '      Minimum Chl/C in nanophytoplankton        chlcnm       =', chlcnm
          WRITE(numout,*) '      Minimum Chl/C in diatoms                  chlcdm       =', chlcdm

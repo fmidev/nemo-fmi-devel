@@ -24,14 +24,11 @@ MODULE p4zfechem
    PUBLIC   p4z_fechem        ! called in p4zbio.F90
    PUBLIC   p4z_fechem_init   ! called in trcsms_pisces.F90
 
-   LOGICAL          ::   ln_fechem    !: boolean for complex iron chemistry following Tagliabue and voelker
    LOGICAL          ::   ln_ligvar    !: boolean for variable ligand concentration following Tagliabue and voelker
    REAL(wp), PUBLIC ::   xlam1        !: scavenging rate of Iron 
    REAL(wp), PUBLIC ::   xlamdust     !: scavenging rate of Iron by dust 
    REAL(wp), PUBLIC ::   ligand       !: ligand concentration in the ocean 
    REAL(wp), PUBLIC ::   kfep         !: rate constant for nanoparticle formation
-
-   REAL(wp) :: kl1, kl2, kb1, kb2, ks, kpr, spd, con, kth      !!gm  <<<== DOCTOR names SVP !!!
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -46,12 +43,8 @@ CONTAINS
       !!
       !! ** Purpose :   Compute remineralization/scavenging of iron
       !!
-      !! ** Method  :   2 different chemistry models are available for iron
-      !!                (1) The simple chemistry model of Aumont and Bopp (2006)
-      !!                    based on one ligand and one inorganic form
-      !!                (2) The complex chemistry model of Tagliabue and 
-      !!                    Voelker (2009) based on 2 ligands, 2 inorganic forms
-      !!                    and one particulate form (ln_fechem)
+      !! ** Method  :   A simple chemistry model of iron from Aumont and Bopp (2006)
+      !!                based on one ligand and one inorganic form
       !!---------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt, knt   ! ocean time step
       !
@@ -73,8 +66,6 @@ CONTAINS
       CHARACTER (len=25) :: charout
       REAL(wp), DIMENSION(jpi,jpj,jpk) ::   zTL1, zFe3, ztotlig, precip, zFeL1
       REAL(wp), DIMENSION(jpi,jpj,jpk) ::   zcoll3d, zscav3d, zlcoll3d
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) ::   zFeL2, zTL2, zFe2, zFeP
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:  ) ::   zstrn, zstrn2
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('p4z_fechem')
@@ -82,14 +73,6 @@ CONTAINS
       zFe3 (:,:,:) = 0.
       zFeL1(:,:,:) = 0.
       zTL1 (:,:,:) = 0.
-      IF( ln_fechem ) THEN
-         ALLOCATE( zstrn(jpi,jpj), zstrn2(jpi,jpj) )
-         ALLOCATE( zFe2(jpi,jpj,jpk), zFeL2(jpi,jpj,jpk), zTL2(jpi,jpj,jpk), zFeP(jpi,jpj,jpk) )
-         zFe2 (:,:,:) = 0.
-         zFeL2(:,:,:) = 0.
-         zTL2 (:,:,:) = 0.
-         zFeP (:,:,:) = 0.
-      ENDIF
 
       ! Total ligand concentration : Ligands can be chosen to be constant or variable
       ! Parameterization from Tagliabue and Voelker (2011)
@@ -103,136 +86,28 @@ CONTAINS
         ENDIF
       ENDIF
 
-      IF( ln_fechem ) THEN
-         ! compute the day length depending on latitude and the day
-         zrum = REAL( nday_year - 80, wp ) / REAL( nyear_len(1), wp )
-         zcodel = ASIN(  SIN( zrum * rpi * 2._wp ) * SIN( rad * 23.5_wp )  )
-
-         ! day length in hours
-         zstrn(:,:) = 0.
+      ! ------------------------------------------------------------
+      !  from Aumont and Bopp (2006)
+      ! This model is based on one ligand and Fe' 
+      ! Chemistry is supposed to be fast enough to be at equilibrium
+      ! ------------------------------------------------------------
+      DO jk = 1, jpkm1
          DO jj = 1, jpj
             DO ji = 1, jpi
-               zargu = TAN( zcodel ) * TAN( gphit(ji,jj) * rad )
-               zargu = MAX( -1., MIN(  1., zargu ) )
-               zstrn(ji,jj) = MAX( 0.0, 24. - 2. * ACOS( zargu ) / rad / 15. )
-            END DO
+               zTL1(ji,jj,jk)  = ztotlig(ji,jj,jk)
+               zkeq            = fekeq(ji,jj,jk)
+               zfesatur        = zTL1(ji,jj,jk) * 1E-9
+               ztfe            = trb(ji,jj,jk,jpfer) 
+               ! Fe' is the root of a 2nd order polynom
+               zFe3 (ji,jj,jk) = ( -( 1. + zfesatur * zkeq - zkeq * ztfe )               &
+                  &              + SQRT( ( 1. + zfesatur * zkeq - zkeq * ztfe )**2       &
+                  &              + 4. * ztfe * zkeq) ) / ( 2. * zkeq )
+               zFe3 (ji,jj,jk) = zFe3(ji,jj,jk) * 1E9
+               zFeL1(ji,jj,jk) = MAX( 0., trb(ji,jj,jk,jpfer) * 1E9 - zFe3(ji,jj,jk) )
+           END DO
          END DO
-
-         ! Maximum light intensity
-         zstrn2(:,:) = zstrn(:,:) / 24.
-         WHERE( zstrn(:,:) < 1.e0 ) zstrn(:,:) = 24.
-         zstrn(:,:) = 24. / zstrn(:,:)
-
-         ! ------------------------------------------------------------
-         ! NEW FE CHEMISTRY ROUTINE from Tagliabue and Volker (2009)
-         ! This model is based on two ligands, Fe2+, Fe3+ and Fep
-         ! Chemistry is supposed to be fast enough to be at equilibrium
-         ! ------------------------------------------------------------
-         DO jn = 1, 2
-            DO jk = 1, jpkm1
-               DO jj = 1, jpj
-                  DO ji = 1, jpi
-                     zlight  = etot(ji,jj,jk) * zstrn(ji,jj) * REAL( 2-jn, wp )
-                     zzstrn2 = zstrn2(ji,jj) * REAL( 2-jn, wp ) + (1. - zstrn2(ji,jj) ) * REAL( jn-1, wp )
-                     ! Calculate ligand concentrations : assume 2/3rd of excess goes to
-                     ! strong ligands (L1) and 1/3rd to weak ligands (L2)
-                     ztligand       = ztotlig(ji,jj,jk) - ligand * 1E9
-                     zTL1(ji,jj,jk) =                0.000001 + 0.67 * ztligand
-                     zTL2(ji,jj,jk) = ligand * 1E9 - 0.000001 + 0.33 * ztligand
-                     ! ionic strength from Millero et al. 1987
-                     zph    = -LOG10( MAX( hi(ji,jj,jk), rtrn) )
-                     zoxy   = trb(ji,jj,jk,jpoxy)
-                     ! Fe2+ oxydation rate from Santana-Casiano et al. (2005)
-                     zkox   = 35.407 - 6.7109 * zph + 0.5342 * zph * zph - 5362.6 / ( tempis(ji,jj,jk) + 273.15 )  &
-                     &        - 0.04406 * SQRT( salinprac(ji,jj,jk) ) - 0.002847 * salinprac(ji,jj,jk)
-                     zkox   = ( 10.** zkox ) * spd
-                     zkox   = zkox * MAX( 1.e-6, zoxy) / ( chemo2(ji,jj,jk) + rtrn )
-                     ! PHOTOREDUCTION of complexed iron : Tagliabue and Arrigo (2006)
-                     zkph2 = MAX( 0., 15. * zlight / ( zlight + 2. ) ) * (1. - fr_i(ji,jj))
-                     zkph1 = zkph2 / 5.
-                     ! pass the dfe concentration from PISCES
-                     ztfe  = trb(ji,jj,jk,jpfer) * 1e9
-                     ! ----------------------------------------------------------
-                     ! ANALYTICAL SOLUTION OF ROOTS OF THE FE3+ EQUATION
-                     ! As shown in Tagliabue and Voelker (2009), Fe3+ is the root of a 3rd order polynom. 
-                     ! ----------------------------------------------------------
-                     ! calculate some parameters
-                     za = 1.0 + ks / kpr
-                     zb = 1.0 + zkph2 / ( zkox )
-                     zc = 1.0 + ( zkph1 + kth ) / ( zkox )
-                     zkappa1 = ( kb1 + zkph1 + kth ) / kl1
-                     zkappa2 = ( kb2 + zkph2 ) / kl2
-                     za2 = zTL2(ji,jj,jk) * zb / za + zTL2(ji,jj,jk) * zc / za + zkappa1 + zkappa2 - ztfe / za
-                     za1 = zkappa1 * zTL2(ji,jj,jk) * zb / za + zkappa2 * zTL1(ji,jj,jk) * zc / za &
-                      & + zkappa1 * zkappa2 - ( zkappa1 + zkappa2 ) * ztfe / za
-                     za0 = -zkappa1 * zkappa2 * ztfe / za
-                     zp  = za1 - za2 * za2 / 3.
-                     zq  = za2 * za2 * za2 * 2. / 27. - za2 * za1 / 3. + za0
-                     zp3 = zp / 3.
-                     zq2 = zq / 2.
-                     zd  = zp3 * zp3 * zp3 + zq2 * zq2
-                     zr  = zq / ABS( zq ) * SQRT( ABS( zp ) / 3. )
-                     ! compute the roots
-                     IF( zp > 0.) THEN
-                        ! zphi = ASINH( zq / ( 2. * zr * zr * zr ) )
-                        zphi =  zq / ( 2. * zr * zr * zr ) 
-                        zphi = LOG( zphi + SQRT( zphi * zphi + 1 ) )  ! asinh(x) = log(x + sqrt(x^2+1))
-                        zxs  = -2. * zr * SINH( zphi / 3. ) - za1 / 3.
-                     ELSE
-                        IF( zd > 0. ) THEN
-                           zfff = MAX( 1., zq / ( 2. * zr * zr * zr ) )
-                           ! zphi = ACOSH( zfff )
-                           zphi = LOG( zfff + SQRT( zfff * zfff - 1 ) )  ! acosh(x) = log(x + sqrt(x^2-1))
-                           zxs = -2. * zr * COSH( zphi / 3. ) - za1 / 3.
-                        ELSE
-                           zfff = MIN( 1., zq / ( 2. * zr * zr * zr ) )
-                           zphi = ACOS( zfff )
-                           DO jic = 1, 3
-                              zfunc = -2 * zr * COS( zphi / 3. + 2. * REAL( jic - 1, wp ) * rpi / 3. ) - za2 / 3.
-                              IF( zfunc > 0. .AND. zfunc <= ztfe)  zxs = zfunc
-                           END DO
-                        ENDIF
-                     ENDIF
-                     ! solve for the other Fe species
-                     zzFe3  = MAX( 0., zxs )
-                     zzFep  = MAX( 0., ( ks * zzFe3 / kpr ) )
-                     zzFeL1 = MAX( 0., ( zzFe3 * zTL1(ji,jj,jk) ) / ( zkappa1 + zzFe3 ) )
-                     zzFeL2 = (ztfe - za * zzFe3 - zc * zzFeL1 ) / zb
-                     zzFe2  = MAX( 0., ( ( ( zkph1 + kth ) * zzFeL1 + zkph2 * zzFeL2 ) / zkox ) )
-                     zzFep  = ztfe - zzFe3 - zzFe2 - zzFeL1 - zzFeL2
-                     zFe3(ji,jj,jk)  = zFe3(ji,jj,jk)  + zzFe3 * zzstrn2
-                     zFe2(ji,jj,jk)  = zFe2(ji,jj,jk)  + zzFe2 * zzstrn2
-                     zFeL2(ji,jj,jk) = zFeL2(ji,jj,jk) + zzFeL2 * zzstrn2
-                     zFeL1(ji,jj,jk) = zFeL1(ji,jj,jk) + zzFeL1 * zzstrn2
-                     zFeP(ji,jj,jk)  = zFeP(ji,jj,jk)  + zzFeP * zzstrn2
-                  END DO
-               END DO
-            END DO
-         END DO
-      ELSE
-         ! ------------------------------------------------------------
-         ! OLD FE CHEMISTRY ROUTINE from Aumont and Bopp (2006)
-         ! This model is based on one ligand and Fe' 
-         ! Chemistry is supposed to be fast enough to be at equilibrium
-         ! ------------------------------------------------------------
-         DO jk = 1, jpkm1
-            DO jj = 1, jpj
-               DO ji = 1, jpi
-                  zTL1(ji,jj,jk)  = ztotlig(ji,jj,jk)
-                  zkeq            = fekeq(ji,jj,jk)
-                  zfesatur        = zTL1(ji,jj,jk) * 1E-9
-                  ztfe            = trb(ji,jj,jk,jpfer) 
-                  ! Fe' is the root of a 2nd order polynom
-                  zFe3 (ji,jj,jk) = ( -( 1. + zfesatur * zkeq - zkeq * ztfe )               &
-                     &              + SQRT( ( 1. + zfesatur * zkeq - zkeq * ztfe )**2       &
-                     &              + 4. * ztfe * zkeq) ) / ( 2. * zkeq )
-                  zFe3 (ji,jj,jk) = zFe3(ji,jj,jk) * 1E9
-                  zFeL1(ji,jj,jk) = MAX( 0., trb(ji,jj,jk,jpfer) * 1E9 - zFe3(ji,jj,jk) )
-              END DO
-            END DO
-         END DO
+      END DO
          !
-      ENDIF
 
       zdust = 0.         ! if no dust available
       DO jk = 1, jpkm1
@@ -246,20 +121,15 @@ CONTAINS
                fe3sol  = fesol(ji,jj,jk,1) * ( zhplus**3 + fesol(ji,jj,jk,2) * zhplus**2  &
                &         + fesol(ji,jj,jk,3) * zhplus + fesol(ji,jj,jk,4)     &
                &         + fesol(ji,jj,jk,5) / zhplus )
-               IF( ln_fechem ) THEN
-                  zfeequi = ( zFe3(ji,jj,jk) + zFe2(ji,jj,jk) + zFeP(ji,jj,jk) ) * 1E-9
-                  zfecoll = ( 0.3 * zFeL1(ji,jj,jk) + 0.5 * zFeL2(ji,jj,jk) ) * 1E-9
-                  precip(ji,jj,jk) = 0.0
-               ELSE
-                  zfeequi = zFe3(ji,jj,jk) * 1E-9
-                  zhplus  = max( rtrn, hi(ji,jj,jk) )
-                  fe3sol  = fesol(ji,jj,jk,1) * ( zhplus**3 + fesol(ji,jj,jk,2) * zhplus**2  &
+               !
+               zfeequi = zFe3(ji,jj,jk) * 1E-9
+               zhplus  = max( rtrn, hi(ji,jj,jk) )
+               fe3sol  = fesol(ji,jj,jk,1) * ( zhplus**3 + fesol(ji,jj,jk,2) * zhplus**2  &
                   &         + fesol(ji,jj,jk,3) * zhplus + fesol(ji,jj,jk,4)     &
                   &         + fesol(ji,jj,jk,5) / zhplus )
-                  zfecoll = 0.5 * zFeL1(ji,jj,jk) * 1E-9
-                  ! precipitation of Fe3+, creation of nanoparticles
-                  precip(ji,jj,jk) = MAX( 0., ( zFe3(ji,jj,jk) * 1E-9 - fe3sol ) ) * kfep * xstep
-               ENDIF
+               zfecoll = 0.5 * zFeL1(ji,jj,jk) * 1E-9
+               ! precipitation of Fe3+, creation of nanoparticles
+               precip(ji,jj,jk) = MAX( 0., ( zFe3(ji,jj,jk) * 1E-9 - fe3sol ) ) * kfep * xstep
                !
                ztrc   = ( trb(ji,jj,jk,jppoc) + trb(ji,jj,jk,jpgoc) + trb(ji,jj,jk,jpcal) + trb(ji,jj,jk,jpgsi) ) * 1.e6 
                IF( ln_dust )  zdust  = dust(ji,jj) / ( wdust / rday ) * tmask(ji,jj,jk) &
@@ -310,9 +180,7 @@ CONTAINS
       !
       !  Define the bioavailable fraction of iron
       !  ----------------------------------------
-      IF( ln_fechem ) THEN  ;  biron(:,:,:) = MAX( 0., trb(:,:,:,jpfer) - zFeP(:,:,:) * 1E-9 )
-      ELSE                  ;  biron(:,:,:) = trb(:,:,:,jpfer) 
-      ENDIF
+      biron(:,:,:) = trb(:,:,:,jpfer) 
       !
       IF( ln_ligand ) THEN
          !
@@ -333,30 +201,22 @@ CONTAINS
             END DO
          END DO
          !
-         IF( .NOT.ln_fechem) THEN
-            plig(:,:,:) =  MAX( 0., ( ( zFeL1(:,:,:) * 1E-9 ) / ( trb(:,:,:,jpfer) +rtrn ) ) )
-         ENDIF
+         plig(:,:,:) =  MAX( 0., ( ( zFeL1(:,:,:) * 1E-9 ) / ( trb(:,:,:,jpfer) +rtrn ) ) )
          !
       ENDIF
       !  Output of some diagnostics variables
       !     ---------------------------------
       IF( lk_iomput ) THEN
          IF( knt == nrdttrc ) THEN
-         zrfact2 = 1.e3 * rfact2r  ! conversion from mol/L/timestep into mol/m3/s
-         IF( iom_use("Fe3")    )  CALL iom_put("Fe3"    , zFe3   (:,:,:)       * tmask(:,:,:) )   ! Fe3+
-         IF( iom_use("FeL1")   )  CALL iom_put("FeL1"   , zFeL1  (:,:,:)       * tmask(:,:,:) )   ! FeL1
-         IF( iom_use("TL1")    )  CALL iom_put("TL1"    , zTL1   (:,:,:)       * tmask(:,:,:) )   ! TL1
-         IF( iom_use("Totlig") )  CALL iom_put("Totlig" , ztotlig(:,:,:)       * tmask(:,:,:) )   ! TL
-         IF( iom_use("Biron")  )  CALL iom_put("Biron"  , biron  (:,:,:)  * 1e9 * tmask(:,:,:) )   ! biron
-         IF( iom_use("FESCAV") )  CALL iom_put("FESCAV" , zscav3d(:,:,:)  * 1e9 * tmask(:,:,:) * zrfact2 )
-         IF( iom_use("FECOLL") )  CALL iom_put("FECOLL" , zcoll3d(:,:,:)  * 1e9 * tmask(:,:,:) * zrfact2 )
-         IF( iom_use("LGWCOLL"))  CALL iom_put("LGWCOLL", zlcoll3d(:,:,:) * 1e9 * tmask(:,:,:) * zrfact2 )
-         IF( ln_fechem ) THEN
-            IF( iom_use("Fe2")  ) CALL iom_put("Fe2"    , zFe2   (:,:,:)       * tmask(:,:,:) )   ! Fe2+
-            IF( iom_use("FeL2") ) CALL iom_put("FeL2"   , zFeL2  (:,:,:)       * tmask(:,:,:) )   ! FeL2
-            IF( iom_use("FeP")  ) CALL iom_put("FeP"    , zFeP   (:,:,:)       * tmask(:,:,:) )   ! FeP
-            IF( iom_use("TL2")  ) CALL iom_put("TL2"    , zTL2   (:,:,:)       * tmask(:,:,:) )   ! TL2
-         ENDIF
+            zrfact2 = 1.e3 * rfact2r  ! conversion from mol/L/timestep into mol/m3/s
+            IF( iom_use("Fe3")    )  CALL iom_put("Fe3"    , zFe3   (:,:,:)       * tmask(:,:,:) )   ! Fe3+
+            IF( iom_use("FeL1")   )  CALL iom_put("FeL1"   , zFeL1  (:,:,:)       * tmask(:,:,:) )   ! FeL1
+            IF( iom_use("TL1")    )  CALL iom_put("TL1"    , zTL1   (:,:,:)       * tmask(:,:,:) )   ! TL1
+            IF( iom_use("Totlig") )  CALL iom_put("Totlig" , ztotlig(:,:,:)       * tmask(:,:,:) )   ! TL
+            IF( iom_use("Biron")  )  CALL iom_put("Biron"  , biron  (:,:,:)  * 1e9 * tmask(:,:,:) )   ! biron
+            IF( iom_use("FESCAV") )  CALL iom_put("FESCAV" , zscav3d(:,:,:)  * 1e9 * tmask(:,:,:) * zrfact2 )
+            IF( iom_use("FECOLL") )  CALL iom_put("FECOLL" , zcoll3d(:,:,:)  * 1e9 * tmask(:,:,:) * zrfact2 )
+            IF( iom_use("LGWCOLL"))  CALL iom_put("LGWCOLL", zlcoll3d(:,:,:) * 1e9 * tmask(:,:,:) * zrfact2 )
          ENDIF
       ENDIF
 
@@ -364,11 +224,6 @@ CONTAINS
          WRITE(charout, FMT="('fechem')")
          CALL prt_ctl_trc_info(charout)
          CALL prt_ctl_trc(tab4d=tra, mask=tmask, clinfo=ctrcnm)
-      ENDIF
-      !
-      IF( ln_fechem )  THEN
-         DEALLOCATE( zstrn, zstrn2 )
-         DEALLOCATE( zFe2, zFeL2, zTL2, zFeP )
       ENDIF
       !
       IF( ln_timing )   CALL timing_stop('p4z_fechem')
@@ -390,7 +245,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER ::   ios   ! Local integer 
       !!
-      NAMELIST/nampisfer/ ln_fechem, ln_ligvar, xlam1, xlamdust, ligand, kfep 
+      NAMELIST/nampisfer/ ln_ligvar, xlam1, xlamdust, ligand, kfep 
       !!----------------------------------------------------------------------
       !
       IF(lwp) THEN
@@ -409,7 +264,6 @@ CONTAINS
 
       IF(lwp) THEN                     ! control print
          WRITE(numout,*) '   Namelist : nampisfer'
-         WRITE(numout,*) '      enable complex iron chemistry scheme      ln_fechem    =', ln_fechem
          WRITE(numout,*) '      variable concentration of ligand          ln_ligvar    =', ln_ligvar
          WRITE(numout,*) '      scavenging rate of Iron                   xlam1        =', xlam1
          WRITE(numout,*) '      scavenging rate of Iron by dust           xlamdust     =', xlamdust
@@ -417,32 +271,6 @@ CONTAINS
          WRITE(numout,*) '      rate constant for nanoparticle formation  kfep         =', kfep
       ENDIF
       ! 
-      IF (ln_ligand .AND. ln_fechem) CALL ctl_stop( 'STOP', 'p4z_fechem_init: ln_ligand and ln_fechem are incompatible')
-      !
-      IF( ln_fechem ) THEN             ! set some constants used by the complexe chemistry scheme
-         !
-         spd = 3600. * 24.
-         con = 1.E9
-         ! LIGAND KINETICS (values from Witter et al. 2000)
-         ! Weak (L2) ligands
-         ! Phaeophytin
-         kl2 = 12.2E5  * spd / con
-         kb2 = 12.3E-6 * spd
-         ! Strong (L1) ligands
-         ! Saccharides
-         ! kl1 = 12.2E5  * spd / con
-         ! kb1 = 12.3E-6 * spd
-         ! DFOB-
-         kl1 = 19.6e5  * spd / con
-         kb1 = 1.5e-6  * spd
-         ! pcp and remin of Fe3p
-         ks  = 0.075
-         kpr = 0.05
-         ! thermal reduction of Fe3
-         kth = 0.0048 * 24.
-         !
-      ENDIF
-      !
    END SUBROUTINE p4z_fechem_init
    
    !!======================================================================

@@ -154,7 +154,6 @@
    xadap      =  0.       ! Adaptation factor to low light
    excretn    =  0.05     ! excretion ratio of phytoplankton
    excretd    =  0.05     ! excretion ratio of diatoms
-   ln_newprod =  .true.   ! Enable new parame. of production (T/F) 
    bresp      =  0.033    ! Basal respiration rate
    chlcnm     =  0.033    ! Maximum Chl/C in nanophytoplankton
    chlcdm     =  0.05     ! Maximum Chl/C in diatoms
@@ -303,12 +302,11 @@
 !-----------------------------------------------------------------------
 &nampisfer     !   parameters for iron chemistry
 !-----------------------------------------------------------------------
-   ln_fechem =  .false.   ! complex iron chemistry ( T/F )
-   ln_ligvar =  .false.   ! variable ligand concentration
-   xlam1        =  0.005  ! scavenging rate of Iron
-   xlamdust     =  150.0  ! Scavenging rate of dust
-   ligand       =  0.7E-9 ! Ligands concentration 
-   kfep         =  0.01   ! Nanoparticle formation rate constant
+   ln_ligvar =  .true.    ! variable ligand concentration
+   xlam1     =  0.005     ! scavenging rate of Iron
+   xlamdust  =  150.0     ! Scavenging rate of dust
+   ligand    =  0.7E-9    ! Ligands concentration 
+   kfep      =  0.01      ! Nanoparticle formation rate constant
 /
 !-----------------------------------------------------------------------  
 &nampisrem     !   parameters for remineralization
