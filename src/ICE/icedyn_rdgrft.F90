@@ -38,17 +38,17 @@ MODULE icedyn_rdgrft
    PUBLIC   ice_strength          ! called by icedyn_rhg_evp
 
    ! Variables shared among ridging subroutines
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:) ::   closing_net     ! net rate at which area is removed    (1/s)
-      !                                                 ! (ridging ice area - area of new ridges) / dt
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:)   ::   opning         ! rate of opening due to divergence/shear
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:)   ::   closing_gross  ! rate at which area removed, not counting area of new ridges
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   apartf   ! participation function; fraction of ridging/closing associated w/ category n
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hrmin    ! minimum ridge thickness
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hrmax    ! maximum ridge thickness
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hraft    ! thickness of rafted ice
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   hi_hrdg  ! thickness of ridging ice / mean ridge thickness
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   aridge   ! participating ice ridging
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:) ::   araft    ! participating ice rafting
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:)     ::   closing_net     ! net rate at which area is removed    (1/s)
+      !                                                               ! (ridging ice area - area of new ridges) / dt
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:)     ::   opning          ! rate of opening due to divergence/shear
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:)     ::   closing_gross   ! rate at which area removed, not counting area of new ridges
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   apartf          ! participation function; fraction of ridging/closing associated w/ category n
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   hrmin           ! minimum ridge thickness
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   hrmax           ! maximum ridge thickness
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   hraft           ! thickness of rafted ice
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   hi_hrdg         ! thickness of ridging ice / mean ridge thickness
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   aridge          ! participating ice ridging
+   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   araft           ! participating ice rafting
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ze_i_2d
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ze_s_2d
    !
@@ -58,7 +58,6 @@ MODULE icedyn_rdgrft
    ! ** namelist (namdyn_rdgrft) **
    LOGICAL  ::   ln_str_H79       ! ice strength parameterization (Hibler79)
    REAL(wp) ::   rn_pstar         ! determines ice strength, Hibler JPO79
-   REAL(wp) ::   rn_crhg          ! determines changes in ice strength
    REAL(wp) ::   rn_csrdg         ! fraction of shearing energy contributing to ridging            
    LOGICAL  ::   ln_partf_lin     ! participation function linear (Thorndike et al. (1975))
    REAL(wp) ::   rn_gstar         !    fractional area of young ice contributing to ridging
@@ -78,7 +77,7 @@ MODULE icedyn_rdgrft
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL license (see ./LICENSE)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -192,7 +191,11 @@ CONTAINS
             !
             ! divergence given by the advection scheme
             !   (which may not be equal to divu as computed from the velocity field)
-            zdivu_adv(ji) = ( 1._wp - ato_i_1d(ji) - SUM( a_i_2d(ji,:) ) ) * r1_rdtice
+            IF    ( ln_adv_Pra ) THEN
+               zdivu_adv(ji) = ( 1._wp - ato_i_1d(ji) - SUM( a_i_2d(ji,:) ) ) * r1_rdtice
+            ELSEIF( ln_adv_UMx ) THEN
+               zdivu_adv(ji) = zdivu(ji)
+            ENDIF
             !
             IF( zdivu_adv(ji) < 0._wp )   closing_net(ji) = MAX( closing_net(ji), -zdivu_adv(ji) )   ! make sure the closing rate is large enough
             !                                                                                        ! to give asum = 1.0 after ridging

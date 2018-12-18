@@ -37,7 +37,7 @@ MODULE icewri
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL license (see ./LICENSE)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -49,7 +49,7 @@ CONTAINS
       !
       INTEGER  ::   ji, jj, jk, jl  ! dummy loop indices
       REAL(wp) ::   z2da, z2db, zrho1, zrho2
-      REAL(wp), DIMENSION(jpi,jpj)     ::   z2d !  2D workspace
+      REAL(wp), DIMENSION(jpi,jpj)     ::   z2d, zfast !  2D workspace
       REAL(wp), DIMENSION(jpi,jpj)     ::   zmsk00, zmsk05, zmsk15, zmsksn ! O%, 5% and 15% concentration mask and snow mask
       REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zmsk00l, zmsksnl               ! cat masks
       !
@@ -131,7 +131,8 @@ CONTAINS
       IF( iom_use('utau_ai'  ) )   CALL iom_put( "utau_ai", utau_ice * zmsk00     )   ! Wind stress term in force balance (x)
       IF( iom_use('vtau_ai'  ) )   CALL iom_put( "vtau_ai", vtau_ice * zmsk00     )   ! Wind stress term in force balance (y)
 
-      IF( iom_use('icevel') ) THEN 
+      IF( iom_use('icevel') .OR. iom_use('fasticepres') ) THEN 
+        ! module of ice velocity
          DO jj = 2 , jpjm1
             DO ji = 2 , jpim1
                z2da  = ( u_ice(ji,jj) + u_ice(ji-1,jj) )
@@ -140,7 +141,13 @@ CONTAINS
            END DO
          END DO
          CALL lbc_lnk( z2d, 'T', 1. )
-         IF( iom_use('icevel') )   CALL iom_put( "icevel" , z2d                   )   ! ice velocity module
+         IF( iom_use('icevel') )   CALL iom_put( "icevel" , z2d )
+
+        ! record presence of fast ice
+         WHERE( z2d(:,:) < 5.e-04_wp .AND. zmsk00(:,:) == 1._wp ) ; zfast(:,:) = 1._wp
+         ELSEWHERE                                                ; zfast(:,:) = 0._wp
+         END WHERE
+         IF( iom_use('fasticepres') )   CALL iom_put( "fasticepres" , zfast )
       ENDIF
 
       ! --- category-dependent fields --- !

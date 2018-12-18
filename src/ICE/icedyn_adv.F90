@@ -39,16 +39,14 @@ MODULE icedyn_adv
    INTEGER, PARAMETER ::   np_advUMx = 2   ! Ultimate-Macho scheme
    !
    ! ** namelist (namdyn_adv) **
-   LOGICAL ::   ln_adv_Pra   ! Prather        advection scheme
-   LOGICAL ::   ln_adv_UMx   ! Ultimate-Macho advection scheme
-   INTEGER ::   nn_UMx       ! order of the UMx advection scheme   
+   INTEGER         ::   nn_UMx       ! order of the UMx advection scheme   
    !
    !! * Substitution
 #  include "vectopt_loop_substitute.h90"
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL license (see ./LICENSE)
+   !! Software governed by the CeCILL licence     (./LICENSE)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -88,21 +86,19 @@ CONTAINS
       !                                !-----------------------!
       CASE( np_advUMx )                ! ULTIMATE-MACHO scheme !
          !                             !-----------------------!
-         CALL ice_dyn_adv_umx( nn_UMx, kt, u_ice, v_ice,  &
-            &                  ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
+         CALL ice_dyn_adv_umx( nn_UMx, kt, u_ice, v_ice, ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
       !                                !-----------------------!
       CASE( np_advPRA )                ! PRATHER scheme        !
          !                             !-----------------------!
-         CALL ice_dyn_adv_pra( kt, u_ice, v_ice,  &
-            &                  ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
+         CALL ice_dyn_adv_pra(         kt, u_ice, v_ice, ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
       END SELECT
 
       !----------------------------
       ! Debug the advection schemes
       !----------------------------
-      ! clem: At least one advection scheme above is not strictly positive => UM from 3d to 5th order
-      !       In Prather, I am not sure if the fields are bounded by 0 or not (it seems not)
-      !       In UM3-5  , advected fields are not bounded and negative values can appear.
+      ! clem: At least one advection scheme above is not strictly positive => UMx
+      !       In Prather, I am not sure if the fields are bounded by 0 or not (it seems yes)
+      !       In UMx    , advected fields are not perfectly bounded and negative values can appear.
       !                   These values are usually very small but in some occasions they can also be non-negligible
       !                   Therefore one needs to bound the advected fields by 0 (though this is not a clean fix)
       !
@@ -117,7 +113,7 @@ CONTAINS
          &                                                                  , dim=4 ), dim=3 ) )* r1_rdtice )  ! -- eq. heat flux [W/m2]
       !
       ! ==> conservation is ensured by calling this routine below,
-      !     however the global ice volume is then changed by advection (but errors are very small) 
+      !     however the global ice volume is then changed by advection (but errors are small) 
       CALL ice_var_zapneg( ato_i, v_i, v_s, sv_i, oa_i, a_i, a_ip, v_ip, e_s, e_i )
 
       !------------

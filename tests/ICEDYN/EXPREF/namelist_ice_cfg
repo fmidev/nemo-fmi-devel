@@ -32,9 +32,10 @@
 !------------------------------------------------------------------------------
 &namdyn         !   Ice dynamics
 !------------------------------------------------------------------------------
-   ln_dynFULL       = .false.         !  dyn.: full ice dynamics               (rheology + advection + ridging/rafting + correction)
+   ln_dynALL        = .false.         !  dyn.: full ice dynamics               (rheology + advection + ridging/rafting + correction)
    ln_dynRHGADV     = .true.          !  dyn.: no ridge/raft & no corrections  (rheology + advection)
-   ln_dynADV        = .false.         !  dyn.: only advection w prescribed vel.(rn_uvice + advection)
+   ln_dynADV1D      = .false.         !  dyn.: only advection 1D                  (Schar & Smolarkiewicz 1996 test case)
+   ln_dynADV2D      = .false.         !  dyn.: only advection 2D w prescribed vel.(rn_uvice + advection)
       rn_uice       =   0.5           !        prescribed ice u-velocity
       rn_vice       =   0.            !        prescribed ice v-velocity
 /
@@ -94,7 +95,7 @@
    sn_tsu = 'initice'                 , -12 ,'tsu'   ,  .false.  , .true., 'yearly'  , '' , '', ''
    sn_tmi = 'initice'                 , -12 ,'tmi'   ,  .false.  , .true., 'yearly'  , '' , '', ''
    sn_smi = 'initice'                 , -12 ,'smi'   ,  .false.  , .true., 'yearly'  , '' , '', ''
-   cn_dir ='./'
+   cn_dir='./'
 /
 !------------------------------------------------------------------------------
 &namalb         !   albedo parameters

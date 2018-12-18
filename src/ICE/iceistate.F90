@@ -63,7 +63,7 @@ MODULE iceistate
    !!----------------------------------------------------------------------
    !! NEMO/ICE 4.0 , NEMO Consortium (2018)
    !! $Id$
-   !! Software governed by the CeCILL license (see ./LICENSE)
+   !! Software governed by the CeCILL licence (modipsl/doc/NEMO_CeCILL.txt)
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -173,104 +173,112 @@ CONTAINS
          ! a gaussian distribution for ice concentration is used
          ! then we check whether the distribution fullfills
          ! volume and area conservation, positivity and ice categories bounds
-         zh_i_ini(:,:,:) = 0._wp 
-         za_i_ini(:,:,:) = 0._wp
-         !
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               !
-               IF( zat_i_ini(ji,jj) > 0._wp .AND. zht_i_ini(ji,jj) > 0._wp )THEN
 
-                  ! find which category (jl0) the input ice thickness falls into
-                  jl0 = jpl
-                  DO jl = 1, jpl
-                     IF ( ( zht_i_ini(ji,jj) >  hi_max(jl-1) ) .AND. ( zht_i_ini(ji,jj) <= hi_max(jl) ) ) THEN
-                        jl0 = jl
-                        CYCLE
-                     ENDIF
-                  END DO
+         IF( jpl == 1 ) THEN
+            !
+            zh_i_ini(:,:,1) = zht_i_ini(:,:)
+            za_i_ini(:,:,1) = zat_i_ini(:,:)            
+            !
+         ELSE
+            zh_i_ini(:,:,:) = 0._wp 
+            za_i_ini(:,:,:) = 0._wp
+            !
+            DO jj = 1, jpj
+               DO ji = 1, jpi
                   !
-                  itest(:) = 0
-                  i_fill   = jpl + 1                                            !------------------------------------
-                  DO WHILE ( ( SUM( itest(:) ) /= 4 ) .AND. ( i_fill >= 2 ) )   ! iterative loop on i_fill categories
-                     !                                                          !------------------------------------
-                     i_fill = i_fill - 1
+                  IF( zat_i_ini(ji,jj) > 0._wp .AND. zht_i_ini(ji,jj) > 0._wp )THEN
+
+                     ! find which category (jl0) the input ice thickness falls into
+                     jl0 = jpl
+                     DO jl = 1, jpl
+                        IF ( ( zht_i_ini(ji,jj) >  hi_max(jl-1) ) .AND. ( zht_i_ini(ji,jj) <= hi_max(jl) ) ) THEN
+                           jl0 = jl
+                           CYCLE
+                        ENDIF
+                     END DO
                      !
-                     zh_i_ini(ji,jj,:) = 0._wp 
-                     za_i_ini(ji,jj,:) = 0._wp
                      itest(:) = 0
-                     !
-                     IF ( i_fill == 1 ) THEN      !-- case very thin ice: fill only category 1
-                        zh_i_ini(ji,jj,1) = zht_i_ini(ji,jj)
-                        za_i_ini(ji,jj,1) = zat_i_ini(ji,jj)
-                     ELSE                         !-- case ice is thicker: fill categories >1
-                        ! thickness
-                        DO jl = 1, i_fill-1
-                           zh_i_ini(ji,jj,jl) = hi_mean(jl)
-                        END DO
+                     i_fill   = jpl + 1                                            !------------------------------------
+                     DO WHILE ( ( SUM( itest(:) ) /= 4 ) .AND. ( i_fill >= 2 ) )   ! iterative loop on i_fill categories
+                        !                                                          !------------------------------------
+                        i_fill = i_fill - 1
                         !
-                        ! concentration
-                        za_i_ini(ji,jj,jl0) = zat_i_ini(ji,jj) / SQRT(REAL(jpl))
-                        DO jl = 1, i_fill - 1
-                           IF( jl /= jl0 )THEN
-                              zarg               = ( zh_i_ini(ji,jj,jl) - zht_i_ini(ji,jj) ) / ( 0.5_wp * zht_i_ini(ji,jj) )
-                              za_i_ini(ji,jj,jl) = za_i_ini(ji,jj,jl0) * EXP(-zarg**2)
+                        zh_i_ini(ji,jj,:) = 0._wp 
+                        za_i_ini(ji,jj,:) = 0._wp
+                        itest(:) = 0
+                        !
+                        IF ( i_fill == 1 ) THEN      !-- case very thin ice: fill only category 1
+                           zh_i_ini(ji,jj,1) = zht_i_ini(ji,jj)
+                           za_i_ini(ji,jj,1) = zat_i_ini(ji,jj)
+                        ELSE                         !-- case ice is thicker: fill categories >1
+                           ! thickness
+                           DO jl = 1, i_fill-1
+                              zh_i_ini(ji,jj,jl) = hi_mean(jl)
+                           END DO
+                           !
+                           ! concentration
+                           za_i_ini(ji,jj,jl0) = zat_i_ini(ji,jj) / SQRT(REAL(jpl))
+                           DO jl = 1, i_fill - 1
+                              IF( jl /= jl0 )THEN
+                                 zarg               = ( zh_i_ini(ji,jj,jl) - zht_i_ini(ji,jj) ) / ( 0.5_wp * zht_i_ini(ji,jj) )
+                                 za_i_ini(ji,jj,jl) = za_i_ini(ji,jj,jl0) * EXP(-zarg**2)
+                              ENDIF
+                           END DO
+
+                           ! last category
+                           za_i_ini(ji,jj,i_fill) = zat_i_ini(ji,jj) - SUM( za_i_ini(ji,jj,1:i_fill-1) )
+                           zV = SUM( za_i_ini(ji,jj,1:i_fill-1) * zh_i_ini(ji,jj,1:i_fill-1) )
+                           zh_i_ini(ji,jj,i_fill) = ( zvt_i_ini(ji,jj) - zV ) / MAX( za_i_ini(ji,jj,i_fill), epsi10 ) 
+
+                           ! correction if concentration of upper cat is greater than lower cat
+                           !   (it should be a gaussian around jl0 but sometimes it is not)
+                           IF ( jl0 /= jpl ) THEN
+                              DO jl = jpl, jl0+1, -1
+                                 IF ( za_i_ini(ji,jj,jl) > za_i_ini(ji,jj,jl-1) ) THEN
+                                    zdv = zh_i_ini(ji,jj,jl) * za_i_ini(ji,jj,jl)
+                                    zh_i_ini(ji,jj,jl    ) = 0._wp
+                                    za_i_ini(ji,jj,jl    ) = 0._wp
+                                    za_i_ini(ji,jj,1:jl-1) = za_i_ini(ji,jj,1:jl-1)  &
+                                       &                     + zdv / MAX( REAL(jl-1) * zht_i_ini(ji,jj), epsi10 )
+                                 END IF
+                              ENDDO
                            ENDIF
-                        END DO
-
-                        ! last category
-                        za_i_ini(ji,jj,i_fill) = zat_i_ini(ji,jj) - SUM( za_i_ini(ji,jj,1:i_fill-1) )
-                        zV = SUM( za_i_ini(ji,jj,1:i_fill-1) * zh_i_ini(ji,jj,1:i_fill-1) )
-                        zh_i_ini(ji,jj,i_fill) = ( zvt_i_ini(ji,jj) - zV ) / MAX( za_i_ini(ji,jj,i_fill), epsi10 ) 
-
-                        ! correction if concentration of upper cat is greater than lower cat
-                        !   (it should be a gaussian around jl0 but sometimes it is not)
-                        IF ( jl0 /= jpl ) THEN
-                           DO jl = jpl, jl0+1, -1
-                              IF ( za_i_ini(ji,jj,jl) > za_i_ini(ji,jj,jl-1) ) THEN
-                                 zdv = zh_i_ini(ji,jj,jl) * za_i_ini(ji,jj,jl)
-                                 zh_i_ini(ji,jj,jl    ) = 0._wp
-                                 za_i_ini(ji,jj,jl    ) = 0._wp
-                                 za_i_ini(ji,jj,1:jl-1) = za_i_ini(ji,jj,1:jl-1)  &
-                                    &                     + zdv / MAX( REAL(jl-1) * zht_i_ini(ji,jj), epsi10 )
-                              END IF
-                           ENDDO
+                           !
                         ENDIF
                         !
+                        ! Compatibility tests
+                        zconv = ABS( zat_i_ini(ji,jj) - SUM( za_i_ini(ji,jj,1:jpl) ) )           ! Test 1: area conservation
+                        IF ( zconv < epsi06 ) itest(1) = 1
+                        !
+                        zconv = ABS(       zat_i_ini(ji,jj)       * zht_i_ini(ji,jj)   &         ! Test 2: volume conservation
+                           &        - SUM( za_i_ini (ji,jj,1:jpl) * zh_i_ini (ji,jj,1:jpl) ) )
+                        IF ( zconv < epsi06 ) itest(2) = 1
+                        !
+                        IF ( zh_i_ini(ji,jj,i_fill) >= hi_max(i_fill-1) ) itest(3) = 1           ! Test 3: thickness of the last category is in-bounds ?
+                        !
+                        itest(4) = 1
+                        DO jl = 1, i_fill
+                           IF ( za_i_ini(ji,jj,jl) < 0._wp ) itest(4) = 0                        ! Test 4: positivity of ice concentrations
+                        END DO
+                        !                                                          !----------------------------
+                     END DO                                                        ! end iteration on categories
+                     !                                                             !----------------------------
+                     IF( lwp .AND. SUM(itest) /= 4 ) THEN 
+                        WRITE(numout,*)
+                        WRITE(numout,*) ' !!!! ALERT itest is not equal to 4      !!! '
+                        WRITE(numout,*) ' !!!! Something is wrong in the SI3 initialization procedure '
+                        WRITE(numout,*)
+                        WRITE(numout,*) ' *** itest_i (i=1,4) = ', itest(:)
+                        WRITE(numout,*) ' zat_i_ini : ', zat_i_ini(ji,jj)
+                        WRITE(numout,*) ' zht_i_ini : ', zht_i_ini(ji,jj)
                      ENDIF
                      !
-                     ! Compatibility tests
-                     zconv = ABS( zat_i_ini(ji,jj) - SUM( za_i_ini(ji,jj,1:jpl) ) )           ! Test 1: area conservation
-                     IF ( zconv < epsi06 ) itest(1) = 1
-                     !
-                     zconv = ABS(       zat_i_ini(ji,jj)       * zht_i_ini(ji,jj)   &         ! Test 2: volume conservation
-                        &        - SUM( za_i_ini (ji,jj,1:jpl) * zh_i_ini (ji,jj,1:jpl) ) )
-                     IF ( zconv < epsi06 ) itest(2) = 1
-                     !
-                     IF ( zh_i_ini(ji,jj,i_fill) >= hi_max(i_fill-1) ) itest(3) = 1           ! Test 3: thickness of the last category is in-bounds ?
-                     !
-                     itest(4) = 1
-                     DO jl = 1, i_fill
-                        IF ( za_i_ini(ji,jj,jl) < 0._wp ) itest(4) = 0                        ! Test 4: positivity of ice concentrations
-                     END DO
-                     !                                                          !----------------------------
-                  END DO                                                        ! end iteration on categories
-                  !                                                             !----------------------------
-                  IF( lwp .AND. SUM(itest) /= 4 ) THEN 
-                     WRITE(numout,*)
-                     WRITE(numout,*) ' !!!! ALERT itest is not equal to 4      !!! '
-                     WRITE(numout,*) ' !!!! Something is wrong in the SI3 initialization procedure '
-                     WRITE(numout,*)
-                     WRITE(numout,*) ' *** itest_i (i=1,4) = ', itest(:)
-                     WRITE(numout,*) ' zat_i_ini : ', zat_i_ini(ji,jj)
-                     WRITE(numout,*) ' zht_i_ini : ', zht_i_ini(ji,jj)
                   ENDIF
                   !
-               ENDIF
-               !
-            END DO   
-         END DO   
-
+               END DO
+            END DO
+         ENDIF
+         
          !---------------------------------------------------------------------
          ! 4) Fill in sea ice arrays
          !---------------------------------------------------------------------

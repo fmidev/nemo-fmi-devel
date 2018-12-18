@@ -556,12 +556,6 @@ CONTAINS
       REAL(wp), DIMENSION(:,:,:,:), INTENT(inout) ::   pe_i       ! ice heat content
       !!-------------------------------------------------------------------
       !
-      WHERE( pato_i(:,:)   < 0._wp )   pato_i(:,:)   = 0._wp
-      WHERE( poa_i (:,:,:) < 0._wp )   poa_i (:,:,:) = 0._wp
-      WHERE( pa_i  (:,:,:) < 0._wp )   pa_i  (:,:,:) = 0._wp
-      WHERE( pa_ip (:,:,:) < 0._wp )   pa_ip (:,:,:) = 0._wp
-      WHERE( pv_ip (:,:,:) < 0._wp )   pv_ip (:,:,:) = 0._wp ! in theory one should change wfx_pnd(-) and wfx_sum(+)
-      !                                                        but it does not change conservation, so keep it this way is ok
       !
       DO jl = 1, jpl       !==  loop over the categories  ==!
          !
@@ -571,7 +565,7 @@ CONTAINS
          DO jk = 1, nlay_i
             DO jj = 1 , jpj
                DO ji = 1 , jpi
-                  IF( pe_i(ji,jj,jk,jl) < 0._wp ) THEN
+                  IF( pe_i(ji,jj,jk,jl) < 0._wp .OR. pa_i(ji,jj,jl) < 0._wp ) THEN
                      hfx_res(ji,jj)   = hfx_res(ji,jj) - pe_i(ji,jj,jk,jl) * r1_rdtice ! W.m-2 <0
                      pe_i(ji,jj,jk,jl) = 0._wp
                   ENDIF
@@ -582,7 +576,7 @@ CONTAINS
          DO jk = 1, nlay_s
             DO jj = 1 , jpj
                DO ji = 1 , jpi
-                  IF( pe_s(ji,jj,jk,jl) < 0._wp ) THEN
+                  IF( pe_s(ji,jj,jk,jl) < 0._wp .OR. pa_i(ji,jj,jl) < 0._wp ) THEN
                      hfx_res(ji,jj)   = hfx_res(ji,jj) - pe_s(ji,jj,jk,jl) * r1_rdtice ! W.m-2 <0
                      pe_s(ji,jj,jk,jl) = 0._wp
                   ENDIF
@@ -595,15 +589,15 @@ CONTAINS
          !-----------------------------------------------------
          DO jj = 1 , jpj
             DO ji = 1 , jpi
-              IF( pv_i(ji,jj,jl) < 0._wp ) THEN
+               IF( pv_i(ji,jj,jl) < 0._wp .OR. pa_i(ji,jj,jl) < 0._wp ) THEN
                   wfx_res(ji,jj)    = wfx_res(ji,jj) + pv_i (ji,jj,jl) * rhoi * r1_rdtice
                   pv_i   (ji,jj,jl) = 0._wp
                ENDIF
-               IF( pv_s(ji,jj,jl) < 0._wp ) THEN
+               IF( pv_s(ji,jj,jl) < 0._wp .OR. pa_i(ji,jj,jl) < 0._wp ) THEN
                   wfx_res(ji,jj)    = wfx_res(ji,jj) + pv_s (ji,jj,jl) * rhos * r1_rdtice
                   pv_s   (ji,jj,jl) = 0._wp
                ENDIF
-               IF( psv_i(ji,jj,jl) < 0._wp ) THEN
+               IF( psv_i(ji,jj,jl) < 0._wp .OR. pa_i(ji,jj,jl) < 0._wp ) THEN
                   sfx_res(ji,jj)    = sfx_res(ji,jj) + psv_i(ji,jj,jl) * rhoi * r1_rdtice
                   psv_i  (ji,jj,jl) = 0._wp
                ENDIF
@@ -611,6 +605,13 @@ CONTAINS
          END DO
          !
       END DO 
+      !
+      WHERE( pato_i(:,:)   < 0._wp )   pato_i(:,:)   = 0._wp
+      WHERE( poa_i (:,:,:) < 0._wp )   poa_i (:,:,:) = 0._wp
+      WHERE( pa_i  (:,:,:) < 0._wp )   pa_i  (:,:,:) = 0._wp
+      WHERE( pa_ip (:,:,:) < 0._wp )   pa_ip (:,:,:) = 0._wp
+      WHERE( pv_ip (:,:,:) < 0._wp )   pv_ip (:,:,:) = 0._wp ! in theory one should change wfx_pnd(-) and wfx_sum(+)
+      !                                                        but it does not change conservation, so keep it this way is ok
       !
    END SUBROUTINE ice_var_zapneg
 

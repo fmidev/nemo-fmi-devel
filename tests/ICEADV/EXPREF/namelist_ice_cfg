@@ -21,22 +21,23 @@
 !------------------------------------------------------------------------------
 &nampar         !   Generic parameters
 !------------------------------------------------------------------------------
+   jpl              =   1             !  number of ice  categories
+   nlay_i           =   2             !  number of ice  layers
    ln_icedyn        = .true.          !  ice dynamics (T) or not (F)
    ln_icethd        = .false.         !  ice thermo   (T) or not (F)
 /
 !------------------------------------------------------------------------------
 &namitd         !   Ice discretization
 !------------------------------------------------------------------------------
-   rn_himin         =   0.1           !  minimum ice thickness (m) used in remapping
 /
 !------------------------------------------------------------------------------
 &namdyn         !   Ice dynamics
 !------------------------------------------------------------------------------
    ln_dynALL        = .false.         !  dyn.: full ice dynamics               (rheology + advection + ridging/rafting + correction)
-   ln_dynRHGADV     = .true.          !  dyn.: no ridge/raft & no corrections  (rheology + advection)
-   ln_dynADV1D      = .false.         !  dyn.: only advection 1D                  (Schar & Smolarkiewicz 1996 test case)
+   ln_dynRHGADV     = .false.         !  dyn.: no ridge/raft & no corrections  (rheology + advection)
+   ln_dynADV1D      = .true.          !  dyn.: only advection 1D                  (Schar & Smolarkiewicz 1996 test case)
    ln_dynADV2D      = .false.         !  dyn.: only advection 2D w prescribed vel.(rn_uvice + advection)
-      rn_uice       =   0.5           !        prescribed ice u-velocity
+      rn_uice       =   1.            !        prescribed ice u-velocity
       rn_vice       =   0.            !        prescribed ice v-velocity
 /
 !------------------------------------------------------------------------------
@@ -46,7 +47,6 @@
 !------------------------------------------------------------------------------
 &namdyn_rhg     !   Ice rheology
 !------------------------------------------------------------------------------
-      ln_aEVP       = .false.         !     adaptive rheology (Kimmritz et al. 2016 & 2017)
 /
 !------------------------------------------------------------------------------
 &namdyn_adv     !   Ice advection
@@ -86,7 +86,16 @@
 !------------------------------------------------------------------------------
 &namini         !   Ice initialization
 !------------------------------------------------------------------------------
-   ln_iceini        = .false.          !  activate ice initialization (T) or not (F)
+   ln_iceini        = .true.          !  activate ice initialization (T) or not (F)
+   ln_iceini_file   = .true.          !  netcdf file provided for initialization (T) or not (F)
+
+   sn_hti = 'initice_60pts'                 , -12 ,'hti'   ,  .false.  , .true., 'yearly'  , '' , '', ''
+   sn_hts = 'initice_60pts'                 , -12 ,'hts'   ,  .false.  , .true., 'yearly'  , '' , '', ''
+   sn_ati = 'initice_60pts'                 , -12 ,'ati'   ,  .false.  , .true., 'yearly'  , '' , '', ''
+   sn_tsu = 'initice_60pts'                 , -12 ,'tsu'   ,  .false.  , .true., 'yearly'  , '' , '', ''
+   sn_tmi = 'initice_60pts'                 , -12 ,'tmi'   ,  .false.  , .true., 'yearly'  , '' , '', ''
+   sn_smi = 'initice_60pts'                 , -12 ,'smi'   ,  .false.  , .true., 'yearly'  , '' , '', ''
+   cn_dir='./'
 /
 !------------------------------------------------------------------------------
 &namalb         !   albedo parameters

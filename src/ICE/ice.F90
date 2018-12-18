@@ -128,17 +128,26 @@ MODULE ice
    
    !                                     !!** ice-dynamics namelist (namdyn) **
    REAL(wp), PUBLIC ::   rn_ishlat        !: lateral boundary condition for sea-ice
-   LOGICAL , PUBLIC ::   ln_landfast      !: landfast ice parameterization (T or F) 
-   REAL(wp), PUBLIC ::   rn_gamma         !:    fraction of ocean depth that ice must reach to initiate landfast ice
-   REAL(wp), PUBLIC ::   rn_icebfr        !:    maximum bottom stress per unit area of contact (landfast ice) 
-   REAL(wp), PUBLIC ::   rn_lfrelax       !:    relaxation time scale (s-1) to reach static friction (landfast ice) 
+   LOGICAL , PUBLIC ::   ln_landfast_L16  !: landfast ice parameterizationfrom lemieux2016 
+   LOGICAL , PUBLIC ::   ln_landfast_home !: landfast ice parameterizationfrom home made 
+   REAL(wp), PUBLIC ::   rn_depfra        !:    fraction of ocean depth that ice must reach to initiate landfast ice
+   REAL(wp), PUBLIC ::   rn_icebfr        !:    maximum bottom stress per unit area of contact (lemieux2016) or per unit volume (home) 
+   REAL(wp), PUBLIC ::   rn_lfrelax       !:    relaxation time scale (s-1) to reach static friction
+   REAL(wp), PUBLIC ::   rn_tensile       !:    isotropic tensile strength
    !
-   !                                     !!** ice-rheology namelist (namrhg) **
+   !                                     !!** ice-ridging/rafting namelist (namdyn_rdgrft) **
+   REAL(wp), PUBLIC ::   rn_crhg          !: determines changes in ice strength (also used for landfast param)
+   !
+   !                                     !!** ice-rheology namelist (namdyn_rhg) **
    LOGICAL , PUBLIC ::   ln_aEVP          !: using adaptive EVP (T or F) 
    REAL(wp), PUBLIC ::   rn_creepl        !: creep limit : has to be under 1.0e-9
    REAL(wp), PUBLIC ::   rn_ecc           !: eccentricity of the elliptical yield curve
    INTEGER , PUBLIC ::   nn_nevp          !: number of iterations for subcycling
    REAL(wp), PUBLIC ::   rn_relast        !: ratio => telast/rdt_ice (1/3 or 1/9 depending on nb of subcycling nevp) 
+   !
+   !                                     !!** ice-advection namelist (namdyn_adv) **
+   LOGICAL , PUBLIC ::   ln_adv_Pra       !: Prather        advection scheme
+   LOGICAL , PUBLIC ::   ln_adv_UMx       !: Ultimate-Macho advection scheme
    !
    !                                     !!** ice-surface forcing namelist (namforcing) **
                                           ! -- icethd_dh -- !

@@ -118,9 +118,11 @@ CONTAINS
       REAL(wp) ::   zdtevp, z1_dtevp                                    ! time step for subcycling
       REAL(wp) ::   ecc2, z1_ecc2                                       ! square of yield ellipse eccenticity
       REAL(wp) ::   zalph1, z1_alph1, zalph2, z1_alph2                  ! alpha coef from Bouillon 2009 or Kimmritz 2017
-      REAL(wp) ::   zm1, zm2, zm3, zmassU, zmassV                       ! ice/snow mass
+      REAL(wp) ::   zm1, zm2, zm3, zmassU, zmassV, zvU, zvV             ! ice/snow mass and volume
       REAL(wp) ::   zdelta, zp_delf, zds2, zdt, zdt2, zdiv, zdiv2       ! temporary scalars
       REAL(wp) ::   zTauO, zTauB, zTauE, zvel                           ! temporary scalars
+      REAL(wp) ::   zkt                                                 ! isotropic tensile strength for landfast ice
+      REAL(wp) ::   zvCr                                                ! critical ice volume above which ice is landfast
       !
       REAL(wp) ::   zresm                                               ! Maximal error on ice velocity
       REAL(wp) ::   zintb, zintn                                        ! dummy argument
@@ -136,6 +138,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zmU_t, zmV_t                    ! (ice-snow_mass / dt) on U/V points
       REAL(wp), DIMENSION(jpi,jpj) ::   zmf                             ! coriolis parameter at T points
       REAL(wp), DIMENSION(jpi,jpj) ::   zTauU_ia , ztauV_ia             ! ice-atm. stress at U-V points
+      REAL(wp), DIMENSION(jpi,jpj) ::   zTauU_ib , ztauV_ib             ! ice-bottom stress at U-V points (landfast param)
       REAL(wp), DIMENSION(jpi,jpj) ::   zspgU , zspgV                   ! surface pressure gradient at U/V points
       REAL(wp), DIMENSION(jpi,jpj) ::   v_oceU, u_oceV, v_iceU, u_iceV  ! ocean/ice u/v component on V/U points                           
       REAL(wp), DIMENSION(jpi,jpj) ::   zfU   , zfV                     ! internal stresses
@@ -255,7 +258,11 @@ CONTAINS
             z1_e2t0(ji,jj) = 1._wp / ( e2t(ji  ,jj+1) + e2t(ji,jj  ) )
          END DO
       END DO
-            
+
+      ! landfast param from Lemieux(2016): add isotropic tensile strength (following Konig Beatty and Holland, 2010)
+      IF( ln_landfast_L16 .OR. ln_landfast_home ) THEN   ;   zkt = rn_tensile
+      ELSE                                               ;   zkt = 0._wp
+      ENDIF
       !
       !------------------------------------------------------------------------------!
       ! 2) Wind / ocean stress, mass terms, coriolis terms
@@ -316,6 +323,45 @@ CONTAINS
       END DO
       CALL lbc_lnk_multi( zmf, 'T', 1., zdt_m, 'T', 1. )
       !
+      !                                  !== Landfast ice parameterization ==!
+      !
+      IF( ln_landfast_L16 ) THEN         !-- Lemieux 2016
+         DO jj = 2, jpjm1
+            DO ji = fs_2, fs_jpim1
+               ! ice thickness at U-V points
+               zvU = 0.5_wp * ( vt_i(ji,jj) * e1e2t(ji,jj) + vt_i(ji+1,jj) * e1e2t(ji+1,jj) ) * r1_e1e2u(ji,jj) * umask(ji,jj,1)
+               zvV = 0.5_wp * ( vt_i(ji,jj) * e1e2t(ji,jj) + vt_i(ji,jj+1) * e1e2t(ji,jj+1) ) * r1_e1e2v(ji,jj) * vmask(ji,jj,1)
+               ! ice-bottom stress at U points
+               zvCr = zaU(ji,jj) * rn_depfra * hu_n(ji,jj)
+               zTauU_ib(ji,jj)   = rn_icebfr * MAX( 0._wp, zvU - zvCr ) * EXP( -rn_crhg * ( 1._wp - zaU(ji,jj) ) )
+               ! ice-bottom stress at V points
+               zvCr = zaV(ji,jj) * rn_depfra * hv_n(ji,jj)
+               zTauV_ib(ji,jj)   = rn_icebfr * MAX( 0._wp, zvV - zvCr ) * EXP( -rn_crhg * ( 1._wp - zaV(ji,jj) ) )
+               ! ice_bottom stress at T points
+               zvCr = at_i(ji,jj) * rn_depfra * ht_n(ji,jj)
+               tau_icebfr(ji,jj) = rn_icebfr * MAX( 0._wp, vt_i(ji,jj) - zvCr ) * EXP( -rn_crhg * ( 1._wp - at_i(ji,jj) ) )
+            END DO
+         END DO
+         CALL lbc_lnk( tau_icebfr(:,:), 'T', 1. )
+         !
+      ELSEIF( ln_landfast_home ) THEN          !-- Home made
+         DO jj = 2, jpjm1
+            DO ji = fs_2, fs_jpim1
+               zTauU_ib(ji,jj) = tau_icebfr(ji,jj)
+               zTauV_ib(ji,jj) = tau_icebfr(ji,jj)
+            END DO
+         END DO
+         !
+      ELSE                                     !-- no landfast
+         DO jj = 2, jpjm1
+            DO ji = fs_2, fs_jpim1
+               zTauU_ib(ji,jj) = 0._wp
+               zTauV_ib(ji,jj) = 0._wp
+            END DO
+         END DO
+      ENDIF
+      IF( iom_use('tau_icebfr') )   CALL iom_put( 'tau_icebfr', tau_icebfr(:,:) )
+
       !------------------------------------------------------------------------------!
       ! 3) Solution of the momentum equation, iterative procedure
       !------------------------------------------------------------------------------!
@@ -379,9 +425,9 @@ CONTAINS
                   z1_alph2 = z1_alph1
                ENDIF
                
-               ! stress at T points
-               zs1(ji,jj) = ( zs1(ji,jj) * zalph1 + zp_delt(ji,jj) * ( zdiv - zdelta ) ) * z1_alph1
-               zs2(ji,jj) = ( zs2(ji,jj) * zalph2 + zp_delt(ji,jj) * ( zdt * z1_ecc2 ) ) * z1_alph2
+               ! stress at T points (zkt/=0 if landfast)
+               zs1(ji,jj) = ( zs1(ji,jj) * zalph1 + zp_delt(ji,jj) * ( zdiv * (1._wp + zkt) - zdelta * (1._wp - zkt) ) ) * z1_alph1
+               zs2(ji,jj) = ( zs2(ji,jj) * zalph2 + zp_delt(ji,jj) * ( zdt * z1_ecc2 * (1._wp + zkt) ) ) * z1_alph2
              
             END DO
          END DO
@@ -400,8 +446,8 @@ CONTAINS
                ! P/delta at F points
                zp_delf = 0.25_wp * ( zp_delt(ji,jj) + zp_delt(ji+1,jj) + zp_delt(ji,jj+1) + zp_delt(ji+1,jj+1) )
                
-               ! stress at F points
-               zs12(ji,jj)= ( zs12(ji,jj) * zalph2 + zp_delf * ( zds(ji,jj) * z1_ecc2 ) * 0.5_wp ) * z1_alph2
+               ! stress at F points (zkt/=0 if landfast)
+               zs12(ji,jj)= ( zs12(ji,jj) * zalph2 + zp_delf * ( zds(ji,jj) * z1_ecc2 * (1._wp + zkt) ) * 0.5_wp ) * z1_alph2
 
             END DO
          END DO
@@ -449,8 +495,8 @@ CONTAINS
                   ztauy_oi(ji,jj) = zTauO * ( v_oce(ji,jj) - v_ice(ji,jj) )
                   !
                   !                 !--- tau_bottom/v_ice
-                  zvel  = MAX( zepsi, SQRT( v_ice(ji,jj) * v_ice(ji,jj) + u_iceV(ji,jj) * u_iceV(ji,jj) ) )
-                  zTauB = - tau_icebfr(ji,jj) / zvel
+                  zvel  = 5.e-05_wp + SQRT( v_ice(ji,jj) * v_ice(ji,jj) + u_iceV(ji,jj) * u_iceV(ji,jj) )
+                  zTauB = - zTauV_ib(ji,jj) / zvel
                   !
                   !                 !--- Coriolis at V-points (energy conserving formulation)
                   zCory(ji,jj)  = - 0.25_wp * r1_e2v(ji,jj) *  &
@@ -461,7 +507,7 @@ CONTAINS
                   zTauE = zfV(ji,jj) + zTauV_ia(ji,jj) + zCory(ji,jj) + zspgV(ji,jj) + ztauy_oi(ji,jj)
                   !
                   !                 !--- landfast switch => 0 = static friction ; 1 = sliding friction
-                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, ztauE - tau_icebfr(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
+                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, ztauE - zTauV_ib(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
                   !
                   IF( ln_aEVP ) THEN !--- ice velocity using aEVP (Kimmritz et al 2016 & 2017)
                   v_ice(ji,jj) = ( (          rswitch * ( zmV_t(ji,jj) * ( zbeta(ji,jj) * v_ice(ji,jj) + v_ice_b(ji,jj) )         & ! previous velocity
@@ -497,8 +543,8 @@ CONTAINS
                   ztaux_oi(ji,jj) = zTauO * ( u_oce(ji,jj) - u_ice(ji,jj) )
                   !
                   !                 !--- tau_bottom/u_ice
-                  zvel  = MAX( zepsi, SQRT( v_iceU(ji,jj) * v_iceU(ji,jj) + u_ice(ji,jj) * u_ice(ji,jj) ) )
-                  zTauB = - tau_icebfr(ji,jj) / zvel
+                  zvel  = 5.e-05_wp + SQRT( v_iceU(ji,jj) * v_iceU(ji,jj) + u_ice(ji,jj) * u_ice(ji,jj) )
+                  zTauB = - zTauU_ib(ji,jj) / zvel
                   !
                   !                 !--- Coriolis at U-points (energy conserving formulation)
                   zCorx(ji,jj)  =   0.25_wp * r1_e1u(ji,jj) *  &
@@ -509,7 +555,7 @@ CONTAINS
                   zTauE = zfU(ji,jj) + zTauU_ia(ji,jj) + zCorx(ji,jj) + zspgU(ji,jj) + ztaux_oi(ji,jj)
                   !
                   !                 !--- landfast switch => 0 = static friction ; 1 = sliding friction
-                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, ztauE - tau_icebfr(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
+                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, ztauE - zTauU_ib(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
                   !
                   IF( ln_aEVP ) THEN !--- ice velocity using aEVP (Kimmritz et al 2016 & 2017)
                   u_ice(ji,jj) = ( (          rswitch * ( zmU_t(ji,jj) * ( zbeta(ji,jj) * u_ice(ji,jj) + u_ice_b(ji,jj) )         & ! previous velocity
@@ -547,8 +593,8 @@ CONTAINS
                   ztaux_oi(ji,jj) = zTauO * ( u_oce(ji,jj) - u_ice(ji,jj) )
                   !
                   !                 !--- tau_bottom/u_ice
-                  zvel  = MAX( zepsi, SQRT( v_iceU(ji,jj) * v_iceU(ji,jj) + u_ice(ji,jj) * u_ice(ji,jj) ) )
-                  zTauB = - tau_icebfr(ji,jj) / zvel
+                  zvel  = 5.e-05_wp + SQRT( v_iceU(ji,jj) * v_iceU(ji,jj) + u_ice(ji,jj) * u_ice(ji,jj) )
+                  zTauB = - zTauU_ib(ji,jj) / zvel
                   !
                   !                 !--- Coriolis at U-points (energy conserving formulation)
                   zCorx(ji,jj)  =   0.25_wp * r1_e1u(ji,jj) *  &
@@ -559,7 +605,7 @@ CONTAINS
                   zTauE = zfU(ji,jj) + zTauU_ia(ji,jj) + zCorx(ji,jj) + zspgU(ji,jj) + ztaux_oi(ji,jj)
                   !
                   !                 !--- landfast switch => 0 = static friction ; 1 = sliding friction
-                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, ztauE - tau_icebfr(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
+                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, ztauE - zTauU_ib(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
                   !
                   IF( ln_aEVP ) THEN !--- ice velocity using aEVP (Kimmritz et al 2016 & 2017)
                   u_ice(ji,jj) = ( (          rswitch * ( zmU_t(ji,jj) * ( zbeta(ji,jj) * u_ice(ji,jj) + u_ice_b(ji,jj) )         & ! previous velocity
@@ -595,8 +641,8 @@ CONTAINS
                   ztauy_oi(ji,jj) = zTauO * ( v_oce(ji,jj) - v_ice(ji,jj) )
                   !
                   !                 !--- tau_bottom/v_ice
-                  zvel  = MAX( zepsi, SQRT( v_ice(ji,jj) * v_ice(ji,jj) + u_iceV(ji,jj) * u_iceV(ji,jj) ) )
-                  ztauB = - tau_icebfr(ji,jj) / zvel
+                  zvel  = 5.e-05_wp + SQRT( v_ice(ji,jj) * v_ice(ji,jj) + u_iceV(ji,jj) * u_iceV(ji,jj) )
+                  zTauB = - zTauV_ib(ji,jj) / zvel
                   !
                   !                 !--- Coriolis at v-points (energy conserving formulation)
                   zCory(ji,jj)  = - 0.25_wp * r1_e2v(ji,jj) *  &
@@ -607,7 +653,7 @@ CONTAINS
                   zTauE = zfV(ji,jj) + zTauV_ia(ji,jj) + zCory(ji,jj) + zspgV(ji,jj) + ztauy_oi(ji,jj)
                   !
                   !                 !--- landfast switch => 0 = static friction ; 1 = sliding friction
-                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, zTauE - tau_icebfr(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
+                  rswitch = 1._wp - MIN( 1._wp, ABS( SIGN( 1._wp, zTauE - zTauV_ib(ji,jj) ) - SIGN( 1._wp, zTauE ) ) )
                   !
                   IF( ln_aEVP ) THEN !--- ice velocity using aEVP (Kimmritz et al 2016 & 2017)
                   v_ice(ji,jj) = ( (          rswitch * ( zmV_t(ji,jj) * ( zbeta(ji,jj) * v_ice(ji,jj) + v_ice_b(ji,jj) )         & ! previous velocity
