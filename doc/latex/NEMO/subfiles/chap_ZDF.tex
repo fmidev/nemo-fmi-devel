@@ -1,18 +1,17 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Chapter  Vertical Ocean Physics (ZDF)
 % ================================================================
 \chapter{Vertical Ocean Physics (ZDF)}
 \label{chap:ZDF}
+
 \minitoc
 
 %gm% Add here a small introduction to ZDF and naming of the different physics (similar to what have been written for TRA and DYN.
 
-
 \newpage
-$\ $\newline    % force a new ligne
-
 
 % ================================================================
 % Vertical Mixing
@@ -59,16 +58,15 @@ constant values over the whole ocean.
 This is the crudest way to define the vertical ocean physics.
 It is recommended that this option is only used in process studies, not in basin scale simulations.
 Typical values used in this case are:
-\begin{align*} 
-A_u^{vm} = A_v^{vm} &= 1.2\ 10^{-4}~m^2.s^{-1} 	\\
-A^{vT} = A^{vS} &= 1.2\ 10^{-5}~m^2.s^{-1}
+\begin{align*}
+  A_u^{vm} = A_v^{vm} &= 1.2\ 10^{-4}~m^2.s^{-1} 	\\
+  A^{vT} = A^{vS} &= 1.2\ 10^{-5}~m^2.s^{-1}
 \end{align*}
 
 These values are set through the \np{rn\_avm0} and \np{rn\_avt0} namelist parameters. 
 In all cases, do not use values smaller that those associated with the molecular viscosity and diffusivity,
 that is $\sim10^{-6}~m^2.s^{-1}$ for momentum, $\sim10^{-7}~m^2.s^{-1}$ for temperature and
 $\sim10^{-9}~m^2.s^{-1}$ for salinity.
-
 
 % -------------------------------------------------------------------------------------------------------------
 %        Richardson Number Dependent
@@ -89,12 +87,15 @@ The hypothesis of a mixing mainly maintained by the growth of Kelvin-Helmholtz l
 a dependency between the vertical eddy coefficients and the local Richardson number
 ($i.e.$ the ratio of stratification to vertical shear).
 Following \citet{Pacanowski_Philander_JPO81}, the following formulation has been implemented:
-\begin{equation} \label{eq:zdfric}
-   \left\{      \begin{aligned}
-         A^{vT} &= \frac {A_{ric}^{vT}}{\left( 1+a \; Ri \right)^n} + A_b^{vT}       \\
-         A^{vm} &= \frac{A^{vT}        }{\left( 1+ a \;Ri  \right)   } + A_b^{vm}
-   \end{aligned}    \right.
-\end{equation}
+\[
+  % \label{eq:zdfric}
+  \left\{
+    \begin{aligned}
+      A^{vT} &= \frac {A_{ric}^{vT}}{\left( 1+a \; Ri \right)^n} + A_b^{vT}       \\
+      A^{vm} &= \frac{A^{vT}        }{\left( 1+ a \;Ri  \right)   } + A_b^{vm}
+    \end{aligned}
+  \right.
+\]
 where $Ri = N^2 / \left(\partial_z \textbf{U}_h \right)^2$ is the local Richardson number,
 $N$ is the local Brunt-Vais\"{a}l\"{a} frequency (see \autoref{subsec:TRA_bn2}), 
 $A_b^{vT} $ and $A_b^{vm}$ are the constant background values set as in the constant case
@@ -110,15 +111,15 @@ In this case, the local depth of turbulent wind-mixing or "Ekman depth" $h_{e}(x
 the vertical eddy coefficients prescribed within this layer.
 
 This depth is assumed proportional to the "depth of frictional influence" that is limited by rotation:
-\begin{equation}
-h_{e} = Ek \frac {u^{*}} {f_{0}}
-\end{equation}
+\[
+  h_{e} = Ek \frac {u^{*}} {f_{0}}
+\]
 where, $Ek$ is an empirical parameter, $u^{*}$ is the friction velocity and $f_{0}$ is the Coriolis parameter.
 
 In this similarity height relationship, the turbulent friction velocity:
-\begin{equation}
-u^{*} = \sqrt \frac {|\tau|} {\rho_o}
-\end{equation}
+\[
+  u^{*} = \sqrt \frac {|\tau|} {\rho_o}
+\]
 is computed from the wind stress vector $|\tau|$ and the reference density $ \rho_o$.
 The final $h_{e}$ is further constrained by the adjustable bounds \np{rn\_mldmin} and \np{rn\_mldmax}.
 Once $h_{e}$ is computed, the vertical eddy coefficients within $h_{e}$ are set to
@@ -145,21 +146,23 @@ Since then, significant modifications have been introduced by \citet{Madec1998} 
 the formulation of the mixing length scale.
 The time evolution of $\bar{e}$ is the result of the production of $\bar{e}$ through vertical shear,
 its destruction through stratification, its vertical diffusion, and its dissipation of \citet{Kolmogorov1942} type:
-\begin{equation} \label{eq:zdftke_e}
-\frac{\partial \bar{e}}{\partial t} = 
-\frac{K_m}{{e_3}^2 }\;\left[ {\left( {\frac{\partial u}{\partial k}} \right)^2
-				        +\left( {\frac{\partial v}{\partial k}} \right)^2} \right]
--K_\rho\,N^2
-+\frac{1}{e_3}	\;\frac{\partial }{\partial k}\left[ {\frac{A^{vm}}{e_3 }
-				\;\frac{\partial \bar{e}}{\partial k}} \right]
-- c_\epsilon \;\frac{\bar {e}^{3/2}}{l_\epsilon }
+\begin{equation}
+  \label{eq:zdftke_e}
+  \frac{\partial \bar{e}}{\partial t} =
+  \frac{K_m}{{e_3}^2 }\;\left[ {\left( {\frac{\partial u}{\partial k}} \right)^2
+      +\left( {\frac{\partial v}{\partial k}} \right)^2} \right]
+  -K_\rho\,N^2
+  +\frac{1}{e_3}	\;\frac{\partial }{\partial k}\left[ {\frac{A^{vm}}{e_3 }
+      \;\frac{\partial \bar{e}}{\partial k}} \right]
+  - c_\epsilon \;\frac{\bar {e}^{3/2}}{l_\epsilon }
 \end{equation}
-\begin{equation} \label{eq:zdftke_kz}
-   \begin{split}
-         K_m &= C_k\  l_k\  \sqrt {\bar{e}\; }  	\\
-         K_\rho &= A^{vm} / P_{rt}
-   \end{split}
-\end{equation}
+\[
+  % \label{eq:zdftke_kz}
+  \begin{split}
+    K_m &= C_k\  l_k\  \sqrt {\bar{e}\; }  	\\
+    K_\rho &= A^{vm} / P_{rt}
+  \end{split}
+\]
 where $N$ is the local Brunt-Vais\"{a}l\"{a} frequency (see \autoref{subsec:TRA_bn2}), 
 $l_{\epsilon }$ and $l_{\kappa }$ are the dissipation and mixing length scales, 
 $P_{rt}$ is the Prandtl number, $K_m$ and $K_\rho$ are the vertical eddy viscosity and diffusivity coefficients.
@@ -167,12 +170,14 @@ The constants $C_k =  0.1$ and $C_\epsilon = \sqrt {2} /2$ $\approx 0.7$ are des
 vertical mixing at any depth \citep{Gaspar1990}. 
 They are set through namelist parameters \np{nn\_ediff} and \np{nn\_ediss}.
 $P_{rt}$ can be set to unity or, following \citet{Blanke1993}, be a function of the local Richardson number, $R_i$:
-\begin{align*} \label{eq:prt}
-P_{rt} = \begin{cases}
-                    \ \ \ 1 &      \text{if $\ R_i \leq 0.2$} 	\\
-                    5\,R_i &      \text{if $\ 0.2 \leq R_i \leq 2$} 	\\
-                    \ \ 10 &      \text{if $\ 2 \leq R_i$} 
-            \end{cases}
+\begin{align*}
+  % \label{eq:prt}
+  P_{rt} =
+  \begin{cases}
+    \ \ \ 1 &      \text{if $\ R_i \leq 0.2$} 	\\
+    5\,R_i &      \text{if $\ 0.2 \leq R_i \leq 2$} 	\\
+    \ \ 10 &      \text{if $\ 2 \leq R_i$}
+  \end{cases}
 \end{align*}
 Options are defined through the  \ngn{namzdfy\_tke} namelist variables.
 The choice of $P_{rt}$ is controlled by the \np{nn\_pdl} namelist variable.
@@ -194,12 +199,14 @@ They must be specified at least larger than the molecular values, and are set th
 \np{rn\_avt0} (namzdf namelist, see \autoref{subsec:ZDF_cst}).
 
 \subsubsection{Turbulent length scale}
+
 For computational efficiency, the original formulation of the turbulent length scales proposed by
 \citet{Gaspar1990} has been simplified.
 Four formulations are proposed, the choice of which is controlled by the \np{nn\_mxl} namelist parameter.
 The first two are based on the following first order approximation \citep{Blanke1993}:
-\begin{equation} \label{eq:tke_mxl0_1}
-l_k = l_\epsilon = \sqrt {2 \bar{e}\; } / N
+\begin{equation}
+  \label{eq:tke_mxl0_1}
+  l_k = l_\epsilon = \sqrt {2 \bar{e}\; } / N
 \end{equation}
 which is valid in a stable stratified region with constant values of the Brunt-Vais\"{a}l\"{a} frequency.
 The resulting length scale is bounded by the distance to the surface or to the bottom
@@ -210,9 +217,10 @@ the information contained in the vertical density profile.
 To overcome these drawbacks, \citet{Madec1998} introduces the \np{nn\_mxl}\forcode{ = 2..3} cases,
 which add an extra assumption concerning the vertical gradient of the computed length scale.
 So, the length scales are first evaluated as in \autoref{eq:tke_mxl0_1} and then bounded such that:
-\begin{equation} \label{eq:tke_mxl_constraint}
-\frac{1}{e_3 }\left| {\frac{\partial l}{\partial k}} \right| \leq 1
-\qquad \text{with }\  l =  l_k = l_\epsilon
+\begin{equation}
+  \label{eq:tke_mxl_constraint}
+  \frac{1}{e_3 }\left| {\frac{\partial l}{\partial k}} \right| \leq 1
+  \qquad \text{with }\  l =  l_k = l_\epsilon
 \end{equation}
 \autoref{eq:tke_mxl_constraint} means that the vertical variations of the length scale cannot be larger than
 the variations of depth.
@@ -226,32 +234,37 @@ $l_{up}$ and $l_{dwn}$, the upward and downward length scales, and
 evaluate the dissipation and mixing length scales as
 (and note that here we use numerical indexing):
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t] \begin{center}
-\includegraphics[width=1.00\textwidth]{Fig_mixing_length}
-\caption{ \protect\label{fig:mixing_length} 
-Illustration of the mixing length computation. }
-\end{center}  
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=1.00\textwidth]{Fig_mixing_length}
+    \caption{
+      \protect\label{fig:mixing_length}
+      Illustration of the mixing length computation.
+    }
+  \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{equation} \label{eq:tke_mxl2}
-\begin{aligned}
- l_{up\ \ }^{(k)} &= \min \left(  l^{(k)} \ , \ l_{up}^{(k+1)} + e_{3t}^{(k)}\ \ \ \;  \right)
+\[
+  % \label{eq:tke_mxl2}
+  \begin{aligned}
+    l_{up\ \ }^{(k)} &= \min \left(  l^{(k)} \ , \ l_{up}^{(k+1)} + e_{3t}^{(k)}\ \ \ \;  \right)
     \quad &\text{ from $k=1$ to $jpk$ }\ \\
- l_{dwn}^{(k)} &= \min \left(  l^{(k)} \ , \ l_{dwn}^{(k-1)} + e_{3t}^{(k-1)}  \right)   
+    l_{dwn}^{(k)} &= \min \left(  l^{(k)} \ , \ l_{dwn}^{(k-1)} + e_{3t}^{(k-1)}  \right)
     \quad &\text{ from $k=jpk$ to $1$ }\ \\
-\end{aligned}
-\end{equation}
+  \end{aligned}
+\]
 where $l^{(k)}$ is computed using \autoref{eq:tke_mxl0_1}, $i.e.$ $l^{(k)} = \sqrt {2 {\bar e}^{(k)} / {N^2}^{(k)} }$.
 
 In the \np{nn\_mxl}\forcode{ = 2} case, the dissipation and mixing length scales take the same value:
 $ l_k=  l_\epsilon = \min \left(\ l_{up} \;,\;  l_{dwn}\ \right)$, while in the \np{nn\_mxl}\forcode{ = 3} case,
 the dissipation and mixing turbulent length scales are give as in \citet{Gaspar1990}:
-\begin{equation} \label{eq:tke_mxl_gaspar}
-\begin{aligned}
-& l_k          = \sqrt{\  l_{up} \ \ l_{dwn}\ }  	\\
-& l_\epsilon = \min \left(\ l_{up} \;,\;  l_{dwn}\ \right) 
-\end{aligned}
-\end{equation}
+\[
+  % \label{eq:tke_mxl_gaspar}
+  \begin{aligned}
+    & l_k          = \sqrt{\  l_{up} \ \ l_{dwn}\ }  	\\
+    & l_\epsilon = \min \left(\ l_{up} \;,\;  l_{dwn}\ \right)
+  \end{aligned}
+\]
 
 At the ocean surface, a non zero length scale is set through the  \np{rn\_mxl0} namelist parameter.
 Usually the surface scale is given by $l_o = \kappa \,z_o$ where $\kappa = 0.4$ is von Karman's constant and
@@ -260,9 +273,9 @@ Assuming $z_o=0.1$~m \citep{Craig_Banner_JPO94} leads to a 0.04~m, the default v
 In the ocean interior a minimum length scale is set to recover the molecular viscosity when
 $\bar{e}$ reach its minimum value ($1.10^{-6}= C_k\, l_{min} \,\sqrt{\bar{e}_{min}}$ ).
 
-
 \subsubsection{Surface wave breaking parameterization}
 %-----------------------------------------------------------------------%
+
 Following \citet{Mellor_Blumberg_JPO04}, the TKE turbulence closure model has been modified to
 include the effect of surface wave breaking energetics.
 This results in a reduction of summertime surface temperature when the mixed layer is relatively shallow.
@@ -271,14 +284,16 @@ air-sea drag coefficient.
 The latter concerns the bulk formulea and is not discussed here. 
 
 Following \citet{Craig_Banner_JPO94}, the boundary condition on surface TKE value is :
-\begin{equation}  \label{eq:ZDF_Esbc}
-\bar{e}_o = \frac{1}{2}\,\left(  15.8\,\alpha_{CB} \right)^{2/3} \,\frac{|\tau|}{\rho_o}
+\begin{equation}
+  \label{eq:ZDF_Esbc}
+  \bar{e}_o = \frac{1}{2}\,\left(  15.8\,\alpha_{CB} \right)^{2/3} \,\frac{|\tau|}{\rho_o}
 \end{equation}
 where $\alpha_{CB}$ is the \citet{Craig_Banner_JPO94} constant of proportionality which depends on the ''wave age'',
 ranging from 57 for mature waves to 146 for younger waves \citep{Mellor_Blumberg_JPO04}. 
 The boundary condition on the turbulent length scale follows the Charnock's relation:
-\begin{equation} \label{eq:ZDF_Lsbc}
-l_o = \kappa \beta \,\frac{|\tau|}{g\,\rho_o}
+\begin{equation}
+  \label{eq:ZDF_Lsbc}
+  l_o = \kappa \beta \,\frac{|\tau|}{g\,\rho_o}
 \end{equation}
 where $\kappa=0.40$ is the von Karman constant, and $\beta$ is the Charnock's constant.
 \citet{Mellor_Blumberg_JPO04} suggest $\beta = 2.10^{5}$ the value chosen by
@@ -292,9 +307,9 @@ with $\beta$ hard coded to the Stacey's value.
 Note that a minimal threshold of \np{rn\_emin0}$=10^{-4}~m^2.s^{-2}$ (namelist parameters) is applied on
 surface $\bar{e}$ value.
 
-
 \subsubsection{Langmuir cells}
 %--------------------------------------%
+
 Langmuir circulations (LC) can be described as ordered large-scale vertical motions in
 the surface layer of the oceans.
 Although LC have nothing to do with convection, the circulation pattern is rather similar to
@@ -312,26 +327,28 @@ The presence of $P_{LC}$ in \autoref{eq:zdftke_e}, the TKE equation, is controll
  
 By making an analogy with the characteristic convective velocity scale ($e.g.$, \citet{D'Alessio_al_JPO98}),
 $P_{LC}$ is assumed to be : 
-\begin{equation}
+\[
 P_{LC}(z) = \frac{w_{LC}^3(z)}{H_{LC}}
-\end{equation}
+\]
 where $w_{LC}(z)$ is the vertical velocity profile of LC, and $H_{LC}$ is the LC depth.
 With no information about the wave field, $w_{LC}$ is assumed to be proportional to 
 the Stokes drift $u_s = 0.377\,\,|\tau|^{1/2}$, where $|\tau|$ is the surface wind stress module 
 \footnote{Following \citet{Li_Garrett_JMR93}, the surface Stoke drift velocity may be expressed as
   $u_s =  0.016 \,|U_{10m}|$.
   Assuming an air density of $\rho_a=1.22 \,Kg/m^3$ and a drag coefficient of
-  $1.5~10^{-3}$ give the expression used of $u_s$ as a function of the module of surface stress}.
+  $1.5~10^{-3}$ give the expression used of $u_s$ as a function of the module of surface stress
+}.
 For the vertical variation, $w_{LC}$ is assumed to be zero at the surface as well as at
 a finite depth $H_{LC}$ (which is often close to the mixed layer depth),
 and simply varies as a sine function in between (a first-order profile for the Langmuir cell structures). 
 The resulting expression for $w_{LC}$ is :
-\begin{equation}
-w_{LC}  = \begin{cases}
-                   c_{LC} \,u_s \,\sin(- \pi\,z / H_{LC} )    &      \text{if $-z \leq H_{LC}$} 	\\
-                   0                 				 &      \text{otherwise} 
-                 \end{cases}
-\end{equation}
+\[
+  w_{LC}  =
+  \begin{cases}
+    c_{LC} \,u_s \,\sin(- \pi\,z / H_{LC} )    &      \text{if $-z \leq H_{LC}$} 	\\
+    0                 				 &      \text{otherwise}
+  \end{cases}
+\]
 where $c_{LC} = 0.15$ has been chosen by \citep{Axell_JGR02} as a good compromise to fit LES data.
 The chosen value yields maximum vertical velocities $w_{LC}$ of the order of a few centimeters per second.
 The value of $c_{LC}$ is set through the \np{rn\_lc} namelist parameter,
@@ -340,10 +357,9 @@ having in mind that it should stay between 0.15 and 0.54 \citep{Axell_JGR02}.
 The $H_{LC}$ is estimated in a similar way as the turbulent length scale of TKE equations:
 $H_{LC}$ is depth to which a water parcel with kinetic energy due to Stoke drift can reach on its own by
 converting its kinetic energy to potential energy, according to 
-\begin{equation}
+\[
 - \int_{-H_{LC}}^0 { N^2\;z  \;dz} = \frac{1}{2} u_s^2
-\end{equation}
-
+\]
 
 \subsubsection{Mixing just below the mixed layer}
 %--------------------------------------------------------------%
@@ -361,8 +377,9 @@ When using this parameterization ($i.e.$ when \np{nn\_etau}\forcode{ = 1}),
 the TKE input to the ocean ($S$) imposed by the winds in the form of near-inertial oscillations,
 swell and waves is parameterized by \autoref{eq:ZDF_Esbc} the standard TKE surface boundary condition,
 plus a depth depend one given by:
-\begin{equation}  \label{eq:ZDF_Ehtau}
-S = (1-f_i) \; f_r \; e_s \; e^{-z / h_\tau} 
+\begin{equation}
+  \label{eq:ZDF_Ehtau}
+  S = (1-f_i) \; f_r \; e_s \; e^{-z / h_\tau}
 \end{equation}
 where $z$ is the depth, $e_s$ is TKE surface boundary condition, $f_r$ is the fraction of the surface TKE that
 penetrate in the ocean, $h_\tau$ is a vertical mixing length scale that controls exponential shape of
@@ -379,8 +396,6 @@ or to using the high frequency part of the stress to evaluate the fraction of TK
 Those two options are obsolescent features introduced for test purposes.
 They will be removed in the next release. 
 
-
-
 % from Burchard et al OM 2008 : 
 % the most critical process not reproduced by statistical turbulence models is the activity of 
 % internal waves and their interaction with turbulence. After the Reynolds decomposition, 
@@ -389,8 +404,6 @@ They will be removed in the next release.
 % Thus far, the representation of internal wave mixing in ocean models has been relatively crude 
 % (e.g. Mellor, 1989; Large et al., 1994; Meier, 2001; Axell, 2002; St. Laurent and Garrett, 2002).
 
-
-
 % -------------------------------------------------------------------------------------------------------------
 %        TKE discretization considerations
 % -------------------------------------------------------------------------------------------------------------
@@ -398,11 +411,14 @@ They will be removed in the next release.
 \label{subsec:ZDF_tke_ene}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]   \begin{center}
-\includegraphics[width=1.00\textwidth]{Fig_ZDF_TKE_time_scheme}
-\caption{ \protect\label{fig:TKE_time_scheme} 
-Illustration of the TKE time integration and its links to the momentum and tracer time integration. }
-\end{center}  
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=1.00\textwidth]{Fig_ZDF_TKE_time_scheme}
+    \caption{
+      \protect\label{fig:TKE_time_scheme}
+      Illustration of the TKE time integration and its links to the momentum and tracer time integration.
+    }
+  \end{center}  
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -418,12 +434,13 @@ the one-level forward time stepping of TKE equation.
 With this framework, the total loss of kinetic energy (in 1D for the demonstration) due to
 the vertical momentum diffusion is obtained by multiplying this quantity by $u^t$ and
 summing the result vertically:   
-\begin{equation} \label{eq:energ1}
-\begin{split}
-\int_{-H}^{\eta}  u^t \,\partial_z &\left( {K_m}^t \,(\partial_z u)^{t+\rdt}  \right) \,dz   \\
-&= \Bigl[  u^t \,{K_m}^t \,(\partial_z u)^{t+\rdt} \Bigr]_{-H}^{\eta}          
- - \int_{-H}^{\eta}{ {K_m}^t \,\partial_z{u^t} \,\partial_z u^{t+\rdt} \,dz }
-\end{split}
+\begin{equation}
+  \label{eq:energ1}
+  \begin{split}
+    \int_{-H}^{\eta}  u^t \,\partial_z &\left( {K_m}^t \,(\partial_z u)^{t+\rdt}  \right) \,dz   \\
+    &= \Bigl[  u^t \,{K_m}^t \,(\partial_z u)^{t+\rdt} \Bigr]_{-H}^{\eta}
+    - \int_{-H}^{\eta}{ {K_m}^t \,\partial_z{u^t} \,\partial_z u^{t+\rdt} \,dz }
+  \end{split}
 \end{equation}
 Here, the vertical diffusion of momentum is discretized backward in time with a coefficient, $K_m$,
 known at time $t$ (\autoref{fig:TKE_time_scheme}), as it is required when using the TKE scheme
@@ -442,14 +459,15 @@ A similar consideration applies on the destruction rate of $\bar{e}$ due to stra
 This term must balance the input of potential energy resulting from vertical mixing.
 The rate of change of potential energy (in 1D for the demonstration) due vertical mixing is obtained by
 multiplying vertical density diffusion tendency by $g\,z$ and and summing the result vertically:
-\begin{equation} \label{eq:energ2}
-\begin{split}
-\int_{-H}^{\eta} g\,z\,\partial_z &\left( {K_\rho}^t \,(\partial_k \rho)^{t+\rdt}   \right) \,dz    \\
-&= \Bigl[  g\,z \,{K_\rho}^t \,(\partial_z \rho)^{t+\rdt} \Bigr]_{-H}^{\eta}  
-   - \int_{-H}^{\eta}{ g \,{K_\rho}^t \,(\partial_k \rho)^{t+\rdt} } \,dz   \\
-&= - \Bigl[  z\,{K_\rho}^t \,(N^2)^{t+\rdt} \Bigr]_{-H}^{\eta}
-+ \int_{-H}^{\eta}{  \rho^{t+\rdt} \, {K_\rho}^t \,(N^2)^{t+\rdt} \,dz  }
-\end{split}
+\begin{equation}
+  \label{eq:energ2}
+  \begin{split}
+    \int_{-H}^{\eta} g\,z\,\partial_z &\left( {K_\rho}^t \,(\partial_k \rho)^{t+\rdt}   \right) \,dz    \\
+    &= \Bigl[  g\,z \,{K_\rho}^t \,(\partial_z \rho)^{t+\rdt} \Bigr]_{-H}^{\eta}
+    - \int_{-H}^{\eta}{ g \,{K_\rho}^t \,(\partial_k \rho)^{t+\rdt} } \,dz   \\
+    &= - \Bigl[  z\,{K_\rho}^t \,(N^2)^{t+\rdt} \Bigr]_{-H}^{\eta}
+    + \int_{-H}^{\eta}{  \rho^{t+\rdt} \, {K_\rho}^t \,(N^2)^{t+\rdt} \,dz  }
+  \end{split}
 \end{equation}
 where we use $N^2 = -g \,\partial_k \rho / (e_3 \rho)$. 
 The first term of the right hand side of \autoref{eq:energ2} is always zero because
@@ -467,22 +485,23 @@ the shear at $t$ and $t-\rdt$ must be performed prior to the averaging.
 Furthermore, the possible time variation of $e_3$ (\key{vvl} case) have to be taken into account.
 
 The above energetic considerations leads to the following final discrete form for the TKE equation:
-\begin{equation} \label{eq:zdftke_ene}
-\begin{split}
-\frac { (\bar{e})^t - (\bar{e})^{t-\rdt} } {\rdt}  \equiv  
-\Biggl\{ \Biggr.
-  &\overline{ \left( \left(\overline{K_m}^{\,i+1/2}\right)^{t-\rdt} \,\frac{\delta_{k+1/2}[u^{t+\rdt}]}{{e_3u}^{t+\rdt} } 
-                                                                              \ \frac{\delta_{k+1/2}[u^ t         ]}{{e_3u}^ t          }  \right) }^{\,i} \\
-+&\overline{  \left( \left(\overline{K_m}^{\,j+1/2}\right)^{t-\rdt} \,\frac{\delta_{k+1/2}[v^{t+\rdt}]}{{e_3v}^{t+\rdt} } 
-                                                                               \ \frac{\delta_{k+1/2}[v^ t         ]}{{e_3v}^ t          }  \right) }^{\,j} 
-\Biggr. \Biggr\}   \\
-%
-- &{K_\rho}^{t-\rdt}\,{(N^2)^t}    \\
-%
-+&\frac{1}{{e_3w}^{t+\rdt}}  \;\delta_{k+1/2} \left[   {K_m}^{t-\rdt} \,\frac{\delta_{k}[(\bar{e})^{t+\rdt}]} {{e_3w}^{t+\rdt}}   \right]   \\
-%
-- &c_\epsilon \; \left( \frac{\sqrt{\bar {e}}}{l_\epsilon}\right)^{t-\rdt}\,(\bar {e})^{t+\rdt}
-\end{split}
+\begin{equation}
+  \label{eq:zdftke_ene}
+  \begin{split}
+    \frac { (\bar{e})^t - (\bar{e})^{t-\rdt} } {\rdt}  \equiv
+    \Biggl\{ \Biggr.
+    &\overline{ \left( \left(\overline{K_m}^{\,i+1/2}\right)^{t-\rdt} \,\frac{\delta_{k+1/2}[u^{t+\rdt}]}{{e_3u}^{t+\rdt} }
+        \ \frac{\delta_{k+1/2}[u^ t         ]}{{e_3u}^ t          }  \right) }^{\,i} \\
+    +&\overline{  \left( \left(\overline{K_m}^{\,j+1/2}\right)^{t-\rdt} \,\frac{\delta_{k+1/2}[v^{t+\rdt}]}{{e_3v}^{t+\rdt} }
+        \ \frac{\delta_{k+1/2}[v^ t         ]}{{e_3v}^ t          }  \right) }^{\,j}
+    \Biggr. \Biggr\}   \\
+    %
+    - &{K_\rho}^{t-\rdt}\,{(N^2)^t}    \\
+    %
+    +&\frac{1}{{e_3w}^{t+\rdt}}  \;\delta_{k+1/2} \left[   {K_m}^{t-\rdt} \,\frac{\delta_{k}[(\bar{e})^{t+\rdt}]} {{e_3w}^{t+\rdt}}   \right]   \\
+    %
+    - &c_\epsilon \; \left( \frac{\sqrt{\bar {e}}}{l_\epsilon}\right)^{t-\rdt}\,(\bar {e})^{t+\rdt}
+  \end{split}
 \end{equation}
 where the last two terms in \autoref{eq:zdftke_ene} (vertical diffusion and Kolmogorov dissipation)
 are time stepped using a backward scheme (see\autoref{sec:STP_forward_imp}).
@@ -510,36 +529,40 @@ where the triplet $(p, m, n)$ value given in Tab.\autoref{tab:GLS} allows to rec
 well-known turbulent closures ($k$-$kl$ \citep{Mellor_Yamada_1982}, $k$-$\epsilon$ \citep{Rodi_1987},
 $k$-$\omega$ \citep{Wilcox_1988} among others \citep{Umlauf_Burchard_JMS03,Kantha_Carniel_CSR05}). 
 The GLS scheme is given by the following set of equations:
-\begin{equation} \label{eq:zdfgls_e}
-\frac{\partial \bar{e}}{\partial t} = 
-\frac{K_m}{\sigma_e e_3 }\;\left[ {\left( \frac{\partial u}{\partial k} \right)^2
-                                                   +\left( \frac{\partial v}{\partial k} \right)^2} \right]
--K_\rho \,N^2
-+\frac{1}{e_3}\,\frac{\partial}{\partial k} \left[ \frac{K_m}{e_3}\,\frac{\partial \bar{e}}{\partial k} \right]
-- \epsilon
+\begin{equation}
+  \label{eq:zdfgls_e}
+  \frac{\partial \bar{e}}{\partial t} =
+  \frac{K_m}{\sigma_e e_3 }\;\left[ {\left( \frac{\partial u}{\partial k} \right)^2
+      +\left( \frac{\partial v}{\partial k} \right)^2} \right]
+  -K_\rho \,N^2
+  +\frac{1}{e_3}\,\frac{\partial}{\partial k} \left[ \frac{K_m}{e_3}\,\frac{\partial \bar{e}}{\partial k} \right]
+  - \epsilon
 \end{equation}
 
-\begin{equation} \label{eq:zdfgls_psi}
-   \begin{split}
-\frac{\partial \psi}{\partial t} =& \frac{\psi}{\bar{e}} \left\{
-\frac{C_1\,K_m}{\sigma_{\psi} {e_3}}\;\left[ {\left( \frac{\partial u}{\partial k} \right)^2
-                                                                   +\left( \frac{\partial v}{\partial k} \right)^2} \right]
-- C_3 \,K_\rho\,N^2   - C_2 \,\epsilon \,Fw   \right\}             \\
-&+\frac{1}{e_3}  \;\frac{\partial }{\partial k}\left[ {\frac{K_m}{e_3 }
-                                  \;\frac{\partial \psi}{\partial k}} \right]\;
-   \end{split}
-\end{equation}
+\[
+  % \label{eq:zdfgls_psi}
+  \begin{split}
+    \frac{\partial \psi}{\partial t} =& \frac{\psi}{\bar{e}} \left\{
+      \frac{C_1\,K_m}{\sigma_{\psi} {e_3}}\;\left[ {\left( \frac{\partial u}{\partial k} \right)^2
+          +\left( \frac{\partial v}{\partial k} \right)^2} \right]
+      - C_3 \,K_\rho\,N^2   - C_2 \,\epsilon \,Fw   \right\}             \\
+    &+\frac{1}{e_3}  \;\frac{\partial }{\partial k}\left[ {\frac{K_m}{e_3 }
+        \;\frac{\partial \psi}{\partial k}} \right]\;
+  \end{split}
+\]
 
-\begin{equation} \label{eq:zdfgls_kz}
-   \begin{split}
-         K_m    &= C_{\mu} \ \sqrt {\bar{e}} \ l         \\
-         K_\rho &= C_{\mu'}\ \sqrt {\bar{e}} \ l
-   \end{split}
-\end{equation}
+\[
+  % \label{eq:zdfgls_kz}
+  \begin{split}
+    K_m    &= C_{\mu} \ \sqrt {\bar{e}} \ l         \\
+    K_\rho &= C_{\mu'}\ \sqrt {\bar{e}} \ l
+  \end{split}
+\]
 
-\begin{equation} \label{eq:zdfgls_eps}
-{\epsilon} = C_{0\mu} \,\frac{\bar {e}^{3/2}}{l} \;
-\end{equation}
+\[
+  % \label{eq:zdfgls_eps}
+  {\epsilon} = C_{0\mu} \,\frac{\bar {e}^{3/2}}{l} \;
+\]
 where $N$ is the local Brunt-Vais\"{a}l\"{a} frequency (see \autoref{subsec:TRA_bn2}) and
 $\epsilon$ the dissipation rate. 
 The constants $C_1$, $C_2$, $C_3$, ${\sigma_e}$, ${\sigma_{\psi}}$ and the wall function ($Fw$) depends of
@@ -548,28 +571,33 @@ Four different turbulent models are pre-defined (Tab.\autoref{tab:GLS}).
 They are made available through the \np{nn\_clo} namelist parameter. 
 
 %--------------------------------------------------TABLE--------------------------------------------------
-\begin{table}[htbp]	\begin{center}
-%\begin{tabular}{cp{70pt}cp{70pt}cp{70pt}cp{70pt}cp{70pt}cp{70pt}c}
-\begin{tabular}{ccccc}
-          	             &   $k-kl$   & $k-\epsilon$ & $k-\omega$ &   generic   \\  
-%                        & \citep{Mellor_Yamada_1982} &  \citep{Rodi_1987}       & \citep{Wilcox_1988} &                 \\  
-\hline  \hline 
-\np{nn\_clo}     & \textbf{0} &   \textbf{1}  &   \textbf{2}   &    \textbf{3}   \\  
-\hline 
-$( p , n , m )$	       &   ( 0 , 1 , 1 )   & ( 3 , 1.5 , -1 )   & ( -1 , 0.5 , -1 )    &  ( 2 , 1 , -0.67 )  \\
-$\sigma_k$      &    2.44         &     1.              &      2.                &      0.8          \\
-$\sigma_\psi$  &    2.44         &     1.3            &      2.                 &       1.07       \\
-$C_1$              &      0.9         &     1.44          &      0.555          &       1.           \\
-$C_2$              &      0.5         &     1.92          &      0.833          &       1.22       \\
-$C_3$              &      1.           &     1.              &      1.                &       1.           \\
-$F_{wall}$        &      Yes        &       --             &     --                  &      --          \\
-\hline
-\hline
-\end{tabular}
-\caption{   \protect\label{tab:GLS} 
-  Set of predefined GLS parameters, or equivalently predefined turbulence models available with
-  \protect\key{zdfgls} and controlled by the \protect\np{nn\_clos} namelist variable in \protect\ngn{namzdf\_gls}.}
-\end{center}	\end{table}
+\begin{table}[htbp]
+  \begin{center}
+    % \begin{tabular}{cp{70pt}cp{70pt}cp{70pt}cp{70pt}cp{70pt}cp{70pt}c}
+    \begin{tabular}{ccccc}
+      &   $k-kl$   & $k-\epsilon$ & $k-\omega$ &   generic   \\
+      % & \citep{Mellor_Yamada_1982} &  \citep{Rodi_1987}       & \citep{Wilcox_1988} &                 \\
+      \hline
+      \hline
+      \np{nn\_clo}     & \textbf{0} &   \textbf{1}  &   \textbf{2}   &    \textbf{3}   \\
+      \hline
+      $( p , n , m )$	       &   ( 0 , 1 , 1 )   & ( 3 , 1.5 , -1 )   & ( -1 , 0.5 , -1 )    &  ( 2 , 1 , -0.67 )  \\
+      $\sigma_k$      &    2.44         &     1.              &      2.                &      0.8          \\
+      $\sigma_\psi$  &    2.44         &     1.3            &      2.                 &       1.07       \\
+      $C_1$              &      0.9         &     1.44          &      0.555          &       1.           \\
+      $C_2$              &      0.5         &     1.92          &      0.833          &       1.22       \\
+      $C_3$              &      1.           &     1.              &      1.                &       1.           \\
+      $F_{wall}$        &      Yes        &       --             &     --                  &      --          \\
+      \hline
+      \hline
+    \end{tabular}
+    \caption{
+      \protect\label{tab:GLS}
+      Set of predefined GLS parameters, or equivalently predefined turbulence models available with
+      \protect\key{zdfgls} and controlled by the \protect\np{nn\_clos} namelist variable in \protect\ngn{namzdf\_gls}.
+    }
+  \end{center}
+\end{table}
 %--------------------------------------------------------------------------------------------------------------
 
 In the Mellor-Yamada model, the negativity of $n$ allows to use a wall function to force the convergence of
@@ -645,21 +673,25 @@ or/and the use of a turbulent closure scheme.
 %--------------------------------------------------------------------------------------------------------------
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!htb]  	\begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_npc}
-\caption{  \protect\label{fig:npc} 
-  Example of an unstable density profile treated by the non penetrative convective adjustment algorithm.
-  $1^{st}$ step: the initial profile is checked from the surface to the bottom.
-  It is found to be unstable between levels 3 and 4.
-  They are mixed.
-  The resulting $\rho$ is still larger than $\rho$(5): levels 3 to 5 are mixed.
-  The resulting $\rho$ is still larger than $\rho$(6): levels 3 to 6 are mixed.
-  The $1^{st}$ step ends since the density profile is then stable below the level 3.
-  $2^{nd}$ step: the new $\rho$ profile is checked following the same procedure as in $1^{st}$ step:
-  levels 2 to 5 are mixed.
-  The new density profile is checked.
-  It is found stable: end of algorithm.}
-\end{center}  	\end{figure}
+\begin{figure}[!htb]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_npc}
+    \caption{
+      \protect\label{fig:npc}
+      Example of an unstable density profile treated by the non penetrative convective adjustment algorithm.
+      $1^{st}$ step: the initial profile is checked from the surface to the bottom.
+      It is found to be unstable between levels 3 and 4.
+      They are mixed.
+      The resulting $\rho$ is still larger than $\rho$(5): levels 3 to 5 are mixed.
+      The resulting $\rho$ is still larger than $\rho$(6): levels 3 to 6 are mixed.
+      The $1^{st}$ step ends since the density profile is then stable below the level 3.
+      $2^{nd}$ step: the new $\rho$ profile is checked following the same procedure as in $1^{st}$ step:
+      levels 2 to 5 are mixed.
+      The new density profile is checked.
+      It is found stable: end of algorithm.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 Options are defined through the \ngn{namzdf} namelist variables.
@@ -780,9 +812,10 @@ temperature and salinity.
 This parameterisation has been introduced in \mdl{zdfddm} module and is controlled by the \key{zdfddm} CPP key.
 
 Diapycnal mixing of S and T are described by diapycnal diffusion coefficients 
-\begin{align*} % \label{eq:zdfddm_Kz}
-    &A^{vT} = A_o^{vT}+A_f^{vT}+A_d^{vT}	\\
-    &A^{vS} = A_o^{vS}+A_f^{vS}+A_d^{vS}
+\begin{align*}
+  % \label{eq:zdfddm_Kz}
+  &A^{vT} = A_o^{vT}+A_f^{vT}+A_d^{vT}	\\
+  &A^{vS} = A_o^{vS}+A_f^{vS}+A_d^{vS}
 \end{align*}
 where subscript $f$ represents mixing by salt fingering, $d$ by diffusive convection,
 and $o$ by processes other than double diffusion.
@@ -791,26 +824,33 @@ $R_\rho = \alpha \partial_z T / \beta \partial_z S$, where $\alpha$ and $\beta$ 
 thermal expansion and saline contraction (see \autoref{subsec:TRA_eos}).
 To represent mixing of $S$ and $T$ by salt fingering, we adopt the diapycnal diffusivities suggested by Schmitt
 (1981):
-\begin{align} \label{eq:zdfddm_f}
-A_f^{vS} &= 	\begin{cases}
-	\frac{A^{\ast v}}{1+(R_\rho / R_c)^n   } &\text{if  $R_\rho > 1$ and $N^2>0$ } \\
-	0 				  					    &\text{otherwise} 
-				\end{cases}   
-\\ 		    \label{eq:zdfddm_f_T}
-A_f^{vT} &= 0.7 \ A_f^{vS} / R_\rho 
+\begin{align}
+  \label{eq:zdfddm_f}
+  A_f^{vS} &=
+             \begin{cases}
+               \frac{A^{\ast v}}{1+(R_\rho / R_c)^n   } &\text{if  $R_\rho > 1$ and $N^2>0$ } \\
+               0 				  					    &\text{otherwise}
+             \end{cases}
+  \\ 		    \label{eq:zdfddm_f_T}
+  A_f^{vT} &= 0.7 \ A_f^{vS} / R_\rho 
 \end{align}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]   \begin{center}
-\includegraphics[width=0.99\textwidth]{Fig_zdfddm}
-\caption{  \protect\label{fig:zdfddm}
-  From \citet{Merryfield1999} :
-  (a) Diapycnal diffusivities $A_f^{vT}$ and $A_f^{vS}$ for temperature and salt in regions of salt fingering.
-  Heavy curves denote $A^{\ast v} = 10^{-3}~m^2.s^{-1}$ and thin curves $A^{\ast v} = 10^{-4}~m^2.s^{-1}$;
-  (b) diapycnal diffusivities $A_d^{vT}$ and $A_d^{vS}$ for temperature and salt in regions of diffusive convection.
-  Heavy curves denote the Federov parameterisation and thin curves the Kelley parameterisation.
-  The latter is not implemented in \NEMO. }
-\end{center}    \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.99\textwidth]{Fig_zdfddm}
+    \caption{
+      \protect\label{fig:zdfddm}
+      From \citet{Merryfield1999} :
+      (a) Diapycnal diffusivities $A_f^{vT}$ and $A_f^{vS}$ for temperature and salt in regions of salt fingering.
+      Heavy curves denote $A^{\ast v} = 10^{-3}~m^2.s^{-1}$ and thin curves $A^{\ast v} = 10^{-4}~m^2.s^{-1}$;
+      (b) diapycnal diffusivities $A_d^{vT}$ and $A_d^{vS}$ for temperature and salt in regions of
+      diffusive convection.
+      Heavy curves denote the Federov parameterisation and thin curves the Kelley parameterisation.
+      The latter is not implemented in \NEMO.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 The factor 0.7 in \autoref{eq:zdfddm_f_T} reflects the measured ratio $\alpha F_T /\beta F_S \approx  0.7$ of
@@ -819,20 +859,22 @@ Following  \citet{Merryfield1999}, we adopt $R_c = 1.6$, $n = 6$, and $A^{\ast v
 
 To represent mixing of S and T by diffusive layering,  the diapycnal diffusivities suggested by
 Federov (1988) is used: 
-\begin{align} 	\label{eq:zdfddm_d}
-A_d^{vT} &= 	\begin{cases}
-	1.3635 \, \exp{\left( 4.6\, \exp{ \left[  -0.54\,( R_{\rho}^{-1} - 1 )  \right] }    \right)}
-									&\text{if  $0<R_\rho < 1$ and $N^2>0$ } \\
-	0 								&\text{otherwise} 
-				\end{cases}   
-\\   			\label{eq:zdfddm_d_S}
-A_d^{vS} &= 	\begin{cases}
-	A_d^{vT}\ \left( 1.85\,R_{\rho} - 0.85 \right)
-									&\text{if  $0.5 \leq R_\rho<1$ and $N^2>0$ } \\
-	A_d^{vT} \ 0.15 \ R_\rho
-									&\text{if  $\ \ 0 < R_\rho<0.5$ and $N^2>0$ } \\
-	0 								&\text{otherwise} 
-				\end{cases}   
+\begin{align}
+  % \label{eq:zdfddm_d}
+  A_d^{vT} &=
+             \begin{cases}
+               1.3635 \, \exp{\left( 4.6\, \exp{ \left[  -0.54\,( R_{\rho}^{-1} - 1 )  \right] }    \right)}
+               &\text{if  $0<R_\rho < 1$ and $N^2>0$ } \\
+               0 								&\text{otherwise}
+             \end{cases}
+                                       \nonumber \\
+  \label{eq:zdfddm_d_S}
+  A_d^{vS} &=
+             \begin{cases}
+               A_d^{vT}\ \left( 1.85\,R_{\rho} - 0.85 \right) &\text{if  $0.5 \leq R_\rho<1$ and $N^2>0$ } \\
+               A_d^{vT} \ 0.15 \ R_\rho               &\text{if  $\ \ 0 < R_\rho<0.5$ and $N^2>0$ } \\
+               0 								&\text{otherwise}
+             \end{cases}
 \end{align}
 
 The dependencies of \autoref{eq:zdfddm_f} to \autoref{eq:zdfddm_d_S} on $R_\rho$ are illustrated in
@@ -862,9 +904,10 @@ only the bottom friction is described in detail below.
 Both the surface momentum flux (wind stress) and the bottom momentum flux (bottom friction) enter the equations as
 a condition on the vertical diffusive flux.
 For the bottom boundary layer, one has:
-\begin{equation} \label{eq:zdfbfr_flux}
-A^{vm} \left( \partial {\textbf U}_h / \partial z \right) = {{\cal F}}_h^{\textbf U}
-\end{equation}
+\[
+  % \label{eq:zdfbfr_flux}
+  A^{vm} \left( \partial {\textbf U}_h / \partial z \right) = {{\cal F}}_h^{\textbf U}
+\]
 where ${\cal F}_h^{\textbf U}$ is represents the downward flux of horizontal momentum outside
 the logarithmic turbulent boundary layer (thickness of the order of 1~m in the ocean).
 How ${\cal F}_h^{\textbf U}$ influences the interior depends on the vertical resolution of the model near
@@ -877,8 +920,9 @@ When the vertical mixing coefficient is this small, using a flux condition is eq
 entering the viscous forces (either wind stress or bottom friction) as a body force over the depth of the top or
 bottom model layer.
 To illustrate this, consider the equation for $u$ at $k$, the last ocean level:
-\begin{equation} \label{eq:zdfbfr_flux2}
-\frac{\partial u_k}{\partial t} = \frac{1}{e_{3u}} \left[ \frac{A_{uw}^{vm}}{e_{3uw}} \delta_{k+1/2}\;[u] - {\cal F}^u_h \right] \approx - \frac{{\cal F}^u_{h}}{e_{3u}}
+\begin{equation}
+  \label{eq:zdfbfr_flux2}
+  \frac{\partial u_k}{\partial t} = \frac{1}{e_{3u}} \left[ \frac{A_{uw}^{vm}}{e_{3uw}} \delta_{k+1/2}\;[u] - {\cal F}^u_h \right] \approx - \frac{{\cal F}^u_{h}}{e_{3u}}
 \end{equation}
 If the bottom layer thickness is 200~m, the Ekman transport will be distributed over that depth.
 On the other hand, if the vertical resolution is high (1~m or less) and a turbulent closure model is used,
@@ -896,8 +940,9 @@ the barotropic component needs to be handled separately.
 For this purpose it is convenient to compute and store coefficients which can be simply combined with
 bottom velocities and geometric values to provide the momentum trend due to bottom friction.
 These coefficients are computed in \mdl{zdfbfr} and generally take the form $c_b^{\textbf U}$ where:
-\begin{equation} \label{eq:zdfbfr_bdef}
-\frac{\partial {\textbf U_h}}{\partial t} = 
+\begin{equation}
+  \label{eq:zdfbfr_bdef}
+  \frac{\partial {\textbf U_h}}{\partial t} =
   - \frac{{\cal F}^{\textbf U}_{h}}{e_{3u}} = \frac{c_b^{\textbf U}}{e_{3u}} \;{\textbf U}_h^b
 \end{equation}
 where $\textbf{U}_h^b = (u_b\;,\;v_b)$ is the near-bottom, horizontal, ocean velocity.
@@ -910,9 +955,10 @@ where $\textbf{U}_h^b = (u_b\;,\;v_b)$ is the near-bottom, horizontal, ocean vel
 
 The linear bottom friction parameterisation (including the special case of a free-slip condition) assumes that
 the bottom friction is proportional to the interior velocity (i.e. the velocity of the last model level):
-\begin{equation} \label{eq:zdfbfr_linear}
-{\cal F}_h^\textbf{U} = \frac{A^{vm}}{e_3} \; \frac{\partial \textbf{U}_h}{\partial k} = r \; \textbf{U}_h^b
-\end{equation}
+\[
+  % \label{eq:zdfbfr_linear}
+  {\cal F}_h^\textbf{U} = \frac{A^{vm}}{e_3} \; \frac{\partial \textbf{U}_h}{\partial k} = r \; \textbf{U}_h^b
+\]
 where $r$ is a friction coefficient expressed in ms$^{-1}$.
 This coefficient is generally estimated by setting a typical decay time $\tau$ in the deep ocean, 
 and setting $r = H / \tau$, where $H$ is the ocean depth.
@@ -926,12 +972,13 @@ This is the default value used in \NEMO. It corresponds to a decay time scale of
 It can be changed by specifying \np{rn\_bfri1} (namelist parameter).
 
 For the linear friction case the coefficients defined in the general expression \autoref{eq:zdfbfr_bdef} are: 
-\begin{equation} \label{eq:zdfbfr_linbfr_b}
-\begin{split}
- c_b^u &= - r\\
- c_b^v &= - r\\
-\end{split}
-\end{equation}
+\[
+  % \label{eq:zdfbfr_linbfr_b}
+  \begin{split}
+    c_b^u &= - r\\
+    c_b^v &= - r\\
+  \end{split}
+\]
 When \np{nn\_botfr}\forcode{ = 1}, the value of $r$ used is \np{rn\_bfri1}.
 Setting \np{nn\_botfr}\forcode{ = 0} is equivalent to setting $r=0$ and
 leads to a free-slip bottom boundary condition.
@@ -949,10 +996,11 @@ $mask\_value$*\np{rn\_bfrien}*\np{rn\_bfri1}.
 \label{subsec:ZDF_bfr_nonlinear}
 
 The non-linear bottom friction parameterisation assumes that the bottom friction is quadratic: 
-\begin{equation} \label{eq:zdfbfr_nonlinear}
-{\cal F}_h^\textbf{U} = \frac{A^{vm}}{e_3 }\frac{\partial \textbf {U}_h 
-}{\partial k}=C_D \;\sqrt {u_b ^2+v_b ^2+e_b } \;\; \textbf {U}_h^b 
-\end{equation}
+\[
+  % \label{eq:zdfbfr_nonlinear}
+  {\cal F}_h^\textbf{U} = \frac{A^{vm}}{e_3 }\frac{\partial \textbf {U}_h
+  }{\partial k}=C_D \;\sqrt {u_b ^2+v_b ^2+e_b } \;\; \textbf {U}_h^b
+\]
 where $C_D$ is a drag coefficient, and $e_b $ a bottom turbulent kinetic energy due to tides,
 internal waves breaking and other short time scale currents.
 A typical value of the drag coefficient is $C_D = 10^{-3} $.
@@ -964,12 +1012,13 @@ The CME choices have been set as default values (\np{rn\_bfri2} and \np{rn\_bfeb
 As for the linear case, the bottom friction is imposed in the code by adding the trend due to
 the bottom friction to the general momentum trend in \mdl{dynbfr}.
 For the non-linear friction case the terms computed in \mdl{zdfbfr} are:
-\begin{equation} \label{eq:zdfbfr_nonlinbfr}
-\begin{split}
- c_b^u &= - \; C_D\;\left[ u^2 + \left(\bar{\bar{v}}^{i+1,j}\right)^2 + e_b \right]^{1/2}\\
- c_b^v &= - \; C_D\;\left[  \left(\bar{\bar{u}}^{i,j+1}\right)^2 + v^2 + e_b \right]^{1/2}\\
-\end{split}
-\end{equation}
+\[
+  % \label{eq:zdfbfr_nonlinbfr}
+  \begin{split}
+    c_b^u &= - \; C_D\;\left[ u^2 + \left(\bar{\bar{v}}^{i+1,j}\right)^2 + e_b \right]^{1/2}\\
+    c_b^v &= - \; C_D\;\left[  \left(\bar{\bar{u}}^{i,j+1}\right)^2 + v^2 + e_b \right]^{1/2}\\
+  \end{split}
+\]
 
 The coefficients that control the strength of the non-linear bottom friction are initialised as namelist parameters:
 $C_D$= \np{rn\_bfri2}, and $e_b$ =\np{rn\_bfeb2}.
@@ -990,9 +1039,9 @@ In the non-linear bottom friction case, the drag coefficient, $C_D$, can be opti
 a "law of the wall" scaling.
 If  \np{ln\_loglayer} = .true., $C_D$ is no longer constant but is related to the thickness of
 the last wet layer in each column by:
-\begin{equation}
-C_D = \left ( {\kappa \over {\rm log}\left ( 0.5e_{3t}/rn\_bfrz0 \right ) } \right )^2
-\end{equation}
+\[
+  C_D = \left ( {\kappa \over {\rm log}\left ( 0.5e_{3t}/rn\_bfrz0 \right ) } \right )^2
+\]
 
 \noindent where $\kappa$ is the von-Karman constant and \np{rn\_bfrz0} is a roughness length provided via
 the namelist.
@@ -1000,9 +1049,9 @@ the namelist.
 For stability, the drag coefficient is bounded such that it is kept greater or equal to
 the base \np{rn\_bfri2} value and it is not allowed to exceed the value of an additional namelist parameter:
 \np{rn\_bfri2\_max}, i.e.:
-\begin{equation}
-rn\_bfri2 \leq C_D \leq rn\_bfri2\_max
-\end{equation}
+\[
+  rn\_bfri2 \leq C_D \leq rn\_bfri2\_max
+\]
 
 \noindent Note also that a log-layer enhancement can also be applied to the top boundary friction if
 under ice-shelf cavities are in use (\np{ln\_isfcav}\forcode{ = .true.}).
@@ -1017,27 +1066,28 @@ In this case, the relevant namelist parameters are \np{rn\_tfrz0}, \np{rn\_tfri2
 Some care needs to exercised over the choice of parameters to ensure that the implementation of
 bottom friction does not induce numerical instability.
 For the purposes of stability analysis, an approximation to \autoref{eq:zdfbfr_flux2} is:
-\begin{equation} \label{eq:Eqn_bfrstab}
-\begin{split}
- \Delta u &= -\frac{{{\cal F}_h}^u}{e_{3u}}\;2 \rdt    \\
-               &= -\frac{ru}{e_{3u}}\;2\rdt\\
-\end{split}
+\begin{equation}
+  \label{eq:Eqn_bfrstab}
+  \begin{split}
+    \Delta u &= -\frac{{{\cal F}_h}^u}{e_{3u}}\;2 \rdt    \\
+    &= -\frac{ru}{e_{3u}}\;2\rdt\\
+  \end{split}
 \end{equation}
 \noindent where linear bottom friction and a leapfrog timestep have been assumed.
 To ensure that the bottom friction cannot reverse the direction of flow it is necessary to have:
-\begin{equation}
- |\Delta u| < \;|u| 
-\end{equation}
+\[
+  |\Delta u| < \;|u| 
+\]
 \noindent which, using \autoref{eq:Eqn_bfrstab}, gives:
-\begin{equation}
-r\frac{2\rdt}{e_{3u}} < 1 \qquad  \Rightarrow \qquad r < \frac{e_{3u}}{2\rdt}\\
-\end{equation}
+\[
+  r\frac{2\rdt}{e_{3u}} < 1 \qquad  \Rightarrow \qquad r < \frac{e_{3u}}{2\rdt}\\
+\]
 This same inequality can also be derived in the non-linear bottom friction case if
 a velocity of 1 m.s$^{-1}$ is assumed.
 Alternatively, this criterion can be rearranged to suggest a minimum bottom box thickness to ensure stability:
-\begin{equation}
-e_{3u} > 2\;r\;\rdt
-\end{equation}
+\[
+  e_{3u} > 2\;r\;\rdt
+\]
 \noindent which it may be necessary to impose if partial steps are being used.
 For example, if $|u| = 1$ m.s$^{-1}$, $rdt = 1800$ s, $r = 10^{-3}$ then $e_{3u}$ should be greater than 3.6 m.
 For most applications, with physically sensible parameters these restrictions should not be of concern.
@@ -1069,10 +1119,11 @@ This option requires \np{ln\_zdfexp} to be \forcode{.false.} in the \textit{namz
 This implementation is realised in \mdl{dynzdf\_imp} and \mdl{dynspg\_ts}. In \mdl{dynzdf\_imp},
 the bottom boundary condition is implemented implicitly.
 
-\begin{equation} \label{eq:dynzdf_bfr}
-\left.{\left( {\frac{A^{vm} }{e_3 }\ \frac{\partial \textbf{U}_h}{\partial k}} \right)} \right|_{mbk}
-	 = \binom{c_{b}^{u}u^{n+1}_{mbk}}{c_{b}^{v}v^{n+1}_{mbk}}
-\end{equation}
+\[
+  % \label{eq:dynzdf_bfr}
+  \left.{\left( {\frac{A^{vm} }{e_3 }\ \frac{\partial \textbf{U}_h}{\partial k}} \right)} \right|_{mbk}
+  = \binom{c_{b}^{u}u^{n+1}_{mbk}}{c_{b}^{v}v^{n+1}_{mbk}}
+\]
 
 where $mbk$ is the layer number of the bottom wet layer.
 Superscript $n+1$ means the velocity used in the friction formula is to be calculated, so, it is implicit.
@@ -1088,15 +1139,16 @@ should not be added in the 2-D barotropic mode.
 
 The implementation of the implicit bottom friction in \mdl{dynspg\_ts} is done in two steps as the following:
 
-\begin{equation} \label{eq:dynspg_ts_bfr1}
-\frac{\textbf{U}_{med}-\textbf{U}^{m-1}}{2\Delta t}=-g\nabla\eta-f\textbf{k}\times\textbf{U}^{m}+c_{b}
-\left(\textbf{U}_{med}-\textbf{U}^{m-1}\right)
-\end{equation}
-\begin{equation} \label{eq:dynspg_ts_bfr2}
-\frac{\textbf{U}^{m+1}-\textbf{U}_{med}}{2\Delta t}=\textbf{T}+
-\left(g\nabla\eta^{'}+f\textbf{k}\times\textbf{U}^{'}\right)-
-2\Delta t_{bc}c_{b}\left(g\nabla\eta^{'}+f\textbf{k}\times\textbf{u}_{b}\right)
-\end{equation}
+\[
+  % \label{eq:dynspg_ts_bfr1}
+  \frac{\textbf{U}_{med}-\textbf{U}^{m-1}}{2\Delta t}=-g\nabla\eta-f\textbf{k}\times\textbf{U}^{m}+c_{b}
+  \left(\textbf{U}_{med}-\textbf{U}^{m-1}\right)
+\]
+\[
+  \frac{\textbf{U}^{m+1}-\textbf{U}_{med}}{2\Delta t}=\textbf{T}+
+  \left(g\nabla\eta^{'}+f\textbf{k}\times\textbf{U}^{'}\right)-
+  2\Delta t_{bc}c_{b}\left(g\nabla\eta^{'}+f\textbf{k}\times\textbf{u}_{b}\right)
+\]
 
 where $\textbf{T}$ is the vertical integrated 3-D momentum trend.
 We assume the leap-frog time-stepping is used here.
@@ -1105,9 +1157,6 @@ $c_{b}$ is the friction coefficient.
 $\eta$ is the sea surface level calculated in the barotropic loops while $\eta^{'}$ is the sea surface level used in
 the 3-D baroclinic mode.
 $\textbf{u}_{b}$ is the bottom layer horizontal velocity.
-
-
-
 
 % -------------------------------------------------------------------------------------------------------------
 %       Bottom Friction with split-explicit time splitting
@@ -1156,16 +1205,14 @@ the fully implicit form of the bottom friction should be used (see \autoref{subs
 which can be selected by setting \np{ln\_bfrimp} $=$ \forcode{.true.}.
 
 Otherwise, the implicit formulation takes the form:
-\begin{equation} \label{eq:zdfbfr_implicitts}
- \bar{U}^{t+ \rdt} = \; \left [ \bar{U}^{t-\rdt}\; + 2 \rdt\;RHS \right ] / \left [ 1 - 2 \rdt \;c_b^{u} / H_e \right ]  
-\end{equation}
+\[
+  % \label{eq:zdfbfr_implicitts}
+  \bar{U}^{t+ \rdt} = \; \left [ \bar{U}^{t-\rdt}\; + 2 \rdt\;RHS \right ] / \left [ 1 - 2 \rdt \;c_b^{u} / H_e \right ]
+\]
 where $\bar U$ is the barotropic velocity, $H_e$ is the full depth (including sea surface height), 
 $c_b^u$ is the bottom friction coefficient as calculated in \rou{zdf\_bfr} and
 $RHS$ represents all the components to the vertically integrated momentum trend except for
 that due to bottom friction.
-
-
-
 
 % ================================================================
 % Tidal Mixing
@@ -1191,8 +1238,9 @@ The parameterization of tidal mixing follows the general formulation for the ver
 In this formulation an additional vertical diffusivity resulting from internal tide breaking,
 $A^{vT}_{tides}$ is expressed as a function of $E(x,y)$,
 the energy transfer from barotropic tides to baroclinic tides:
-\begin{equation} \label{eq:Ktides}
-A^{vT}_{tides} =  q \,\Gamma \,\frac{ E(x,y) \, F(z) }{ \rho \, N^2 }
+\begin{equation}
+  \label{eq:Ktides}
+  A^{vT}_{tides} =  q \,\Gamma \,\frac{ E(x,y) \, F(z) }{ \rho \, N^2 }
 \end{equation}
 where $\Gamma$ is the mixing efficiency, $N$ the Brunt-Vais\"{a}l\"{a} frequency (see \autoref{subsec:TRA_bn2}),
 $\rho$ the density, $q$ the tidal dissipation efficiency, and $F(z)$ the vertical structure function. 
@@ -1208,9 +1256,10 @@ The vertical structure function $F(z)$ models the distribution of the turbulent 
 It is implemented as a simple exponential decaying upward away from the bottom,
 with a vertical scale of $h_o$ (\np{rn\_htmx} namelist parameter,
 with a typical value of $500\,m$) \citep{St_Laurent_Nash_DSR04}, 
-\begin{equation} \label{eq:Fz}
-F(i,j,k) = \frac{ e^{ -\frac{H+z}{h_o} } }{ h_o \left( 1- e^{ -\frac{H}{h_o} } \right) }
-\end{equation}
+\[
+  % \label{eq:Fz}
+  F(i,j,k) = \frac{ e^{ -\frac{H+z}{h_o} } }{ h_o \left( 1- e^{ -\frac{H}{h_o} } \right) }
+\]
 and is normalized so that vertical integral over the water column is unity. 
 
 The associated vertical viscosity is calculated from the vertical diffusivity assuming a Prandtl number of 1,
@@ -1233,11 +1282,15 @@ Its global mean value is $1.1$ TW,
 in agreement with independent estimates \citep{Egbert_Ray_Nat00, Egbert_Ray_JGR01}. 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t] 	\begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_ZDF_M2_K1_tmx}
-\caption{  \protect\label{fig:ZDF_M2_K1_tmx} 
-(a) M2 and (b) K1 internal wave drag energy from \citet{Carrere_Lyard_GRL03} ($W/m^2$). }
-\end{center}  	\end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_ZDF_M2_K1_tmx}
+    \caption{
+      \protect\label{fig:ZDF_M2_K1_tmx}
+      (a) M2 and (b) K1 internal wave drag energy from \citet{Carrere_Lyard_GRL03} ($W/m^2$).
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
  
 % -------------------------------------------------------------------------------------------------------------
@@ -1267,12 +1320,15 @@ but with a maximum of energy available within the thermocline.
 \citet{Koch-Larrouy_al_GRL07} have suggested that the vertical distribution of
 the energy dissipation proportional to $N^2$ below the core of the thermocline and to $N$ above. 
 The resulting $F(z)$ is:
-\begin{equation} \label{eq:Fz_itf}
-F(i,j,k) \sim     \left\{ \begin{aligned}
-\frac{q\,\Gamma E(i,j) } {\rho N \, \int N     dz}    \qquad \text{when $\partial_z N < 0$} \\
-\frac{q\,\Gamma E(i,j) } {\rho     \, \int N^2 dz}    \qquad \text{when $\partial_z N > 0$}
-                      \end{aligned} \right.
-\end{equation}
+\[
+  % \label{eq:Fz_itf}
+  F(i,j,k) \sim     \left\{
+    \begin{aligned}
+      \frac{q\,\Gamma E(i,j) } {\rho N \, \int N     dz}    \qquad \text{when $\partial_z N < 0$} \\
+      \frac{q\,\Gamma E(i,j) } {\rho     \, \int N^2 dz}    \qquad \text{when $\partial_z N > 0$}
+    \end{aligned}
+  \right.
+\]
 
 Averaged over the ITF area, the resulting tidal mixing coefficient is $1.5\,cm^2/s$, 
 which agrees with the independent estimates inferred from observations.
@@ -1281,7 +1337,6 @@ the different Indonesian seas, suggesting that the horizontal and vertical distr
 the mixing are adequately prescribed \citep{Koch-Larrouy_al_GRL07, Koch-Larrouy_al_OD08a, Koch-Larrouy_al_OD08b}.
 Note also that such a parameterisation has a significant impact on the behaviour of
 global coupled GCMs \citep{Koch-Larrouy_al_CD10}.
-
 
 % ================================================================
 % Internal wave-driven mixing
@@ -1298,9 +1353,10 @@ The parameterization of mixing induced by breaking internal waves is a generaliz
 the approach originally proposed by \citet{St_Laurent_al_GRL02}.
 A three-dimensional field of internal wave energy dissipation $\epsilon(x,y,z)$ is first constructed,
 and the resulting diffusivity is obtained as 
-\begin{equation} \label{eq:Kwave}
-A^{vT}_{wave} =  R_f \,\frac{ \epsilon }{ \rho \, N^2 }
-\end{equation}
+\[
+  % \label{eq:Kwave}
+  A^{vT}_{wave} =  R_f \,\frac{ \epsilon }{ \rho \, N^2 }
+\]
 where $R_f$ is the mixing efficiency and $\epsilon$ is a specified three dimensional distribution of
 the energy available for mixing.
 If the \np{ln\_mevar} namelist parameter is set to false, the mixing efficiency is taken as constant and
@@ -1322,14 +1378,14 @@ is constructed from three static maps of column-integrated internal wave energy 
 $E_{cri}(i,j)$, $E_{pyc}(i,j)$, and $E_{bot}(i,j)$, combined to three corresponding vertical structures
 (de Lavergne et al., in prep):
 \begin{align*}
-F_{cri}(i,j,k) &\propto e^{-h_{ab} / h_{cri} }\\
-F_{pyc}(i,j,k) &\propto N^{n\_p}\\
-F_{bot}(i,j,k) &\propto N^2 \, e^{- h_{wkb} / h_{bot} }
+  F_{cri}(i,j,k) &\propto e^{-h_{ab} / h_{cri} }\\
+  F_{pyc}(i,j,k) &\propto N^{n\_p}\\
+  F_{bot}(i,j,k) &\propto N^2 \, e^{- h_{wkb} / h_{bot} }
 \end{align*} 
 In the above formula, $h_{ab}$ denotes the height above bottom,
 $h_{wkb}$ denotes the WKB-stretched height above bottom, defined by
 \[
-h_{wkb} = H \, \frac{ \int_{-H}^{z} N \, dz' } { \int_{-H}^{\eta} N \, dz'  } \; ,
+  h_{wkb} = H \, \frac{ \int_{-H}^{z} N \, dz' } { \int_{-H}^{\eta} N \, dz'  } \; ,
 \]
 The $n_p$ parameter (given by \np{nn\_zpyc} in \ngn{namzdf\_tmx\_new} namelist)
 controls the stratification-dependence of the pycnocline-intensified dissipation.
@@ -1342,6 +1398,6 @@ the abyssal hill topography \citep{Goff_JGR2010} and the latitude.
 
 % ================================================================
 
-
+\biblio
 
 \end{document}

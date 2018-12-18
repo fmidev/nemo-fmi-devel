@@ -1,10 +1,12 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
-% Chapter 2 ——— Space and Time Domain (DOM)
+% Chapter 2 Space and Time Domain (DOM)
 % ================================================================
 \chapter{Space Domain (DOM)}
 \label{chap:DOM}
+
 \minitoc
 
 % Missing things:
@@ -15,16 +17,12 @@
 % 	-geo2ocean:  how to switch from geographic to mesh coordinate
 %     - domclo:  closed sea and lakes.... management of closea sea area : specific to global configuration, both forced and coupled
 
-
 \newpage
-$\ $\newline    % force a new line
 
 Having defined the continuous equations in \autoref{chap:PE} and chosen a time discretization \autoref{chap:STP},
 we need to choose a discretization on a grid, and numerical algorithms.
 In the present chapter, we provide a general description of the staggered grid used in \NEMO,
 and other information relevant to the main directory routines as well as the DOM (DOMain) directory.
-
-$\ $\newline    % force a new line
 
 % ================================================================
 % Fundamentals of the Discretisation
@@ -39,14 +37,19 @@ $\ $\newline    % force a new line
 \label{subsec:DOM_cell}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!tb]    \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_cell}
-\caption{ \protect\label{fig:cell}
-  Arrangement of variables.
-  $t$ indicates scalar points where temperature, salinity, density, pressure and horizontal divergence are defined.
-  ($u$,$v$,$w$) indicates vector points,
-  and $f$ indicates vorticity points where both relative and planetary vorticities are defined}
-\end{center}   \end{figure}
+\begin{figure}[!tb]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_cell}
+    \caption{
+      \protect\label{fig:cell}
+      Arrangement of variables.
+      $t$ indicates scalar points where temperature, salinity, density, pressure and
+      horizontal divergence are defined.
+      ($u$,$v$,$w$) indicates vector points,
+      and $f$ indicates vorticity points where both relative and planetary vorticities are defined
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 The numerical techniques used to solve the Primitive Equations in this model are based on the traditional,
@@ -82,23 +85,26 @@ when needed, an area, volume, or the total ocean depth must be evaluated as the 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{table}[!tb]
-\begin{center} \begin{tabular}{|p{46pt}|p{56pt}|p{56pt}|p{56pt}|}
-\hline
-T	&$i$ 		& $j$		& $k$		 \\ \hline
-u	& $i+1/2$	& $j$		& $k$	 	\\ \hline
-v	& $i$	 	& $j+1/2$	& $k$	 	\\ \hline
-w	& $i$	 	& $j$		& $k+1/2$ 	\\ \hline
-f	& $i+1/2$ 	& $j+1/2$	& $k$	 	\\ \hline
-uw	& $i+1/2$ 	& $j$		& $k+1/2$ 	\\ \hline
-vw	& $i$	 	& $j+1/2$	& $k+1/2$ 	\\ \hline
-fw	& $i+1/2$ 	& $j+1/2$	& $k+1/2$ 	\\ \hline
-\end{tabular}
-\caption{ \protect\label{tab:cell}
-  Location of grid-points as a function of integer or integer and a half value of the column, line or level.
-  This indexing is only used for the writing of the semi-discrete equation.
-  In the code, the indexing uses integer values only and has a reverse direction in the vertical
-  (see \autoref{subsec:DOM_Num_Index})}
-\end{center}
+  \begin{center}
+    \begin{tabular}{|p{46pt}|p{56pt}|p{56pt}|p{56pt}|}
+      \hline
+      T	&$i$ 		& $j$		& $k$		 \\ \hline
+      u	& $i+1/2$	& $j$		& $k$	 	\\ \hline
+      v	& $i$	 	& $j+1/2$	& $k$	 	\\ \hline
+      w	& $i$	 	& $j$		& $k+1/2$ 	\\ \hline
+      f	& $i+1/2$ 	& $j+1/2$	& $k$	 	\\ \hline
+      uw	& $i+1/2$ 	& $j$		& $k+1/2$ 	\\ \hline
+      vw	& $i$	 	& $j+1/2$	& $k+1/2$ 	\\ \hline
+      fw	& $i+1/2$ 	& $j+1/2$	& $k+1/2$ 	\\ \hline
+    \end{tabular}
+    \caption{
+      \protect\label{tab:cell}
+      Location of grid-points as a function of integer or integer and a half value of the column, line or level.
+      This indexing is only used for the writing of the semi-discrete equation.
+      In the code, the indexing uses integer values only and has a reverse direction in the vertical
+      (see \autoref{subsec:DOM_Num_Index})
+    }
+  \end{center}
 \end{table}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -110,50 +116,56 @@ fw	& $i+1/2$ 	& $j+1/2$	& $k+1/2$ 	\\ \hline
 
 Given the values of a variable $q$ at adjacent points,
 the differencing and averaging operators at the midpoint between them are:
-\begin{subequations} \label{eq:di_mi}
-\begin{align}
- \delta_i [q]       &=  \  \    q(i+1/2)  - q(i-1/2)		\\
- \overline q^{\,i} &= \left\{ q(i+1/2) + q(i-1/2) \right\} \; / \; 2
-\end{align}
-\end{subequations}
+\[
+  % \label{eq:di_mi}
+  \begin{split}
+    \delta_i [q]       &=  \  \    q(i+1/2)  - q(i-1/2)		\\
+    \overline q^{\,i} &= \left\{ q(i+1/2) + q(i-1/2) \right\} \; / \; 2
+  \end{split}
+\]
 
 Similar operators are defined with respect to $i+1/2$, $j$, $j+1/2$, $k$, and $k+1/2$.
 Following \autoref{eq:PE_grad} and \autoref{eq:PE_lap}, the gradient of a variable $q$ defined at
 a $t$-point has its three components defined at $u$-, $v$- and $w$-points while
 its Laplacien is defined at $t$-point.
 These operators have the following discrete forms in the curvilinear $s$-coordinate system:
-\begin{equation} \label{eq:DOM_grad}
-\nabla q\equiv 	\frac{1}{e_{1u} } \delta_{i+1/2 } [q] \;\,\mathbf{i}
-		+	\frac{1}{e_{2v} } \delta_{j+1/2 } [q] \;\,\mathbf{j}
-		+	\frac{1}{e_{3w}} \delta_{k+1/2} [q] \;\,\mathbf{k}
-\end{equation}
-\begin{multline} \label{eq:DOM_lap}
-\Delta q\equiv \frac{1}{e_{1t}\,e_{2t}\,e_{3t} }
-       \;\left(          \delta_i  \left[ \frac{e_{2u}\,e_{3u}} {e_{1u}} \;\delta_{i+1/2} [q] \right]
-+                        \delta_j  \left[ \frac{e_{1v}\,e_{3v}}  {e_{2v}} \;\delta_{j+1/2} [q] \right] \;  \right)		\\
-+\frac{1}{e_{3t}} \delta_k \left[ \frac{1}{e_{3w} }                     \;\delta_{k+1/2} [q] \right]
-\end{multline}
+\[
+  % \label{eq:DOM_grad}
+  \nabla q\equiv 	\frac{1}{e_{1u} } \delta_{i+1/2 } [q] \;\,\mathbf{i}
+  +	\frac{1}{e_{2v} } \delta_{j+1/2 } [q] \;\,\mathbf{j}
+  +	\frac{1}{e_{3w}} \delta_{k+1/2} [q] \;\,\mathbf{k}
+\]
+\begin{multline*}
+  % \label{eq:DOM_lap}
+  \Delta q\equiv \frac{1}{e_{1t}\,e_{2t}\,e_{3t} }
+  \;\left(          \delta_i  \left[ \frac{e_{2u}\,e_{3u}} {e_{1u}} \;\delta_{i+1/2} [q] \right]
+    +                        \delta_j  \left[ \frac{e_{1v}\,e_{3v}}  {e_{2v}} \;\delta_{j+1/2} [q] \right] \;  \right)		\\
+  +\frac{1}{e_{3t}} \delta_k \left[ \frac{1}{e_{3w} }                     \;\delta_{k+1/2} [q] \right]
+\end{multline*}
 
 Following \autoref{eq:PE_curl} and \autoref{eq:PE_div}, a vector ${\rm {\bf A}}=\left( a_1,a_2,a_3\right)$
 defined at vector points $(u,v,w)$ has its three curl components defined at $vw$-, $uw$, and $f$-points,
 and its divergence defined at $t$-points:
-\begin{align}  \label{eq:DOM_curl}
- \nabla \times {\rm{\bf A}}\equiv &
-      \frac{1}{e_{2v}\,e_{3vw} } \ \left( \delta_{j +1/2} \left[e_{3w}\,a_3 \right] -\delta_{k+1/2} \left[e_{2v} \,a_2 \right] \right)  &\ \mathbf{i} \\ 
- +& \frac{1}{e_{2u}\,e_{3uw}} \ \left( \delta_{k+1/2} \left[e_{1u}\,a_1  \right] -\delta_{i +1/2} \left[e_{3w}\,a_3 \right] \right)  &\ \mathbf{j} \\
- +& \frac{1}{e_{1f} \,e_{2f}    } \ \left( \delta_{i +1/2} \left[e_{2v}\,a_2  \right] -\delta_{j +1/2} \left[e_{1u}\,a_1 \right] \right)  &\ \mathbf{k}
- \end{align}
-\begin{align} \label{eq:DOM_div}
-\nabla \cdot \rm{\bf A} \equiv 
-    \frac{1}{e_{1t}\,e_{2t}\,e_{3t}} \left( \delta_i \left[e_{2u}\,e_{3u}\,a_1 \right]
-                                           +\delta_j \left[e_{1v}\,e_{3v}\,a_2 \right] \right)+\frac{1}{e_{3t} }\delta_k \left[a_3 \right]
-\end{align}
+\begin{align*}
+  % \label{eq:DOM_curl}
+  \nabla \times {\rm{\bf A}}\equiv &
+                                     \frac{1}{e_{2v}\,e_{3vw} } \ \left( \delta_{j +1/2} \left[e_{3w}\,a_3 \right] -\delta_{k+1/2} \left[e_{2v} \,a_2 \right] \right)  &\ \mathbf{i} \\
+  +& \frac{1}{e_{2u}\,e_{3uw}} \ \left( \delta_{k+1/2} \left[e_{1u}\,a_1  \right] -\delta_{i +1/2} \left[e_{3w}\,a_3 \right] \right)  &\ \mathbf{j} \\
+  +& \frac{1}{e_{1f} \,e_{2f}    } \ \left( \delta_{i +1/2} \left[e_{2v}\,a_2  \right] -\delta_{j +1/2} \left[e_{1u}\,a_1 \right] \right)  &\ \mathbf{k}
+\end{align*}
+\begin{align*}
+  % \label{eq:DOM_div}
+  \nabla \cdot \rm{\bf A} \equiv
+  \frac{1}{e_{1t}\,e_{2t}\,e_{3t}} \left( \delta_i \left[e_{2u}\,e_{3u}\,a_1 \right]
+  +\delta_j \left[e_{1v}\,e_{3v}\,a_2 \right] \right)+\frac{1}{e_{3t} }\delta_k \left[a_3 \right]
+\end{align*}
 
 The vertical average over the whole water column denoted by an overbar becomes for a quantity $q$ which
 is a masked field (i.e. equal to zero inside solid area):
-\begin{equation} \label{eq:DOM_bar}
-\bar q 	=         \frac{1}{H}    \int_{k^b}^{k^o} {q\;e_{3q} \,dk} 
-		\equiv \frac{1}{H_q }\sum\limits_k {q\;e_{3q} }
+\begin{equation}
+  \label{eq:DOM_bar}
+  \bar q 	=         \frac{1}{H}    \int_{k^b}^{k^o} {q\;e_{3q} \,dk}
+  \equiv \frac{1}{H_q }\sum\limits_k {q\;e_{3q} }
 \end{equation}
 where $H_q$  is the ocean depth, which is the masked sum of the vertical scale factors at $q$ points,
 $k^b$ and $k^o$ are the bottom and surface $k$-indices,
@@ -161,11 +173,13 @@ and the symbol $k^o$ refers to a summation over all grid points of the same type
 the subscript (here $k$). 
 
 In continuous form, the following properties are satisfied:
-\begin{equation} \label{eq:DOM_curl_grad}
-\nabla \times \nabla q ={\rm {\bf {0}}}
+\begin{equation}
+  \label{eq:DOM_curl_grad}
+  \nabla \times \nabla q ={\rm {\bf {0}}}
 \end{equation}
-\begin{equation} \label{eq:DOM_div_curl}
-\nabla \cdot \left( {\nabla \times {\rm {\bf A}}} \right)=0
+\begin{equation}
+  \label{eq:DOM_div_curl}
+  \nabla \cdot \left( {\nabla \times {\rm {\bf A}}} \right)=0
 \end{equation}
 
 It is straightforward to demonstrate that these properties are verified locally in discrete form as soon as
@@ -178,13 +192,13 @@ the differencing operators ($\delta_i$, $\delta_j$ and $\delta_k$) are skew-symm
 and further that the averaging operators $\overline{\,\cdot\,}^{\,i}$, $\overline{\,\cdot\,}^{\,k}$ and
 $\overline{\,\cdot\,}^{\,k}$) are symmetric linear operators,
 $i.e.$
-\begin{align} 
-\label{eq:DOM_di_adj}
-\sum\limits_i { a_i \;\delta_i \left[ b \right]} 
-	&\equiv -\sum\limits_i {\delta_{i+1/2} \left[ a \right]\;b_{i+1/2} }      \\
-\label{eq:DOM_mi_adj}
-\sum\limits_i { a_i \;\overline b^{\,i}} 
-	& \equiv \quad \sum\limits_i {\overline a ^{\,i+1/2}\;b_{i+1/2} } 
+\begin{align}
+  \label{eq:DOM_di_adj}
+  \sum\limits_i { a_i \;\delta_i \left[ b \right]}
+  &\equiv -\sum\limits_i {\delta_{i+1/2} \left[ a \right]\;b_{i+1/2} }      \\
+  \label{eq:DOM_mi_adj}
+  \sum\limits_i { a_i \;\overline b^{\,i}}
+  & \equiv \quad \sum\limits_i {\overline a ^{\,i+1/2}\;b_{i+1/2} }
 \end{align}
 
 In other words, the adjoint of the differencing and averaging operators are $\delta_i^*=\delta_{i+1/2}$ and 
@@ -199,12 +213,16 @@ demonstrate integral conservative properties of the discrete formulation chosen.
 \label{subsec:DOM_Num_Index}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!tb]  \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_index_hor}
-\caption{   \protect\label{fig:index_hor}
-  Horizontal integer indexing used in the \textsc{Fortran} code.
-  The dashed area indicates the cell in which variables contained in arrays have the same $i$- and $j$-indices}
-\end{center}   \end{figure}
+\begin{figure}[!tb]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_index_hor}
+    \caption{
+      \protect\label{fig:index_hor}
+      Horizontal integer indexing used in the \textsc{Fortran} code.
+      The dashed area indicates the cell in which variables contained in arrays have the same $i$- and $j$-indices
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 The array representation used in the \textsc{Fortran} code requires an integer indexing while
@@ -248,13 +266,17 @@ Since the scale factors are chosen to be strictly positive, a \emph{minus sign} 
 code \emph{before all the vertical derivatives} of the discrete equations given in this documentation.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!pt]    \begin{center}
-\includegraphics[width=.90\textwidth]{Fig_index_vert}
-\caption{ \protect\label{fig:index_vert}
-  Vertical integer indexing used in the \textsc{Fortran } code.
-  Note that the $k$-axis is orientated downward.
-  The dashed area indicates the cell in which variables contained in arrays have the same $k$-index.}
-\end{center}   \end{figure}
+\begin{figure}[!pt]
+  \begin{center}
+    \includegraphics[width=.90\textwidth]{Fig_index_vert}
+    \caption{
+      \protect\label{fig:index_vert}
+      Vertical integer indexing used in the \textsc{Fortran } code.
+      Note that the $k$-axis is orientated downward.
+      The dashed area indicates the cell in which variables contained in arrays have the same $k$-index.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 % -----------------------------------
@@ -271,9 +293,6 @@ The total size of the computational domain is set by the parameters \np{jpiglo},
 Parameters $jpi$ and $jpj$ refer to the size of each processor subdomain when
 the code is run in parallel using domain decomposition (\key{mpp\_mpi} defined,
 see \autoref{sec:LBC_mpp}).
-
-
-$\ $\newline    % force a new line
 
 % ================================================================
 % Domain: List of fields needed
@@ -350,20 +369,20 @@ the horizontal mesh definition reduces to define the wanted $\lambda(i)$, $\varp
 and their derivatives $\lambda'(i)$ $\varphi'(j)$ in the \mdl{domhgr} module.
 The model computes the grid-point positions and scale factors in the horizontal plane as follows:
 \begin{flalign*}
-\lambda_t &\equiv \text{glamt}= \lambda(i)	  & \varphi_t &\equiv \text{gphit} = \varphi(j)\\
-\lambda_u &\equiv \text{glamu}= \lambda(i+1/2)& \varphi_u &\equiv \text{gphiu}= \varphi(j)\\
-\lambda_v &\equiv \text{glamv}= \lambda(i)       & \varphi_v &\equiv \text{gphiv} = \varphi(j+1/2)\\
-\lambda_f &\equiv \text{glamf }= \lambda(i+1/2)& \varphi_f &\equiv \text{gphif }= \varphi(j+1/2) 
+  \lambda_t &\equiv \text{glamt}= \lambda(i)	  & \varphi_t &\equiv \text{gphit} = \varphi(j)\\
+  \lambda_u &\equiv \text{glamu}= \lambda(i+1/2)& \varphi_u &\equiv \text{gphiu}= \varphi(j)\\
+  \lambda_v &\equiv \text{glamv}= \lambda(i)       & \varphi_v &\equiv \text{gphiv} = \varphi(j+1/2)\\
+  \lambda_f &\equiv \text{glamf }= \lambda(i+1/2)& \varphi_f &\equiv \text{gphif }= \varphi(j+1/2)
 \end{flalign*}
 \begin{flalign*}
-e_{1t} &\equiv \text{e1t} = r_a |\lambda'(i)		\; \cos\varphi(j)  |&
-e_{2t} &\equiv \text{e2t} = r_a |\varphi'(j)|  \\
-e_{1u} &\equiv \text{e1t} = r_a |\lambda'(i+1/2)	\; \cos\varphi(j)  |&
-e_{2u} &\equiv \text{e2t} = r_a |\varphi'(j)|\\
-e_{1v} &\equiv \text{e1t} = r_a |\lambda'(i)		\; \cos\varphi(j+1/2)  |&
-e_{2v} &\equiv \text{e2t} = r_a |\varphi'(j+1/2)|\\
-e_{1f} &\equiv \text{e1t} = r_a |\lambda'(i+1/2)\; \cos\varphi(j+1/2)  |&
-e_{2f} &\equiv \text{e2t} = r_a |\varphi'(j+1/2)|
+  e_{1t} &\equiv \text{e1t} = r_a |\lambda'(i)		\; \cos\varphi(j)  |&
+  e_{2t} &\equiv \text{e2t} = r_a |\varphi'(j)|  \\
+  e_{1u} &\equiv \text{e1t} = r_a |\lambda'(i+1/2)	\; \cos\varphi(j)  |&
+  e_{2u} &\equiv \text{e2t} = r_a |\varphi'(j)|\\
+  e_{1v} &\equiv \text{e1t} = r_a |\lambda'(i)		\; \cos\varphi(j+1/2)  |&
+  e_{2v} &\equiv \text{e2t} = r_a |\varphi'(j+1/2)|\\
+  e_{1f} &\equiv \text{e1t} = r_a |\lambda'(i+1/2)\; \cos\varphi(j+1/2)  |&
+  e_{2f} &\equiv \text{e2t} = r_a |\varphi'(j+1/2)|
 \end{flalign*}
 where the last letter of each computational name indicates the grid point considered and
 $r_a$ is the earth radius (defined in \mdl{phycst} along with all universal constants).
@@ -384,16 +403,21 @@ secondly, analytical transformations encourage good practice by the definition o
 (rather than allowing the user to set arbitrary jumps in thickness between adjacent layers) \citep{Treguier1996}.
 An example of the effect of such a choice is shown in \autoref{fig:zgr_e3}.
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]     \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_zgr_e3}
-\caption{ \protect\label{fig:zgr_e3}
-  Comparison of (a) traditional definitions of grid-point position and grid-size in the vertical,
-  and (b) analytically derived grid-point position and scale factors.
-  For both grids here,
-  the same $w$-point depth has been chosen but in (a) the $t$-points are set half way between $w$-points while
-  in (b) they are defined from an analytical function: $z(k)=5\,(k-1/2)^3 - 45\,(k-1/2)^2 + 140\,(k-1/2) - 150$.
-  Note the resulting difference between the value of the grid-size $\Delta_k$ and those of the scale factor $e_k$. }
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_zgr_e3}
+    \caption{
+      \protect\label{fig:zgr_e3}
+      Comparison of (a) traditional definitions of grid-point position and grid-size in the vertical,
+      and (b) analytically derived grid-point position and scale factors.
+      For both grids here,
+      the same $w$-point depth has been chosen but in (a) the $t$-points are set half way between $w$-points while
+      in (b) they are defined from an analytical function: $z(k)=5\,(k-1/2)^3 - 45\,(k-1/2)^2 + 140\,(k-1/2) - 150$.
+      Note the resulting difference between the value of the grid-size $\Delta_k$ and
+      those of the scale factor $e_k$.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 % -------------------------------------------------------------------------------------------------------------
@@ -419,8 +443,6 @@ An example is Gibraltar Strait in the ORCA2 configuration.
 When such modifications are done,
 the output grid written when \np{nn\_msh} $\not= 0$ is no more equal to the input grid.
 
-$\ $\newline    % force a new line
-
 % ================================================================
 % Domain: Vertical Grid (domzgr)
 % ================================================================
@@ -442,18 +464,22 @@ In the vertical, the model mesh is determined by four things:
 $(i,j)$ column of points.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!tb]    \begin{center}
-\includegraphics[width=1.0\textwidth]{Fig_z_zps_s_sps}
-\caption{  \protect\label{fig:z_zps_s_sps}
-  The ocean bottom as seen by the model:
-  (a) $z$-coordinate with full step,
-  (b) $z$-coordinate with partial step,
-  (c) $s$-coordinate: terrain following representation,
-  (d) hybrid $s-z$ coordinate,
-  (e) hybrid $s-z$ coordinate with partial step, and
-  (f) same as (e) but in the non-linear free surface (\protect\np{ln\_linssh}\forcode{ = .false.}).
-  Note that the non-linear free surface can be used with any of the 5 coordinates (a) to (e).}
-\end{center}   \end{figure}
+\begin{figure}[!tb]
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{Fig_z_zps_s_sps}
+    \caption{
+      \protect\label{fig:z_zps_s_sps}
+      The ocean bottom as seen by the model:
+      (a) $z$-coordinate with full step,
+      (b) $z$-coordinate with partial step,
+      (c) $s$-coordinate: terrain following representation,
+      (d) hybrid $s-z$ coordinate,
+      (e) hybrid $s-z$ coordinate with partial step, and
+      (f) same as (e) but in the non-linear free surface (\protect\np{ln\_linssh}\forcode{ = .false.}).
+      Note that the non-linear free surface can be used with any of the 5 coordinates (a) to (e).
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 The choice of a vertical coordinate, even if it is made through \ngn{namzgr} namelist parameters, 
@@ -481,7 +507,8 @@ no provision is made for reading it from a file.
 The only input file is the bathymetry (in meters) (\ifile{bathy\_meter})
 \footnote{
   N.B. in full step $z$-coordinate, a \ifile{bathy\_level} file can replace the \ifile{bathy\_meter} file,
-  so that the computation of the number of wet ocean point in each water column is by-passed}. 
+  so that the computation of the number of wet ocean point in each water column is by-passed
+}. 
 If \np{ln\_isfcav}\forcode{ = .true.},
 an extra file input file describing the ice shelf draft (in meters) (\ifile{isf\_draft\_meter}) is needed.
 
@@ -562,13 +589,17 @@ but the code has to be adapted to the user's configuration.
 \label{subsec:DOM_zco}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!tb]    \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_zgr}
-\caption{ \protect\label{fig:zgr}
-  Default vertical mesh for ORCA2: 30 ocean levels (L30).
-  Vertical level functions for (a) T-point depth and (b) the associated scale factor as computed from
-  \autoref{eq:DOM_zgr_ana_1} using \autoref{eq:DOM_zgr_coef} in $z$-coordinate.}
-\end{center}   \end{figure}
+\begin{figure}[!tb]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_zgr}
+    \caption{
+      \protect\label{fig:zgr}
+      Default vertical mesh for ORCA2: 30 ocean levels (L30).
+      Vertical level functions for (a) T-point depth and (b) the associated scale factor as computed from
+      \autoref{eq:DOM_zgr_ana_1} using \autoref{eq:DOM_zgr_coef} in $z$-coordinate.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 The reference coordinate transformation $z_0 (k)$ defines the arrays $gdept_0$ and $gdepw_0$ for
@@ -588,11 +619,12 @@ the parameters \jp{jpk} (number of $w$-levels) and \np{pphmax} (total ocean dept
 
 For climate-related studies it is often desirable to concentrate the vertical resolution near the ocean surface.
 The following function is proposed as a standard for a $z$-coordinate (with either full or partial steps): 
-\begin{equation} \label{eq:DOM_zgr_ana_1}
-\begin{split}
- z_0 (k) 	&= h_{sur} -h_0 \;k-\;h_1 \;\log \left[ {\,\cosh \left( {{(k-h_{th} )} / {h_{cr} }} \right)\,} \right] \\ 
- e_3^0 (k) 	&= \left| -h_0 -h_1 \;\tanh \left( {{(k-h_{th} )} / {h_{cr} }} \right) \right| 
-\end{split}
+\begin{equation}
+  \label{eq:DOM_zgr_ana_1}
+  \begin{split}
+    z_0 (k) 	&= h_{sur} -h_0 \;k-\;h_1 \;\log \left[ {\,\cosh \left( {{(k-h_{th} )} / {h_{cr} }} \right)\,} \right] \\
+    e_3^0 (k) 	&= \left| -h_0 -h_1 \;\tanh \left( {{(k-h_{th} )} / {h_{cr} }} \right) \right|
+  \end{split}
 \end{equation}
 where $k=1$ to \jp{jpk} for $w$-levels and $k=1$ to $k=1$ for $T-$levels.
 Such an expression allows us to define a nearly uniform vertical location of levels at the ocean top and bottom with
@@ -600,11 +632,12 @@ a smooth hyperbolic tangent transition in between (\autoref{fig:zgr}).
 
 If the ice shelf cavities are opened (\np{ln\_isfcav}\forcode{ = .true.}), the definition of $z_0$ is the same.
 However, definition of $e_3^0$ at $t$- and $w$-points is respectively changed to:
-\begin{equation} \label{eq:DOM_zgr_ana_2}
-\begin{split}
- e_3^T(k) &= z_W (k+1) - z_W (k)   \\
- e_3^W(k) &= z_T (k)   - z_T (k-1) \\
-\end{split}
+\begin{equation}
+  \label{eq:DOM_zgr_ana_2}
+  \begin{split}
+    e_3^T(k) &= z_W (k+1) - z_W (k)   \\
+    e_3^W(k) &= z_T (k)   - z_T (k-1) \\
+  \end{split}
 \end{equation}
 This formulation decrease the self-generated circulation into the ice shelf cavity 
 (which can, in extreme case, leads to blow up).\\
@@ -613,13 +646,14 @@ This formulation decrease the self-generated circulation into the ice shelf cavi
 The most used vertical grid for ORCA2 has $10~m$ ($500~m)$ resolution in the surface (bottom) layers and
 a depth which varies from 0 at the sea surface to a minimum of $-5000~m$.
 This leads to the following conditions:
-\begin{equation} \label{eq:DOM_zgr_coef}
-\begin{split}
- e_3 (1+1/2)		&=10. \\ 
- e_3 (jpk-1/2)	&=500. \\ 
- z(1)			&=0. \\ 
- z(jpk)			&=-5000. \\ 
-\end{split}
+\begin{equation}
+  \label{eq:DOM_zgr_coef}
+  \begin{split}
+    e_3 (1+1/2)		&=10. \\
+    e_3 (jpk-1/2)	&=500. \\
+    z(1)			&=0. \\
+    z(jpk)			&=-5000. \\
+  \end{split}
 \end{equation}
 
 With the choice of the stretching $h_{cr} =3$ and the number of levels \jp{jpk}=$31$,
@@ -653,44 +687,49 @@ As an example, for the $45$ layers used in the DRAKKAR configuration those param
 \np{ppdzmin}\forcode{ = 6}m, \np{pphmax}\forcode{ = 5750}m.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{table}     \begin{center} \begin{tabular}{c||r|r|r|r}
-\hline
-\textbf{LEVEL}& \textbf{gdept\_1d}& \textbf{gdepw\_1d}& \textbf{e3t\_1d }& \textbf{e3w\_1d  } \\ \hline
-1	&	\textbf{  5.00}	&       0.00 &	\textbf{ 10.00} &	 10.00 \\	\hline
-2	&	\textbf{15.00}	& 	  10.00 &	\textbf{ 10.00} &	 10.00 \\	\hline
-3	&	\textbf{25.00}	&	  20.00 &	\textbf{ 10.00} & 	 10.00 \\	\hline
-4	&	\textbf{35.01}	&	  30.00 & 	\textbf{ 10.01} & 	 10.00 \\	\hline
-5	&	\textbf{45.01}	&	  40.01 &	\textbf{ 10.01} &	 10.01 \\	\hline
-6	&	\textbf{55.03}	&	  50.02 &	\textbf{ 10.02} & 	 10.02 \\	\hline
-7	&	\textbf{65.06}	&	  60.04 &	\textbf{ 10.04} &	 10.03 \\	\hline
-8	&	\textbf{75.13}	&	  70.09 &	\textbf{ 10.09} &	 10.06 \\	\hline
-9	&	\textbf{85.25}	&	  80.18 &	\textbf{ 10.17} &	 10.12 \\	\hline
-10	& 	\textbf{95.49}	& 	  90.35 &	\textbf{ 10.33} &	 10.24 \\	\hline
-11	& 	\textbf{105.97}	& 	 100.69 &	\textbf{ 10.65} &	 10.47 \\	\hline
-12	& 	\textbf{116.90}	& 	 111.36 &	\textbf{ 11.27} &	 10.91 \\	\hline
-13	& 	\textbf{128.70}	& 	 122.65 &	\textbf{ 12.47} &	 11.77 \\	\hline
-14	& 	\textbf{142.20}	& 	 135.16 &	\textbf{ 14.78} &	 13.43 \\	\hline
-15	& 	\textbf{158.96}	& 	 150.03 &	\textbf{ 19.23} &	 16.65 \\	\hline
-16	& 	\textbf{181.96}	& 	 169.42 &	\textbf{ 27.66} &	 22.78 \\	\hline
-17	& 	\textbf{216.65}	& 	 197.37 & 	\textbf{ 43.26} &	 34.30 \\ \hline
-18	& 	\textbf{272.48}	& 	 241.13 & 	\textbf{ 70.88} &	 55.21 \\ \hline
-19	& 	\textbf{364.30}	& 	 312.74 & 	\textbf{116.11} &	 90.99 \\ \hline
-20	& 	\textbf{511.53}	& 	 429.72 & 	\textbf{181.55} & 	146.43 \\ \hline
-21	& 	\textbf{732.20}	& 	 611.89 & 	\textbf{261.03} & 	220.35 \\ \hline
-22	& 	\textbf{1033.22}&	 872.87 & 	\textbf{339.39} & 	301.42 \\ \hline
-23	& 	\textbf{1405.70}&	1211.59 & \textbf{402.26} & 	373.31 \\ \hline
-24	& 	\textbf{1830.89}&	1612.98 & \textbf{444.87} & 	426.00 \\ \hline
-25	& 	\textbf{2289.77}&	2057.13 & \textbf{470.55} & 	459.47 \\ \hline
-26	& 	\textbf{2768.24}&	2527.22 & \textbf{484.95} & 	478.83 \\ \hline
-27	& 	\textbf{3257.48}&	3011.90 & \textbf{492.70} & 	489.44 \\ \hline
-28	& 	\textbf{3752.44}&	3504.46 & \textbf{496.78} & 	495.07 \\ \hline
-29	& 	\textbf{4250.40}&	4001.16 & \textbf{498.90} & 	498.02 \\ \hline
-30	& 	\textbf{4749.91}&	4500.02 & \textbf{500.00} &	499.54 \\ \hline
-31	& 	\textbf{5250.23}&	5000.00 &	\textbf{500.56} &	500.33 \\ \hline
-\end{tabular} \end{center} 
-\caption{ \protect\label{tab:orca_zgr}
-  Default vertical mesh in $z$-coordinate for 30 layers ORCA2 configuration as computed from
-  \autoref{eq:DOM_zgr_ana_2} using the coefficients given in \autoref{eq:DOM_zgr_coef}}
+\begin{table}
+  \begin{center}
+    \begin{tabular}{c||r|r|r|r}
+      \hline
+      \textbf{LEVEL}& \textbf{gdept\_1d}& \textbf{gdepw\_1d}& \textbf{e3t\_1d }& \textbf{e3w\_1d  } \\ \hline
+      1	&	\textbf{  5.00}	&       0.00 &	\textbf{ 10.00} &	 10.00 \\	\hline
+      2	&	\textbf{15.00}	& 	  10.00 &	\textbf{ 10.00} &	 10.00 \\	\hline
+      3	&	\textbf{25.00}	&	  20.00 &	\textbf{ 10.00} & 	 10.00 \\	\hline
+      4	&	\textbf{35.01}	&	  30.00 & 	\textbf{ 10.01} & 	 10.00 \\	\hline
+      5	&	\textbf{45.01}	&	  40.01 &	\textbf{ 10.01} &	 10.01 \\	\hline
+      6	&	\textbf{55.03}	&	  50.02 &	\textbf{ 10.02} & 	 10.02 \\	\hline
+      7	&	\textbf{65.06}	&	  60.04 &	\textbf{ 10.04} &	 10.03 \\	\hline
+      8	&	\textbf{75.13}	&	  70.09 &	\textbf{ 10.09} &	 10.06 \\	\hline
+      9	&	\textbf{85.25}	&	  80.18 &	\textbf{ 10.17} &	 10.12 \\	\hline
+      10	& 	\textbf{95.49}	& 	  90.35 &	\textbf{ 10.33} &	 10.24 \\	\hline
+      11	& 	\textbf{105.97}	& 	 100.69 &	\textbf{ 10.65} &	 10.47 \\	\hline
+      12	& 	\textbf{116.90}	& 	 111.36 &	\textbf{ 11.27} &	 10.91 \\	\hline
+      13	& 	\textbf{128.70}	& 	 122.65 &	\textbf{ 12.47} &	 11.77 \\	\hline
+      14	& 	\textbf{142.20}	& 	 135.16 &	\textbf{ 14.78} &	 13.43 \\	\hline
+      15	& 	\textbf{158.96}	& 	 150.03 &	\textbf{ 19.23} &	 16.65 \\	\hline
+      16	& 	\textbf{181.96}	& 	 169.42 &	\textbf{ 27.66} &	 22.78 \\	\hline
+      17	& 	\textbf{216.65}	& 	 197.37 & 	\textbf{ 43.26} &	 34.30 \\ \hline
+      18	& 	\textbf{272.48}	& 	 241.13 & 	\textbf{ 70.88} &	 55.21 \\ \hline
+      19	& 	\textbf{364.30}	& 	 312.74 & 	\textbf{116.11} &	 90.99 \\ \hline
+      20	& 	\textbf{511.53}	& 	 429.72 & 	\textbf{181.55} & 	146.43 \\ \hline
+      21	& 	\textbf{732.20}	& 	 611.89 & 	\textbf{261.03} & 	220.35 \\ \hline
+      22	& 	\textbf{1033.22}&	 872.87 & 	\textbf{339.39} & 	301.42 \\ \hline
+      23	& 	\textbf{1405.70}&	1211.59 & \textbf{402.26} & 	373.31 \\ \hline
+      24	& 	\textbf{1830.89}&	1612.98 & \textbf{444.87} & 	426.00 \\ \hline
+      25	& 	\textbf{2289.77}&	2057.13 & \textbf{470.55} & 	459.47 \\ \hline
+      26	& 	\textbf{2768.24}&	2527.22 & \textbf{484.95} & 	478.83 \\ \hline
+      27	& 	\textbf{3257.48}&	3011.90 & \textbf{492.70} & 	489.44 \\ \hline
+      28	& 	\textbf{3752.44}&	3504.46 & \textbf{496.78} & 	495.07 \\ \hline
+      29	& 	\textbf{4250.40}&	4001.16 & \textbf{498.90} & 	498.02 \\ \hline
+      30	& 	\textbf{4749.91}&	4500.02 & \textbf{500.00} &	499.54 \\ \hline
+      31	& 	\textbf{5250.23}&	5000.00 &	\textbf{500.56} &	500.33 \\ \hline
+    \end{tabular}
+  \end{center}
+  \caption{
+    \protect\label{tab:orca_zgr}
+    Default vertical mesh in $z$-coordinate for 30 layers ORCA2 configuration as computed from
+    \autoref{eq:DOM_zgr_ana_2} using the coefficients given in \autoref{eq:DOM_zgr_coef}
+  }
 \end{table}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -738,12 +777,13 @@ Options are defined in \ngn{namzgr\_sco}.
 In $s$-coordinate (\np{ln\_sco}\forcode{ = .true.}), the depth and thickness of the model levels are defined from
 the product of a depth field and either a stretching function or its derivative, respectively:
 
-\begin{equation} \label{eq:DOM_sco_ana}
-\begin{split}
- z(k) 		&= h(i,j) \; z_0(k)	\\
- e_3(k)	&= h(i,j) \; z_0'(k)
-\end{split}
-\end{equation}
+\[
+  % \label{eq:DOM_sco_ana}
+  \begin{split}
+    z(k) 		&= h(i,j) \; z_0(k)	\\
+    e_3(k)	&= h(i,j) \; z_0'(k)
+  \end{split}
+\]
 
 where $h$ is the depth of the last $w$-level ($z_0(k)$) defined at the $t$-point location in the horizontal and
 $z_0(k)$ is a function which varies from $0$ at the sea surface to $1$ at the ocean bottom.
@@ -762,45 +802,50 @@ The original default NEMO s-coordinate stretching is available if neither of the
 (\np{ln\_s\_SH94}\forcode{ = .false.} and \np{ln\_s\_SF12}\forcode{ = .false.}). 
 This uses a depth independent $\tanh$ function for the stretching \citep{Madec_al_JPO96}:
 
-\begin{equation}
+\[
   z = s_{min}+C\left(s\right)\left(H-s_{min}\right)
-  \label{eq:SH94_1}
-\end{equation}
+  % \label{eq:SH94_1}
+\]
 
 where $s_{min}$ is the depth at which the $s$-coordinate stretching starts and
 allows a $z$-coordinate to placed on top of the stretched coordinate,
 and $z$ is the depth (negative down from the asea surface).
 
-\begin{equation}
+\[
   s = -\frac{k}{n-1} \quad \text{ and } \quad 0 \leq k \leq n-1
-  \label{eq:DOM_s}
-\end{equation}
+  % \label{eq:DOM_s}
+\]
 
-\begin{equation} \label{eq:DOM_sco_function}
-\begin{split}
-C(s)	&=  \frac{ \left[	  \tanh{ \left( \theta \, (s+b) \right)} 
-	  	 			- \tanh{ \left(  \theta \, b      \right)}  \right]}
-		      {2\;\sinh \left( \theta \right)}
-\end{split}
-\end{equation}
+\[
+  % \label{eq:DOM_sco_function}
+  \begin{split}
+    C(s)	&=  \frac{ \left[	  \tanh{ \left( \theta \, (s+b) \right)}
+        - \tanh{ \left(  \theta \, b      \right)}  \right]}
+    {2\;\sinh \left( \theta \right)}
+  \end{split}
+\]
 
 A stretching function,
 modified from the commonly used \citet{Song_Haidvogel_JCP94} stretching (\np{ln\_s\_SH94}\forcode{ = .true.}),
 is also available and is more commonly used for shelf seas modelling:
 
-\begin{equation}
+\[
   C\left(s\right) =   \left(1 - b \right)\frac{ \sinh\left( \theta s\right)}{\sinh\left(\theta\right)} +      \\
   b\frac{ \tanh \left[ \theta \left(s + \frac{1}{2} \right)\right] - \tanh\left(\frac{\theta}{2}\right)}{ 2\tanh\left (\frac{\theta}{2}\right)}
-  \label{eq:SH94_2}
-\end{equation}
+  % \label{eq:SH94_2}
+\]
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!ht]    \begin{center}
-\includegraphics[width=1.0\textwidth]{Fig_sco_function}
-\caption{  \protect\label{fig:sco_function}
-  Examples of the stretching function applied to a seamount;
-  from left to right: surface, surface and bottom, and bottom intensified resolutions}
-\end{center}   \end{figure}
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{Fig_sco_function}
+    \caption{
+      \protect\label{fig:sco_function}
+      Examples of the stretching function applied to a seamount;
+      from left to right: surface, surface and bottom, and bottom intensified resolutions
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 where $H_c$ is the critical depth (\np{rn\_hc}) at which
@@ -814,21 +859,23 @@ Another example has been provided at version 3.5 (\np{ln\_s\_SF12}) that allows 
 an analytical terrain-following stretching \citet{Siddorn_Furner_OM12}.
 In this case the a stretching function $\gamma$ is defined such that:
 
-\begin{equation}
-z = -\gamma h \quad \text{ with } \quad 0 \leq \gamma \leq 1
-\label{eq:z}
-\end{equation}
+\[
+  z = -\gamma h \quad \text{ with } \quad 0 \leq \gamma \leq 1
+  % \label{eq:z}
+\]
 
 The function is defined with respect to $\sigma$, the unstretched terrain-following coordinate:
 
-\begin{equation} \label{eq:DOM_gamma_deriv}
-\gamma= A\left(\sigma-\frac{1}{2}\left(\sigma^{2}+f\left(\sigma\right)\right)\right)+B\left(\sigma^{3}-f\left(\sigma\right)\right)+f\left(\sigma\right)
-\end{equation}
+\[
+  % \label{eq:DOM_gamma_deriv}
+  \gamma= A\left(\sigma-\frac{1}{2}\left(\sigma^{2}+f\left(\sigma\right)\right)\right)+B\left(\sigma^{3}-f\left(\sigma\right)\right)+f\left(\sigma\right)
+\]
 
 Where:
-\begin{equation} \label{eq:DOM_gamma}
-f\left(\sigma\right)=\left(\alpha+2\right)\sigma^{\alpha+1}-\left(\alpha+1\right)\sigma^{\alpha+2} \quad \text{ and } \quad \sigma = \frac{k}{n-1} 
-\end{equation}
+\[
+  % \label{eq:DOM_gamma}
+  f\left(\sigma\right)=\left(\alpha+2\right)\sigma^{\alpha+1}-\left(\alpha+1\right)\sigma^{\alpha+2} \quad \text{ and } \quad \sigma = \frac{k}{n-1}
+\]
 
 This gives an analytical stretching of $\sigma$ that is solvable in $A$ and $B$ as a function of
 the user prescribed stretching parameter $\alpha$ (\np{rn\_alpha}) that stretches towards
@@ -836,9 +883,10 @@ the surface ($\alpha > 1.0$) or the bottom ($\alpha < 1.0$) and
 user prescribed surface (\np{rn\_zs}) and bottom depths.
 The bottom cell depth in this example is given as a function of water depth:
 
-\begin{equation} \label{eq:DOM_zb}
-Z_b= h a + b
-\end{equation}
+\[
+  % \label{eq:DOM_zb}
+  Z_b = h a + b
+\]
 
 where the namelist parameters \np{rn\_zb\_a} and \np{rn\_zb\_b} are $a$ and $b$ respectively.
 
@@ -850,8 +898,9 @@ where the namelist parameters \np{rn\_zb\_a} and \np{rn\_zb\_b} are $a$ and $b$ 
      a 50 level $Z$-coordinate (contoured surfaces) and
      the \citet{Siddorn_Furner_OM12} $S$-coordinate (dashed lines) in
      the surface 100m for a idealised bathymetry that goes from 50m to 5500m depth.
-     For clarity every third coordinate surface is shown.}
-    \label{fig:fig_compare_coordinates_surface}
+     For clarity every third coordinate surface is shown.
+   }
+   \label{fig:fig_compare_coordinates_surface}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -918,14 +967,14 @@ If the incompatibility is too strong (need to dig more than 1 cell), the cell is
 
 From the \textit{mbathy} and \textit{misfdep} array, the mask fields are defined as follows:
 \begin{align*}
-tmask(i,j,k) &= \begin{cases}   \; 0&   \text{ if $k < misfdep(i,j) $ } \\
-                                \; 1&   \text{ if $misfdep(i,j) \leq k\leq mbathy(i,j)$  }    \\
-                                \; 0&   \text{ if $k > mbathy(i,j)$  }    \end{cases}     \\
-umask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i+1,j,k)	\\
-vmask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i,j+1,k)	\\
-fmask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i+1,j,k)	\\
-             &    \ \ \, * tmask(i,j,k) \ * \ tmask(i+1,j,k) \\
-wmask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i,j,k-1) \text{ with } wmask(i,j,1) = tmask(i,j,1) 
+  tmask(i,j,k) &= \begin{cases}   \; 0&   \text{ if $k < misfdep(i,j) $ } \\
+    \; 1&   \text{ if $misfdep(i,j) \leq k\leq mbathy(i,j)$  }    \\
+    \; 0&   \text{ if $k > mbathy(i,j)$  }    \end{cases}     \\
+  umask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i+1,j,k)	\\
+  vmask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i,j+1,k)	\\
+  fmask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i+1,j,k)	\\
+               &    \ \ \, * tmask(i,j,k) \ * \ tmask(i+1,j,k) \\
+  wmask(i,j,k) &=         \; tmask(i,j,k) \ * \ tmask(i,j,k-1) \text{ with } wmask(i,j,1) = tmask(i,j,1)
 \end{align*}
 
 Note that, without ice shelves cavities,
@@ -964,4 +1013,7 @@ By default, the ocean start from rest (the velocity field is set to zero) and th
   use constant salinity value of 35.5 psu and an analytical profile of temperature (typical of the tropical ocean),
   see \rou{istate\_t\_s} subroutine called from \mdl{istate} module.
 \end{description}
+
+\biblio
+
 \end{document}

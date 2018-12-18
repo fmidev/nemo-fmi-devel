@@ -1,17 +1,16 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 
 % ================================================================
-% Chapter ———  Lateral Ocean Physics (LDF)
+% Chapter Lateral Ocean Physics (LDF)
 % ================================================================
 \chapter{Lateral Ocean Physics (LDF)}
 \label{chap:LDF}
+
 \minitoc
 
-
 \newpage
-$\ $\newline    % force a new ligne
-
 
 The lateral physics terms in the momentum and tracer equations have been described in \autoref{eq:PE_zdf} and
 their discrete formulation in \autoref{sec:TRA_ldf} and \autoref{sec:DYN_ldf}).
@@ -42,8 +41,10 @@ is described in Appdx\autoref{apdx:triad}
 \label{sec:LDF_slp}
 
 %%%
-\gmcomment{  we should emphasize here that the implementation is a rather old one. 
-Better work can be achieved by using \citet{Griffies_al_JPO98, Griffies_Bk04} iso-neutral scheme. }
+\gmcomment{
+  we should emphasize here that the implementation is a rather old one.
+  Better work can be achieved by using \citet{Griffies_al_JPO98, Griffies_Bk04} iso-neutral scheme.
+}
 
 A direction for lateral mixing has to be defined when the desired operator does not act along the model levels.
 This occurs when $(a)$ horizontal mixing is required on tracer or momentum
@@ -67,23 +68,20 @@ the diffusive fluxes in the three directions are set to zero and $T$ is assumed 
 $i.e.$ a linear function of $z_T$, the depth of a $T$-point. 
 %gm { Steven : My version is obviously wrong since I'm left with an arbitrary constant which is the local vertical temperature gradient}
 
-\begin{equation} \label{eq:ldfslp_geo}
-\begin{aligned}
- r_{1u} &= \frac{e_{3u}}{ \left( e_{1u}\;\overline{\overline{e_{3w}}}^{\,i+1/2,\,k} \right)}
- 			  \;\delta_{i+1/2}[z_t] 
- 		&\approx \frac{1}{e_{1u}}\; \delta_{i+1/2}[z_t] \ \ \
-\\
- r_{2v} &= \frac{e_{3v}}{\left( e_{2v}\;\overline{\overline{e_{3w}}}^{\,j+1/2,\,k} \right)} 
- 			  \;\delta_{j+1/2} [z_t] 
-		&\approx \frac{1}{e_{2v}}\; \delta_{j+1/2}[z_t] \ \ \
-\\
- r_{1w} &= \frac{1}{e_{1w}}\;\overline{\overline{\delta_{i+1/2}[z_t]}}^{\,i,\,k+1/2}
- 		&\approx \frac{1}{e_{1w}}\; \delta_{i+1/2}[z_{uw}] 
- \\
- r_{2w} &= \frac{1}{e_{2w}}\;\overline{\overline{\delta_{j+1/2}[z_t]}}^{\,j,\,k+1/2}
-		&\approx \frac{1}{e_{2w}}\; \delta_{j+1/2}[z_{vw}] 
- \\
-\end{aligned}
+\begin{equation}
+  \label{eq:ldfslp_geo}
+  \begin{aligned}
+    r_{1u} &= \frac{e_{3u}}{ \left( e_{1u}\;\overline{\overline{e_{3w}}}^{\,i+1/2,\,k} \right)}
+    \;\delta_{i+1/2}[z_t]
+    &\approx \frac{1}{e_{1u}}\; \delta_{i+1/2}[z_t] \ \ \ \\
+    r_{2v} &= \frac{e_{3v}}{\left( e_{2v}\;\overline{\overline{e_{3w}}}^{\,j+1/2,\,k} \right)}
+    \;\delta_{j+1/2} [z_t]
+    &\approx \frac{1}{e_{2v}}\; \delta_{j+1/2}[z_t] \ \ \ \\
+    r_{1w} &= \frac{1}{e_{1w}}\;\overline{\overline{\delta_{i+1/2}[z_t]}}^{\,i,\,k+1/2}
+    &\approx \frac{1}{e_{1w}}\; \delta_{i+1/2}[z_{uw}]  \\
+    r_{2w} &= \frac{1}{e_{2w}}\;\overline{\overline{\delta_{j+1/2}[z_t]}}^{\,j,\,k+1/2}
+    &\approx \frac{1}{e_{2w}}\; \delta_{j+1/2}[z_{vw}]
+  \end{aligned}
 \end{equation}
 
 %gm%  caution I'm not sure the simplification was a good idea! 
@@ -93,6 +91,7 @@ and either \np{ln\_traldf\_hor}\forcode{ = .true.} or \np{ln\_dynldf\_hor}\forco
 
 \subsection{Slopes for tracer iso-neutral mixing}
 \label{subsec:LDF_slp_iso}
+
 In iso-neutral mixing  $r_1$ and $r_2$ are the slopes between the iso-neutral and computational surfaces.
 Their formulation does not depend on the vertical coordinate used.
 Their discrete formulation is found using the fact that the diffusive fluxes of
@@ -100,23 +99,20 @@ locally referenced potential density ($i.e.$ $in situ$ density) vanish.
 So, substituting $T$ by $\rho$ in \autoref{eq:tra_ldf_iso} and setting the diffusive fluxes in
 the three directions to zero leads to the following definition for the neutral slopes:
 
-\begin{equation} \label{eq:ldfslp_iso}
-\begin{split}
- r_{1u} &= \frac{e_{3u}}{e_{1u}}\; \frac{\delta_{i+1/2}[\rho]}
- 								{\overline{\overline{\delta_{k+1/2}[\rho]}}^{\,i+1/2,\,k}}
-\\
- r_{2v} &= \frac{e_{3v}}{e_{2v}}\; \frac{\delta_{j+1/2}\left[\rho \right]}
- 								{\overline{\overline{\delta_{k+1/2}[\rho]}}^{\,j+1/2,\,k}}
-\\
- r_{1w} &= \frac{e_{3w}}{e_{1w}}\; 
- 			\frac{\overline{\overline{\delta_{i+1/2}[\rho]}}^{\,i,\,k+1/2}}
-				 {\delta_{k+1/2}[\rho]}
-\\
- r_{2w} &= \frac{e_{3w}}{e_{2w}}\; 
- 			\frac{\overline{\overline{\delta_{j+1/2}[\rho]}}^{\,j,\,k+1/2}}
-				 {\delta_{k+1/2}[\rho]}
-\\
-\end{split}
+\begin{equation}
+  \label{eq:ldfslp_iso}
+  \begin{split}
+    r_{1u} &= \frac{e_{3u}}{e_{1u}}\; \frac{\delta_{i+1/2}[\rho]}
+    {\overline{\overline{\delta_{k+1/2}[\rho]}}^{\,i+1/2,\,k}} \\
+    r_{2v} &= \frac{e_{3v}}{e_{2v}}\; \frac{\delta_{j+1/2}\left[\rho \right]}
+    {\overline{\overline{\delta_{k+1/2}[\rho]}}^{\,j+1/2,\,k}} \\
+    r_{1w} &= \frac{e_{3w}}{e_{1w}}\;
+    \frac{\overline{\overline{\delta_{i+1/2}[\rho]}}^{\,i,\,k+1/2}}
+    {\delta_{k+1/2}[\rho]} \\
+    r_{2w} &= \frac{e_{3w}}{e_{2w}}\;
+    \frac{\overline{\overline{\delta_{j+1/2}[\rho]}}^{\,j,\,k+1/2}}
+    {\delta_{k+1/2}[\rho]}
+  \end{split}
 \end{equation}
 
 %gm% rewrite this as the explanation is not very clear !!!
@@ -160,37 +156,34 @@ but further transformation is needed depending on the vertical coordinate used:
   Following \citet{Griffies_Bk04}, instead of specifying directly that there is a zero neutral diffusive flux of
   locally referenced potential density, we stay in the $T$-$S$ plane and consider the balance between
   the neutral direction diffusive fluxes of potential temperature and salinity:
-\begin{equation}
-\alpha \ \textbf{F}(T) = \beta \ \textbf{F}(S)
-\end{equation}
-%gm{  where vector F is ....}
+  \[
+    \alpha \ \textbf{F}(T) = \beta \ \textbf{F}(S)
+  \]
+  % gm{  where vector F is ....}
 
 This constraint leads to the following definition for the slopes:
 
-\begin{equation} \label{eq:ldfslp_iso2}
-\begin{split}
- r_{1u} &= \frac{e_{3u}}{e_{1u}}\; \frac
- 		{\alpha_u \;\delta_{i+1/2}[T] - \beta_u \;\delta_{i+1/2}[S]}
-		{\alpha_u \;\overline{\overline{\delta_{k+1/2}[T]}}^{\,i+1/2,\,k}
-		 -\beta_u  \;\overline{\overline{\delta_{k+1/2}[S]}}^{\,i+1/2,\,k} }
-\\
- r_{2v} &= \frac{e_{3v}}{e_{2v}}\; \frac
- 		{\alpha_v \;\delta_{j+1/2}[T] - \beta_v \;\delta_{j+1/2}[S]}
-		{\alpha_v \;\overline{\overline{\delta_{k+1/2}[T]}}^{\,j+1/2,\,k}
-		 -\beta_v  \;\overline{\overline{\delta_{k+1/2}[S]}}^{\,j+1/2,\,k} }
-\\
- r_{1w} &= \frac{e_{3w}}{e_{1w}}\; \frac
-		{\alpha_w \;\overline{\overline{\delta_{i+1/2}[T]}}^{\,i,\,k+1/2}
-		 -\beta_w  \;\overline{\overline{\delta_{i+1/2}[S]}}^{\,i,\,k+1/2} }
- 		{\alpha_w \;\delta_{k+1/2}[T] - \beta_w \;\delta_{k+1/2}[S]}
-\\
- r_{2w} &= \frac{e_{3w}}{e_{2w}}\; \frac
-		{\alpha_w \;\overline{\overline{\delta_{j+1/2}[T]}}^{\,j,\,k+1/2}
-		 -\beta_w  \;\overline{\overline{\delta_{j+1/2}[S]}}^{\,j,\,k+1/2} }
- 		{\alpha_w \;\delta_{k+1/2}[T] - \beta_w \;\delta_{k+1/2}[S]}
-\\
-\end{split}
-\end{equation}
+\[
+  % \label{eq:ldfslp_iso2}
+  \begin{split}
+    r_{1u} &= \frac{e_{3u}}{e_{1u}}\; \frac
+    {\alpha_u \;\delta_{i+1/2}[T] - \beta_u \;\delta_{i+1/2}[S]}
+    {\alpha_u \;\overline{\overline{\delta_{k+1/2}[T]}}^{\,i+1/2,\,k}
+      -\beta_u  \;\overline{\overline{\delta_{k+1/2}[S]}}^{\,i+1/2,\,k} } \\
+    r_{2v} &= \frac{e_{3v}}{e_{2v}}\; \frac
+    {\alpha_v \;\delta_{j+1/2}[T] - \beta_v \;\delta_{j+1/2}[S]}
+    {\alpha_v \;\overline{\overline{\delta_{k+1/2}[T]}}^{\,j+1/2,\,k}
+      -\beta_v  \;\overline{\overline{\delta_{k+1/2}[S]}}^{\,j+1/2,\,k} }    \\
+    r_{1w} &= \frac{e_{3w}}{e_{1w}}\; \frac
+    {\alpha_w \;\overline{\overline{\delta_{i+1/2}[T]}}^{\,i,\,k+1/2}
+      -\beta_w  \;\overline{\overline{\delta_{i+1/2}[S]}}^{\,i,\,k+1/2} }
+    {\alpha_w \;\delta_{k+1/2}[T] - \beta_w \;\delta_{k+1/2}[S]} \\
+    r_{2w} &= \frac{e_{3w}}{e_{2w}}\; \frac
+    {\alpha_w \;\overline{\overline{\delta_{j+1/2}[T]}}^{\,j,\,k+1/2}
+      -\beta_w  \;\overline{\overline{\delta_{j+1/2}[S]}}^{\,j,\,k+1/2} }
+    {\alpha_w \;\delta_{k+1/2}[T] - \beta_w \;\delta_{k+1/2}[S]} \\
+  \end{split}
+\]
 where $\alpha$ and $\beta$, the thermal expansion and saline contraction coefficients introduced in
 \autoref{subsec:TRA_bn2}, have to be evaluated at the three velocity points.
 In order to save computation time, they should be approximated by the mean of their values at $T$-points
@@ -221,11 +214,15 @@ Nevertheless, this iso-neutral operator does not ensure that variance cannot inc
 contrary to the \citet{Griffies_al_JPO98} operator which has that property. 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!ht]      \begin{center}
-\includegraphics[width=0.70\textwidth]{Fig_LDF_ZDF1}
-\caption {    \protect\label{fig:LDF_ZDF1}
-  averaging procedure for isopycnal slope computation.}
-\end{center}    \end{figure}
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.70\textwidth]{Fig_LDF_ZDF1}
+    \caption {
+      \protect\label{fig:LDF_ZDF1}
+      averaging procedure for isopycnal slope computation.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 %There are three additional questions about the slope calculation. 
@@ -252,7 +249,8 @@ $1/100$ at $70$ metres and thereafter decreasing to zero at the bottom of the oc
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.70\textwidth]{Fig_eiv_slp}
-    \caption {     \protect\label{fig:eiv_slp}
+    \caption{
+      \protect\label{fig:eiv_slp}
       Vertical profile of the slope used for lateral mixing in the mixed layer:
       \textit{(a)} in the real ocean the slope is the iso-neutral slope in the ocean interior,
       which has to be adjusted at the surface boundary
@@ -264,7 +262,8 @@ $1/100$ at $70$ metres and thereafter decreasing to zero at the bottom of the oc
       imposing a maximum slope of 1/100;
       \textit{(c)} profile of slope actually used in \NEMO: a linear decrease of the slope from
       zero at the surface to its ocean interior value computed just below the mixed layer.
-      Note the huge change in the slope at the base of the mixed layer between \textit{(b)} and \textit{(c)}.}
+      Note the huge change in the slope at the base of the mixed layer between \textit{(b)} and \textit{(c)}.
+    }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -282,14 +281,15 @@ The slopes between the surface along which the diffusion operator acts and the s
 They are computed from the slopes used for tracer diffusion,
 $i.e.$ \autoref{eq:ldfslp_geo} and \autoref{eq:ldfslp_iso} :
 
-\begin{equation} \label{eq:ldfslp_dyn}
-\begin{aligned}
-&r_{1t}\ \ = \overline{r_{1u}}^{\,i}       &&&    r_{1f}\ \ &= \overline{r_{1u}}^{\,i+1/2} \\
-&r_{2f} \ \ = \overline{r_{2v}}^{\,j+1/2} &&& 	r_{2t}\ &= \overline{r_{2v}}^{\,j} \\
-&r_{1uw}  = \overline{r_{1w}}^{\,i+1/2} &&\ \ \text{and} \ \ &   r_{1vw}&= \overline{r_{1w}}^{\,j+1/2} \\
-&r_{2uw}= \overline{r_{2w}}^{\,j+1/2} &&&         r_{2vw}&= \overline{r_{2w}}^{\,j+1/2}\\
-\end{aligned}
-\end{equation}
+\[
+  % \label{eq:ldfslp_dyn}
+  \begin{aligned}
+    &r_{1t}\ \ = \overline{r_{1u}}^{\,i}       &&&    r_{1f}\ \ &= \overline{r_{1u}}^{\,i+1/2} \\
+    &r_{2f} \ \ = \overline{r_{2v}}^{\,j+1/2} &&& 	r_{2t}\ &= \overline{r_{2v}}^{\,j} \\
+    &r_{1uw}  = \overline{r_{1w}}^{\,i+1/2} &&\ \ \text{and} \ \ &   r_{1vw}&= \overline{r_{1w}}^{\,j+1/2} \\
+    &r_{2uw}= \overline{r_{2w}}^{\,j+1/2} &&&         r_{2vw}&= \overline{r_{2w}}^{\,j+1/2}\\
+  \end{aligned}
+\]
 
 The major issue remaining is in the specification of the boundary conditions.
 The same boundary conditions are chosen as those used for lateral diffusion along model level surfaces,
@@ -352,12 +352,14 @@ This profile is hard coded in file \hf{traldf\_c1d}, but can be easily modified 
 \subsubsection{Horizontally varying mixing coefficients (\protect\key{traldf\_c2d} and \protect\key{dynldf\_c2d})}
 By default the horizontal variation of the eddy coefficient depends on the local mesh size and
 the type of operator used:
-\begin{equation} \label{eq:title}
-  A_l = \left\{     
-   \begin{aligned}
-         & \frac{\max(e_1,e_2)}{e_{max}} A_o^l  			& \text{for laplacian operator } \\
-         & \frac{\max(e_1,e_2)^{3}}{e_{max}^{3}} A_o^l          & \text{for bilaplacian operator } 
-   \end{aligned}    \right.
+\begin{equation}
+  \label{eq:title}
+  A_l = \left\{
+    \begin{aligned}
+      & \frac{\max(e_1,e_2)}{e_{max}} A_o^l  			& \text{for laplacian operator } \\
+      & \frac{\max(e_1,e_2)^{3}}{e_{max}^{3}} A_o^l          & \text{for bilaplacian operator }
+    \end{aligned}
+  \right.
 \end{equation}
 where $e_{max}$ is the maximum of $e_1$ and $e_2$ taken over the whole masked ocean domain,
 and $A_o^l$ is the \np{rn\_ahm0} (momentum) or \np{rn\_aht0} (tracer) namelist parameter.
@@ -391,8 +393,6 @@ The only case available is specific to the ORCA2 and ORCA05 global ocean configu
 It provides only a tracer mixing coefficient for eddy induced velocity (ORCA2) or both iso-neutral and
 eddy induced velocity (ORCA05) that depends on the local growth rate of baroclinic instability.
 This specification is actually used when an ORCA key and both \key{traldf\_eiv} and \key{traldf\_c2d} are defined.
-
-$\ $\newline    % force a new ligne
 
 The following points are relevant when the eddy coefficient varies spatially:
 
@@ -438,13 +438,15 @@ see \autoref{subsec:DYN_adv_ubs}) and can be useful for testing purposes.
   If none of the keys \key{traldf\_cNd}, N=1,2,3 is set (the default), spatially constant iso-neutral $A_l$ and
   GM diffusivity $A_e$ are directly set by \np{rn\_aeih\_0} and \np{rn\_aeiv\_0}.
   If 2D-varying coefficients are set with \key{traldf\_c2d} then $A_l$ is reduced in proportion with horizontal
-  scale factor according to \autoref{eq:title} \footnote{
+  scale factor according to \autoref{eq:title}
+  \footnote{
     Except in global ORCA  $0.5^{\circ}$ runs with \key{traldf\_eiv},
     where $A_l$ is set like $A_e$ but with a minimum vale of $100\;\mathrm{m}^2\;\mathrm{s}^{-1}$
   }.
   In idealised setups with \key{traldf\_c2d}, $A_e$ is reduced similarly, but if \key{traldf\_eiv} is set in
   the global configurations with \key{traldf\_c2d}, a horizontally varying $A_e$ is instead set from
-  the Held-Larichev parameterisation \footnote{
+  the Held-Larichev parameterisation
+  \footnote{
     In this case, $A_e$ at low latitudes $|\theta|<20^{\circ}$ is further reduced by a factor $|f/f_{20}|$,
     where $f_{20}$ is the value of $f$ at $20^{\circ}$~N
   } (\mdl{ldfeiv}) and \np{rn\_aeiv\_0} is ignored unless it is zero.
@@ -457,12 +459,13 @@ Contrary to the case of iso-neutral mixing, the slopes used here are referenced 
 $i.e.$ \autoref{eq:ldfslp_geo} is used in $z$-coordinates,
 and the sum \autoref{eq:ldfslp_geo} + \autoref{eq:ldfslp_iso} in $s$-coordinates.
 The eddy induced velocity is given by: 
-\begin{equation} \label{eq:ldfeiv}
-\begin{split}
- u^* & = \frac{1}{e_{2u}e_{3u}}\; \delta_k \left[e_{2u} \, A_{uw}^{eiv} \; \overline{r_{1w}}^{\,i+1/2} \right]\\
-v^* & = \frac{1}{e_{1u}e_{3v}}\; \delta_k \left[e_{1v} \, A_{vw}^{eiv} \; \overline{r_{2w}}^{\,j+1/2} \right]\\
-w^* & = \frac{1}{e_{1w}e_{2w}}\; \left\{ \delta_i \left[e_{2u} \, A_{uw}^{eiv} \; \overline{r_{1w}}^{\,i+1/2} \right] + \delta_j \left[e_{1v} \, A_{vw}^{eiv} \; \overline{r_{2w}}^{\,j+1/2} \right] \right\} \\
-\end{split}
+\begin{equation}
+  \label{eq:ldfeiv}
+  \begin{split}
+    u^* & = \frac{1}{e_{2u}e_{3u}}\; \delta_k \left[e_{2u} \, A_{uw}^{eiv} \; \overline{r_{1w}}^{\,i+1/2} \right]\\
+    v^* & = \frac{1}{e_{1u}e_{3v}}\; \delta_k \left[e_{1v} \, A_{vw}^{eiv} \; \overline{r_{2w}}^{\,j+1/2} \right]\\
+    w^* & = \frac{1}{e_{1w}e_{2w}}\; \left\{ \delta_i \left[e_{2u} \, A_{uw}^{eiv} \; \overline{r_{1w}}^{\,i+1/2} \right] + \delta_j \left[e_{1v} \, A_{vw}^{eiv} \; \overline{r_{2w}}^{\,j+1/2} \right] \right\} \\
+  \end{split}
 \end{equation}
 where $A^{eiv}$ is the eddy induced velocity coefficient whose value is set through \np{rn\_aeiv},
 a \textit{nam\_traldf} namelist parameter.
@@ -478,7 +481,6 @@ paramount importance.
 At the surface, lateral and bottom boundaries, the eddy induced velocity,
 and thus the advective eddy fluxes of heat and salt, are set to zero. 
 
-
-
+\biblio
 
 \end{document}

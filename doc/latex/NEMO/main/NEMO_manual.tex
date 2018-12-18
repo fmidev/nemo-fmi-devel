@@ -24,7 +24,16 @@
 %% 
 %% ==============================================================================
 
+%% Trick to include biblio in subfile compilation
+\newcommand{\biblio}{
+  \bibliographystyle{../main/ametsoc}
+  \bibliography{../main/NEMO_manual}
+}
+
 \begin{document}
+
+%% Trick to include biblio in subfile compilation
+\def\biblio{}
 
 
 %% Frontmatter
@@ -70,9 +79,9 @@ Decembre 2017																											\\
 \mainmatter
 
 
-%% Abstract - Foreword
+%% Foreword
 
-\subfile{../subfiles/abstract_foreword}
+\subfile{../subfiles/foreword}
 
 
 % Introduction

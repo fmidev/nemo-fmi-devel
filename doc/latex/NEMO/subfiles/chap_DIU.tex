@@ -1,4 +1,5 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Diurnal SST models (DIU)
@@ -27,7 +28,7 @@ The skin temperature can be split into three parts:
   where long wave cooling is dominant and cools the immediate ocean surface.
 \end{itemize}
 
-Models are provided for both the warm layer, \mdfl{diurnal_bulk}, and the cool skin, \mdl{cool_skin}.
+Models are provided for both the warm layer, \mdl{diurnal\_bulk}, and the cool skin, \mdl{cool\_skin}.
 Foundation SST is not considered as it can be obtained either from the main NEMO model
 ($i.e.$ from the temperature of the top few model levels) or from some other source.  
 It must be noted that both the cool skin and warm layer models produce estimates of the change in temperature
@@ -71,7 +72,7 @@ In equation (\autoref{eq:ecmwf1}) $\alpha_w=2\times10^{-4}$ is the thermal expan
 $\kappa=0.4$ is von K\'{a}rm\'{a}n's constant, $c_p$ is the heat capacity at constant pressure of sea water,
 $\rho_w$ is the water density, and $L$ is the Monin-Obukhov length.
 The tunable variable $\nu$ is a shape parameter that defines the expected subskin temperature profile via
-$T(z)=T(0)-\left(\frac{z}{D_T}\right)^\nu\DeltaT_{\rm{wl}}$,
+$T(z) = T(0) - \left( \frac{z}{D_T} \right)^\nu \Delta T_{\rm{wl}}$,
 where $T$ is the absolute temperature and $z\le D_T$ is the depth below the top of the warm layer.
 The influence of wind on TAKAYA10 comes through the magnitude of the friction velocity of the water $u^*_{w}$,
 which can be related to the 10\,m wind speed $u_{10}$ through
@@ -79,9 +80,10 @@ the relationship $u^*_{w} = u_{10}\sqrt{\frac{C_d\rho_a}{\rho_w}}$, where $C_d$ 
 and $\rho_a$ is the density of air.
 The symbol $Q$ in equation (\autoref{eq:ecmwf1}) is the instantaneous total thermal energy flux into
 the diurnal layer, $i.e.$
-\begin{equation}
-Q = Q_{\rm{sol}} + Q_{\rm{lw}} + Q_{\rm{h}}\mbox{,} \label{eq:e_flux_eqn}
-\end{equation}
+\[
+  Q = Q_{\rm{sol}} + Q_{\rm{lw}} + Q_{\rm{h}}\mbox{,}
+  % \label{eq:e_flux_eqn}
+\]
 where $Q_{\rm{h}}$ is the sensible and latent heat flux, $Q_{\rm{lw}}$ is the long wave flux,
 and $Q_{\rm{sol}}$ is the solar flux absorbed within the diurnal warm layer.
 For $Q_{\rm{sol}}$ the 9 term representation of \citet{Gentemann_al_JGR09} is used.
@@ -117,10 +119,10 @@ In practice the second term acts as a relaxation on the temperature.
 
 The cool skin is modelled using the framework of \citet{Saunders_JAS82} who used a formulation of the near surface temperature difference based upon the heat flux and the friction velocity $u^*_{w}$.
 As the cool skin is so thin (~1\,mm) we ignore the solar flux component to the heat flux and the Saunders equation for the cool skin temperature difference $\Delta T_{\rm{cs}}$ becomes
-\begin{equation}
-\label{eq:sunders_eqn}
-\Delta T_{\rm{cs}}=\frac{Q_{\rm{ns}}\delta}{k_t} \mbox{,}
-\end{equation}
+\[
+  % \label{eq:sunders_eqn}
+  \Delta T_{\rm{cs}}=\frac{Q_{\rm{ns}}\delta}{k_t} \mbox{,}
+\]
 where $Q_{\rm{ns}}$ is the, usually negative, non-solar heat flux into the ocean and
 $k_t$ is the thermal conductivity of sea water.
 $\delta$ is the thickness of the skin layer and is given by
@@ -135,20 +137,22 @@ The value of $\lambda$ used in equation (\autoref{eq:sunders_thick_eqn}) is that
 which is shown in \citet{Tu_Tsuang_GRL05} to outperform a number of other parametrisations at
 both low and high wind speeds.
 Specifically,
-\begin{equation}
-\label{eq:artale_lambda_eqn}
-\lambda = \frac{ 8.64\times10^4 u^*_{w} k_t }{ \rho c_p h \mu \gamma }\mbox{,}
-\end{equation}
+\[
+  % \label{eq:artale_lambda_eqn}
+  \lambda = \frac{ 8.64\times10^4 u^*_{w} k_t }{ \rho c_p h \mu \gamma }\mbox{,}
+\]
 where $h=10$\,m is a reference depth and
 $\gamma$ is a dimensionless function of wind speed $u$:
-\begin{equation}
-\label{eq:artale_gamma_eqn}
-\gamma = \left\{ \begin{matrix}
-                     0.2u+0.5\mbox{,} & u \le 7.5\,\mbox{ms}^{-1} \\
-                     1.6u-10\mbox{,} & 7.5 < u < 10\,\mbox{ms}^{-1} \\
-                     6\mbox{,} & \ge 10\,\mbox{ms}^{-1} \\
-                 \end{matrix}
-          \right.
-\end{equation}
+\[
+  % \label{eq:artale_gamma_eqn}
+  \gamma =
+  \begin{cases}
+    0.2u+0.5\mbox{,} & u \le 7.5\,\mbox{ms}^{-1} \\
+    1.6u-10\mbox{,} & 7.5 < u < 10\,\mbox{ms}^{-1} \\
+    6\mbox{,} & u \ge 10\,\mbox{ms}^{-1} \\
+  \end{cases}
+\]
+
+\biblio
 
 \end{document}

@@ -1,4 +1,5 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 
 % ================================================================
@@ -60,20 +61,23 @@ have no effect on the vorticity of the flow.
 
 Let us define as either the relative, planetary and total potential vorticity, i.e. ?, ?, and ?, respectively.
 The continuous formulation of the vorticity term satisfies following integral constraints:
-\begin{equation} \label{eq:vor_vorticity}
-\int_D {{\textbf {k}}\cdot \frac{1}{e_3 }\nabla \times \left( {\varsigma 
-\;{\rm {\bf k}}\times {\textbf {U}}_h } \right)\;dv} =0
-\end{equation}
+\[
+  % \label{eq:vor_vorticity}
+  \int_D {{\textbf {k}}\cdot \frac{1}{e_3 }\nabla \times \left( {\varsigma
+        \;{\rm {\bf k}}\times {\textbf {U}}_h } \right)\;dv} =0
+\]
 
-\begin{equation} \label{eq:vor_enstrophy}
-if\quad \chi =0\quad \quad \int\limits_D {\varsigma \;{\textbf{k}}\cdot 
-\frac{1}{e_3 }\nabla \times \left( {\varsigma {\textbf{k}}\times {\textbf{U}}_h } \right)\;dv} =-\int\limits_D {\frac{1}{2}\varsigma ^2\,\chi \;dv} 
-=0
-\end{equation}
+\[
+  % \label{eq:vor_enstrophy}
+  if\quad \chi =0\quad \quad \int\limits_D {\varsigma \;{\textbf{k}}\cdot
+    \frac{1}{e_3 }\nabla \times \left( {\varsigma {\textbf{k}}\times {\textbf{U}}_h } \right)\;dv} =-\int\limits_D {\frac{1}{2}\varsigma ^2\,\chi \;dv}
+  =0
+\]
 
-\begin{equation} \label{eq:vor_energy}
-\int_D {{\textbf{U}}_h \times \left( {\varsigma \;{\textbf{k}}\times {\textbf{U}}_h } \right)\;dv} =0
-\end{equation}
+\[
+  % \label{eq:vor_energy}
+  \int_D {{\textbf{U}}_h \times \left( {\varsigma \;{\textbf{k}}\times {\textbf{U}}_h } \right)\;dv} =0
+\]
 where $dv = e_1\, e_2\, e_3\, di\, dj\, dk$ is the volume element.
 (II.4.1a) means that $\varsigma $ is conserved. (II.4.1b) is obtained by an integration by part.
 It means that $\varsigma^2$ is conserved for a horizontally non-divergent flow.
@@ -121,9 +125,10 @@ In addition, when the equation of state is linear
 the change of horizontal kinetic energy due to the work of pressure forces is balanced by the change of
 potential energy due to buoyancy forces:
 
-\begin{equation} \label{eq:hpg_pe}
-\int_D {-\frac{1}{\rho_o }\left. {\nabla p^h} \right|_z \cdot {\textbf {U}}_h \;dv} \;=\;\int_D {\nabla .\left( {\rho \,{\textbf{U}}} \right)\;g\;z\;\;dv}
-\end{equation}
+\[
+  % \label{eq:hpg_pe}
+  \int_D {-\frac{1}{\rho_o }\left. {\nabla p^h} \right|_z \cdot {\textbf {U}}_h \;dv} \;=\;\int_D {\nabla .\left( {\rho \,{\textbf{U}}} \right)\;g\;z\;\;dv}
+\]
 
 Using the discrete form given in {\S}~II.2-a and the symmetry or anti-symmetry properties of
 the mean and difference operators, (II.4.3) is demonstrated in the Appendix C.
@@ -141,9 +146,10 @@ Nevertheless, the $\psi$-equation is solved numerically by an iterative solver (
 thus the property is only satisfied with the accuracy required on the solver.
 In addition, with the rigid-lid approximation, the change of horizontal kinetic energy due to the work of 
 surface pressure forces is exactly zero:
-\begin{equation} \label{eq:spg}
-\int_D {-\frac{1}{\rho_o }\nabla _h } \left( {p_s } \right)\cdot {\textbf{U}}_h \;dv=0
-\end{equation}
+\[
+  % \label{eq:spg}
+  \int_D {-\frac{1}{\rho_o }\nabla _h } \left( {p_s } \right)\cdot {\textbf{U}}_h \;dv=0
+\]
 
 (II.4.4) is satisfied in discrete form only if
 the discrete barotropic streamfunction time evolution equation is given by (II.2.3) (see appendix C).
@@ -158,11 +164,12 @@ otherwise there is no guarantee that the surface pressure force work vanishes.
 
 In continuous formulation, the advective terms of the tracer equations conserve the tracer content and
 the quadratic form of the tracer, $i.e.$
-\begin{equation} \label{eq:tra_tra2}
-\int_D {\nabla .\left( {T\;{\textbf{U}}} \right)\;dv} =0
-\;\text{and}
-\int_D {T\;\nabla .\left( {T\;{\textbf{U}}} \right)\;dv} =0
-\end{equation}
+\[
+  % \label{eq:tra_tra2}
+  \int_D {\nabla .\left( {T\;{\textbf{U}}} \right)\;dv} =0
+  \;\text{and}
+  \int_D {T\;\nabla .\left( {T\;{\textbf{U}}} \right)\;dv} =0
+\]
 
 The numerical scheme used ({\S}II.2-b) (equations in flux form, second order centred finite differences) satisfies
 (II.4.5) (see appendix C).
@@ -179,36 +186,41 @@ In practice, the mass is conserved with a very good accuracy.
 \textbf{* lateral momentum diffusion term}
 
 The continuous formulation of the horizontal diffusion of momentum satisfies the following integral constraints~:
-\begin{equation} \label{eq:dynldf_dyn}
-\int\limits_D {\frac{1}{e_3 }{\rm {\bf k}}\cdot \nabla \times \left[ {\nabla 
-_h \left( {A^{lm}\;\chi } \right)-\nabla _h \times \left( {A^{lm}\;\zeta 
-\;{\rm {\bf k}}} \right)} \right]\;dv} =0
-\end{equation}
+\[
+  % \label{eq:dynldf_dyn}
+  \int\limits_D {\frac{1}{e_3 }{\rm {\bf k}}\cdot \nabla \times \left[ {\nabla
+        _h \left( {A^{lm}\;\chi } \right)-\nabla _h \times \left( {A^{lm}\;\zeta
+            \;{\rm {\bf k}}} \right)} \right]\;dv} =0
+\]
 
-\begin{equation} \label{eq:dynldf_div}
-\int\limits_D {\nabla _h \cdot \left[ {\nabla _h \left( {A^{lm}\;\chi } 
-\right)-\nabla _h \times \left( {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)} 
-\right]\;dv} =0
-\end{equation}
+\[
+  % \label{eq:dynldf_div}
+  \int\limits_D {\nabla _h \cdot \left[ {\nabla _h \left( {A^{lm}\;\chi }
+        \right)-\nabla _h \times \left( {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)}
+    \right]\;dv} =0
+\]
 
-\begin{equation} \label{eq:dynldf_curl}
-\int_D {{\rm {\bf U}}_h \cdot \left[ {\nabla _h \left( {A^{lm}\;\chi } 
-\right)-\nabla _h \times \left( {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)} 
-\right]\;dv} \leqslant 0
-\end{equation}
+\[
+  % \label{eq:dynldf_curl}
+  \int_D {{\rm {\bf U}}_h \cdot \left[ {\nabla _h \left( {A^{lm}\;\chi }
+        \right)-\nabla _h \times \left( {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)}
+    \right]\;dv} \leqslant 0
+\]
 
-\begin{equation} \label{eq:dynldf_curl2}
-\mbox{if}\quad A^{lm}=cste\quad \quad \int_D {\zeta \;{\rm {\bf k}}\cdot 
-\nabla \times \left[ {\nabla _h \left( {A^{lm}\;\chi } \right)-\nabla _h 
-\times \left( {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)} \right]\;dv} 
-\leqslant 0
-\end{equation}
+\[
+  % \label{eq:dynldf_curl2}
+  \mbox{if}\quad A^{lm}=cste\quad \quad \int_D {\zeta \;{\rm {\bf k}}\cdot
+    \nabla \times \left[ {\nabla _h \left( {A^{lm}\;\chi } \right)-\nabla _h
+        \times \left( {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)} \right]\;dv}
+  \leqslant 0
+\]
 
-\begin{equation} \label{eq:dynldf_div2}
-\mbox{if}\quad A^{lm}=cste\quad \quad \int_D {\chi \;\nabla _h \cdot \left[ 
-{\nabla _h \left( {A^{lm}\;\chi } \right)-\nabla _h \times \left( 
-{A^{lm}\;\zeta \;{\rm {\bf k}}} \right)} \right]\;dv} \leqslant 0
-\end{equation}
+\[
+  % \label{eq:dynldf_div2}
+  \mbox{if}\quad A^{lm}=cste\quad \quad \int_D {\chi \;\nabla _h \cdot \left[
+      {\nabla _h \left( {A^{lm}\;\chi } \right)-\nabla _h \times \left(
+          {A^{lm}\;\zeta \;{\rm {\bf k}}} \right)} \right]\;dv} \leqslant 0
+\]
 
 
 (II.4.6a) and (II.4.6b) means that the horizontal diffusion of momentum conserve both the potential vorticity and
@@ -236,34 +248,37 @@ momentum satisfies following integral constraints~:
 
 conservation of momentum, dissipation of horizontal kinetic energy
 
-\begin{equation} \label{eq:dynzdf_dyn}
-\begin{aligned}
-& \int_D {\frac{1}{e_3 }}  \frac{\partial }{\partial k}\left( \frac{A^{vm}}{e_3 }\frac{\partial {\textbf{U}}_h }{\partial k} \right) \;dv = \overrightarrow{\textbf{0}} \\ 
-& \int_D \textbf{U}_h \cdot \frac{1}{e_3} \frac{\partial}{\partial k} \left( {\frac{A^{vm}}{e_3 }}{\frac{\partial \textbf{U}_h }{\partial k}} \right) \;dv \leq 0 \\ 
- \end{aligned} 
- \end{equation}
+\[
+  % \label{eq:dynzdf_dyn}
+  \begin{aligned}
+    & \int_D {\frac{1}{e_3 }}  \frac{\partial }{\partial k}\left( \frac{A^{vm}}{e_3 }\frac{\partial {\textbf{U}}_h }{\partial k} \right) \;dv = \overrightarrow{\textbf{0}} \\
+    & \int_D \textbf{U}_h \cdot \frac{1}{e_3} \frac{\partial}{\partial k} \left( {\frac{A^{vm}}{e_3 }}{\frac{\partial \textbf{U}_h }{\partial k}} \right) \;dv \leq 0 \\
+  \end{aligned}
+\]
 conservation of vorticity, dissipation of enstrophy
-\begin{equation} \label{eq:dynzdf_vor}
-\begin{aligned}
-& \int_D {\frac{1}{e_3 }{\rm {\bf k}}\cdot \nabla \times \left( {\frac{1}{e_3 
-}\frac{\partial }{\partial k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm 
-{\bf U}}_h }{\partial k}} \right)} \right)\;dv} =0 \\ 
-& \int_D {\zeta \,{\rm {\bf k}}\cdot \nabla \times \left( {\frac{1}{e_3 
-}\frac{\partial }{\partial k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm 
-{\bf U}}_h }{\partial k}} \right)} \right)\;dv} \leq 0 \\ 
-\end{aligned}
-\end{equation}
+\[
+  % \label{eq:dynzdf_vor}
+  \begin{aligned}
+    & \int_D {\frac{1}{e_3 }{\rm {\bf k}}\cdot \nabla \times \left( {\frac{1}{e_3
+          }\frac{\partial }{\partial k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm
+                  {\bf U}}_h }{\partial k}} \right)} \right)\;dv} =0 \\
+    & \int_D {\zeta \,{\rm {\bf k}}\cdot \nabla \times \left( {\frac{1}{e_3
+          }\frac{\partial }{\partial k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm
+                  {\bf U}}_h }{\partial k}} \right)} \right)\;dv} \leq 0 \\
+  \end{aligned}
+\]
 conservation of horizontal divergence, dissipation of square of the horizontal divergence
-\begin{equation} \label{eq:dynzdf_div}
-\begin{aligned}
- &\int_D {\nabla \cdot \left( {\frac{1}{e_3 }\frac{\partial }{\partial 
-k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm {\bf U}}_h }{\partial k}} 
-\right)} \right)\;dv} =0 \\ 
-& \int_D {\chi \;\nabla \cdot \left( {\frac{1}{e_3 }\frac{\partial }{\partial 
-k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm {\bf U}}_h }{\partial k}} 
-\right)} \right)\;dv} \leq 0 \\ 
-\end{aligned}
-\end{equation}
+\[
+  % \label{eq:dynzdf_div}
+  \begin{aligned}
+    &\int_D {\nabla \cdot \left( {\frac{1}{e_3 }\frac{\partial }{\partial
+            k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm {\bf U}}_h }{\partial k}}
+          \right)} \right)\;dv} =0 \\
+    & \int_D {\chi \;\nabla \cdot \left( {\frac{1}{e_3 }\frac{\partial }{\partial
+            k}\left( {\frac{A^{vm}}{e_3 }\frac{\partial {\rm {\bf U}}_h }{\partial k}}
+          \right)} \right)\;dv} \leq 0 \\
+  \end{aligned}
+\]
 
 In discrete form, all these properties are satisfied in $z$-coordinate (see Appendix C).
 In $s$-coordinates, only first order properties can be demonstrated,
@@ -285,21 +300,23 @@ in practice, the mass is conserved with a very good accuracy.
 \textbf{* lateral physics: }conservation of tracer, dissipation of tracer 
 variance, i.e.
 
-\begin{equation} \label{eq:traldf_t_t2}
-\begin{aligned}
-&\int_D \nabla\, \cdot\, \left( A^{lT} \,\Re \,\nabla \,T \right)\;dv = 0 \\ 
-&\int_D \,T\, \nabla\, \cdot\, \left( A^{lT} \,\Re \,\nabla \,T \right)\;dv \leq 0 \\ 
-\end{aligned}
-\end{equation}
+\[
+  % \label{eq:traldf_t_t2}
+  \begin{aligned}
+    &\int_D \nabla\, \cdot\, \left( A^{lT} \,\Re \,\nabla \,T \right)\;dv = 0 \\
+    &\int_D \,T\, \nabla\, \cdot\, \left( A^{lT} \,\Re \,\nabla \,T \right)\;dv \leq 0 \\
+  \end{aligned}
+\]
 
 \textbf{* vertical physics: }conservation of tracer, dissipation of tracer variance, $i.e.$
 
-\begin{equation} \label{eq:trazdf_t_t2}
-\begin{aligned}
-& \int_D \frac{1}{e_3 } \frac{\partial }{\partial k}\left( \frac{A^{vT}}{e_3 }  \frac{\partial T}{\partial k}  \right)\;dv = 0 \\ 
-& \int_D \,T \frac{1}{e_3 } \frac{\partial }{\partial k}\left( \frac{A^{vT}}{e_3 }  \frac{\partial T}{\partial k}  \right)\;dv \leq 0 \\ 
-\end{aligned}
-\end{equation}
+\[
+  % \label{eq:trazdf_t_t2}
+  \begin{aligned}
+    & \int_D \frac{1}{e_3 } \frac{\partial }{\partial k}\left( \frac{A^{vT}}{e_3 }  \frac{\partial T}{\partial k}  \right)\;dv = 0 \\
+    & \int_D \,T \frac{1}{e_3 } \frac{\partial }{\partial k}\left( \frac{A^{vT}}{e_3 }  \frac{\partial T}{\partial k}  \right)\;dv \leq 0 \\
+  \end{aligned}
+\]
 
 Using the symmetry or anti-symmetry properties of the mean and difference operators,
 it is shown that the discrete form of tracer physics given in {\S}~II.2-c satisfies all the integral constraints
@@ -309,5 +326,7 @@ A discrete form of the lateral tracer physics can be derived which satisfies the
 Nevertheless, it requires a horizontal averaging of the vertical component of the lateral physics that
 prevents the use of implicit resolution in the vertical.
 It has not been implemented.
+
+\biblio
 
 \end{document}

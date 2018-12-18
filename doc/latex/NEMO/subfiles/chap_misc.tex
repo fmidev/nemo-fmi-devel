@@ -1,14 +1,15 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
-% Chapter ---€” Miscellaneous Topics
+% Chapter --- Miscellaneous Topics
 % ================================================================
 \chapter{Miscellaneous Topics}
 \label{chap:MISC}
+
 \minitoc
 
 \newpage
-$\ $\newline    % force a new ligne
 
 % ================================================================
 % Representation of Unresolved Straits
@@ -63,7 +64,8 @@ This is done in \mdl{dommsk} together with the setting of the coastal value of f
   \begin{center}
     \includegraphics[width=0.80\textwidth]{Fig_Gibraltar}
     \includegraphics[width=0.80\textwidth]{Fig_Gibraltar2}
-    \caption{	\protect\label{fig:MISC_strait_hand}
+    \caption{
+      \protect\label{fig:MISC_strait_hand}
       Example of the Gibraltar strait defined in a $1^{\circ} \times 1^{\circ}$ mesh.
       \textit{Top}: using partially open cells.
       The meridional scale factor at $v$-point is reduced on both sides of the strait to account for
@@ -72,7 +74,8 @@ This is done in \mdl{dommsk} together with the setting of the coastal value of f
       \textit{Bottom}: using viscous boundary layers.
       The four fmask parameters along the strait coastlines are set to a value larger than 4,
       $i.e.$ "strong" no-slip case (see \autoref{fig:LBC_shlat}) creating a large viscous boundary layer that
-      allows a reduced transport through the strait.}
+      allows a reduced transport through the strait.
+    }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -145,7 +148,8 @@ the \np{namelist\_cfg} file according to their needs.
 \begin{figure}[!ht]
   \begin{center}
     \includegraphics[width=0.90\textwidth]{Fig_LBC_zoom}
-    \caption{	\protect\label{fig:LBC_zoom}
+    \caption{
+      \protect\label{fig:LBC_zoom}
       Position of a model domain compared to the data input domain when the zoom functionality is used.
     }
   \end{center}
@@ -289,8 +293,6 @@ This allows a very large model domain to be used, just by changing the domain si
 without adjusting either the time-step or the physical parameterisations. 
 
 % ================================================================
+\biblio
+
 \end{document}
-
-
-
-

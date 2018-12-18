@@ -1,4 +1,5 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Chapter observation operator (OBS)
@@ -10,9 +11,7 @@ Authors: D. Lea, M. Martin, K. Mogensen, A. Vidard, A. Weaver, A. Ryan, ...   % 
 
 \minitoc
 
-
 \newpage
-$\ $\newline    % force a new line
 
 The observation and model comparison code (OBS) reads in observation files
 (profile temperature and salinity, sea surface temperature, sea level anomaly, sea ice concentration, and velocity) and calculates an interpolated model equivalent value at the observation location and nearest model timestep.
@@ -572,18 +571,19 @@ namelist values \np{nn\_2dint\_???} where ??? is one of sla,sst,sss,sic.
 Below is some more detail on the various options for interpolation and averaging available in NEMO.
 
 \subsubsection{Horizontal interpolation}
+
 Consider an observation point ${\rm P}$ with with longitude and latitude $({\lambda_{}}_{\rm P}, \phi_{\rm P})$ and
 the four nearest neighbouring model grid points ${\rm A}$, ${\rm B}$, ${\rm C}$ and ${\rm D}$ with
 longitude and latitude ($\lambda_{\rm A}$, $\phi_{\rm A}$),($\lambda_{\rm B}$, $\phi_{\rm B}$) etc.
 All horizontal interpolation methods implemented in NEMO estimate the value of a model variable $x$ at point $P$ as
 a weighted linear combination of the values of the model variables at the grid points ${\rm A}$, ${\rm B}$ etc.:
-\begin{align}
-{x_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} & 
-\frac{1}{w} \left( {w_{}}_{\rm A} {x_{}}_{\rm A} + 
-                   {w_{}}_{\rm B} {x_{}}_{\rm B} + 
-                   {w_{}}_{\rm C} {x_{}}_{\rm C} + 
-                   {w_{}}_{\rm D} {x_{}}_{\rm D} \right)
-\end{align}
+\begin{align*}
+  {x_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} &
+                                                   \frac{1}{w} \left( {w_{}}_{\rm A} {x_{}}_{\rm A} +
+                                                   {w_{}}_{\rm B} {x_{}}_{\rm B} +
+                                                   {w_{}}_{\rm C} {x_{}}_{\rm C} +
+                                                   {w_{}}_{\rm D} {x_{}}_{\rm D} \right)
+\end{align*}
 where ${w_{}}_{\rm A}$, ${w_{}}_{\rm B}$ etc. are the respective weights for the model field at
 points ${\rm A}$, ${\rm B}$ etc., and $w = {w_{}}_{\rm A} + {w_{}}_{\rm B} + {w_{}}_{\rm C} + {w_{}}_{\rm D}$.
 
@@ -596,61 +596,49 @@ Four different possibilities are available for computing the weights.
   the model grid points $A$, $B$ etc.
   For example, the weight given to the field ${x_{}}_{\rm A}$ is specified as the product of the distances
   from ${\rm P}$ to the other points:
-  \begin{align}
-  {w_{}}_{\rm A} = s({\rm P}, {\rm B}) \, s({\rm P}, {\rm C}) \, s({\rm P}, {\rm D})
-  \nonumber
-  \end{align}
+  \begin{align*}
+    {w_{}}_{\rm A} = s({\rm P}, {\rm B}) \, s({\rm P}, {\rm C}) \, s({\rm P}, {\rm D})
+  \end{align*}
   where 
-  \begin{align}
-   s\left ({\rm P}, {\rm M} \right ) 
+  \begin{align*}
+    s\left ({\rm P}, {\rm M} \right ) 
      & \hspace{-2mm} = \hspace{-2mm} & 
       \cos^{-1} \! \left\{ 
                \sin {\phi_{}}_{\rm P} \sin {\phi_{}}_{\rm M}
              + \cos {\phi_{}}_{\rm P} \cos {\phi_{}}_{\rm M} 
                \cos ({\lambda_{}}_{\rm M} - {\lambda_{}}_{\rm P}) 
                    \right\}
-   \end{align}
+   \end{align*}
    and $M$ corresponds to $B$, $C$ or $D$.
    A more stable form of the great-circle distance formula for small distances ($x$ near 1)
    involves the arcsine function ($e.g.$ see p.~101 of \citet{Daley_Barker_Bk01}:
-   \begin{align}
-   s\left( {\rm P}, {\rm M} \right) 
-     & \hspace{-2mm} = \hspace{-2mm} & 
-      \sin^{-1} \! \left\{ \sqrt{ 1 - x^2 } \right\}
-   \nonumber
-   \end{align}
+   \begin{align*}
+     s\left( {\rm P}, {\rm M} \right) & \hspace{-2mm} = \hspace{-2mm} & \sin^{-1} \! \left\{ \sqrt{ 1 - x^2 } \right\}
+   \end{align*}
    where
-   \begin{align}
-    x & \hspace{-2mm} = \hspace{-2mm} & 
-      {a_{}}_{\rm M} {a_{}}_{\rm P} + {b_{}}_{\rm M} {b_{}}_{\rm P} + {c_{}}_{\rm M} {c_{}}_{\rm P}
-   \nonumber
-   \end{align}
+   \begin{align*}
+     x & \hspace{-2mm} = \hspace{-2mm} &
+                                         {a_{}}_{\rm M} {a_{}}_{\rm P} + {b_{}}_{\rm M} {b_{}}_{\rm P} + {c_{}}_{\rm M} {c_{}}_{\rm P}
+   \end{align*}
    and 
-   \begin{align}
-      {a_{}}_{\rm M} & \hspace{-2mm} = \hspace{-2mm} & \sin {\phi_{}}_{\rm M}, 
-      \nonumber \\
-      {a_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} & \sin {\phi_{}}_{\rm P}, 
-      \nonumber \\
-      {b_{}}_{\rm M} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm M} \cos {\phi_{}}_{\rm M}, 
-      \nonumber \\
-      {b_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm P} \cos {\phi_{}}_{\rm P}, 
-      \nonumber \\
-      {c_{}}_{\rm M} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm M} \sin {\phi_{}}_{\rm M}, 
-      \nonumber \\
+   \begin{align*}
+      {a_{}}_{\rm M} & \hspace{-2mm} = \hspace{-2mm} & \sin {\phi_{}}_{\rm M}, \\
+      {a_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} & \sin {\phi_{}}_{\rm P}, \\
+      {b_{}}_{\rm M} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm M} \cos {\phi_{}}_{\rm M}, \\
+      {b_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm P} \cos {\phi_{}}_{\rm P}, \\
+      {c_{}}_{\rm M} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm M} \sin {\phi_{}}_{\rm M}, \\
       {c_{}}_{\rm P} & \hspace{-2mm} = \hspace{-2mm} & \cos {\phi_{}}_{\rm P} \sin {\phi_{}}_{\rm P}.
-      \nonumber
-   \nonumber
-  \end{align}
+  \end{align*}
 
 \item[2.] {\bf Great-Circle distance-weighted interpolation with small angle approximation.}
   Similar to the previous interpolation but with the distance $s$ computed as
-  \begin{align}
-    s\left( {\rm P}, {\rm M} \right) 
-     & \hspace{-2mm} = \hspace{-2mm} & 
-      \sqrt{ \left( {\phi_{}}_{\rm M} - {\phi_{}}_{\rm P} \right)^{2} 
-      + \left( {\lambda_{}}_{\rm M} - {\lambda_{}}_{\rm P} \right)^{2}
-        \cos^{2} {\phi_{}}_{\rm M} }
-  \end{align}
+  \begin{align*}
+    s\left( {\rm P}, {\rm M} \right)
+    & \hspace{-2mm} = \hspace{-2mm} &
+                                      \sqrt{ \left( {\phi_{}}_{\rm M} - {\phi_{}}_{\rm P} \right)^{2}
+                                      + \left( {\lambda_{}}_{\rm M} - {\lambda_{}}_{\rm P} \right)^{2}
+                                      \cos^{2} {\phi_{}}_{\rm M} }
+  \end{align*}
   where $M$ corresponds to $A$, $B$, $C$ or $D$.
 
 \item[3.] {\bf Bilinear interpolation for a regular spaced grid.}
@@ -687,21 +675,29 @@ Examples of the weights calculated for an observation with rectangular and radia
 Figs.~\autoref{fig:obsavgrec} and~\autoref{fig:obsavgrad}.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}      \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_OBS_avg_rec}
-\caption{      \protect\label{fig:obsavgrec}
-  Weights associated with each model grid box (blue lines and numbers)
-  for an observation at -170.5E, 56.0N with a rectangular footprint of 1\deg x 1\deg.}
-\end{center}      \end{figure}
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_OBS_avg_rec}
+    \caption{
+      \protect\label{fig:obsavgrec}
+      Weights associated with each model grid box (blue lines and numbers)
+      for an observation at -170.5E, 56.0N with a rectangular footprint of 1\deg x 1\deg.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}      \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_OBS_avg_rad}
-\caption{      \protect\label{fig:obsavgrad}
-  Weights associated with each model grid box (blue lines and numbers)
-  for an observation at -170.5E, 56.0N with a radial footprint with diameter 1\deg.} 
-\end{center}      \end{figure}
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_OBS_avg_rad}
+    \caption{
+      \protect\label{fig:obsavgrad}
+      Weights associated with each model grid box (blue lines and numbers)
+      for an observation at -170.5E, 56.0N with a radial footprint with diameter 1\deg.
+    } 
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
@@ -718,31 +714,31 @@ and let ${\rm A}({\lambda_{}}_{\rm A} ,{\phi_{}}_{\rm A} )$, ${\rm B}({\lambda_{
 ${\rm C}({\lambda_{}}_{\rm C} ,{\phi_{}}_{\rm C} )$ and ${\rm D}({\lambda_{}}_{\rm D} ,{\phi_{}}_{\rm D} )$
 denote the bottom left, bottom right, top left and top right corner points of the cell, respectively. 
 To determine if P is inside the cell, we verify that the cross-products 
-\begin{align}
-\begin{array}{lllll}
-{{\bf r}_{}}_{\rm PA} \times {{\bf r}_{}}_{\rm PC}
-& = & [({\lambda_{}}_{\rm A}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm C}   \; -\; {\phi_{}}_{\rm P} )
-    - ({\lambda_{}}_{\rm C}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm A}   \; -\; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
-{{\bf r}_{}}_{\rm PB} \times {{\bf r}_{}}_{\rm PA}
-& = & [({\lambda_{}}_{\rm B}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm A}   \; -\; {\phi_{}}_{\rm P} )
-    - ({\lambda_{}}_{\rm A}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm B}   \; -\; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
-{{\bf r}_{}}_{\rm PC} \times {{\bf r}_{}}_{\rm PD}
-& = & [({\lambda_{}}_{\rm C}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm D}   \; -\; {\phi_{}}_{\rm P} )
-    - ({\lambda_{}}_{\rm D}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm C}   \; -\; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
-{{\bf r}_{}}_{\rm PD} \times {{\bf r}_{}}_{\rm PB}
-& = & [({\lambda_{}}_{\rm D}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm B}   \; -\; {\phi_{}}_{\rm P} )
-    - ({\lambda_{}}_{\rm B}\; -\; {\lambda_{}}_{\rm P} )
-      ({\phi_{}}_{\rm D}  \;  - \; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
-\end{array}
-\label{eq:cross}
-\end{align}
+\begin{align*}
+  \begin{array}{lllll}
+    {{\bf r}_{}}_{\rm PA} \times {{\bf r}_{}}_{\rm PC}
+    & = & [({\lambda_{}}_{\rm A}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm C}   \; -\; {\phi_{}}_{\rm P} )
+          - ({\lambda_{}}_{\rm C}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm A}   \; -\; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
+    {{\bf r}_{}}_{\rm PB} \times {{\bf r}_{}}_{\rm PA}
+    & = & [({\lambda_{}}_{\rm B}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm A}   \; -\; {\phi_{}}_{\rm P} )
+          - ({\lambda_{}}_{\rm A}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm B}   \; -\; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
+    {{\bf r}_{}}_{\rm PC} \times {{\bf r}_{}}_{\rm PD}
+    & = & [({\lambda_{}}_{\rm C}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm D}   \; -\; {\phi_{}}_{\rm P} )
+          - ({\lambda_{}}_{\rm D}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm C}   \; -\; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
+    {{\bf r}_{}}_{\rm PD} \times {{\bf r}_{}}_{\rm PB}
+    & = & [({\lambda_{}}_{\rm D}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm B}   \; -\; {\phi_{}}_{\rm P} )
+          - ({\lambda_{}}_{\rm B}\; -\; {\lambda_{}}_{\rm P} )
+          ({\phi_{}}_{\rm D}  \;  - \; {\phi_{}}_{\rm P} )] \; \widehat{\bf k} \\
+  \end{array}
+  % \label{eq:cross}
+\end{align*}
 point in the opposite direction to the unit normal $\widehat{\bf k}$
 (i.e., that the coefficients of $\widehat{\bf k}$ are negative),
 where ${{\bf r}_{}}_{\rm PA}$, ${{\bf r}_{}}_{\rm PB}$, etc. correspond to
@@ -773,11 +769,15 @@ and 2) round-robin.
 \subsubsection{Geographical distribution of observations among processors}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}      \begin{center}
-\includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_ASM_obsdist_local}
-\caption{      \protect\label{fig:obslocal}
-  Example of the distribution of observations with the geographical distribution of observational data.} 
-\end{center}      \end{figure}
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_ASM_obsdist_local}
+    \caption{
+      \protect\label{fig:obslocal}
+      Example of the distribution of observations with the geographical distribution of observational data.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 This is the simplest option in which the observations are distributed according to
@@ -798,11 +798,15 @@ this could lead to load imbalance.
 \subsubsection{Round-robin distribution of observations among processors}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}     \begin{center}
-\includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_ASM_obsdist_global}
-\caption{      \protect\label{fig:obsglobal}
-  Example of the distribution of observations with the round-robin distribution of observational data.}
-\end{center}     \end{figure}
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_ASM_obsdist_global}
+    \caption{
+      \protect\label{fig:obsglobal}
+      Example of the distribution of observations with the round-robin distribution of observational data.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 An alternative approach is to distribute the observations equally among processors and
@@ -1152,9 +1156,6 @@ only 2 write operations, 1 per forecast.
 The above notation reveals the internal split between match up iterators and file iterators.
 This technique has not been used before so experimentation is needed before results can be trusted.
 
-
-
-
 \newpage
 
 \section{Observation utilities}
@@ -1366,27 +1367,34 @@ plot density for profile observations.
 The rightmost group of buttons will print the plot window as a postscript, save it as png, or exit from dataplot.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}     \begin{center}
-%\includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_OBS_dataplot_main}
-\includegraphics[width=9cm,angle=-90.]{Fig_OBS_dataplot_main}
-\caption{      \protect\label{fig:obsdataplotmain}
-  Main window of dataplot.}
-\end{center}     \end{figure}
+\begin{figure}
+  \begin{center}
+    % \includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_OBS_dataplot_main}
+    \includegraphics[width=9cm,angle=-90.]{Fig_OBS_dataplot_main}
+    \caption{
+      \protect\label{fig:obsdataplotmain}
+      Main window of dataplot.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 If a profile point is clicked with the mouse button a plot of the observation and background values as
 a function of depth (\autoref{fig:obsdataplotprofile}).
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}     \begin{center}
-%\includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_OBS_dataplot_prof}
-\includegraphics[width=7cm,angle=-90.]{Fig_OBS_dataplot_prof}
-\caption{      \protect\label{fig:obsdataplotprofile}
-  Profile plot from dataplot produced by right clicking on a point in the main window.}
-\end{center}     \end{figure}
+\begin{figure}
+  \begin{center}
+    % \includegraphics[width=10cm,height=12cm,angle=-90.]{Fig_OBS_dataplot_prof}
+    \includegraphics[width=7cm,angle=-90.]{Fig_OBS_dataplot_prof}
+    \caption{
+      \protect\label{fig:obsdataplotprofile}
+      Profile plot from dataplot produced by right clicking on a point in the main window.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-
-
+\biblio
 
 \end{document}

@@ -1,7 +1,8 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
-% Chapter 1 ——— Model Basics
+% Chapter 1 Model Basics
 % ================================================================
 % ================================================================
 % Curvilinear z*- s*-coordinate System
@@ -19,14 +20,14 @@ In that case, the free surface equation is nonlinear, and the variations of volu
 These coordinates systems is presented in a report \citep{Levier2007} available on the \NEMO web site. 
 
 \colorbox{yellow}{  end of to be updated}
-\newline
 
 % from MOM4p1 documentation
 
 To overcome problems with vanishing surface and/or bottom cells, we consider the zstar coordinate 
-\begin{equation} \label{eq:PE_}
-	z^\star = H \left( \frac{z-\eta}{H+\eta} \right)
-\end{equation}
+\[
+  % \label{eq:PE_}
+  z^\star = H \left( \frac{z-\eta}{H+\eta} \right)
+\]
 
 This coordinate is closely related to the "eta" coordinate used in many atmospheric models
 (see Black (1994) for a review of eta coordinate atmospheric models).
@@ -64,12 +65,9 @@ Quite generally, the time independent range for the $z^\star$ coordinate is a ve
 allows for a nearly arbitrary vertical resolution even in the presence of large amplitude fluctuations of
 the surface height, again so long as $\eta > -H$. 
 
-
-
 %%%
 %  essai update time splitting...
 %%%
-
 
 % ================================================================
 % Surface Pressure Gradient and Sea Surface Height
@@ -78,7 +76,7 @@ the surface height, again so long as $\eta > -H$.
 \label{sec:DYN_hpg_spg}
 %-----------------------------------------nam_dynspg----------------------------------------------------
 
-\nlst{nam_dynspg} 
+%\nlst{nam_dynspg} 
 %------------------------------------------------------------------------------------------------------------
 Options are defined through the \ngn{nam\_dynspg} namelist variables.
 The surface pressure gradient term is related to the representation of the free surface (\autoref{sec:PE_hor_pg}).
@@ -104,10 +102,11 @@ so that the update of the next velocities is done in module \mdl{dynspg\_flt} an
 In the explicit free surface formulation, the model time step is chosen small enough to
 describe the external gravity waves (typically a few ten seconds).
 The sea surface height is given by:
-\begin{equation} \label{eq:dynspg_ssh}
-\frac{\partial \eta }{\partial t}\equiv \frac{\text{EMP}}{\rho_w }+\frac{1}{e_{1T} 
-e_{2T} }\sum\limits_k {\left( {\delta_i \left[ {e_{2u} e_{3u} u} 
-\right]+\delta_j \left[ {e_{1v} e_{3v} v} \right]} \right)} 
+\begin{equation}
+  \label{eq:dynspg_ssh}
+  \frac{\partial \eta }{\partial t}\equiv \frac{\text{EMP}}{\rho_w }+\frac{1}{e_{1T}
+    e_{2T} }\sum\limits_k {\left( {\delta_i \left[ {e_{2u} e_{3u} u}
+        \right]+\delta_j \left[ {e_{1v} e_{3v} v} \right]} \right)}
 \end{equation}
 
 where EMP is the surface freshwater budget (evaporation minus precipitation, and minus river runoffs
@@ -117,12 +116,14 @@ The sea-surface height is evaluated using a leapfrog scheme in combination with 
 i.e. the velocity appearing in (\autoref{eq:dynspg_ssh}) is centred in time (\textit{now} velocity). 
 
 The surface pressure gradient, also evaluated using a leap-frog scheme, is then simply given by:
-\begin{equation} \label{eq:dynspg_exp}
-\left\{ \begin{aligned}
- - \frac{1}    						{e_{1u}} \;	\delta_{i+1/2} \left[  \,\eta\,  \right] 	\\
- \\
- - \frac{1}    						{e_{2v}} \;	\delta_{j+1/2} \left[  \,\eta\,  \right]  
-\end{aligned} \right.
+\begin{equation}
+  \label{eq:dynspg_exp}
+  \left\{
+    \begin{aligned}
+      - \frac{1}    						{e_{1u}} \;	\delta_{i+1/2} \left[  \,\eta\,  \right] \\ \\
+      - \frac{1}    						{e_{2v}} \;	\delta_{j+1/2} \left[  \,\eta\,  \right]
+    \end{aligned}
+  \right.
 \end{equation} 
 
 Consistent with the linearization, a $\left. \rho \right|_{k=1} / \rho_o$ factor is omitted in
@@ -143,25 +144,28 @@ while the three dimensional prognostic variables are solved with a longer time s
 is a multiple of \np{rdtbt} in the \ngn{namdom} namelist (Figure III.3). 
 
 %>   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >
-\begin{figure}[!t] 	\begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_DYN_dynspg_ts}
-\caption{	 \protect\label{fig:DYN_dynspg_ts}
-  Schematic of the split-explicit time stepping scheme for the barotropic and baroclinic modes,
-  after \citet{Griffies2004}.
-  Time increases to the right.
-  Baroclinic time steps are denoted by $t-\Delta t$, $t, t+\Delta t$, and $t+2\Delta t$.
-  The curved line represents a leap-frog time step,
-  and the smaller barotropic time steps $N \Delta t=2\Delta t$ are denoted by the zig-zag line.
-  The vertically integrated forcing \textbf{M}(t) computed at
-  baroclinic time step t represents the interaction between the barotropic and baroclinic motions.
-  While keeping the total depth, tracer, and freshwater forcing fields fixed,
-  a leap-frog integration carries the surface height and vertically integrated velocity from
-  t to $t+2 \Delta t$ using N barotropic time steps of length $\Delta t$.
-  Time averaging the barotropic fields over the N+1 time steps (endpoints included)
-  centers the vertically integrated velocity at the baroclinic timestep $t+\Delta t$.
-  A baroclinic leap-frog time step carries the surface height to $t+\Delta t$ using the convergence of
-  the time averaged vertically integrated velocity taken from baroclinic time step t. }
-\end{center}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_DYN_dynspg_ts}
+    \caption{
+      \protect\label{fig:DYN_dynspg_ts}
+      Schematic of the split-explicit time stepping scheme for the barotropic and baroclinic modes,
+      after \citet{Griffies2004}.
+      Time increases to the right.
+      Baroclinic time steps are denoted by $t-\Delta t$, $t, t+\Delta t$, and $t+2\Delta t$.
+      The curved line represents a leap-frog time step,
+      and the smaller barotropic time steps $N \Delta t=2\Delta t$ are denoted by the zig-zag line.
+      The vertically integrated forcing \textbf{M}(t) computed at
+      baroclinic time step t represents the interaction between the barotropic and baroclinic motions.
+      While keeping the total depth, tracer, and freshwater forcing fields fixed,
+      a leap-frog integration carries the surface height and vertically integrated velocity from
+      t to $t+2 \Delta t$ using N barotropic time steps of length $\Delta t$.
+      Time averaging the barotropic fields over the N+1 time steps (endpoints included)
+      centers the vertically integrated velocity at the baroclinic timestep $t+\Delta t$.
+      A baroclinic leap-frog time step carries the surface height to $t+\Delta t$ using the convergence of
+      the time averaged vertically integrated velocity taken from baroclinic time step t.
+    }
+  \end{center}
 \end{figure}
 %>   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >   >
 
@@ -177,15 +181,17 @@ Assume knowledge of the full velocity and tracer fields at baroclinic time $\tau
 Hence, we can update the surface height and vertically integrated velocity with a leap-frog scheme using
 the small barotropic time step $\Delta t$.
 We have
-\begin{equation} \label{eq:DYN_spg_ts_eta}
-\eta^{(b)}(\tau,t_{n+1}) - \eta^{(b)}(\tau,t_{n+1}) (\tau,t_{n-1})
-	= 2 \Delta t \left[-\nabla \cdot \textbf{U}^{(b)}(\tau,t_n) + \text{EMP}_w(\tau) \right] 
-\end{equation}
-\begin{multline} \label{eq:DYN_spg_ts_u}
-\textbf{U}^{(b)}(\tau,t_{n+1}) - \textbf{U}^{(b)}(\tau,t_{n-1})  \\
-	= 2\Delta t \left[ - f \textbf{k} \times \textbf{U}^{(b)}(\tau,t_{n}) 
-	- H(\tau) \nabla p_s^{(b)}(\tau,t_{n}) +\textbf{M}(\tau) \right]
-\end{multline}
+\[
+  % \label{eq:DYN_spg_ts_eta}
+  \eta^{(b)}(\tau,t_{n+1}) - \eta^{(b)}(\tau,t_{n+1}) (\tau,t_{n-1})
+  = 2 \Delta t \left[-\nabla \cdot \textbf{U}^{(b)}(\tau,t_n) + \text{EMP}_w(\tau) \right] 
+\]
+\begin{multline*}
+  % \label{eq:DYN_spg_ts_u}
+  \textbf{U}^{(b)}(\tau,t_{n+1}) - \textbf{U}^{(b)}(\tau,t_{n-1})  \\
+  = 2\Delta t \left[ - f \textbf{k} \times \textbf{U}^{(b)}(\tau,t_{n})
+    - H(\tau) \nabla p_s^{(b)}(\tau,t_{n}) +\textbf{M}(\tau) \right]
+\end{multline*}
 \
 
 In these equations, araised (b) denotes values of surface height and
@@ -196,54 +202,60 @@ the vertically integrated forcing $\textbf{M}(\tau)$
 the freshwater flux $\text{EMP}_w(\tau)$, and total depth of the ocean $H(\tau)$ are held for
 the duration of the barotropic time stepping over a single cycle.
 This is also the time that sets the barotropic time steps via 
-\begin{equation} \label{eq:DYN_spg_ts_t}
-t_n=\tau+n\Delta t   
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_t}
+  t_n=\tau+n\Delta t   
+\]
 with $n$ an integer.
 The density scaled surface pressure is evaluated via 
-\begin{equation} \label{eq:DYN_spg_ts_ps}
-p_s^{(b)}(\tau,t_{n}) = \begin{cases}
-	g \;\eta_s^{(b)}(\tau,t_{n}) \;\rho(\tau)_{k=1}) / \rho_o  &      \text{non-linear case} \\
-	g \;\eta_s^{(b)}(\tau,t_{n})  &      \text{linear case} 
-	\end{cases}
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_ps}
+  p_s^{(b)}(\tau,t_{n}) =
+  \begin{cases}
+    g \;\eta_s^{(b)}(\tau,t_{n}) \;\rho(\tau)_{k=1}) / \rho_o  &      \text{non-linear case} \\
+    g \;\eta_s^{(b)}(\tau,t_{n})  &      \text{linear case}
+  \end{cases}
+\]
 To get started, we assume the following initial conditions 
-\begin{equation} \label{eq:DYN_spg_ts_eta}
-\begin{split}
-\eta^{(b)}(\tau,t_{n=0}) &= \overline{\eta^{(b)}(\tau)}
-\\
-\eta^{(b)}(\tau,t_{n=1}) &= \eta^{(b)}(\tau,t_{n=0}) + \Delta t \ \text{RHS}_{n=0} 
-\end{split}
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_eta}
+  \begin{split}
+    \eta^{(b)}(\tau,t_{n=0}) &= \overline{\eta^{(b)}(\tau)} \\
+    \eta^{(b)}(\tau,t_{n=1}) &= \eta^{(b)}(\tau,t_{n=0}) + \Delta t \ \text{RHS}_{n=0}
+  \end{split}
+\]
 with 
-\begin{equation} \label{eq:DYN_spg_ts_etaF}
- \overline{\eta^{(b)}(\tau)} = \frac{1}{N+1} \sum\limits_{n=0}^N \eta^{(b)}(\tau-\Delta t,t_{n})
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_etaF}
+  \overline{\eta^{(b)}(\tau)} = \frac{1}{N+1} \sum\limits_{n=0}^N \eta^{(b)}(\tau-\Delta t,t_{n})
+\]
 the time averaged surface height taken from the previous barotropic cycle.
 Likewise,
-\begin{equation} \label{eq:DYN_spg_ts_u}
-\textbf{U}^{(b)}(\tau,t_{n=0}) = \overline{\textbf{U}^{(b)}(\tau)}	\\
-\\
-\textbf{U}(\tau,t_{n=1}) = \textbf{U}^{(b)}(\tau,t_{n=0}) + \Delta t \ \text{RHS}_{n=0}  	
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_u}
+  \textbf{U}^{(b)}(\tau,t_{n=0}) = \overline{\textbf{U}^{(b)}(\tau)}	\\ \\
+  \textbf{U}(\tau,t_{n=1}) = \textbf{U}^{(b)}(\tau,t_{n=0}) + \Delta t \ \text{RHS}_{n=0}
+\]
 with 
-\begin{equation} \label{eq:DYN_spg_ts_u}
- \overline{\textbf{U}^{(b)}(\tau)} 
- 	= \frac{1}{N+1} \sum\limits_{n=0}^N\textbf{U}^{(b)}(\tau-\Delta t,t_{n})
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_u}
+  \overline{\textbf{U}^{(b)}(\tau)} = \frac{1}{N+1} \sum\limits_{n=0}^N\textbf{U}^{(b)}(\tau-\Delta t,t_{n})
+\]
 the time averaged vertically integrated transport.
 Notably, there is no Robert-Asselin time filter used in the barotropic portion of the integration. 
 
 Upon reaching $t_{n=N} = \tau + 2\Delta \tau$ , the vertically integrated velocity is time averaged to
 produce the updated vertically integrated velocity at baroclinic time $\tau + \Delta \tau$ 
-\begin{equation} \label{eq:DYN_spg_ts_u}
-\textbf{U}(\tau+\Delta t) = \overline{\textbf{U}^{(b)}(\tau+\Delta t)} 
- 	= \frac{1}{N+1} \sum\limits_{n=0}^N\textbf{U}^{(b)}(\tau,t_{n})
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_u}
+  \textbf{U}(\tau+\Delta t) = \overline{\textbf{U}^{(b)}(\tau+\Delta t)}
+  = \frac{1}{N+1} \sum\limits_{n=0}^N\textbf{U}^{(b)}(\tau,t_{n})
+\]
 The surface height on the new baroclinic time step is then determined via
 a baroclinic leap-frog using the following form 
-\begin{equation} \label{eq:DYN_spg_ts_ssh}
-\eta(\tau+\Delta) - \eta^{F}(\tau-\Delta) = 2\Delta t \ \left[ - \nabla \cdot \textbf{U}(\tau) + \text{EMP}_w \right]  
+\begin{equation}
+  \label{eq:DYN_spg_ts_ssh}
+  \eta(\tau+\Delta) - \eta^{F}(\tau-\Delta) = 2\Delta t \ \left[ - \nabla \cdot \textbf{U}(\tau) + \text{EMP}_w \right]
 \end{equation}
 
 The use of this "big-leap-frog" scheme for the surface height ensures compatibility between
@@ -256,26 +268,24 @@ We have tried various forms of such filtering,
 with the following method discussed in Griffies et al. (2001) chosen due to its stability and
 reasonably good maintenance of tracer conservation properties (see ??) 
 
-\begin{equation} \label{eq:DYN_spg_ts_sshf}
-\eta^{F}(\tau-\Delta) =  \overline{\eta^{(b)}(\tau)} 
+\begin{equation}
+  \label{eq:DYN_spg_ts_sshf}
+  \eta^{F}(\tau-\Delta) =  \overline{\eta^{(b)}(\tau)}
 \end{equation}
 Another approach tried was 
 
-\begin{equation} \label{eq:DYN_spg_ts_sshf2}
-\eta^{F}(\tau-\Delta) = \eta(\tau) 
-	+ (\alpha/2) \left[\overline{\eta^{(b)}}(\tau+\Delta t)
-				    + \overline{\eta^{(b)}}(\tau-\Delta t) -2 \;\eta(\tau) \right]
-\end{equation}
+\[
+  % \label{eq:DYN_spg_ts_sshf2}
+  \eta^{F}(\tau-\Delta) = \eta(\tau)
+  + (\alpha/2) \left[\overline{\eta^{(b)}}(\tau+\Delta t)
+    + \overline{\eta^{(b)}}(\tau-\Delta t) -2 \;\eta(\tau) \right]
+\]
 
 which is useful since it isolates all the time filtering aspects into the term multiplied by $\alpha$.
 This isolation allows for an easy check that tracer conservation is exact when eliminating tracer and
 surface height time filtering (see ?? for more complete discussion).
 However, in the general case with a non-zero $\alpha$, the filter \autoref{eq:DYN_spg_ts_sshf} was found to
 be more conservative, and so is recommended. 
-
-
-
-
 
 %-------------------------------------------------------------
 % Filtered formulation 
@@ -303,5 +313,6 @@ The three time-stepping methods (explicit, split-explicit and filtered) are the 
 \autoref{DYN_spg_linear} except that the ocean depth is now time-dependent.
 In particular, this means that in filtered case, the matrix to be inverted has to be recomputed at each time-step.
 
+\biblio
 
 \end{document}

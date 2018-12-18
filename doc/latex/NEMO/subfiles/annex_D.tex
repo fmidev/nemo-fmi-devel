@@ -1,16 +1,15 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
-% Appendix D Ñ Coding Rules
+% Appendix D Coding Rules
 % ================================================================
 \chapter{Coding Rules}
 \label{apdx:D}
+
 \minitoc
 
 \newpage
-$\ $\newline    % force a new ligne
-$\ $\newline    % force a new ligne
-
 
 A "model life" is more than ten years.
 Its software, composed of a few hundred modules, is used by many people who are scientists or students and
@@ -101,8 +100,8 @@ will display the module name and the line where the var\_name declaration is.
 
 - use call to ctl\_stop routine instead of just a STOP.
 
-
 \newpage
+
 % ================================================================
 % Naming Conventions
 % ================================================================
@@ -115,79 +114,76 @@ The naming conventions are summarised in the Table below:
 
 
 %--------------------------------------------------TABLE--------------------------------------------------
-\begin{table}[htbp]  \label{tab:VarName}
-\begin{center}
-\begin{tabular}{|p{45pt}|p{35pt}|p{45pt}|p{40pt}|p{40pt}|p{40pt}|p{40pt}|p{40pt}|}
-\hline  Type \par / Status &   integer&   real&   logical &   character  & structure &   double \par precision&   complex \\  
-\hline
-public  \par or  \par module variable& 
-\textbf{m n} \par \textit{but not} \par \textbf{nn\_ np\_}& 
-\textbf{a b e f g h o q r} \par \textbf{t} \textit{to} \textbf{x} \par but not \par \textbf{fs rn\_}& 
-\textbf{l} \par \textit{but not} \par \textbf{lp ld} \par \textbf{ ll ln\_}& 
-\textbf{c} \par \textit{but not} \par \textbf{cp cd} \par \textbf{cl cn\_}& 
-\textbf{s} \par \textit{but not} \par \textbf{sd sd} \par \textbf{sl sn\_}& 
-\textbf{d} \par \textit{but not} \par \textbf{dp dd} \par \textbf{dl dn\_}& 
-\textbf{y} \par \textit{but not} \par \textbf{yp yd} \par \textbf{yl yn} \\
-\hline
-dummy \par argument& 
-\textbf{k} \par \textit{but not} \par \textbf{kf}& 
-\textbf{p} \par \textit{but not} \par \textbf{pp pf}& 
-\textbf{ld}& 
-\textbf{cd}& 
-\textbf{sd}& 
-\textbf{dd}& 
-\textbf{yd} \\
-\hline
-local \par variable& 
-\textbf{i}& 
-\textbf{z}& 
-\textbf{ll}& 
-\textbf{cl}& 
-\textbf{sl}& 
-\textbf{dl}& 
-\textbf{yl} \\
-\hline
-loop \par control& 
-\textbf{j} \par \textit{but not} \par \textbf{jp}& 
-& 
-& 
-&
-& 
-& 
- \\
-\hline
-parameter& 
-\textbf{jp np\_}& 
-\textbf{pp}& 
-\textbf{lp}& 
-\textbf{cp}& 
-\textbf{sp}& 
-\textbf{dp}& 
-\textbf{yp} \\
-\hline
-
-namelist&
-\textbf{nn\_}& 
-\textbf{rn\_}& 
-\textbf{ln\_}& 
-\textbf{cn\_}& 
-\textbf{sn\_}& 
-\textbf{dn\_}& 
-\textbf{yn\_}
-\\
-\hline
-CPP \par macro& 
-\textbf{kf}& 
-\textbf{fs} \par & 
-& 
-&
-& 
-& 
- \\
-\hline
-\end{tabular}
-\label{tab:tab1}
-\end{center}
+\begin{table}[htbp]
+  \label{tab:VarName}
+  \begin{center}
+    \begin{tabular}{|p{45pt}|p{35pt}|p{45pt}|p{40pt}|p{40pt}|p{40pt}|p{40pt}|p{40pt}|}
+      \hline
+      Type \par / Status
+      & integer
+      & real
+      & logical
+      & character
+      & structure
+      & double \par precision
+      & complex \\
+      \hline
+      public  \par or  \par module variable
+      & \textbf{m n} \par \textit{but not} \par \textbf{nn\_ np\_}
+      & \textbf{a b e f g h o q r} \par \textbf{t} \textit{to} \textbf{x} \par but not \par \textbf{fs rn\_}
+      & \textbf{l} \par \textit{but not} \par \textbf{lp ld} \par \textbf{ ll ln\_}
+      & \textbf{c} \par \textit{but not} \par \textbf{cp cd} \par \textbf{cl cn\_}
+      & \textbf{s} \par \textit{but not} \par \textbf{sd sd} \par \textbf{sl sn\_}
+      & \textbf{d} \par \textit{but not} \par \textbf{dp dd} \par \textbf{dl dn\_}
+      & \textbf{y} \par \textit{but not} \par \textbf{yp yd} \par \textbf{yl yn} \\
+      \hline
+      dummy \par argument
+      & \textbf{k} \par \textit{but not} \par \textbf{kf}
+      & \textbf{p} \par \textit{but not} \par \textbf{pp pf}
+      & \textbf{ld}
+      & \textbf{cd}
+      & \textbf{sd}
+      & \textbf{dd}
+      & \textbf{yd} \\
+      \hline
+      local \par variable
+      & \textbf{i}
+      & \textbf{z}
+      & \textbf{ll}
+      & \textbf{cl}
+      & \textbf{sl}
+      & \textbf{dl}
+      & \textbf{yl} \\
+      \hline
+      loop \par control
+      & \textbf{j} \par \textit{but not} \par \textbf{jp} &&&&&& \\
+      \hline
+      parameter
+      & \textbf{jp np\_}
+      & \textbf{pp}
+      & \textbf{lp}
+      & \textbf{cp}
+      & \textbf{sp}
+      & \textbf{dp}
+      & \textbf{yp} \\
+      \hline
+      namelist
+      & \textbf{nn\_}
+      & \textbf{rn\_}
+      & \textbf{ln\_}
+      & \textbf{cn\_}
+      & \textbf{sn\_}
+      & \textbf{dn\_}
+      & \textbf{yn\_}
+      \\
+      \hline
+      CPP \par macro
+      & \textbf{kf}
+      & \textbf{fs} \par &&&&& \\
+      \hline
+    \end{tabular}
+    \label{tab:tab1}
+  \end{center}
 \end{table}
 %--------------------------------------------------------------------------------------------------------------
 
@@ -196,11 +192,14 @@ it is also used for code variables that are read in namelist and should never be
 It is the case, for example, for the size of a domain (jpi,jpj,jpk).
 
 \newpage
+
 % ================================================================
 % The program structure
 % ================================================================
 %\section{Program structure}
-%abel{sec:Apdx_D_structure}
+%\label{sec:Apdx_D_structure}
 
 %To be done....
+\biblio
+
 \end{document}

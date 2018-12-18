@@ -1,21 +1,21 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
-% Chapter � Configurations
+% Chapter Configurations
 % ================================================================
 \chapter{Configurations}
 \label{chap:CFG}
+
 \minitoc
 
 \newpage
-$\ $\newline    % force a new ligne
 
 % ================================================================
 % Introduction
 % ================================================================
 \section{Introduction}
 \label{sec:CFG_intro}
-
 
 The purpose of this part of the manual is to introduce the \NEMO reference configurations.
 These configurations are offered as means to explore various numerical and physical options,
@@ -35,9 +35,7 @@ though by no means are all options exercised in the reference configurations.
 \section{C1D: 1D Water column model (\protect\key{c1d}) }
 \label{sec:CFG_c1d}
 
-$\ $\newline
 BE careful: to be re-written according to suppression of jpizoom and jpjzoom !!!!
-$\ $\newline
 
 The 1D model option simulates a stand alone water column within the 3D \NEMO system.
 It can be applied to the ocean alone or to the ocean-ice system and can include passive tracers or a biogeochemical model.
@@ -101,13 +99,15 @@ In this namelist\_cfg the name of domain input file is set in \ngn{namcfg} block
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=0.98\textwidth]{Fig_ORCA_NH_mesh}
-    \caption{  \protect\label{fig:MISC_ORCA_msh}
+    \caption{
+      \protect\label{fig:MISC_ORCA_msh}
       ORCA mesh conception.
       The departure from an isotropic Mercator grid start poleward of 20\degN.
       The two "north pole" are the foci of a series of embedded ellipses (blue curves) which
       are determined analytically and form the i-lines of the ORCA mesh (pseudo latitudes).
       Then, following \citet{Madec_Imbard_CD96}, the normal to the series of ellipses (red curves) is computed which
-      provides the j-lines of the mesh (pseudo longitudes).  }
+      provides the j-lines of the mesh (pseudo longitudes).
+    }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -132,16 +132,18 @@ or even the scale factor derivatives over the whole ocean domain, as the mesh is
   \begin{center}
     \includegraphics[width=1.0\textwidth]{Fig_ORCA_NH_msh05_e1_e2}
     \includegraphics[width=0.80\textwidth]{Fig_ORCA_aniso}
-    \caption {  \protect\label{fig:MISC_ORCA_e1e2}
+    \caption {
+      \protect\label{fig:MISC_ORCA_e1e2}
       \textit{Top}: Horizontal scale factors ($e_1$, $e_2$) and
       \textit{Bottom}: ratio of anisotropy ($e_1 / e_2$)
       for ORCA 0.5\deg ~mesh.
       South of 20\degN a Mercator grid is used ($e_1 = e_2$) so that the anisotropy ratio is 1.
       Poleward of 20\degN, the two "north pole" introduce a weak anisotropy over the ocean areas ($< 1.2$) except in
-      vicinity of Victoria Island (Canadian Arctic Archipelago). }
-\end{center}   \end{figure}
+      vicinity of Victoria Island (Canadian Arctic Archipelago).
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 
 The method is applied to Mercator grid ($i.e.$ same zonal and meridional grid spacing) poleward of 20\degN,
 so that the Equator is a mesh line, which provides a better numerical solution for equatorial dynamics.
@@ -160,7 +162,6 @@ while the ratio of anisotropy remains close to one except near the Victoria Isla
 \subsection{ORCA pre-defined resolution}
 \label{subsec:CFG_orca_resolution}
 
-
 The NEMO system is provided with five built-in ORCA configurations which differ in the horizontal resolution.
 The value of the resolution is given by the resolution at the Equator expressed in degrees.
 Each of configuration is set through the \textit{domain\_cfg} domain configuration file,
@@ -168,27 +169,29 @@ which sets the grid size and configuration name parameters.
 The NEMO System Team provides only ORCA2 domain input file "\ifile{ORCA\_R2\_zps\_domcfg}" file
 (Tab. \autoref{tab:ORCA}).
 
-
-
-
 %--------------------------------------------------TABLE--------------------------------------------------
-\begin{table}[!t]     \begin{center}
-\begin{tabular}{p{4cm} c c c c}
-Horizontal Grid         	             & \np{ORCA\_index} &  \np{jpiglo} & \np{jpjglo} &       \\  
-\hline  \hline
-\~4\deg	   &        4         &         92     &      76      &       \\
-\~2\deg        &        2         &       182     &    149      &        \\
-\~1\deg        &        1         &       362     &     292     &        \\
-\~0.5\deg     &        05       &       722     &     511     &        \\
-\~0.25\deg   &        025     &      1442    &   1021     &        \\
-%\key{orca\_r8}       &        8         &      2882    &   2042     &        \\
-%\key{orca\_r12}     &      12         &      4322    &   3062      &       \\
-\hline   \hline
-\end{tabular}
-\caption{ \protect\label{tab:ORCA}
-  Domain size of ORCA family configurations.
-  The flag for configurations of ORCA family need to be set in \textit{domain\_cfg} file. }
-\end{center}
+\begin{table}[!t]
+  \begin{center}
+    \begin{tabular}{p{4cm} c c c c}
+      Horizontal Grid         	             & \np{ORCA\_index} &  \np{jpiglo} & \np{jpjglo} &       \\
+      \hline
+      \hline
+      \~4\deg	   &        4         &         92     &      76      &       \\
+      \~2\deg        &        2         &       182     &    149      &        \\
+      \~1\deg        &        1         &       362     &     292     &        \\
+      \~0.5\deg     &        05       &       722     &     511     &        \\
+      \~0.25\deg   &        025     &      1442    &   1021     &        \\
+      % \key{orca\_r8}       &        8         &      2882    &   2042     &        \\
+      % \key{orca\_r12}     &      12         &      4322    &   3062      &       \\
+      \hline
+      \hline
+    \end{tabular}
+    \caption{
+      \protect\label{tab:ORCA}
+      Domain size of ORCA family configurations.
+      The flag for configurations of ORCA family need to be set in \textit{domain\_cfg} file.
+    }
+  \end{center}
 \end{table}
 %--------------------------------------------------------------------------------------------------------------
 
@@ -283,9 +286,11 @@ namelist \path{CONFIG/GYRE/EXP00/namelist_cfg}.
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=1.0\textwidth]{Fig_GYRE}
-    \caption{  \protect\label{fig:GYRE}
+    \caption{
+      \protect\label{fig:GYRE}
       Snapshot of relative vorticity at the surface of the model domain in GYRE R9, R27 and R54.
-      From \citet{Levy_al_OM10}.}
+      From \citet{Levy_al_OM10}.
+    }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -313,5 +318,7 @@ Boundaries may be completely omitted by setting \np{ln\_bdy} to false.
 Sample surface fluxes, river forcing and a sample initial restart file are included to test a realistic model run.
 The Baltic boundary is included within the river input file and is specified as a river source.
 Unlike ordinary river points the Baltic inputs also include salinity and temperature data.
+
+\biblio
 
 \end{document}

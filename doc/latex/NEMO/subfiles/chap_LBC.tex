@@ -1,15 +1,15 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Chapter — Lateral Boundary Condition (LBC) 
 % ================================================================
 \chapter{Lateral Boundary Condition (LBC)}
 \label{chap:LBC}
+
 \minitoc
 
 \newpage
-$\ $\newline    % force a new ligne
-
 
 %gm% add here introduction to this chapter
 
@@ -43,21 +43,26 @@ $i.e.$ the mask array of the grid point where the flux is evaluated.
 For example, the heat flux in the \textbf{i}-direction is evaluated at $u$-points.
 Evaluating this quantity as,
 
-\begin{equation} \label{eq:lbc_aaaa}
-\frac{A^{lT} }{e_1 }\frac{\partial T}{\partial i}\equiv \frac{A_u^{lT} 
-}{e_{1u} } \; \delta_{i+1 / 2} \left[ T \right]\;\;mask_u 
-\end{equation}
+\[
+  % \label{eq:lbc_aaaa}
+  \frac{A^{lT} }{e_1 }\frac{\partial T}{\partial i}\equiv \frac{A_u^{lT}
+  }{e_{1u} } \; \delta_{i+1 / 2} \left[ T \right]\;\;mask_u
+\]
 (where mask$_{u}$ is the mask array at a $u$-point) ensures that the heat flux is zero inside land and
 at the boundaries, since mask$_{u}$ is zero at solid boundaries which in this case are defined at $u$-points
 (normal velocity $u$ remains zero at the coast) (\autoref{fig:LBC_uv}). 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]     \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_LBC_uv}
-\caption{  \protect\label{fig:LBC_uv}
-  Lateral boundary (thick line) at T-level.
-  The velocity normal to the boundary is set to zero.}
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_LBC_uv}
+    \caption{
+      \protect\label{fig:LBC_uv}
+      Lateral boundary (thick line) at T-level.
+      The velocity normal to the boundary is set to zero.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 For momentum the situation is a bit more complex as two boundary conditions must be provided along the coast
@@ -77,16 +82,20 @@ controlled by the value of the \np{rn\_shlat} namelist parameter
 These are:
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!p] \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_LBC_shlat}
-\caption{     \protect\label{fig:LBC_shlat} 
-  lateral boundary condition
-  (a) free-slip ($rn\_shlat=0$);
-  (b) no-slip ($rn\_shlat=2$);
-  (c) "partial" free-slip ($0<rn\_shlat<2$) and
-  (d) "strong" no-slip ($2<rn\_shlat$).
-  Implied "ghost" velocity inside land area is display in grey. }
-\end{center}    \end{figure}
+\begin{figure}[!p]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_LBC_shlat}
+    \caption{
+      \protect\label{fig:LBC_shlat}
+      lateral boundary condition
+      (a) free-slip ($rn\_shlat=0$);
+      (b) no-slip ($rn\_shlat=2$);
+      (c) "partial" free-slip ($0<rn\_shlat<2$) and
+      (d) "strong" no-slip ($2<rn\_shlat$).
+      Implied "ghost" velocity inside land area is display in grey.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 \begin{description}
@@ -105,17 +114,18 @@ These are:
   (\autoref{fig:LBC_shlat}-b).
   Therefore, the vorticity along the coastlines is given by: 
 
-\[
-\zeta \equiv 2 \left(\delta_{i+1/2} \left[e_{2v} v \right] - \delta_{j+1/2} \left[e_{1u} u \right] \right) / \left(e_{1f} e_{2f} \right) \ ,
-\]
-where $u$ and $v$ are masked fields.
-Setting the mask$_{f}$ array to $2$ along the coastline provides a vorticity field computed with
-the no-slip boundary condition, simply by multiplying it by the mask$_{f}$ :
-\begin{equation} \label{eq:lbc_bbbb}
-\zeta \equiv \frac{1}{e_{1f} {\kern 1pt}e_{2f} }\left( {\delta_{i+1/2} 
-\left[ {e_{2v} \,v} \right]-\delta_{j+1/2} \left[ {e_{1u} \,u} \right]} 
-\right)\;\mbox{mask}_f 
-\end{equation}
+  \[
+    \zeta \equiv 2 \left(\delta_{i+1/2} \left[e_{2v} v \right] - \delta_{j+1/2} \left[e_{1u} u \right] \right) / \left(e_{1f} e_{2f} \right) \ ,
+  \]
+  where $u$ and $v$ are masked fields.
+  Setting the mask$_{f}$ array to $2$ along the coastline provides a vorticity field computed with
+  the no-slip boundary condition, simply by multiplying it by the mask$_{f}$ :
+  \[
+    % \label{eq:lbc_bbbb}
+    \zeta \equiv \frac{1}{e_{1f} {\kern 1pt}e_{2f} }\left( {\delta_{i+1/2}
+        \left[ {e_{2v} \,v} \right]-\delta_{j+1/2} \left[ {e_{1u} \,u} \right]}
+    \right)\;\mbox{mask}_f
+  \]
 
 \item["partial" free-slip boundary condition (0$<$\np{rn\_shlat}$<$2):] the tangential velocity at
   the coastline is smaller than the offshore velocity, $i.e.$ there is a lateral friction but
@@ -181,11 +191,15 @@ the model variables.
 \end{description}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]     \begin{center}
-\includegraphics[width=1.0\textwidth]{Fig_LBC_jperio}
-\caption{    \protect\label{fig:LBC_jperio}
-  setting of (a) east-west cyclic  (b) symmetric across the equator boundary conditions.}
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{Fig_LBC_jperio}
+    \caption{
+      \protect\label{fig:LBC_jperio}
+      setting of (a) east-west cyclic  (b) symmetric across the equator boundary conditions.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 % -------------------------------------------------------------------------------------------------------------
@@ -201,13 +215,17 @@ and thus requires a specific treatment illustrated in \autoref{fig:North_Fold_T}
 Further information can be found in \mdl{lbcnfd} module which applies the north fold boundary condition.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]    \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_North_Fold_T}
-\caption{    \protect\label{fig:North_Fold_T}
-  North fold boundary with a $T$-point pivot and cyclic east-west boundary condition ($jperio=4$),
-  as used in ORCA 2, 1/4, and 1/12.
-  Pink shaded area corresponds to the inner domain mask (see text). }
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_North_Fold_T}
+    \caption{
+      \protect\label{fig:North_Fold_T}
+      North fold boundary with a $T$-point pivot and cyclic east-west boundary condition ($jperio=4$),
+      as used in ORCA 2, 1/4, and 1/12.
+      Pink shaded area corresponds to the inner domain mask (see text).
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 % ====================================================================
@@ -259,11 +277,15 @@ the east-west cyclic boundary condition is done implicitly,
 whilst the south-symmetric boundary condition option is not available.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]    \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_mpp}
-\caption{   \protect\label{fig:mpp}
-  Positioning of a sub-domain when massively parallel processing is used. }
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_mpp}
+    \caption{
+      \protect\label{fig:mpp}
+      Positioning of a sub-domain when massively parallel processing is used.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 In the standard version of \NEMO, the splitting is regular and arithmetic.
@@ -278,19 +300,20 @@ These dimensions include the internal domain and the overlapping rows.
 The number of rows to exchange (known as the halo) is usually set to one (\jp{jpreci}=1, in \mdl{par\_oce}).
 The whole domain dimensions are named \np{jpiglo}, \np{jpjglo} and \jp{jpk}.
 The relationship between the whole domain and a sub-domain is:
-\begin{align} 
-      jpi & = & ( jpiglo-2*jpreci + (jpni-1) ) / jpni + 2*jpreci  \nonumber \\
-      jpj & = & ( jpjglo-2*jprecj + (jpnj-1) ) / jpnj + 2*jprecj  \label{eq:lbc_jpi}
-\end{align}
+\[
+  jpi = ( jpiglo-2*jpreci + (jpni-1) ) / jpni + 2*jpreci
+  jpj = ( jpjglo-2*jprecj + (jpnj-1) ) / jpnj + 2*jprecj
+\]
 where \jp{jpni}, \jp{jpnj} are the number of processors following the i- and j-axis.
 
 One also defines variables nldi and nlei which correspond to the internal domain bounds, 
 and the variables nimpp and njmpp which are the position of the (1,1) grid-point in the global domain. 
 An element of $T_{l}$, a local array (subdomain) corresponds to an element of $T_{g}$,
 a global array (whole domain) by the relationship: 
-\begin{equation} \label{eq:lbc_nimpp}
-T_{g} (i+nimpp-1,j+njmpp-1,k) = T_{l} (i,j,k),
-\end{equation}
+\[
+  % \label{eq:lbc_nimpp}
+  T_{g} (i+nimpp-1,j+njmpp-1,k) = T_{l} (i,j,k),
+\]
 with  $1 \leq i \leq jpi$, $1  \leq j \leq jpj $ , and  $1  \leq k \leq jpk$.
 
 Processors are numbered from 0 to $jpnij-1$, the number is saved in the variable nproc.
@@ -334,16 +357,20 @@ Therefore, user should not eliminate land processors when creating a meshmask fi
 ($i.e.$ when setting a non-zero value to \np{nn\_msh}).
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!ht]     \begin{center}
-\includegraphics[width=0.90\textwidth]{Fig_mppini2}
-\caption {    \protect\label{fig:mppini2}
-  Example of Atlantic domain defined for the CLIPPER projet.
-  Initial grid is composed of 773 x 1236 horizontal points.
-  (a) the domain is split onto 9 \time 20 subdomains (jpni=9, jpnj=20).
-  52 subdomains are land areas.
-  (b) 52 subdomains are eliminated (white rectangles) and
-  the resulting number of processors really used during the computation is jpnij=128.}
-\end{center}   \end{figure}
+\begin{figure}[!ht]
+  \begin{center}
+    \includegraphics[width=0.90\textwidth]{Fig_mppini2}
+    \caption {
+      \protect\label{fig:mppini2}
+      Example of Atlantic domain defined for the CLIPPER projet.
+      Initial grid is composed of 773 x 1236 horizontal points.
+      (a) the domain is split onto 9 \time 20 subdomains (jpni=9, jpnj=20).
+      52 subdomains are land areas.
+      (b) 52 subdomains are eliminated (white rectangles) and
+      the resulting number of processors really used during the computation is jpnij=128.
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
@@ -399,8 +426,6 @@ eg. for the active tracers the algorithm is set by \np{nn\_tra} and the choice o
 
 The choice of algorithm is currently as follows:
 
-\mbox{}
-
 \begin{itemize}
 \item[0.] No boundary condition applied.
   So the solution will ``see'' the land points around the edge of the edge of the domain.
@@ -409,8 +434,6 @@ The choice of algorithm is currently as follows:
   The Flather scheme is not compatible with the filtered free surface
   ({\it dynspg\_ts}). 
 \end{itemize}
-
-\mbox{}
 
 The main choice for the boundary data is to use initial conditions as boundary data
 (\np{nn\_tra\_dta}\forcode{ = 0}) or to use external data from a file (\np{nn\_tra\_dta}\forcode{ = 1}).
@@ -444,30 +467,34 @@ The Flow Relaxation Scheme (FRS) \citep{Davies_QJRMS76,Engerdahl_Tel95},
 applies a simple relaxation of the model fields to externally-specified values over
 a zone next to the edge of the model domain.
 Given a model prognostic variable $\Phi$
-\begin{equation}  \label{eq:bdy_frs1}
-\Phi(d) = \alpha(d)\Phi_{e}(d) + (1-\alpha(d))\Phi_{m}(d)\;\;\;\;\; d=1,N
-\end{equation}
+\[
+  % \label{eq:bdy_frs1}
+  \Phi(d) = \alpha(d)\Phi_{e}(d) + (1-\alpha(d))\Phi_{m}(d)\;\;\;\;\; d=1,N
+\]
 where $\Phi_{m}$ is the model solution and $\Phi_{e}$ is the specified external field,
 $d$ gives the discrete distance from the model boundary and
 $\alpha$ is a parameter that varies from $1$ at $d=1$ to a small value at $d=N$.
 It can be shown that this scheme is equivalent to adding a relaxation term to
 the prognostic equation for $\Phi$ of the form:
-\begin{equation}  \label{eq:bdy_frs2}
--\frac{1}{\tau}\left(\Phi - \Phi_{e}\right)
-\end{equation}
+\[
+  % \label{eq:bdy_frs2}
+  -\frac{1}{\tau}\left(\Phi - \Phi_{e}\right)
+\]
 where the relaxation time scale $\tau$ is given by a function of $\alpha$ and the model time step $\Delta t$:
-\begin{equation}  \label{eq:bdy_frs3}
-\tau = \frac{1-\alpha}{\alpha}  \,\rdt
-\end{equation}
+\[
+  % \label{eq:bdy_frs3}
+  \tau = \frac{1-\alpha}{\alpha}  \,\rdt
+\]
 Thus the model solution is completely prescribed by the external conditions at the edge of the model domain and
 is relaxed towards the external conditions over the rest of the FRS zone.
 The application of a relaxation zone helps to prevent spurious reflection of
 outgoing signals from the model boundary. 
 
 The function $\alpha$ is specified as a $tanh$ function:
-\begin{equation}  \label{eq:bdy_frs4}
-\alpha(d) = 1 - \tanh\left(\frac{d-1}{2}\right),       \quad d=1,N
-\end{equation}
+\[
+  % \label{eq:bdy_frs4}
+  \alpha(d) = 1 - \tanh\left(\frac{d-1}{2}\right),       \quad d=1,N
+\]
 The width of the FRS zone is specified in the namelist as \np{nn\_rimwidth}.
 This is typically set to a value between 8 and 10.
 
@@ -531,11 +558,15 @@ This can be done by reading a mask file defined as \np{cn\_mask\_file} in the na
 Only one mask file is used even if multiple boundary sets are defined.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]      \begin{center}
-\includegraphics[width=1.0\textwidth]{Fig_LBC_bdy_geom}
-\caption {      \protect\label{fig:LBC_bdy_geom}
-  Example of geometry of unstructured open boundary}
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{Fig_LBC_bdy_geom}
+    \caption {
+      \protect\label{fig:LBC_bdy_geom}
+      Example of geometry of unstructured open boundary
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 %----------------------------------------------
@@ -553,8 +584,6 @@ At Version 3.4 there are new restrictions on the order in which the boundary poi
 (and therefore restrictions on the order of the data in the file).
 In particular:
 
-\mbox{}
-
 \begin{enumerate}
 \item The data points must be in order of increasing $nbr$,
   ie. all the $nbr=1$ points, then all the $nbr=2$ points etc.
@@ -563,18 +592,20 @@ In particular:
   the data for tracers and baroclinic velocities). 
 \end{enumerate}
 
-\mbox{}
-
 These restrictions mean that data files used with previous versions of the model may not work with version 3.4.
 A fortran utility {\it bdy\_reorder} exists in the TOOLS directory which
 will re-order the data in old BDY data files. 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{figure}[!t]     \begin{center}
-\includegraphics[width=1.0\textwidth]{Fig_LBC_nc_header}
-\caption {     \protect\label{fig:LBC_nc_header}
-  Example of the header for a \protect\ifile{coordinates.bdy} file}
-\end{center}   \end{figure}
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{Fig_LBC_nc_header}
+    \caption {
+      \protect\label{fig:LBC_nc_header}
+      Example of the header for a \protect\ifile{coordinates.bdy} file
+    }
+  \end{center}
+\end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 %----------------------------------------------
@@ -607,7 +638,6 @@ applied to all boundaries at once.
 Options are defined through the  \ngn{nambdy\_tide} namelist variables.
  To be written....
 
-
-
+\biblio
 
 \end{document}

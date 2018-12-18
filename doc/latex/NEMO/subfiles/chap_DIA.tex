@@ -1,14 +1,15 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Chapter I/O & Diagnostics
 % ================================================================
 \chapter{Output and Diagnostics (IOM, DIA, TRD, FLO)}
 \label{chap:DIA}
+
 \minitoc
 
 \newpage
-$\ $\newline    % force a new line
 
 % ================================================================
 %       Old Model Output 
@@ -167,34 +168,44 @@ Here is an example of 2 cpus for the io\_server and 62 cpu for nemo using mpirun
 As well as the {\tt using\_server} flag, other controls on the use of XIOS are set in the XIOS context in iodef.xml.
 See the XML basics section below for more details on XML syntax and rules.
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|lXl|} \hline
-		variable name                                                           &
-		description                                                             &
-		example  \\	\hline	\hline
-		buffer\_size                                                            &
-		buffer size used by XIOS to send data from NEMO to XIOS. 
-		Larger is more efficient. 
-		Note that needed/used buffer sizes are summarized at the end of the job &
-		25000000 \\	\hline
-		buffer\_server\_factor\_size                                            &
-		ratio between NEMO and XIOS buffer size.
-		Should be 2.                                                            &
-		2        \\	\hline
-		info\_level                                                             &
-		verbosity level (0 to 100)                                              &
-		0        \\	\hline
-		using\_server                                                           &
-		activate attached(false) or detached(true) mode                         &
-		true     \\	\hline
-		using\_oasis                                                            &
-		XIOS is used with OASIS(true) or not (false)                            &
-		false    \\	\hline
-		oasis\_codes\_id                                                        &
-		when using oasis, define the identifier of NEMO in the namcouple. 
-		Note that the identifier of XIOS is xios.x                              &
-		oceanx   \\	\hline
-	\end{tabularx}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|lXl|}
+    \hline
+    variable name                                                           &
+    description                                                             &
+    example  \\
+    \hline
+    \hline
+    buffer\_size                                                            &
+    buffer size used by XIOS to send data from NEMO to XIOS.
+    Larger is more efficient.
+    Note that needed/used buffer sizes are summarized at the end of the job &
+    25000000 \\
+    \hline
+    buffer\_server\_factor\_size                                            &
+    ratio between NEMO and XIOS buffer size.
+    Should be 2.                                                            &
+    2        \\
+    \hline
+    info\_level                                                             &
+    verbosity level (0 to 100)                                              &
+    0        \\
+    \hline
+    using\_server                                                           &
+    activate attached(false) or detached(true) mode                         &
+    true     \\
+    \hline
+    using\_oasis                                                            &
+    XIOS is used with OASIS(true) or not (false)                            &
+    false    \\
+    \hline
+    oasis\_codes\_id                                                        &
+    when using oasis, define the identifier of NEMO in the namcouple.
+    Note that the identifier of XIOS is xios.x                              &
+    oceanx   \\
+    \hline
+  \end{tabularx}
 \end{table}
 
 \subsection{Practical issues}
@@ -280,17 +291,24 @@ The XML file used in XIOS is structured by 7 families of tags:
 context, axis, domain, grid, field, file and variable.
 Each tag family has hierarchy of three flavors (except for context):
 
-\begin{table} \scriptsize
-	\begin{tabular*}{\textwidth}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|} \hline
-		flavor  & description                                                                 &
-		example                          \\ \hline \hline
-		root    & declaration of the root element that can contain element groups or elements &
-		\xmlcode{<file_definition ... >} \\ \hline
-		group   & declaration of a group element that can contain element groups or elements  &
-		\xmlcode{<file_group      ... >} \\ \hline
-		element & declaration of an element that can contain elements                         &
-		\xmlcode{<file            ... >} \\ \hline
-	\end{tabular*}
+\begin{table}
+  \scriptsize
+  \begin{tabular*}{\textwidth}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|}
+    \hline
+    flavor  & description                                                                 &
+                                                                                            example                          \\
+    \hline
+    \hline
+    root    & declaration of the root element that can contain element groups or elements &
+                                                                                            \xmlcode{<file_definition ... >} \\
+    \hline
+    group   & declaration of a group element that can contain element groups or elements  &
+                                                                                            \xmlcode{<file_group      ... >} \\
+    \hline
+    element & declaration of an element that can contain elements                         &
+                                                                                            \xmlcode{<file            ... >} \\
+    \hline
+  \end{tabular*}
 \end{table}
 
 Each element may have several attributes.
@@ -305,53 +323,75 @@ No interference is possible between 2 different contexts.
 Each context has its own calendar and an associated timestep.
 In \NEMO, we used the following contexts (that can be defined in any order):
 
-\begin{table} \scriptsize
-	\begin{tabular}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|} \hline
-		context         &	description                                                                & 
-		example                              \\	\hline \hline
-		context xios    &	context containing information for XIOS                                    & 
-		\xmlcode{<context id="xios" ... >}   \\	\hline
-		context nemo    &	context containing IO information for NEMO (mother grid when using AGRIF)  & 
-		\xmlcode{<context id="nemo" ... >}   \\	\hline
-		context 1\_nemo &	context containing IO information for NEMO child grid 1 (when using AGRIF) & 
-		\xmlcode{<context id="1_nemo" ... >} \\	\hline
-		context n\_nemo &	context containing IO information for NEMO child grid n (when using AGRIF) & 
-		\xmlcode{<context id="n_nemo" ... >} \\	\hline
-	\end{tabular}
+\begin{table}
+  \scriptsize
+  \begin{tabular}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|}
+    \hline
+    context         &	description                                                                &
+                                                                                                     example                              \\
+    \hline
+    \hline
+    context xios    &	context containing information for XIOS                                    &
+                                                                                                     \xmlcode{<context id="xios" ... >}   \\
+    \hline
+    context nemo    &	context containing IO information for NEMO (mother grid when using AGRIF)  & 
+                                                                                                     \xmlcode{<context id="nemo" ... >}   \\
+    \hline
+    context 1\_nemo &	context containing IO information for NEMO child grid 1 (when using AGRIF) & 
+                                                                                                     \xmlcode{<context id="1_nemo" ... >} \\
+    \hline
+    context n\_nemo &	context containing IO information for NEMO child grid n (when using AGRIF) & 
+                                                                                                     \xmlcode{<context id="n_nemo" ... >} \\
+    \hline
+  \end{tabular}
 \end{table}
 
 \noindent The xios context contains only 1 tag:
 
-\begin{table} \scriptsize
-	\begin{tabular}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|} \hline
-		context tag                                      & 
-		description                                      & 
-		example                              \\ \hline	\hline
-		variable\_definition                             & 
-		define variables needed by XIOS. 
-		This can be seen as a kind of namelist for XIOS. & 
-		\xmlcode{<variable_definition ... >} \\ \hline
+\begin{table}
+  \scriptsize
+  \begin{tabular}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|}
+    \hline
+    context tag                                      &
+                                                       description                                      &
+                                                                                                          example                              \\
+    \hline
+    \hline
+    variable\_definition                             &
+                                                       define variables needed by XIOS.
+                                                       This can be seen as a kind of namelist for XIOS. &
+                                                                                                          \xmlcode{<variable_definition ... >} \\
+    \hline
 	\end{tabular}
 \end{table}
 
 \noindent Each context tag related to NEMO (mother or child grids) is divided into 5 parts 
 (that can be defined in any order):
 
-\begin{table} \scriptsize
-	\begin{tabular}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|} \hline
-		context tag        &	description                                                               & 
-		example                            \\ \hline \hline
-		field\_definition  &	define all variables that can potentially be outputted                    & 
-		\xmlcode{<field_definition ... >}  \\ \hline
-		file\_definition   &	define the netcdf files to be created and the variables they will contain & 
-		\xmlcode{<file_definition ... >}   \\ \hline
-		axis\_definition   &	define vertical axis                                                      & 
-		\xmlcode{<axis_definition ... >}   \\ \hline
-		domain\_definition &	define the horizontal grids                                               & 
-		\xmlcode{<domain_definition ... >} \\ \hline
-		grid\_definition   &	define the 2D and 3D grids (association of an axis and a domain)          & 
-		\xmlcode{<grid_definition ... >}   \\ \hline
-	\end{tabular}
+\begin{table}
+  \scriptsize
+  \begin{tabular}{|p{0.15\textwidth}p{0.4\textwidth}p{0.35\textwidth}|}
+    \hline
+    context tag        &	description                                                               &
+                                                                                                       example                            \\
+    \hline
+    \hline
+    field\_definition  &	define all variables that can potentially be outputted                    &
+                                                                                                       \xmlcode{<field_definition ... >}  \\
+    \hline
+    file\_definition   &	define the netcdf files to be created and the variables they will contain &
+                                                                                                       \xmlcode{<file_definition ... >}   \\
+    \hline
+    axis\_definition   &	define vertical axis                                                      &
+                                                                                                       \xmlcode{<axis_definition ... >}   \\
+    \hline
+    domain\_definition &	define the horizontal grids                                               &
+                                                                                                       \xmlcode{<domain_definition ... >} \\
+    \hline
+    grid\_definition   &	define the 2D and 3D grids (association of an axis and a domain)          &
+                                                                                                       \xmlcode{<grid_definition ... >}   \\
+    \hline
+  \end{tabular}
 \end{table}
 
 \subsubsection{Nesting XML files}
@@ -537,27 +577,41 @@ if the id of the tag file is ''fileN'' (where N = 1 to 999 on 1 to 3 digits) or
 one of the predefined sections or moorings (see next subsection),
 the following part of the name and the name\_suffix (that can be inherited) will be automatically replaced by:
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|lX|} \hline
-		\centering placeholder string &
-		automatically replaced by                          \\ \hline \hline
-		\centering @expname@          &
-		the experiment name (from cn\_exp in the namelist) \\ \hline
-		\centering @freq@             &
-		output frequency (from attribute output\_freq)     \\ \hline
-		\centering @startdate@        &
-		starting date of the simulation (from nn\_date0 in the restart or the namelist). \newline
-		\verb?yyyymmdd?          format                   \\ \hline
-		\centering @startdatefull@    &
-		starting date of the simulation (from nn\_date0 in the restart or the namelist). \newline
-		\verb?yyyymmdd_hh:mm:ss? format                    \\ \hline
-		\centering @enddate@          &
-		ending date of the simulation   (from nn\_date0 and nn\_itend  in the namelist). \newline
-		\verb?yyyymmdd?          format                    \\ \hline
-		\centering @enddatefull@      &
-		ending date of the simulation   (from nn\_date0 and nn\_itend  in the namelist). \newline
-		\verb?yyyymmdd_hh:mm:ss? format                    \\ \hline
-	\end{tabularx}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|lX|}
+    \hline
+    \centering placeholder string &
+    automatically replaced by                          \\
+    \hline
+    \hline
+    \centering @expname@          &
+    the experiment name (from cn\_exp in the namelist) \\
+    \hline
+    \centering @freq@             &
+    output frequency (from attribute output\_freq)     \\
+    \hline
+    \centering @startdate@        &
+    starting date of the simulation (from nn\_date0 in the restart or the namelist).
+    \newline
+    \verb?yyyymmdd?          format                   \\
+    \hline
+    \centering @startdatefull@    &
+    starting date of the simulation (from nn\_date0 in the restart or the namelist).
+    \newline
+    \verb?yyyymmdd_hh:mm:ss? format                    \\
+    \hline
+    \centering @enddate@          &
+    ending date of the simulation   (from nn\_date0 and nn\_itend  in the namelist).
+    \newline
+    \verb?yyyymmdd?          format                    \\
+    \hline
+    \centering @enddatefull@      &
+    ending date of the simulation   (from nn\_date0 and nn\_itend  in the namelist).
+    \newline
+    \verb?yyyymmdd_hh:mm:ss? format                    \\
+    \hline
+  \end{tabularx}
 \end{table}
 
 \noindent For example, 
@@ -584,36 +638,46 @@ By convention, these attributes are defined to ''auto'' (for string) or ''0000''
 Here is the list of these attributes:
 \\
 
-\begin{table} \scriptsize
-\begin{tabularx}{\textwidth}{|X|c|c|c|}   \hline
-	tag ids affected by automatic definition of some of their attributes & 
-	name attribute                                                       & 
-	attribute value                      \\ \hline \hline
-	field\_definition                                                    & 
-	freq\_op                                                             & 
-	\np{rn\_rdt}                         \\ \hline
-	SBC                                                                  & 
-	freq\_op                                                             & 
-	\np{rn\_rdt} $\times$ \np{nn\_fsbc}  \\ \hline
-	ptrc\_T                                                              & 
-	freq\_op                                                             & 
-	\np{rn\_rdt} $\times$ \np{nn\_dttrc} \\ \hline
-	diad\_T                                                              & 
-	freq\_op                                                             & 
-	\np{rn\_rdt} $\times$ \np{nn\_dttrc} \\ \hline
-	EqT, EqU, EqW                                                        & 
-	jbegin, ni,                                                          & 
-	according to the grid                \\
-                                                                        & 
-	name\_suffix                                                         & 
-                                        \\ \hline
-	TAO, RAMA and PIRATA moorings                                        & 
-	zoom\_ibegin, zoom\_jbegin,                                          & 
-	according to the grid                \\
-                                                                        & 
-	name\_suffix                                                         & 
-                                        \\ \hline
-\end{tabularx}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|X|c|c|c|}
+    \hline
+    tag ids affected by automatic definition of some of their attributes &
+    name attribute                                                       &
+    attribute value                      \\
+    \hline
+    \hline
+    field\_definition                                                    &
+    freq\_op                                                             &
+    \np{rn\_rdt}                         \\
+    \hline
+    SBC                                                                  &
+    freq\_op                                                             &
+    \np{rn\_rdt} $\times$ \np{nn\_fsbc}  \\
+    \hline
+    ptrc\_T                                                              &
+    freq\_op                                                             &
+    \np{rn\_rdt} $\times$ \np{nn\_dttrc} \\
+    \hline
+    diad\_T                                                              &
+    freq\_op                                                             &
+    \np{rn\_rdt} $\times$ \np{nn\_dttrc} \\
+    \hline
+    EqT, EqU, EqW                                                        &
+    jbegin, ni,                                                          &
+    according to the grid                \\
+    &
+    name\_suffix                                                         &
+    \\
+    \hline
+    TAO, RAMA and PIRATA moorings                                        &
+    zoom\_ibegin, zoom\_jbegin,                                          &
+    according to the grid                \\
+    &
+    name\_suffix                                                         &
+    \\
+    \hline
+  \end{tabularx}
 \end{table}
 
 \subsubsection{Advanced use of XIOS functionalities}
@@ -773,348 +837,441 @@ field\_ref="sst" means that attributes not explicitely defined, are inherited fr
 
 \subsubsection{Tag list per family}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|l|X|} \hline
-	tag name                                                                                     &
-	description                                                                                  &
-	accepted attribute                                                                           &
-	child of                                                                                     &
-	parent of                       \\ \hline \hline
-	simulation                                                                                   &
-	this tag is the root tag which encapsulates all the content of the XML file                  &
-	none                                                                                         &
-	none                                                                                         &
-	context                         \\ \hline
-	context                                                                                      &
-	encapsulates parts of the XML file dedicated to different codes or different parts of a code &
-	id (''xios'', ''nemo'' or ''n\_nemo'' for the nth AGRIF zoom), src, time\_origin             &
-	simulation                                                                                   &
-	all root tags: ... \_definition \\ \hline
-	\end{tabularx}
-	\caption{Context tags}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|l|X|}
+    \hline
+    tag name                                                                                     &
+    description                                                                                  &
+    accepted attribute                                                                           &
+    child of                                                                                     &
+    parent of                       \\
+    \hline
+    \hline
+    simulation                                                                                   &
+    this tag is the root tag which encapsulates all the content of the XML file                  &
+    none                                                                                         &
+    none                                                                                         &
+    context                         \\
+    \hline
+    context                                                                                      &
+    encapsulates parts of the XML file dedicated to different codes or different parts of a code &
+    id (''xios'', ''nemo'' or ''n\_nemo'' for the nth AGRIF zoom), src, time\_origin             &
+    simulation                                                                                   &
+    all root tags: ... \_definition \\
+    \hline
+  \end{tabularx}
+  \caption{Context tags}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|X|l|} \hline
-	tag name                                                                                & 
-	description                                                                             & 
-	accepted attribute                                                                      & 
-	child of                                                                                & 
-	parent of             \\ \hline \hline
-	field\_definition                                                                       & 
-	encapsulates the definition of all the fields that can potentially be outputted         & 
-	axis\_ref, default\_value, domain\_ref, enabled, grid\_ref, level, operation, prec, src & 
-	context                                                                                 & 
-	field or field\_group \\ \hline
-	field\_group                                                                            & 
-	encapsulates a group of fields                                                          & 
-	axis\_ref, default\_value, domain\_ref, enabled, group\_ref, grid\_ref,
-	id, level, operation, prec, src                                                         & 
-	field\_definition, field\_group, file                                                   & 
-	field or field\_group \\ \hline
-	field                                                                                   & 
-	define a specific field                                                                 & 
-	axis\_ref, default\_value, domain\_ref, enabled, field\_ref, grid\_ref,
-	id, level, long\_name, name, operation, prec, standard\_name, unit                      & 
-	field\_definition, field\_group, file                                                   & 
-	none                  \\ \hline
-	\end{tabularx}
-	\caption{Field tags ("\tt{field\_*}")}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|X|l|}
+    \hline
+    tag name                                                                                &
+    description                                                                             &
+    accepted attribute                                                                      &
+    child of                                                                                &
+    parent of             \\
+    \hline
+    \hline
+    field\_definition                                                                       &
+    encapsulates the definition of all the fields that can potentially be outputted         &
+    axis\_ref, default\_value, domain\_ref, enabled, grid\_ref, level, operation, prec, src &
+    context                                                                                 &
+    field or field\_group \\
+    \hline
+    field\_group                                                                            &
+    encapsulates a group of fields                                                          &
+    axis\_ref, default\_value, domain\_ref, enabled, group\_ref, grid\_ref,
+    id, level, operation, prec, src                                                         &
+    field\_definition, field\_group, file                                                   &
+    field or field\_group \\
+    \hline
+    field                                                                                   &
+    define a specific field                                                                 &
+    axis\_ref, default\_value, domain\_ref, enabled, field\_ref, grid\_ref,
+    id, level, long\_name, name, operation, prec, standard\_name, unit                      &
+    field\_definition, field\_group, file                                                   &
+    none                  \\
+    \hline
+  \end{tabularx}
+  \caption{Field tags ("\tt{field\_*}")}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|X|l|} \hline
-	tag name                                                            & 
-	description                                                         & 
-	accepted attribute                                                  & 
-	child of                                                            & 
-	parent of           \\ \hline \hline
-	file\_definition                                                    & 
-	encapsulates the definition of all the files that will be outputted & 
-	enabled, min\_digits, name, name\_suffix, output\_level,
-	split\_freq\_format, split\_freq, sync\_freq, type, src             & 
-	context                                                             & 
-	file or file\_group \\ \hline
-	file\_group                                                         & 
-	encapsulates a group of files that will be outputted                & 
-	enabled, description, id, min\_digits, name, name\_suffix, output\_freq, output\_level,
-	split\_freq\_format, split\_freq, sync\_freq, type, src             & 
-	file\_definition, file\_group                                       & 
-	file or file\_group \\ \hline
-	file                                                                & 
-	define the contents of a file to be outputted                       & 
-	enabled, description, id, min\_digits, name, name\_suffix, output\_freq, output\_level,
-	split\_freq\_format, split\_freq, sync\_freq, type, src             & 
-	file\_definition, file\_group                                       & 
-	field               \\ \hline
-	\end{tabularx}
-	\caption{File tags ("\tt{file\_*}")}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|X|l|}
+    \hline
+    tag name                                                            &
+    description                                                         &
+    accepted attribute                                                  &
+    child of                                                            &
+    parent of           \\
+    \hline
+    \hline
+    file\_definition                                                    &
+    encapsulates the definition of all the files that will be outputted &
+    enabled, min\_digits, name, name\_suffix, output\_level,
+    split\_freq\_format, split\_freq, sync\_freq, type, src             &
+    context                                                             &
+    file or file\_group \\
+    \hline
+    file\_group                                                         &
+    encapsulates a group of files that will be outputted                &
+    enabled, description, id, min\_digits, name, name\_suffix, output\_freq, output\_level,
+    split\_freq\_format, split\_freq, sync\_freq, type, src             &
+    file\_definition, file\_group                                       &
+    file or file\_group \\
+    \hline
+    file                                                                &
+    define the contents of a file to be outputted                       &
+    enabled, description, id, min\_digits, name, name\_suffix, output\_freq, output\_level,
+    split\_freq\_format, split\_freq, sync\_freq, type, src             &
+    file\_definition, file\_group                                       &
+    field               \\
+    \hline
+  \end{tabularx}
+  \caption{File tags ("\tt{file\_*}")}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|X|X|} \hline
-	tag name                                                                               & 
-	description                                                                            & 
-	accepted attribute                                                                     & 
-	child of                                                                               & 
-	parent of         \\ \hline \hline
-	axis\_definition                                                                       & 
-	define all the vertical axis potentially used by the variables                         & 
-	src                                                                                    & 
-	context                                                                                & 
-	axis\_group, axis \\ \hline
-	axis\_group                                                                            & 
-	encapsulates a group of vertical axis                                                  & 
-	id, lon\_name, positive, src, standard\_name, unit, zoom\_begin, zoom\_end, zoom\_size & 
-	axis\_definition, axis\_group                                                          & 
-	axis\_group, axis \\ \hline
-	axis                                                                                   & 
-	define a vertical axis                                                                 & 
-	id, lon\_name, positive, src, standard\_name, unit, zoom\_begin, zoom\_end, zoom\_size & 
-	axis\_definition, axis\_group                                                          & 
-	none					\\ \hline
-	\end{tabularx}
-	\caption{Axis tags ("\tt{axis\_*}")}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|X|X|}
+    \hline
+    tag name                                                                               &
+    description                                                                            &
+    accepted attribute                                                                     &
+    child of                                                                               &
+    parent of         \\
+    \hline
+    \hline
+    axis\_definition                                                                       &
+    define all the vertical axis potentially used by the variables                         &
+    src                                                                                    &
+    context                                                                                &
+    axis\_group, axis \\
+    \hline
+    axis\_group                                                                            &
+    encapsulates a group of vertical axis                                                  &
+    id, lon\_name, positive, src, standard\_name, unit, zoom\_begin, zoom\_end, zoom\_size &
+    axis\_definition, axis\_group                                                          &
+    axis\_group, axis \\
+    \hline
+    axis                                                                                   &
+    define a vertical axis                                                                 &
+    id, lon\_name, positive, src, standard\_name, unit, zoom\_begin, zoom\_end, zoom\_size &
+    axis\_definition, axis\_group                                                          &
+    none					\\
+    \hline
+  \end{tabularx}
+  \caption{Axis tags ("\tt{axis\_*}")}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|X|X|} \hline
-	tag name                                                            & 
-	description                                                         & 
-	accepted attribute                                                  & 
-	child of                                                            & 
-	parent of               \\ \hline \hline
-	domain\_\-definition                                                & 
-	define all the horizontal domains potentially used by the variables & 
-	src                                                                 & 
-	context                                                             & 
-	domain\_\-group, domain \\ \hline
-	domain\_group                                                       & 
-	encapsulates a group of horizontal domains                          & 
-	id, lon\_name, src, zoom\_ibegin, zoom\_jbegin, zoom\_ni, zoom\_nj  & 
-	domain\_\-definition, domain\_group                                 & 
-	domain\_\-group, domain \\ \hline
-	domain                                                              & 
-	define an horizontal domain                                         & 
-	id, lon\_name, src, zoom\_ibegin, zoom\_jbegin, zoom\_ni, zoom\_nj  & 
-	domain\_\-definition, domain\_group                                 & 
-	none                    \\ \hline
-	\end{tabularx}
-	\caption{Domain tags ("\tt{domain\_*)}"}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|X|X|}
+    \hline
+    tag name                                                            &
+    description                                                         &
+    accepted attribute                                                  &
+    child of                                                            &
+    parent of               \\
+    \hline
+    \hline
+    domain\_\-definition                                                &
+    define all the horizontal domains potentially used by the variables &
+    src                                                                 &
+    context                                                             &
+    domain\_\-group, domain \\
+    \hline
+    domain\_group                                                       &
+    encapsulates a group of horizontal domains                          &
+    id, lon\_name, src, zoom\_ibegin, zoom\_jbegin, zoom\_ni, zoom\_nj  &
+    domain\_\-definition, domain\_group                                 &
+    domain\_\-group, domain \\
+    \hline
+    domain                                                              &
+    define an horizontal domain                                         &
+    id, lon\_name, src, zoom\_ibegin, zoom\_jbegin, zoom\_ni, zoom\_nj  &
+    domain\_\-definition, domain\_group                                 &
+    none                    \\
+    \hline
+  \end{tabularx}
+  \caption{Domain tags ("\tt{domain\_*)}"}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|X|X|} \hline
-	tag name                                                                                     &
-	description                                                                                  &
-	accepted attribute                                                                           &
-	child of                                                                                     &
-	parent of                       \\ \hline \hline
-	grid\_definition                                                                               &
-	define all the grid (association of a domain and/or an axis) potentially used by the variables &
-	src                                                                                            &
-	context                                                                                        &
-	grid\_group, grid	\\ \hline
-	grid\_group                                                                                    &
-	encapsulates a group of grids                                                                  &
-	id, domain\_ref,axis\_ref                                                                      &
-	grid\_definition, grid\_group                                                                  &
-	grid\_group, grid	\\ \hline
-   grid                                                                                           &
-	define a grid                                                                                  &
-	id, domain\_ref,axis\_ref                                                                      &
-	grid\_definition, grid\_group                                                                  &
-	none 					\\ \hline
-	\end{tabularx}
-	\caption{Grid tags ("\tt{grid\_*}")}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|X|X|}
+    \hline
+    tag name                                                                                     &
+    description                                                                                  &
+    accepted attribute                                                                           &
+    child of                                                                                     &
+    parent of                       \\
+    \hline
+    \hline
+    grid\_definition                                                                               &
+    define all the grid (association of a domain and/or an axis) potentially used by the variables &
+    src                                                                                            &
+    context                                                                                        &
+    grid\_group, grid	\\
+    \hline
+    grid\_group                                                                                    &
+    encapsulates a group of grids                                                                  &
+    id, domain\_ref,axis\_ref                                                                      &
+    grid\_definition, grid\_group                                                                  &
+    grid\_group, grid	\\
+    \hline
+    grid                                                                                           &
+    define a grid                                                                                  &
+    id, domain\_ref,axis\_ref                                                                      &
+    grid\_definition, grid\_group                                                                  &
+    none 					\\
+    \hline
+  \end{tabularx}
+  \caption{Grid tags ("\tt{grid\_*}")}
 \end{table}
 
 \subsubsection{Attributes list per family}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|l|l|} \hline
-		attribute name                           & 
-		description                              & 
-		example                                  & 
-		accepted by            \\ \hline \hline
-		axis\_ref                                & 
-		refers to the id of a vertical axis      & 
-		axis\_ref="deptht"                       & 
-		field, grid families   \\	\hline
-		domain\_ref                              & 
-		refers to the id of a domain             & 
-		domain\_ref="grid\_T"                    & 
-		field or grid families \\ \hline
-		field\_ref                               & 
-		id of the field we want to add in a file & 
-		field\_ref="toce"                        & 
-		field                  \\ \hline
-		grid\_ref                                & 
-		refers to the id of a grid               & 
-		grid\_ref="grid\_T\_2D"                  & 
-		field family           \\ \hline
-		group\_ref                               & 
-		refer to a group of variables            & 
-		group\_ref="mooring"                     & 
-		field\_group           \\ \hline
-	\end{tabularx}
-	\caption{Reference attributes ("\tt{*\_ref}")}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|l|l|}
+    \hline
+    attribute name                           &
+    description                              &
+    example                                  &
+    accepted by            \\
+    \hline
+    \hline
+    axis\_ref                                &
+    refers to the id of a vertical axis      &
+    axis\_ref="deptht"                       &
+    field, grid families   \\
+    \hline
+    domain\_ref                              &
+    refers to the id of a domain             &
+    domain\_ref="grid\_T"                    &
+    field or grid families \\
+    \hline
+    field\_ref                               &
+    id of the field we want to add in a file &
+    field\_ref="toce"                        &
+    field                  \\
+    \hline
+    grid\_ref                                &
+    refers to the id of a grid               &
+    grid\_ref="grid\_T\_2D"                  &
+    field family           \\
+    \hline
+    group\_ref                               &
+    refer to a group of variables            &
+    group\_ref="mooring"                     &
+    field\_group           \\
+    \hline
+  \end{tabularx}
+  \caption{Reference attributes ("\tt{*\_ref}")}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|l|l|} \hline
-		attribute name                                     & 
-		description                                        & 
-		example                                            & 
-		accepted by   \\ \hline \hline
-		zoom\_ibegin                                       & 
-		starting point along x direction of the zoom.
-		Automatically defined for TAO/RAMA/PIRATA moorings & 
-		zoom\_ibegin="1"                                   & 
-		domain family \\ \hline
-		zoom\_jbegin                                       & 
-		starting point along y direction of the zoom.
-		Automatically defined for TAO/RAMA/PIRATA moorings & 
-		zoom\_jbegin="1"                                   & 
-		domain family \\ \hline
-		zoom\_ni                                           & 
-		zoom extent along x direction                      & 
-		zoom\_ni="1"                                       & 
-		domain family \\ \hline
-		zoom\_nj                                           & 
-		zoom extent along y direction                      & 
-		zoom\_nj="1"                                       & 
-		domain family \\ \hline
-	\end{tabularx}
-	\caption{Domain attributes ("\tt{zoom\_*}")}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|l|l|}
+    \hline
+    attribute name                                     &
+    description                                        &
+    example                                            &
+    accepted by   \\
+    \hline
+    \hline
+    zoom\_ibegin                                       &
+    starting point along x direction of the zoom.
+    Automatically defined for TAO/RAMA/PIRATA moorings &
+    zoom\_ibegin="1"                                   &
+    domain family \\
+    \hline
+    zoom\_jbegin                                       &
+    starting point along y direction of the zoom.
+    Automatically defined for TAO/RAMA/PIRATA moorings &
+    zoom\_jbegin="1"                                   &
+    domain family \\
+    \hline
+    zoom\_ni                                           &
+    zoom extent along x direction                      &
+    zoom\_ni="1"                                       &
+    domain family \\
+    \hline
+    zoom\_nj                                           &
+    zoom extent along y direction                      &
+    zoom\_nj="1"                                       &
+    domain family \\
+    \hline
+  \end{tabularx}
+  \caption{Domain attributes ("\tt{zoom\_*}")}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|l|l|} \hline
-		attribute name                                                                                       &
-		description                                                                                          &
-		example                                                                                              &
-		accepted by                            \\ \hline \hline
-		min\_digits                                                                                          &
-		specify the minimum of digits used in the core number in the name of the NetCDF file                 &
-		min\_digits="4"                                                                                      &
-		file family                            \\ \hline
-		name\_suffix                                                                                         &
-		suffix to be inserted after the name and before the cpu number and the ''.nc'' termination of a file &
-		name\_suffix="\_myzoom"                                                                              &
-		file family                            \\ \hline
-		output\_level                                                                                        &
-		output priority of variables in a file: 0 (high) to 10 (low).
-		All variables listed in the file with a level smaller or equal to output\_level will be output.
-		Other variables won't be output even if they are listed in the file.                                 &
-		output\_level="10"                                                                                   &
-		file family                            \\ \hline
-		split\_freq                                                                                          &
-		frequency at which to temporally split output files.
-		Units can be ts (timestep), y, mo, d, h, mi, s.
-		Useful for long runs to prevent over-sized output files.                                             &
-		split\_freq="1mo"                                                                                    &
-		file family                            \\ \hline
-		split\_freq\-\_format                                                                                &
-		date format used in the name of temporally split output files.
-		Can be specified using the following syntaxes: \%y, \%mo, \%d, \%h \%mi and \%s                      &
-		split\_freq\_format= "\%y\%mo\%d"                                                                    &
-		file family                            \\ \hline
-		sync\_freq                                                                                           &
-		NetCDF file synchronization frequency (update of the time\_counter).
-		Units can be ts (timestep), y, mo, d, h, mi, s.                                                      &
-		sync\_freq="10d"                                                                                     &
-		file family                            \\ \hline
-		type (1)                                                                                             &
-		specify if the output files are to be split spatially (multiple\_file) or not (one\_file)            &
-		type="multiple\_file"                                                                                &
-		file familly                           \\ \hline
-	\end{tabularx}
-	\caption{File attributes}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|l|l|}
+    \hline
+    attribute name                                                                                       &
+    description                                                                                          &
+    example                                                                                              &
+    accepted by                            \\
+    \hline
+    \hline
+    min\_digits                                                                                          &
+    specify the minimum of digits used in the core number in the name of the NetCDF file                 &
+    min\_digits="4"                                                                                      &
+    file family                            \\
+    \hline
+    name\_suffix                                                                                         &
+    suffix to be inserted after the name and before the cpu number and the ''.nc'' termination of a file &
+    name\_suffix="\_myzoom"                                                                              &
+    file family                            \\
+    \hline
+    output\_level                                                                                        &
+    output priority of variables in a file: 0 (high) to 10 (low).
+    All variables listed in the file with a level smaller or equal to output\_level will be output.
+    Other variables won't be output even if they are listed in the file.                                 &
+    output\_level="10"                                                                                   &
+    file family                            \\
+    \hline
+    split\_freq                                                                                          &
+    frequency at which to temporally split output files.
+    Units can be ts (timestep), y, mo, d, h, mi, s.
+    Useful for long runs to prevent over-sized output files.                                             &
+    split\_freq="1mo"                                                                                    &
+    file family                            \\
+    \hline
+    split\_freq\-\_format                                                                                &
+    date format used in the name of temporally split output files.
+    Can be specified using the following syntaxes: \%y, \%mo, \%d, \%h \%mi and \%s                      &
+    split\_freq\_format= "\%y\%mo\%d"                                                                    &
+    file family                            \\
+    \hline
+    sync\_freq                                                                                           &
+    NetCDF file synchronization frequency (update of the time\_counter).
+    Units can be ts (timestep), y, mo, d, h, mi, s.                                                      &
+    sync\_freq="10d"                                                                                     &
+    file family                            \\
+    \hline
+    type (1)                                                                                             &
+    specify if the output files are to be split spatially (multiple\_file) or not (one\_file)            &
+    type="multiple\_file"                                                                                &
+    file familly                           \\
+    \hline
+  \end{tabularx}
+  \caption{File attributes}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|l|l|} \hline
-		attribute name                                                                                       &
-		description                                                                                          &
-		example                                                                                              &
-		accepted by                            \\ \hline \hline
-		default\_value                                                                                       &
-		missing\_value definition                                                                            &
-		default\_value="1.e20"                                                                               &
-		field family                           \\ \hline
-		level                                                                                                &
-		output priority of a field: 0 (high) to 10 (low)                                                     &
-		level="1"                                                                                            &
-		field family                           \\ \hline
-		operation                                                                                            &
-		type of temporal operation: average, accumulate, instantaneous, min, max and once                    &
-		operation="average"                                                                                  &
-		field family                           \\ \hline
-		output\_freq                                                                                         &
-		operation frequency. units can be ts (timestep), y, mo, d, h, mi, s.                                 &
-		output\_freq="1d12h"                                                                                 &
-		field family                           \\ \hline
-		prec                                                                                                 &
-		output precision: real 4 or real 8                                                                   &
-		prec="4"                                                                                             &
-		field family                           \\ \hline
-		long\_name                                                                                           &
-		define the long\_name attribute in the NetCDF file                                                   &
-		long\_name="Vertical T levels"                                                                       &
-		field                                  \\ \hline
-		standard\_name                                                                                       &
-		define the standard\_name attribute in the NetCDF file                                               &
-		standard\_name= "Eastward\_Sea\_Ice\_Transport"                                                      &
-		field                                  \\ \hline
-	\end{tabularx}
-	\caption{Field attributes}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|l|l|}
+    \hline
+    attribute name                                                                                       &
+    description                                                                                          &
+    example                                                                                              &
+    accepted by                            \\
+    \hline
+    \hline
+    default\_value                                                                                       &
+    missing\_value definition                                                                            &
+    default\_value="1.e20"                                                                               &
+    field family                           \\
+    \hline
+    level                                                                                                &
+    output priority of a field: 0 (high) to 10 (low)                                                     &
+    level="1"                                                                                            &
+    field family                           \\
+    \hline
+    operation                                                                                            &
+    type of temporal operation: average, accumulate, instantaneous, min, max and once                    &
+    operation="average"                                                                                  &
+    field family                           \\
+    \hline
+    output\_freq                                                                                         &
+    operation frequency. units can be ts (timestep), y, mo, d, h, mi, s.                                 &
+    output\_freq="1d12h"                                                                                 &
+    field family                           \\
+    \hline
+    prec                                                                                                 &
+    output precision: real 4 or real 8                                                                   &
+    prec="4"                                                                                             &
+    field family                           \\
+    \hline
+    long\_name                                                                                           &
+    define the long\_name attribute in the NetCDF file                                                   &
+    long\_name="Vertical T levels"                                                                       &
+    field                                  \\
+    \hline
+    standard\_name                                                                                       &
+    define the standard\_name attribute in the NetCDF file                                               &
+    standard\_name= "Eastward\_Sea\_Ice\_Transport"                                                      &
+    field                                  \\
+    \hline
+  \end{tabularx}
+  \caption{Field attributes}
 \end{table}
 
-\begin{table} \scriptsize
-	\begin{tabularx}{\textwidth}{|l|X|X|X|} \hline
-		attribute name                                                                                       &
-		description                                                                                          &
-		example                                                                                              &
-		accepted by                            \\ \hline \hline
-		enabled                                                                                              &
-		switch on/off the output of a field or a file                                                        &
-		enabled=".true."                                                                                     &
-		field, file families                   \\ \hline
-		description                                                                                          &
-		just for information, not used                                                                       &
-		description="ocean T grid variables"                                                                 &
-		all tags                               \\ \hline
-		id                                                                                                   &
-		allow to identify a tag                                                                              &
-		id="nemo"                                                                                            &
-		accepted by all tags except simulation \\ \hline
-		name                                                                                                 &
-		name of a variable or a file. If the name of a file is undefined, its id is used as a name           &
-		name="tos"                                                                                           &
-		field or file families                 \\ \hline
-		positive                                                                                             &
-		convention used for the orientation of vertival axis (positive downward in \NEMO).                   &
-		positive="down"                                                                                      &
-		axis family                            \\ \hline
-		src                                                                                                  &
-		allow to include a file                                                                              &
-		src="./field\_def.xml"                                                                               &
-		accepted by all tags except simulation \\ \hline
-		time\_origin                                                                                         &
-		specify the origin of the time counter                                                               &
-		time\_origin="1900-01-01 00:00:00"                                                                   &
-		context                                \\ \hline
-		type (2)                                                                                             &
-		define the type of a variable tag                                                                    &
-		type="boolean"                                                                                       &
-		variable                               \\ \hline
-		unit                                                                                                 &
-		unit of a variable or the vertical axis                                                              &
-		unit="m"                                                                                             &
-		field and axis families                \\ \hline
-	\end{tabularx}
-	\caption{Miscellaneous attributes}
+\begin{table}
+  \scriptsize
+  \begin{tabularx}{\textwidth}{|l|X|X|X|}
+    \hline
+    attribute name                                                                                       &
+    description                                                                                          &
+    example                                                                                              &
+    accepted by                            \\
+    \hline
+    \hline
+    enabled                                                                                              &
+    switch on/off the output of a field or a file                                                        &
+    enabled=".true."                                                                                     &
+    field, file families                   \\
+    \hline
+    description                                                                                          &
+    just for information, not used                                                                       &
+    description="ocean T grid variables"                                                                 &
+    all tags                               \\
+    \hline
+    id                                                                                                   &
+    allow to identify a tag                                                                              &
+    id="nemo"                                                                                            &
+    accepted by all tags except simulation \\
+    \hline
+    name                                                                                                 &
+    name of a variable or a file. If the name of a file is undefined, its id is used as a name           &
+    name="tos"                                                                                           &
+    field or file families                 \\
+    \hline
+    positive                                                                                             &
+    convention used for the orientation of vertival axis (positive downward in \NEMO).                   &
+    positive="down"                                                                                      &
+    axis family                            \\
+    \hline
+    src                                                                                                  &
+    allow to include a file                                                                              &
+    src="./field\_def.xml"                                                                               &
+    accepted by all tags except simulation \\
+    \hline
+    time\_origin                                                                                         &
+    specify the origin of the time counter                                                               &
+    time\_origin="1900-01-01 00:00:00"                                                                   &
+    context                                \\
+    \hline
+    type (2)                                                                                             &
+    define the type of a variable tag                                                                    &
+    type="boolean"                                                                                       &
+    variable                               \\
+    \hline
+    unit                                                                                                 &
+    unit of a variable or the vertical axis                                                              &
+    unit="m"                                                                                             &
+    field and axis families                \\
+    \hline
+  \end{tabularx}
+  \caption{Miscellaneous attributes}
 \end{table}
 
 \subsection{CF metadata standard compliance}
@@ -1199,40 +1356,43 @@ Note the variation in the compression ratio achieved which reflects chiefly the 
 each processing region.
 
 %------------------------------------------TABLE----------------------------------------------------
-\begin{table} \scriptsize \centering
-	\begin{tabular}{lrrr}
-		Filename                    & NetCDF3	& NetCDF4  & Reduction \\
-                                  & filesize	& filesize & \%        \\
-                                  & (KB)		& (KB)	  &           \\
-		ORCA2\_restart\_0000.nc     & 16420 	& 8860 	  & 47\%      \\
-		ORCA2\_restart\_0001.nc     & 16064 	& 11456    & 29\%      \\
-		ORCA2\_restart\_0002.nc     & 16064		& 9744	  & 40\%      \\
-		ORCA2\_restart\_0003.nc     & 16420		& 9404	  & 43\%      \\
-		ORCA2\_restart\_0004.nc     & 16200 	& 5844	  & 64\%      \\
-		ORCA2\_restart\_0005.nc     & 15848 	& 8172	  & 49\%      \\
-		ORCA2\_restart\_0006.nc     & 15848 	& 8012 	  & 50\%      \\
-		ORCA2\_restart\_0007.nc     & 16200 	& 5148 	  & 69\%      \\
-		ORCA2\_2d\_grid\_T\_0000.nc & 2200 		& 1504	  & 32\%      \\
-		ORCA2\_2d\_grid\_T\_0001.nc & 2200 		& 1748	  & 21\%      \\
-		ORCA2\_2d\_grid\_T\_0002.nc & 2200 		& 1592	  & 28\%      \\
-		ORCA2\_2d\_grid\_T\_0003.nc & 2200 		& 1540	  & 30\%      \\
-		ORCA2\_2d\_grid\_T\_0004.nc & 2200 		& 1204	  & 46\%      \\
-		ORCA2\_2d\_grid\_T\_0005.nc & 2200 		& 1444	  & 35\%      \\
-		ORCA2\_2d\_grid\_T\_0006.nc & 2200 		& 1428	  & 36\%      \\
-		ORCA2\_2d\_grid\_T\_0007.nc & 2200		& 1148	  & 48\%      \\
-		...                         & ...		& ...      & ...       \\
-		ORCA2\_2d\_grid\_W\_0000.nc & 4416		& 2240	  & 50\%      \\
-		ORCA2\_2d\_grid\_W\_0001.nc & 4416		& 2924	  & 34\%      \\
-		ORCA2\_2d\_grid\_W\_0002.nc & 4416		& 2512	  & 44\%      \\
-		ORCA2\_2d\_grid\_W\_0003.nc & 4416		& 2368	  & 47\%      \\
-		ORCA2\_2d\_grid\_W\_0004.nc & 4416		& 1432	  & 68\%      \\
-		ORCA2\_2d\_grid\_W\_0005.nc & 4416		& 1972	  & 56\%      \\
-		ORCA2\_2d\_grid\_W\_0006.nc & 4416		& 2028	  & 55\%      \\
-		ORCA2\_2d\_grid\_W\_0007.nc & 4416		& 1368	  & 70\%      \\
-	\end{tabular}
-	\caption{
-		\protect\label{tab:NC4}
-		Filesize comparison between NetCDF3 and NetCDF4 with chunking and compression}
+\begin{table}
+  \scriptsize
+  \centering
+  \begin{tabular}{lrrr}
+    Filename                    & NetCDF3	& NetCDF4  & Reduction \\
+                                & filesize	& filesize & \%        \\
+                                & (KB)		& (KB)	  &           \\
+    ORCA2\_restart\_0000.nc     & 16420 	& 8860 	  & 47\%      \\
+    ORCA2\_restart\_0001.nc     & 16064 	& 11456    & 29\%      \\
+    ORCA2\_restart\_0002.nc     & 16064		& 9744	  & 40\%      \\
+    ORCA2\_restart\_0003.nc     & 16420		& 9404	  & 43\%      \\
+    ORCA2\_restart\_0004.nc     & 16200 	& 5844	  & 64\%      \\
+    ORCA2\_restart\_0005.nc     & 15848 	& 8172	  & 49\%      \\
+    ORCA2\_restart\_0006.nc     & 15848 	& 8012 	  & 50\%      \\
+    ORCA2\_restart\_0007.nc     & 16200 	& 5148 	  & 69\%      \\
+    ORCA2\_2d\_grid\_T\_0000.nc & 2200 		& 1504	  & 32\%      \\
+    ORCA2\_2d\_grid\_T\_0001.nc & 2200 		& 1748	  & 21\%      \\
+    ORCA2\_2d\_grid\_T\_0002.nc & 2200 		& 1592	  & 28\%      \\
+    ORCA2\_2d\_grid\_T\_0003.nc & 2200 		& 1540	  & 30\%      \\
+    ORCA2\_2d\_grid\_T\_0004.nc & 2200 		& 1204	  & 46\%      \\
+    ORCA2\_2d\_grid\_T\_0005.nc & 2200 		& 1444	  & 35\%      \\
+    ORCA2\_2d\_grid\_T\_0006.nc & 2200 		& 1428	  & 36\%      \\
+    ORCA2\_2d\_grid\_T\_0007.nc & 2200		& 1148	  & 48\%      \\
+    ...                         & ...		& ...      & ...       \\
+    ORCA2\_2d\_grid\_W\_0000.nc & 4416		& 2240	  & 50\%      \\
+    ORCA2\_2d\_grid\_W\_0001.nc & 4416		& 2924	  & 34\%      \\
+    ORCA2\_2d\_grid\_W\_0002.nc & 4416		& 2512	  & 44\%      \\
+    ORCA2\_2d\_grid\_W\_0003.nc & 4416		& 2368	  & 47\%      \\
+    ORCA2\_2d\_grid\_W\_0004.nc & 4416		& 1432	  & 68\%      \\
+    ORCA2\_2d\_grid\_W\_0005.nc & 4416		& 1972	  & 56\%      \\
+    ORCA2\_2d\_grid\_W\_0006.nc & 4416		& 2028	  & 55\%      \\
+    ORCA2\_2d\_grid\_W\_0007.nc & 4416		& 1368	  & 70\%      \\
+  \end{tabular}
+  \caption{
+    \protect\label{tab:NC4}
+    Filesize comparison between NetCDF3 and NetCDF4 with chunking and compression
+  }
 \end{table}
 %----------------------------------------------------------------------------------------------------
 
@@ -1328,12 +1488,15 @@ Its format is: \\
  - itrash : set to zero; it is a dummy variable to respect Ariane Tools convention
 
 \noindent Example: \\
-\noindent {\scriptsize \texttt{
-100.00000  90.00000  -1.50000 1.00000   0.00000   \\
-102.00000  90.00000  -1.50000 1.00000   0.00000   \\
-104.00000  90.00000  -1.50000 1.00000   0.00000   \\
-106.00000  90.00000  -1.50000 1.00000   0.00000   \\
-108.00000  90.00000  -1.50000 1.00000   0.00000}} \\
+\noindent
+{\scriptsize
+  \texttt{
+    100.00000  90.00000  -1.50000 1.00000   0.00000   \\
+    102.00000  90.00000  -1.50000 1.00000   0.00000   \\
+    104.00000  90.00000  -1.50000 1.00000   0.00000   \\
+    106.00000  90.00000  -1.50000 1.00000   0.00000   \\
+    108.00000  90.00000  -1.50000 1.00000   0.00000}
+} \\
 
 In the other case (longitude and latitude), input filename is init\_float.
 Its format is: \\
@@ -1350,12 +1513,15 @@ Its format is: \\
  - itrash :set to 1; it is a dummy variable.
 
 \noindent Example: \\
-\noindent {\scriptsize \texttt{
- 20.0 0.0 0.0 0 1 1    \\
--21.0 0.0 0.0 0 1 1    \\
--22.0 0.0 0.0 0 1 1    \\
--23.0 0.0 0.0 0 1 1    \\
--24.0 0.0 0.0 0 1 1 }} \\
+\noindent
+{\scriptsize
+  \texttt{
+    20.0 0.0 0.0 0 1 1    \\
+    -21.0 0.0 0.0 0 1 1    \\
+    -22.0 0.0 0.0 0 1 1    \\
+    -23.0 0.0 0.0 0 1 1    \\
+    -24.0 0.0 0.0 0 1 1 }
+} \\
 
 \np{jpnfl} is the total number of floats during the run.
 When initial positions are read in a restart file (\np{ln\_rstflo}\forcode{ = .true.} ),
@@ -1425,13 +1591,17 @@ Some parameters are available in namelist \ngn{namdia\_harm}:
 
  The Harmonic analysis solve the following equation:
 
-\[h_{i} - A_{0} + \sum^{nb\_ana}_{j=1}[A_{j}cos(\nu_{j}t_{j}-\phi_{j})] = e_{i}\]
+ \[
+   h_{i} - A_{0} + \sum^{nb\_ana}_{j=1}[A_{j}cos(\nu_{j}t_{j}-\phi_{j})] = e_{i}
+ \]
 
 With $A_{j}$, $\nu_{j}$, $\phi_{j}$, the amplitude, frequency and phase for each wave and $e_{i}$ the error.
 $h_{i}$ is the sea level for the time $t_{i}$ and $A_{0}$ is the mean sea level. \\
 We can rewrite this equation:
 
-\[h_{i} - A_{0} + \sum^{nb\_ana}_{j=1}[C_{j}cos(\nu_{j}t_{j})+S_{j}sin(\nu_{j}t_{j})] = e_{i}\]
+\[
+  h_{i} - A_{0} + \sum^{nb\_ana}_{j=1}[C_{j}cos(\nu_{j}t_{j})+S_{j}sin(\nu_{j}t_{j})] = e_{i}
+\]
 
 with $A_{j}=\sqrt{C^{2}_{j}+S^{2}_{j}}$ and $\phi_{j}=arctan(S_{j}/C_{j})$.
 
@@ -1496,15 +1666,17 @@ with:
  negative flow do not depend on the order of the 2 extremities in this file. \\
 
 \noindent If nclass $\neq$ 0, the next lines contain the class type and the nclass bounds: \\
-{\scriptsize \texttt{
-long1 lat1 long2 lat2 nclass (ok/no)strpond (no)ice section\_name \\
-classtype                                                         \\
-zbound1                                                           \\
-zbound2                                                           \\
-.                                                                 \\
-.                                                                 \\
-nclass-1                                                          \\
-nclass}}
+{\scriptsize
+  \texttt{
+    long1 lat1 long2 lat2 nclass (ok/no)strpond (no)ice section\_name \\
+    classtype                                                         \\
+    zbound1                                                           \\
+    zbound2                                                           \\
+    .                                                                 \\
+    .                                                                 \\
+    nclass-1                                                          \\
+    nclass}
+}
 
 \noindent where \texttt{classtype} can be:
 
@@ -1526,25 +1698,30 @@ nclass}}
 
  Examples of two sections, the ACC\_Drake\_Passage with no classes,
  and the ATL\_Cuba\_Florida with 4 temperature clases (5 class bounds), are shown: \\
-\noindent {\scriptsize \texttt{
--68.    -54.5   -60.    -64.7  00 okstrpond noice ACC\_Drake\_Passage \\
--80.5    22.5   -80.5    25.5  05 nostrpond noice ATL\_Cuba\_Florida  \\
-ztem                                                                  \\
--2.0                                                                  \\
- 4.5                                                                  \\
- 7.0                                                                  \\
-12.0                                                                  \\
-40.0}}
+ \noindent
+ {\scriptsize
+   \texttt{
+     -68.    -54.5   -60.    -64.7  00 okstrpond noice ACC\_Drake\_Passage \\
+     -80.5    22.5   -80.5    25.5  05 nostrpond noice ATL\_Cuba\_Florida  \\
+     ztem                                                                  \\
+     -2.0                                                                  \\
+     4.5                                                                  \\
+     7.0                                                                  \\
+     12.0                                                                  \\
+     40.0}
+ }
 
 \subsubsection{To read the output files}
 
 The output format is: \\
-{\scriptsize \texttt{
-date, time-step number, section number,                \\
-section name, section slope coefficient, class number, \\
-class name, class bound 1 , classe bound2,             \\
-transport\_direction1, transport\_direction2,          \\
-transport\_total}}                                     \\
+{\scriptsize
+  \texttt{
+    date, time-step number, section number,                \\
+    section name, section slope coefficient, class number, \\
+    class name, class bound 1 , classe bound2,             \\
+    transport\_direction1, transport\_direction2,          \\
+    transport\_total}
+}                                     \\
 
 For sections with classes, the first \texttt{nclass-1} lines correspond to the transport for each class and
 the last line corresponds to the total transport summed over all classes.
@@ -1558,17 +1735,19 @@ this class is called \texttt{N}, meaning \texttt{none}.
 \noindent The \texttt{section slope coefficient} gives information about the significance of transports signs and
 direction: \\
 
-\begin{table} \scriptsize
-	\begin{tabular}{|l|l|l|l|l|} \hline
-		section slope coefficient      & section type & direction 1 & direction 2 & total transport
-		\\ \hline
-		0.                             & horizontal	 & northward	& southward   & postive: northward
-		\\ \hline
-		1000.                          & vertical     & eastward    & westward    & postive: eastward
-		\\ \hline
-		\texttt{$\neq$ 0, $\neq$ 1000.} & diagonal     & eastward    & westward	  & postive: eastward
-		\\ \hline
-	\end{tabular}
+\begin{table}
+  \scriptsize
+  \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    section slope coefficient      & section type & direction 1 & direction 2 & total transport    \\
+    \hline
+    0.                             & horizontal	 & northward	& southward   & postive: northward    \\
+    \hline
+    1000.                          & vertical     & eastward    & westward    & postive: eastward		\\
+    \hline
+    \texttt{$\neq$ 0, $\neq$ 1000.} & diagonal     & eastward    & westward	  & postive: eastward		\\
+    \hline
+  \end{tabular}
 \end{table}
 
 % ================================================================
@@ -1608,32 +1787,40 @@ $\bar{\eta}$ the global mean sea level
 
 A non-Boussinesq fluid conserves mass. It satisfies the following relations:
 
-\[	\begin{split}
-		\mathcal{M} &=  \mathcal{V}  \;\bar{\rho} \\
-		\mathcal{V} &=  \mathcal{A}  \;\bar{\eta}
-	\end{split}  \label{eq:MV_nBq}
-\]
+\begin{equation}
+  \begin{split}
+    \mathcal{M} &=  \mathcal{V}  \;\bar{\rho} \\
+    \mathcal{V} &=  \mathcal{A}  \;\bar{\eta}
+  \end{split}
+  \label{eq:MV_nBq}
+\end{equation}
 
 Temporal changes in total mass is obtained from the density conservation equation:
 
-\[ \frac{1}{e_3} \partial_t ( e_3\,\rho) + \nabla( \rho \, \textbf{U} ) 
-	= \left. \frac{\textit{emp}}{e_3}\right|_\textit{surface}
- \label{eq:Co_nBq} \]
+\begin{equation}
+  \frac{1}{e_3} \partial_t ( e_3\,\rho) + \nabla( \rho \, \textbf{U} )
+  = \left. \frac{\textit{emp}}{e_3}\right|_\textit{surface}
+  \label{eq:Co_nBq}
+\end{equation}
 
 where $\rho$ is the \textit{in situ} density, and \textit{emp} the surface mass exchanges with the other media of
 the Earth system (atmosphere, sea-ice, land).
 Its global averaged leads to the total mass change 
 
-\[ \partial_t \mathcal{M} = \mathcal{A} \;\overline{\textit{emp}}
- \label{eq:Mass_nBq} \]
+\begin{equation}
+  \partial_t \mathcal{M} = \mathcal{A} \;\overline{\textit{emp}}
+  \label{eq:Mass_nBq}
+\end{equation}
 
 where $\overline{\textit{emp}} = \int_S \textit{emp}\,ds$ is the net mass flux through the ocean surface.
 Bringing \autoref{eq:Mass_nBq} and the time derivative of \autoref{eq:MV_nBq} together leads to
 the evolution equation of the mean sea level
 
-\[ \partial_t \bar{\eta} = \frac{\overline{\textit{emp}}}{ \bar{\rho}} 
-                         - \frac{\mathcal{V}}{\mathcal{A}} \;\frac{\partial_t \bar{\rho} }{\bar{\rho}}
- \label{eq:ssh_nBq} \]
+\begin{equation}
+  \partial_t \bar{\eta} = \frac{\overline{\textit{emp}}}{ \bar{\rho}}
+  - \frac{\mathcal{V}}{\mathcal{A}} \;\frac{\partial_t \bar{\rho} }{\bar{\rho}}
+  \label{eq:ssh_nBq}
+\end{equation}
 
 The first term in equation \autoref{eq:ssh_nBq} alters sea level by adding or subtracting mass from the ocean. 
 The second term arises from temporal changes in the global mean density; $i.e.$ from steric effects.
@@ -1642,14 +1829,17 @@ In a Boussinesq fluid, $\rho$ is replaced by $\rho_o$ in all the equation except
 the gravity ($i.e.$ in the hydrostatic balance of the primitive Equations).
 In particular, the mass conservation equation, \autoref{eq:Co_nBq}, degenerates into the incompressibility equation:
 
-\[ \frac{1}{e_3} \partial_t ( e_3 ) + \nabla( \textbf{U} )
-   = \left. \frac{\textit{emp}}{\rho_o \,e_3}\right|_ \textit{surface}
- \label{eq:Co_Bq} \]
+\[
+  \frac{1}{e_3} \partial_t ( e_3 ) + \nabla( \textbf{U} ) = \left. \frac{\textit{emp}}{\rho_o \,e_3}\right|_ \textit{surface}
+  % \label{eq:Co_Bq}
+\]
 
 and the global average of this equation now gives the temporal change of the total volume,
 
-\[ \partial_t \mathcal{V} = \mathcal{A} \;\frac{\overline{\textit{emp}}}{\rho_o}
- \label{eq:V_Bq} \]
+\[
+  \partial_t \mathcal{V} = \mathcal{A} \;\frac{\overline{\textit{emp}}}{\rho_o}
+  % \label{eq:V_Bq}
+\]
 
 Only the volume is conserved, not mass, or, more precisely, the mass which is conserved is the Boussinesq mass,
 $\mathcal{M}_o = \rho_o \mathcal{V}$.
@@ -1665,8 +1855,10 @@ In others words, the Boussinesq mass, $\mathcal{M}_o$, can be related to $\mathc
 the total mass of the ocean seen by the Boussinesq model, via the steric contribution to the sea level,
 $\eta_s$, a spatially uniform variable, as follows:
 
-\[ \mathcal{M}_o = \mathcal{M} + \rho_o \,\eta_s \,\mathcal{A}
- \label{eq:M_Bq} \]
+\begin{equation}
+  \mathcal{M}_o = \mathcal{M} + \rho_o \,\eta_s \,\mathcal{A}
+  \label{eq:M_Bq}
+\end{equation}
 
 Any change in $\mathcal{M}$ which cannot be explained by the net mass flux through the ocean surface
 is converted into a mean change in sea level.
@@ -1674,8 +1866,10 @@ Introducing the total density anomaly, $\mathcal{D}= \int_D d_a \,dv$,
 where $d_a = (\rho -\rho_o ) / \rho_o$ is the density anomaly used in \NEMO (cf. \autoref{subsec:TRA_eos})
 in \autoref{eq:M_Bq} leads to a very simple form for the steric height:
 
-\[	\eta_s = - \frac{1}{\mathcal{A}} \mathcal{D}
- \label{eq:steric_Bq} \]
+\begin{equation}
+  \eta_s = - \frac{1}{\mathcal{A}} \mathcal{D}
+  \label{eq:steric_Bq}
+\end{equation}
 
 The above formulation of the steric height of a Boussinesq ocean requires four remarks.
 First, one can be tempted to define $\rho_o$ as the initial value of $\mathcal{M}/\mathcal{V}$,
@@ -1697,17 +1891,20 @@ does not change when the sea level is changing as it is the case in all global o
 Third, the discretisation of \autoref{eq:steric_Bq} depends on the type of free surface which is considered.
 In the non linear free surface case, $i.e.$ \key{vvl} defined, it is given by
 
-\[ \eta_s = - \frac{ \sum_{i,\,j,\,k} d_a\; e_{1t} e_{2t} e_{3t} }
-                   { \sum_{i,\,j,\,k}       e_{1t} e_{2t} e_{3t} }
- \label{eq:discrete_steric_Bq_nfs} \]
+\[
+  \eta_s = - \frac{ \sum_{i,\,j,\,k} d_a\; e_{1t} e_{2t} e_{3t} }{ \sum_{i,\,j,\,k}       e_{1t} e_{2t} e_{3t} }
+  % \label{eq:discrete_steric_Bq_nfs}
+\]
 
 whereas in the linear free surface,
 the volume above the \textit{z=0} surface must be explicitly taken into account to
 better approximate the total ocean mass and thus the steric sea level:
 
-\[	\eta_s = - \frac{ \sum_{i,\,j,\,k} d_a\; e_{1t}e_{2t}e_{3t} + \sum_{i,\,j} d_a\; e_{1t}e_{2t} \eta }
-                   { \sum_{i,\,j,\,k}       e_{1t}e_{2t}e_{3t} + \sum_{i,\,j}      e_{1t}e_{2t} \eta }
- \label{eq:discrete_steric_Bq_fs} \]
+\[
+  \eta_s = - \frac{ \sum_{i,\,j,\,k} d_a\; e_{1t}e_{2t}e_{3t} + \sum_{i,\,j} d_a\; e_{1t}e_{2t} \eta }
+                  { \sum_{i,\,j,\,k}       e_{1t}e_{2t}e_{3t} + \sum_{i,\,j}       e_{1t}e_{2t} \eta }
+  % \label{eq:discrete_steric_Bq_fs}
+\]
 
 The fourth and last remark concerns the effective sea level and the presence of sea-ice.
 In the real ocean, sea ice (and snow above it)  depresses the liquid seawater through its mass loading.
@@ -1724,8 +1921,10 @@ In AR5 outputs, the thermosteric sea level is demanded.
 It is steric sea level due to changes in ocean density arising just from changes in temperature.
 It is given by:
 
-\[	\eta_s = - \frac{1}{\mathcal{A}} \int_D d_a(T,S_o,p_o) \,dv
- \label{eq:thermosteric_Bq} \]
+\[
+  \eta_s = - \frac{1}{\mathcal{A}} \int_D d_a(T,S_o,p_o) \,dv
+  % \label{eq:thermosteric_Bq}
+\]
 
 where $S_o$ and $p_o$ are the initial salinity and pressure, respectively.
 
@@ -1776,13 +1975,16 @@ the Indo-Pacific mask been deduced from the sum of the Indian and Pacific mask (
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=1.0\textwidth]{Fig_mask_subasins}
-    \caption{	\protect\label{fig:mask_subasins}
+    \caption{
+      \protect\label{fig:mask_subasins}
 		Decomposition of the World Ocean (here ORCA2) into sub-basin used in to
       compute the heat and salt transports as well as the meridional stream-function:
       Atlantic basin (red), Pacific basin (green), Indian basin (bleue), Indo-Pacific basin (bleue+green).
 		Note that semi-enclosed seas (Red, Med and Baltic seas) as well as Hudson Bay are removed from the sub-basins.
-      Note also that the Arctic Ocean has been split into Atlantic and Pacific basins along the North fold line.}
-\end{center} \end{figure}  
+      Note also that the Arctic Ocean has been split into Atlantic and Pacific basins along the North fold line.
+    }
+  \end{center}
+\end{figure}  
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 % -----------------------------------------------------------
@@ -1834,8 +2036,10 @@ This diagnostic is actived with the logical $ln\_diatmb$.
 Courant numbers provide a theoretical indication of the model's numerical stability.
 The advective Courant numbers can be calculated according to
 
-\[	C_u = |u|\frac{\rdt}{e_{1u}}, \quad C_v = |v|\frac{\rdt}{e_{2v}}, \quad C_w = |w|\frac{\rdt}{e_{3w}}
- \label{eq:CFL} \]
+\[
+  C_u = |u|\frac{\rdt}{e_{1u}}, \quad C_v = |v|\frac{\rdt}{e_{2v}}, \quad C_w = |w|\frac{\rdt}{e_{3w}}
+  % \label{eq:CFL}
+\]
 
 in the zonal, meridional and vertical directions respectively.
 The vertical component is included although it is not strictly valid as the vertical velocity is calculated from
@@ -1852,5 +2056,7 @@ with the coordinates of each.
 The maximum values from the run are also copied to the ocean.output file. 
 
 % ================================================================
+
+\biblio
 
 \end{document}

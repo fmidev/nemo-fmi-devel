@@ -1,10 +1,12 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Chapter 1 ——— Ocean Tracers (TRA)
 % ================================================================
 \chapter{Ocean Tracers (TRA)}
 \label{chap:TRA}
+
 \minitoc
 
 % missing/update 
@@ -13,8 +15,6 @@
 %STEVEN :  is the use of the word "positive" to describe a scheme enough, or should it be "positive definite"? I added a comment to this effect on some instances of this below
 
 %\newpage
-\vspace{2.cm}
-%$\ $\newline    % force a new ligne
 
 Using the representation described in \autoref{chap:DOM},
 several semi-discrete space forms of the tracer equations are available depending on
@@ -27,8 +27,8 @@ the resulting field is multiplied by a mask.
 The two active tracers are potential temperature and salinity.
 Their prognostic equations can be summarized as follows:
 \[
-\text{NXT} = \text{ADV}+\text{LDF}+\text{ZDF}+\text{SBC}
-                   \ (+\text{QSR})\ (+\text{BBC})\ (+\text{BBL})\ (+\text{DMP})
+  \text{NXT} = \text{ADV}+\text{LDF}+\text{ZDF}+\text{SBC}
+  \ (+\text{QSR})\ (+\text{BBC})\ (+\text{BBL})\ (+\text{DMP})
 \]
 
 NXT stands for next, referring to the time-stepping.
@@ -58,7 +58,6 @@ in the NEMO/OPA/TRA directory.
 The user has the option of extracting each tendency term on the RHS of the tracer equation for output
 (\np{ln\_tra\_trd} or \np{ln\_tra\_mxl}\forcode{ = .true.}), as described in \autoref{chap:DIA}.
 
-$\ $\newline    % force a new ligne
 % ================================================================
 % Tracer Advection
 % ================================================================
@@ -73,11 +72,12 @@ When considered ($i.e.$ when \np{ln\_traadv\_NONE} is not set to \forcode{.true.
 the advection tendency of a tracer is expressed in flux form,
 $i.e.$ as the divergence of the advective fluxes.
 Its discrete expression is given by :
-\begin{equation} \label{eq:tra_adv}
-ADV_\tau =-\frac{1}{b_t} \left( 
-\;\delta_i \left[ e_{2u}\,e_{3u} \;  u\; \tau_u  \right]
-+\delta_j \left[ e_{1v}\,e_{3v}  \;  v\; \tau_v  \right] \; \right)
--\frac{1}{e_{3t}} \;\delta_k \left[ w\; \tau_w \right]
+\begin{equation}
+  \label{eq:tra_adv}
+  ADV_\tau =-\frac{1}{b_t} \left(
+    \;\delta_i \left[ e_{2u}\,e_{3u} \;  u\; \tau_u  \right]
+    +\delta_j \left[ e_{1v}\,e_{3v}  \;  v\; \tau_v  \right] \; \right)
+  -\frac{1}{e_{3t}} \;\delta_k \left[ w\; \tau_w \right]
 \end{equation}
 where $\tau$ is either T or S, and $b_t= e_{1t}\,e_{2t}\,e_{3t}$ is the volume of $T$-cells.
 The flux form in \autoref{eq:tra_adv} implicitly requires the use of the continuity equation.
@@ -94,7 +94,8 @@ the continuity equation which is used to calculate the vertical velocity.
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=0.9\textwidth]{Fig_adv_scheme}
-    \caption{	\protect\label{fig:adv_scheme}
+    \caption{
+      \protect\label{fig:adv_scheme}
       Schematic representation of some ways used to evaluate the tracer value at $u$-point and
       the amount of tracer exchanged between two neighbouring grid points.
       Upsteam biased scheme (ups):
@@ -192,8 +193,9 @@ CEN implementation can be found in the \mdl{traadv\_cen} module.
 In the $2^{nd}$ order centred formulation (CEN2), the tracer at velocity points is evaluated as the mean of
 the two neighbouring $T$-point values.
 For example, in the $i$-direction :
-\begin{equation} \label{eq:tra_adv_cen2}
-\tau_u^{cen2} =\overline T ^{i+1/2}
+\begin{equation}
+  \label{eq:tra_adv_cen2}
+  \tau_u^{cen2} =\overline T ^{i+1/2}
 \end{equation}
 
 CEN2 is non diffusive ($i.e.$ it conserves the tracer variance, $\tau^2)$ but dispersive
@@ -211,9 +213,9 @@ both (\autoref{eq:tra_adv}) and (\autoref{eq:tra_adv_cen2}) have this order of a
 In the $4^{th}$ order formulation (CEN4), tracer values are evaluated at u- and v-points as
 a $4^{th}$ order interpolation, and thus depend on the four neighbouring $T$-points.
 For example, in the $i$-direction:
-\begin{equation} \label{eq:tra_adv_cen4}
-\tau_u^{cen4} 
-=\overline{   T - \frac{1}{6}\,\delta_i \left[ \delta_{i+1/2}[T] \,\right]   }^{\,i+1/2}
+\begin{equation}
+  \label{eq:tra_adv_cen4}
+  \tau_u^{cen4} =\overline{   T - \frac{1}{6}\,\delta_i \left[ \delta_{i+1/2}[T] \,\right]   }^{\,i+1/2}
 \end{equation}
 In the vertical direction (\np{nn\_cen\_v}\forcode{ = 4}),
 a $4^{th}$ COMPACT interpolation has been prefered \citep{Demange_PhD2014}.
@@ -257,15 +259,17 @@ FCT implementation can be found in the \mdl{traadv\_fct} module.
 In FCT formulation, the tracer at velocity points is evaluated using a combination of an upstream and
 a centred scheme.
 For example, in the $i$-direction :
-\begin{equation} \label{eq:tra_adv_fct}
-\begin{split}
-\tau_u^{ups}&= \begin{cases}
- 					T_{i+1} 	& \text{if $\ u_{i+1/2} <     0$} \hfill \\
- 					T_i   		& \text{if $\ u_{i+1/2} \geq 0$} \hfill \\
-				  \end{cases}     \\
-\\
-\tau_u^{fct}&=\tau_u^{ups} +c_u \;\left( {\tau_u^{cen} -\tau_u^{ups} } \right)
-\end{split}
+\begin{equation}
+  \label{eq:tra_adv_fct}
+  \begin{split}
+    \tau_u^{ups}&=
+    \begin{cases}
+      T_{i+1} 	& \text{if $\ u_{i+1/2} <     0$} \hfill \\
+      T_i   		& \text{if $\ u_{i+1/2} \geq 0$} \hfill \\
+    \end{cases}
+    \\ \\
+    \tau_u^{fct}&=\tau_u^{ups} +c_u \;\left( {\tau_u^{cen} -\tau_u^{ups} } \right)
+  \end{split}
 \end{equation}
 where $c_u$ is a flux limiter function taking values between 0 and 1.
 The FCT order is the one of the centred scheme used
@@ -304,14 +308,17 @@ MUSCL has been first implemented in \NEMO by \citet{Levy_al_GRL01}.
 In its formulation, the tracer at velocity points is evaluated assuming a linear tracer variation between
 two $T$-points (\autoref{fig:adv_scheme}).
 For example, in the $i$-direction :
-\begin{equation} \label{eq:tra_adv_mus}
-   \tau_u^{mus} = \left\{      \begin{aligned}
-         &\tau_i  &+ \frac{1}{2} \;\left( 1-\frac{u_{i+1/2} \;\rdt}{e_{1u}} \right)
-         &\ \widetilde{\partial _i \tau}  & \quad \text{if }\;u_{i+1/2} \geqslant 0      \\
-         &\tau_{i+1/2} &+\frac{1}{2}\;\left( 1+\frac{u_{i+1/2} \;\rdt}{e_{1u} } \right)
-         &\ \widetilde{\partial_{i+1/2} \tau } & \text{if }\;u_{i+1/2} <0
-   \end{aligned}    \right.
-\end{equation}
+\[
+  % \label{eq:tra_adv_mus}
+  \tau_u^{mus} = \left\{
+    \begin{aligned}
+      &\tau_i  &+ \frac{1}{2} \;\left( 1-\frac{u_{i+1/2} \;\rdt}{e_{1u}} \right)
+      &\ \widetilde{\partial _i \tau}  & \quad \text{if }\;u_{i+1/2} \geqslant 0      \\
+      &\tau_{i+1/2} &+\frac{1}{2}\;\left( 1+\frac{u_{i+1/2} \;\rdt}{e_{1u} } \right)
+      &\ \widetilde{\partial_{i+1/2} \tau } & \text{if }\;u_{i+1/2} <0
+    \end{aligned}
+  \right.
+\]
 where $\widetilde{\partial _i \tau}$ is the slope of the tracer on which a limitation is imposed to
 ensure the \textit{positive} character of the scheme.
 
@@ -337,12 +344,14 @@ The UBS scheme, often called UP3, is also known as the Cell Averaged QUICK schem
 (Quadratic Upstream Interpolation for Convective Kinematics).
 It is an upstream-biased third order scheme based on an upstream-biased parabolic interpolation.
 For example, in the $i$-direction:
-\begin{equation} \label{eq:tra_adv_ubs}
-   \tau_u^{ubs} =\overline T ^{i+1/2}-\;\frac{1}{6} \left\{      
-   \begin{aligned}
-         &\tau"_i        	& \quad \text{if }\ u_{i+1/2} \geqslant 0      \\
-         &\tau"_{i+1}	& \quad \text{if }\ u_{i+1/2}       <       0
-   \end{aligned}    \right.
+\begin{equation}
+  \label{eq:tra_adv_ubs}
+  \tau_u^{ubs} =\overline T ^{i+1/2}-\;\frac{1}{6} \left\{
+    \begin{aligned}
+      &\tau"_i        	& \quad \text{if }\ u_{i+1/2} \geqslant 0      \\
+      &\tau"_{i+1}	& \quad \text{if }\ u_{i+1/2}       <       0
+    \end{aligned}
+  \right.
 \end{equation}
 where $\tau "_i =\delta_i \left[ {\delta_{i+1/2} \left[ \tau \right]} \right]$.
 
@@ -372,19 +381,22 @@ This option is not available through a namelist parameter, since the 1/6 coeffic
 Nevertheless it is quite easy to make the substitution in the \mdl{traadv\_ubs} module and obtain a QUICK scheme.
 
 Note that it is straightforward to rewrite \autoref{eq:tra_adv_ubs} as follows:
-\begin{equation} \label{eq:traadv_ubs2}
-\tau_u^{ubs} = \tau_u^{cen4} + \frac{1}{12} \left\{	 
-   \begin{aligned}
-	& + \tau"_i			& \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
-	&  - \tau"_{i+1}		& \quad \text{if }\ u_{i+1/2}       <       0
-   \end{aligned}    \right.
-\end{equation}
+\[
+  \label{eq:traadv_ubs2}
+  \tau_u^{ubs} = \tau_u^{cen4} + \frac{1}{12} \left\{
+    \begin{aligned}
+      & + \tau"_i			& \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
+      &  - \tau"_{i+1}		& \quad \text{if }\ u_{i+1/2}       <       0
+    \end{aligned}
+  \right.
+\]
 or equivalently 
-\begin{equation} \label{eq:traadv_ubs2b}
-u_{i+1/2} \ \tau_u^{ubs} 
-=u_{i+1/2} \ \overline{ T - \frac{1}{6}\,\delta_i\left[ \delta_{i+1/2}[T] \,\right] }^{\,i+1/2}
-- \frac{1}{2} |u|_{i+1/2} \;\frac{1}{6} \;\delta_{i+1/2}[\tau"_i]
-\end{equation}
+\[
+  % \label{eq:traadv_ubs2b}
+  u_{i+1/2} \ \tau_u^{ubs}
+  =u_{i+1/2} \ \overline{ T - \frac{1}{6}\,\delta_i\left[ \delta_{i+1/2}[T] \,\right] }^{\,i+1/2}
+  - \frac{1}{2} |u|_{i+1/2} \;\frac{1}{6} \;\delta_{i+1/2}[\tau"_i]
+\]
 
 \autoref{eq:traadv_ubs2} has several advantages.
 Firstly, it clearly reveals that the UBS scheme is based on the fourth order scheme to which
@@ -518,10 +530,11 @@ the next two sub-sections.
 \label{subsec:TRA_ldf_lev}
 
 The laplacian diffusion operator acting along the model (\textit{i,j})-surfaces is given by: 
-\begin{equation} \label{eq:tra_ldf_lap}
-D_t^{lT} =\frac{1}{b_t} \left( \;
-   \delta_{i}\left[ A_u^{lT} \; \frac{e_{2u}\,e_{3u}}{e_{1u}} \;\delta_{i+1/2} [T] \right] 
-+ \delta_{j}\left[ A_v^{lT} \;  \frac{e_{1v}\,e_{3v}}{e_{2v}} \;\delta_{j+1/2} [T] \right]  \;\right)
+\begin{equation}
+  \label{eq:tra_ldf_lap}
+  D_t^{lT} =\frac{1}{b_t} \left( \;
+    \delta_{i}\left[ A_u^{lT} \; \frac{e_{2u}\,e_{3u}}{e_{1u}} \;\delta_{i+1/2} [T] \right]
+    + \delta_{j}\left[ A_v^{lT} \;  \frac{e_{1v}\,e_{3v}}{e_{2v}} \;\delta_{j+1/2} [T] \right]  \;\right)
 \end{equation}
 where  $b_t$=$e_{1t}\,e_{2t}\,e_{3t}$  is the volume of $T$-cells and
 where zero diffusive fluxes is assumed across solid boundaries,
@@ -553,27 +566,29 @@ They are calculated in the \mdl{zpshde} module, described in \autoref{sec:TRA_zp
 %&& ----------------------------------------------
 \subsubsection{Standard rotated (bi-)laplacian operator (\protect\mdl{traldf\_iso})}
 \label{subsec:TRA_ldf_iso}
+
 The general form of the second order lateral tracer subgrid scale physics (\autoref{eq:PE_zdf})
 takes the following semi-discrete space form in $z$- and $s$-coordinates:
-\begin{equation} \label{eq:tra_ldf_iso}
-\begin{split}
- D_T^{lT} = \frac{1}{b_t}   & \left\{   \,\;\delta_i \left[   A_u^{lT}  \left( 
-	  \frac{e_{2u}\,e_{3u}}{e_{1u}} \,\delta_{i+1/2}[T]
-	- e_{2u}\;r_{1u} \,\overline{\overline{ \delta_{k+1/2}[T] }}^{\,i+1/2,k}
-                                                     \right)   \right]   \right.    \\ 
-&             +\delta_j \left[ A_v^{lT} \left( 
-          \frac{e_{1v}\,e_{3v}}{e_{2v}}  \,\delta_{j+1/2} [T] 
-        - e_{1v}\,r_{2v} \,\overline{\overline{ \delta_{k+1/2} [T] }}^{\,j+1/2,k} 
-                                                    \right)   \right]                 \\ 
-& +\delta_k \left[ A_w^{lT} \left( 
-       -\;e_{2w}\,r_{1w} \,\overline{\overline{ \delta_{i+1/2} [T] }}^{\,i,k+1/2}
-                                                    \right.   \right.                 \\ 
-& \qquad \qquad \quad 
-        - e_{1w}\,r_{2w} \,\overline{\overline{ \delta_{j+1/2} [T] }}^{\,j,k+1/2}     \\
-& \left. {\left. {   \qquad \qquad \ \ \ \left. {
-        +\;\frac{e_{1w}\,e_{2w}}{e_{3w}} \,\left( r_{1w}^2 + r_{2w}^2 \right)
-        \,\delta_{k+1/2} [T] } \right) } \right] \quad } \right\}
-\end{split}
+\begin{equation}
+  \label{eq:tra_ldf_iso}
+  \begin{split}
+    D_T^{lT} = \frac{1}{b_t}   & \left\{   \,\;\delta_i \left[   A_u^{lT}  \left(
+          \frac{e_{2u}\,e_{3u}}{e_{1u}} \,\delta_{i+1/2}[T]
+          - e_{2u}\;r_{1u} \,\overline{\overline{ \delta_{k+1/2}[T] }}^{\,i+1/2,k}
+        \right)   \right]   \right.    \\
+    &             +\delta_j \left[ A_v^{lT} \left(
+        \frac{e_{1v}\,e_{3v}}{e_{2v}}  \,\delta_{j+1/2} [T]
+        - e_{1v}\,r_{2v} \,\overline{\overline{ \delta_{k+1/2} [T] }}^{\,j+1/2,k}
+      \right)   \right]                 \\
+    & +\delta_k \left[ A_w^{lT} \left(
+        -\;e_{2w}\,r_{1w} \,\overline{\overline{ \delta_{i+1/2} [T] }}^{\,i,k+1/2}
+      \right.   \right.                 \\
+    & \qquad \qquad \quad
+    - e_{1w}\,r_{2w} \,\overline{\overline{ \delta_{j+1/2} [T] }}^{\,j,k+1/2}     \\
+    & \left. {\left. {   \qquad \qquad \ \ \ \left. {
+                +\;\frac{e_{1w}\,e_{2w}}{e_{3w}} \,\left( r_{1w}^2 + r_{2w}^2 \right)
+                \,\delta_{k+1/2} [T] } \right) } \right] \quad } \right\}
+  \end{split}
 \end{equation}
 where $b_t$=$e_{1t}\,e_{2t}\,e_{3t}$  is the volume of $T$-cells,
 $r_1$ and $r_2$ are the slopes between the surface of computation ($z$- or $s$-surfaces) and
@@ -651,13 +666,13 @@ Options are defined through the \ngn{namzdf} namelist variables.
 The formulation of the vertical subgrid scale tracer physics is the same for all the vertical coordinates,
 and is based on a laplacian operator.
 The vertical diffusion operator given by (\autoref{eq:PE_zdf}) takes the following semi-discrete space form:
-\begin{equation} \label{eq:tra_zdf}
-\begin{split}
-D^{vT}_T &= \frac{1}{e_{3t}} \; \delta_k \left[ \;\frac{A^{vT}_w}{e_{3w}}  \delta_{k+1/2}[T] \;\right] 
-\\
-D^{vS}_T &= \frac{1}{e_{3t}} \; \delta_k \left[ \;\frac{A^{vS}_w}{e_{3w}}  \delta_{k+1/2}[S] \;\right] 
-\end{split}
-\end{equation}
+\[
+  % \label{eq:tra_zdf}
+  \begin{split}
+    D^{vT}_T &= \frac{1}{e_{3t}} \; \delta_k \left[ \;\frac{A^{vT}_w}{e_{3w}}  \delta_{k+1/2}[T] \;\right]    \\
+    D^{vS}_T &= \frac{1}{e_{3t}} \; \delta_k \left[ \;\frac{A^{vS}_w}{e_{3w}}  \delta_{k+1/2}[S] \;\right]
+  \end{split}
+\]
 where $A_w^{vT}$ and $A_w^{vS}$ are the vertical eddy diffusivity coefficients on temperature and salinity,
 respectively.
 Generally, $A_w^{vT}=A_w^{vS}$ except when double diffusive mixing is parameterised ($i.e.$ \key{zdfddm} is defined).
@@ -725,11 +740,12 @@ $\bullet$ \textit{fwfisf}, the mass flux associated with ice shelf melt,
 (see \autoref{sec:SBC_isf} for further details on how the ice shelf melt is computed and applied).
 
 The surface boundary condition on temperature and salinity is applied as follows:
-\begin{equation} \label{eq:tra_sbc}
-\begin{aligned}
- &F^T = \frac{ 1 }{\rho_o \;C_p \,\left. e_{3t} \right|_{k=1} }  &\overline{ Q_{ns}       }^t  & \\ 
-& F^S =\frac{ 1 }{\rho_o  \,      \left. e_{3t} \right|_{k=1} }  &\overline{ \textit{sfx} }^t   & \\   
- \end{aligned}
+\begin{equation}
+  \label{eq:tra_sbc}
+  \begin{aligned}
+    &F^T = \frac{ 1 }{\rho_o \;C_p \,\left. e_{3t} \right|_{k=1} }  &\overline{ Q_{ns}       }^t  & \\
+    & F^S =\frac{ 1 }{\rho_o  \,      \left. e_{3t} \right|_{k=1} }  &\overline{ \textit{sfx} }^t   & \\
+  \end{aligned}
 \end{equation} 
 where $\overline{x }^t$ means that $x$ is averaged over two consecutive time steps ($t-\rdt/2$ and $t+\rdt/2$).
 Such time averaging prevents the divergence of odd and even time step (see \autoref{chap:STP}).
@@ -740,14 +756,15 @@ On temperature, this term remove the heat content associated with mass exchange 
 On salinity, this term mimics the concentration/dilution effect that would have resulted from a change in
 the volume of the first level.
 The resulting surface boundary condition is applied as follows:
-\begin{equation} \label{eq:tra_sbc_lin}
-\begin{aligned}
- &F^T = \frac{ 1 }{\rho_o \;C_p \,\left. e_{3t} \right|_{k=1} }   
-           &\overline{ \left( Q_{ns} - \textit{emp}\;C_p\,\left. T \right|_{k=1} \right) }^t  & \\ 
-%
-& F^S =\frac{ 1 }{\rho_o \,\left. e_{3t} \right|_{k=1} } 
-           &\overline{ \left( \;\textit{sfx} - \textit{emp} \;\left. S \right|_{k=1}  \right) }^t   & \\   
- \end{aligned}
+\begin{equation}
+  \label{eq:tra_sbc_lin}
+  \begin{aligned}
+    &F^T = \frac{ 1 }{\rho_o \;C_p \,\left. e_{3t} \right|_{k=1} }
+    &\overline{ \left( Q_{ns} - \textit{emp}\;C_p\,\left. T \right|_{k=1} \right) }^t  & \\
+    %
+    & F^S =\frac{ 1 }{\rho_o \,\left. e_{3t} \right|_{k=1} }
+    &\overline{ \left( \;\textit{sfx} - \textit{emp} \;\left. S \right|_{k=1}  \right) }^t   & \\
+  \end{aligned}
 \end{equation} 
 Note that an exact conservation of heat and salt content is only achieved with non-linear free surface.
 In the linear free surface case, there is a small imbalance.
@@ -771,17 +788,19 @@ If it is not used (\np{ln\_flxqsr}\forcode{ = .false.}) all the heat flux is abs
 Thus, in the former case a term is added to the time evolution equation of temperature \autoref{eq:PE_tra_T} and
 the surface boundary condition is modified to take into account only the non-penetrative part of the surface 
 heat flux:
-\begin{equation} \label{eq:PE_qsr}
-\begin{split}
-\frac{\partial T}{\partial t} &= {\ldots} + \frac{1}{\rho_o\, C_p \,e_3} \; \frac{\partial I}{\partial k}	\\
-Q_{ns} &= Q_\text{Total} - Q_{sr}
-\end{split}
+\begin{equation}
+  \label{eq:PE_qsr}
+  \begin{split}
+    \frac{\partial T}{\partial t} &= {\ldots} + \frac{1}{\rho_o\, C_p \,e_3} \; \frac{\partial I}{\partial k}	\\
+    Q_{ns} &= Q_\text{Total} - Q_{sr}
+  \end{split}
 \end{equation}
 where $Q_{sr}$ is the penetrative part of the surface heat flux ($i.e.$ the shortwave radiation) and
 $I$ is the downward irradiance ($\left. I \right|_{z=\eta}=Q_{sr}$).
 The additional term in \autoref{eq:PE_qsr} is discretized as follows:
-\begin{equation} \label{eq:tra_qsr}
-\frac{1}{\rho_o\, C_p \,e_3} \; \frac{\partial I}{\partial k} \equiv \frac{1}{\rho_o\, C_p\, e_{3t}} \delta_k \left[ I_w \right]
+\begin{equation}
+  \label{eq:tra_qsr}
+  \frac{1}{\rho_o\, C_p \,e_3} \; \frac{\partial I}{\partial k} \equiv \frac{1}{\rho_o\, C_p\, e_{3t}} \delta_k \left[ I_w \right]
 \end{equation}
 
 The shortwave radiation, $Q_{sr}$, consists of energy distributed across a wide spectral range.
@@ -797,9 +816,10 @@ The way this second part of the solar energy penetrates into the ocean depends o
 In the simple 2-waveband light penetration scheme (\np{ln\_qsr\_2bd}\forcode{ = .true.})
 a chlorophyll-independent monochromatic formulation is chosen for the shorter wavelengths,
 leading to the following expression \citep{Paulson1977}:
-\begin{equation} \label{eq:traqsr_iradiance}
-I(z) = Q_{sr} \left[Re^{-z / \xi_0} + \left( 1-R\right) e^{-z / \xi_1} \right]
-\end{equation}
+\[
+  % \label{eq:traqsr_iradiance}
+  I(z) = Q_{sr} \left[Re^{-z / \xi_0} + \left( 1-R\right) e^{-z / \xi_1} \right]
+\]
 where $\xi_1$ is the second extinction length scale associated with the shorter wavelengths.
 It is usually chosen to be 23~m by setting the \np{rn\_si0} namelist parameter.
 The set of default values ($\xi_0$, $\xi_1$, $R$) corresponds to a Type I water in Jerlov's (1968) classification
@@ -856,7 +876,8 @@ In this case, we have chosen that all remaining radiation is absorbed in the las
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=1.0\textwidth]{Fig_TRA_Irradiance}
-    \caption{ 	 \protect\label{fig:traqsr_irradiance}
+    \caption{
+      \protect\label{fig:traqsr_irradiance}
       Penetration profile of the downward solar irradiance calculated by four models.
       Two waveband chlorophyll-independent formulation (blue),
       a chlorophyll-dependent monochromatic formulation (green),
@@ -882,7 +903,8 @@ In this case, we have chosen that all remaining radiation is absorbed in the las
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=1.0\textwidth]{Fig_TRA_geoth}
-    \caption{ 	\protect\label{fig:geothermal}
+    \caption{
+      \protect\label{fig:geothermal}
       Geothermal Heat flux (in $mW.m^{-2}$) used by \cite{Emile-Geay_Madec_OS09}.
       It is inferred from the age of the sea floor and the formulae of \citet{Stein_Stein_Nat92}.
     }
@@ -946,19 +968,22 @@ Furthermore, it only connects ocean bottom cells, and therefore does not include
 
 When applying sigma-diffusion (\key{trabbl} defined and \np{nn\_bbl\_ldf} set to 1),
 the diffusive flux between two adjacent cells at the ocean floor is given by 
-\begin{equation} \label{eq:tra_bbl_diff}
-{\rm {\bf F}}_\sigma=A_l^\sigma \; \nabla_\sigma T
-\end{equation} 
+\[
+  % \label{eq:tra_bbl_diff}
+  {\rm {\bf F}}_\sigma=A_l^\sigma \; \nabla_\sigma T
+\]
 with $\nabla_\sigma$ the lateral gradient operator taken between bottom cells,
 and  $A_l^\sigma$ the lateral diffusivity in the BBL.
 Following \citet{Beckmann_Doscher1997}, the latter is prescribed with a spatial dependence,
 $i.e.$ in the conditional form
-\begin{equation} \label{eq:tra_bbl_coef}
-A_l^\sigma (i,j,t)=\left\{ {\begin{array}{l}
- A_{bbl}  \quad \quad   \mbox{if}  \quad   \nabla_\sigma \rho  \cdot  \nabla H<0 \\ 
- \\
- 0\quad \quad \;\,\mbox{otherwise} \\ 
- \end{array}} \right.
+\begin{equation}
+  \label{eq:tra_bbl_coef}
+  A_l^\sigma (i,j,t)=\left\{ {
+      \begin{array}{l}
+        A_{bbl}  \quad \quad   \mbox{if}  \quad   \nabla_\sigma \rho  \cdot  \nabla H<0 \\ \\
+        0\quad \quad \;\,\mbox{otherwise} \\
+      \end{array}}
+  \right.
 \end{equation} 
 where $A_{bbl}$ is the BBL diffusivity coefficient, given by the namelist parameter \np{rn\_ahtbbl} and
 usually set to a value much larger than the one used for lateral mixing in the open ocean.
@@ -967,9 +992,10 @@ the density above the sea floor, at the top of the slope, is larger than in the 
 (see green arrow in \autoref{fig:bbl}).
 In practice, this constraint is applied separately in the two horizontal directions,
 and the density gradient in \autoref{eq:tra_bbl_coef} is evaluated with the log gradient formulation: 
-\begin{equation} \label{eq:tra_bbl_Drho}
-	\nabla_\sigma \rho / \rho = \alpha \,\nabla_\sigma T + \beta   \,\nabla_\sigma S
-\end{equation} 
+\[
+  % \label{eq:tra_bbl_Drho}
+  \nabla_\sigma \rho / \rho = \alpha \,\nabla_\sigma T + \beta   \,\nabla_\sigma S
+\]
 where $\rho$, $\alpha$ and $\beta$ are functions of $\overline{T}^\sigma$,
 $\overline{S}^\sigma$ and $\overline{H}^\sigma$, the along bottom mean temperature, salinity and depth, respectively.
 
@@ -986,7 +1012,8 @@ if this is not what is meant then "downwards sloping flow" is also a possibility
 \begin{figure}[!t]
   \begin{center}
     \includegraphics[width=0.7\textwidth]{Fig_BBL_adv}
-    \caption{ 	\protect\label{fig:bbl}
+    \caption{
+      \protect\label{fig:bbl}
       Advective/diffusive Bottom Boundary Layer.
       The BBL parameterisation is activated when $\rho^i_{kup}$ is larger than $\rho^{i+1}_{kdnw}$.
       Red arrows indicate the additional overturning circulation due to the advective BBL.
@@ -1023,9 +1050,10 @@ The advection is allowed only  if dense water overlies less dense water on the s
 ($i.e.$ $\nabla_\sigma \rho  \cdot  \nabla H<0$).
 For example, the resulting transport of the downslope flow, here in the $i$-direction (\autoref{fig:bbl}),
 is simply given by the following expression:
-\begin{equation} \label{eq:bbl_Utr}
- u^{tr}_{bbl} = \gamma \, g \frac{\Delta \rho}{\rho_o}  e_{1u} \; min \left( {e_{3u}}_{kup},{e_{3u}}_{kdwn} \right)
-\end{equation}
+\[
+  % \label{eq:bbl_Utr}
+  u^{tr}_{bbl} = \gamma \, g \frac{\Delta \rho}{\rho_o}  e_{1u} \; min \left( {e_{3u}}_{kup},{e_{3u}}_{kdwn} \right)
+\]
 where $\gamma$, expressed in seconds, is the coefficient of proportionality provided as \np{rn\_gambbl},
 a namelist parameter, and \textit{kup} and \textit{kdwn} are the vertical index of the higher and lower cells,
 respectively.
@@ -1042,17 +1070,17 @@ the density at level $(i,kup)$ is larger than the one at level $(i,kdwn)$.
 The advective BBL scheme modifies the tracer time tendency of the ocean cells near the topographic step by
 the downslope flow \autoref{eq:bbl_dw}, the horizontal \autoref{eq:bbl_hor} and
 the upward \autoref{eq:bbl_up} return flows as follows: 
-\begin{align} 
-\partial_t T^{do}_{kdw} &\equiv \partial_t T^{do}_{kdw}
-                                     +  \frac{u^{tr}_{bbl}}{{b_t}^{do}_{kdw}}  \left( T^{sh}_{kup} - T^{do}_{kdw} \right)  \label{eq:bbl_dw} \\
-%
-\partial_t T^{sh}_{kup} &\equiv \partial_t T^{sh}_{kup} 
-				   + \frac{u^{tr}_{bbl}}{{b_t}^{sh}_{kup}}   \left( T^{do}_{kup} - T^{sh}_{kup} \right)   \label{eq:bbl_hor} \\
-%
-\intertext{and for $k =kdw-1,\;..., \; kup$ :} 
-%
-\partial_t T^{do}_{k} &\equiv \partial_t S^{do}_{k}
-				   + \frac{u^{tr}_{bbl}}{{b_t}^{do}_{k}}   \left( T^{do}_{k+1} - T^{sh}_{k} \right)   \label{eq:bbl_up}
+\begin{align}
+  \partial_t T^{do}_{kdw} &\equiv \partial_t T^{do}_{kdw}
+                            +  \frac{u^{tr}_{bbl}}{{b_t}^{do}_{kdw}}  \left( T^{sh}_{kup} - T^{do}_{kdw} \right)  \label{eq:bbl_dw} \\
+                            %
+  \partial_t T^{sh}_{kup} &\equiv \partial_t T^{sh}_{kup}
+                            + \frac{u^{tr}_{bbl}}{{b_t}^{sh}_{kup}}   \left( T^{do}_{kup} - T^{sh}_{kup} \right)   \label{eq:bbl_hor} \\
+                            %
+  \intertext{and for $k =kdw-1,\;..., \; kup$ :}
+  %
+  \partial_t T^{do}_{k} &\equiv \partial_t S^{do}_{k}
+                          + \frac{u^{tr}_{bbl}}{{b_t}^{do}_{k}}   \left( T^{do}_{k+1} - T^{sh}_{k} \right)   \label{eq:bbl_up}
 \end{align}
 where $b_t$ is the $T$-cell volume. 
 
@@ -1070,11 +1098,12 @@ It has to be used to compute the effective velocity as well as the effective ove
 %--------------------------------------------------------------------------------------------------------------
 
 In some applications it can be useful to add a Newtonian damping term into the temperature and salinity equations:
-\begin{equation} \label{eq:tra_dmp}
-\begin{split}
- \frac{\partial T}{\partial t}=\;\cdots \;-\gamma \,\left( {T-T_o } \right)  \\
- \frac{\partial S}{\partial t}=\;\cdots \;-\gamma \,\left( {S-S_o } \right)
-\end{split}
+\begin{equation}
+  \label{eq:tra_dmp}
+  \begin{split}
+    \frac{\partial T}{\partial t}=\;\cdots \;-\gamma \,\left( {T-T_o } \right)  \\
+    \frac{\partial S}{\partial t}=\;\cdots \;-\gamma \,\left( {S-S_o } \right)
+  \end{split}
 \end{equation} 
 where $\gamma$ is the inverse of a time scale, and $T_o$ and $S_o$ are given temperature and salinity fields
 (usually a climatology).
@@ -1172,14 +1201,14 @@ with \np{rn\_surf} as surface value, \np{rn\_bot} as bottom value and a transiti
 Options are defined through the  \ngn{namdom} namelist variables.
 The general framework for tracer time stepping is a modified leap-frog scheme \citep{Leclair_Madec_OM09},
 $i.e.$ a three level centred time scheme associated with a Asselin time filter (cf. \autoref{sec:STP_mLF}):
-\begin{equation} \label{eq:tra_nxt}
-\begin{aligned}
-(e_{3t}T)^{t+\rdt} &= (e_{3t}T)_f^{t-\rdt} &+ 2 \, \rdt  \,e_{3t}^t\ \text{RHS}^t &	\\
-\\
-(e_{3t}T)_f^t  \;\ \quad &= (e_{3t}T)^t \;\quad 
-                                    &+\gamma \,\left[ {(e_{3t}T)_f^{t-\rdt} -2(e_{3t}T)^t+(e_{3t}T)^{t+\rdt}} \right] &  \\
-                                 & &- \gamma\,\rdt \, \left[ Q^{t+\rdt/2} -  Q^{t-\rdt/2} \right]  &                      
-\end{aligned}
+\begin{equation}
+  \label{eq:tra_nxt}
+  \begin{aligned}
+    (e_{3t}T)^{t+\rdt} &= (e_{3t}T)_f^{t-\rdt} &+ 2 \, \rdt  \,e_{3t}^t\ \text{RHS}^t &	\\ \\
+    (e_{3t}T)_f^t  \;\ \quad &= (e_{3t}T)^t \;\quad
+    &+\gamma \,\left[ {(e_{3t}T)_f^{t-\rdt} -2(e_{3t}T)^t+(e_{3t}T)^{t+\rdt}} \right] &  \\
+    & &- \gamma\,\rdt \, \left[ Q^{t+\rdt/2} -  Q^{t-\rdt/2} \right]  &
+  \end{aligned}
 \end{equation} 
 where RHS is the right hand side of the temperature equation, the subscript $f$ denotes filtered values,
 $\gamma$ is the Asselin coefficient, and $S$ is the total forcing applied on $T$
@@ -1287,14 +1316,15 @@ controls the EOS used (\forcode{= -1} for TEOS10 ; \forcode{= 0} for EOS-80 ; \f
   \textit{conservative} and \textit{potential} temperature,
   as well as between \textit{absolute} and \textit{practical} salinity.
   S-EOS takes the following expression:
-  \begin{equation} \label{eq:tra_S-EOS}
+  \[
+    % \label{eq:tra_S-EOS}
     \begin{split}
       d_a(T,S,z)  =  ( & - a_0 \; ( 1 + 0.5 \; \lambda_1 \; T_a + \mu_1 \; z ) * T_a  \\
       & + b_0 \; ( 1 - 0.5 \; \lambda_2 \; S_a - \mu_2 \; z ) * S_a  \\
       & - \nu \; T_a \; S_a \;  ) \; / \; \rho_o                     \\
       with \ \  T_a = T-10  \; ;  & \;  S_a = S-35  \; ;\;  \rho_o = 1026~Kg/m^3
     \end{split}
-  \end{equation}
+  \]
   where the computer name of the coefficients as well as their standard value are given in \autoref{tab:SEOS}.
   In fact, when choosing S-EOS, various approximation of EOS can be specified simply by changing the associated coefficients.
   Setting to zero the two thermobaric coefficients ($\mu_1$, $\mu_2$) remove thermobaric effect from S-EOS.
@@ -1305,21 +1335,23 @@ controls the EOS used (\forcode{= -1} for TEOS10 ; \forcode{= 0} for EOS-80 ; \f
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{table}[!tb]
-\begin{center} \begin{tabular}{|p{26pt}|p{72pt}|p{56pt}|p{136pt}|}
-\hline
-coeff.	& computer name   & S-EOS		&  description		                  \\ \hline
-$a_0$       & \np{rn\_a0}     & 1.6550 $10^{-1}$ &  linear thermal expansion coeff. 	\\ \hline
-$b_0$	      & \np{rn\_b0} 	   & 7.6554 $10^{-1}$ &  linear haline  expansion coeff. 	\\ \hline
-$\lambda_1$	& \np{rn\_lambda1}& 5.9520 $10^{-2}$ &  cabbeling coeff. in $T^2$ 	      \\ \hline
-$\lambda_2$	& \np{rn\_lambda2}& 5.4914 $10^{-4}$ &  cabbeling coeff. in $S^2$	 	   \\ \hline
-$\nu$       & \np{rn\_nu}     & 2.4341 $10^{-3}$ &  cabbeling coeff. in $T \, S$ 	   \\ \hline
-$\mu_1$     & \np{rn\_mu1} 	& 1.4970 $10^{-4}$ &  thermobaric coeff. in T    	   \\ \hline
-$\mu_2$     & \np{rn\_mu2} 	& 1.1090 $10^{-5}$ &  thermobaric coeff. in S   	      \\ \hline
-\end{tabular}
-\caption{ \protect\label{tab:SEOS}
-  Standard value of S-EOS coefficients.
-}
-\end{center}
+  \begin{center}
+    \begin{tabular}{|p{26pt}|p{72pt}|p{56pt}|p{136pt}|}
+      \hline
+      coeff.	& computer name   & S-EOS		&  description		                  \\ \hline
+      $a_0$       & \np{rn\_a0}     & 1.6550 $10^{-1}$ &  linear thermal expansion coeff. 	\\ \hline
+      $b_0$	      & \np{rn\_b0} 	   & 7.6554 $10^{-1}$ &  linear haline  expansion coeff. 	\\ \hline
+      $\lambda_1$	& \np{rn\_lambda1}& 5.9520 $10^{-2}$ &  cabbeling coeff. in $T^2$ 	      \\ \hline
+      $\lambda_2$	& \np{rn\_lambda2}& 5.4914 $10^{-4}$ &  cabbeling coeff. in $S^2$	 	   \\ \hline
+      $\nu$       & \np{rn\_nu}     & 2.4341 $10^{-3}$ &  cabbeling coeff. in $T \, S$ 	   \\ \hline
+      $\mu_1$     & \np{rn\_mu1} 	& 1.4970 $10^{-4}$ &  thermobaric coeff. in T    	   \\ \hline
+      $\mu_2$     & \np{rn\_mu2} 	& 1.1090 $10^{-5}$ &  thermobaric coeff. in S   	      \\ \hline
+    \end{tabular}
+    \caption{
+      \protect\label{tab:SEOS}
+      Standard value of S-EOS coefficients.
+    }
+  \end{center}
 \end{table}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -1337,9 +1369,10 @@ non-penetrative convection, tidal mixing  parameterisation, iso-neutral diffusio
 In particular, $N^2$ has to be computed at the local pressure
 (pressure in decibar being approximated by the depth in meters).
 The expression for $N^2$  is given by: 
-\begin{equation} \label{eq:tra_bn2}
-N^2 =	\frac{g}{e_{3w}} \left(   \beta \;\delta_{k+1/2}[S] - \alpha \;\delta_{k+1/2}[T]   \right)
-\end{equation} 
+\[
+  % \label{eq:tra_bn2}
+  N^2 =	\frac{g}{e_{3w}} \left(   \beta \;\delta_{k+1/2}[S] - \alpha \;\delta_{k+1/2}[T]   \right)
+\]
 where $(T,S) = (\Theta, S_A)$ for TEOS10, $= (\theta, S_p)$ for TEOS-80, or $=(T,S)$ for S-EOS,
 and, $\alpha$ and $\beta$ are the thermal and haline expansion coefficients.
 The coefficients are a polynomial function of temperature, salinity and depth which
@@ -1353,12 +1386,12 @@ They are computed through \textit{eos\_rab}, a \textsc{Fortran} function that ca
 \label{subsec:TRA_fzp}
 
 The freezing point of seawater is a function of salinity and pressure \citep{UNESCO1983}:
-\begin{equation} \label{eq:tra_eos_fzp}
-   \begin{split}
-T_f (S,p) = \left( -0.0575 + 1.710523 \;10^{-3} \, \sqrt{S} 
-						     -  2.154996 \;10^{-4} \,S  \right) \ S    \\
-               - 7.53\,10^{-3} \ \ p 
-   \end{split}
+\begin{equation}
+  \label{eq:tra_eos_fzp}
+  \begin{split}
+    T_f (S,p) = \left( -0.0575 + 1.710523 \;10^{-3} \, \sqrt{S} -  2.154996 \;10^{-4} \,S  \right) \ S    \\
+    - 7.53\,10^{-3} \ \ p
+  \end{split}
 \end{equation}
 
 \autoref{eq:tra_eos_fzp} is only used to compute the potential freezing point of sea water
@@ -1404,7 +1437,8 @@ For example, for temperature in the $i$-direction the needed interpolated temper
 \begin{figure}[!p]
   \begin{center}
     \includegraphics[width=0.9\textwidth]{Fig_partial_step_scheme}
-    \caption{ 	\protect\label{fig:Partial_step_scheme}
+    \caption{
+      \protect\label{fig:Partial_step_scheme}
       Discretisation of the horizontal difference and average of tracers in the $z$-partial step coordinate
       (\protect\np{ln\_zps}\forcode{ = .true.}) in the case $( e3w_k^{i+1} - e3w_k^i  )>0$.
       A linear interpolation is used to estimate $\widetilde{T}_k^{i+1}$,
@@ -1416,29 +1450,31 @@ For example, for temperature in the $i$-direction the needed interpolated temper
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \[
-\widetilde{T}= \left\{  \begin{aligned}  
-&T^{\,i+1}      -\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right)}{ e_{3w}^{i+1} }\;\delta_k T^{i+1}	
- 								&& \quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$   } 	\\
-										\\
-&T^{\,i} \ \ \ \,+\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right) }{e_{3w}^i       }\;\delta_k T^{i+1}
-			 					&& \quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   } 
-            \end{aligned}   \right.
+  \widetilde{T}= \left\{
+    \begin{aligned}
+      &T^{\,i+1}      -\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right)}{ e_{3w}^{i+1} }\;\delta_k T^{i+1}
+      && \quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$   } 	\\ \\
+      &T^{\,i} \ \ \ \,+\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right) }{e_{3w}^i       }\;\delta_k T^{i+1}
+      && \quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   }
+    \end{aligned}
+  \right.
 \]
 and the resulting forms for the horizontal difference and the horizontal average value of $T$ at a $U$-point are: 
-\begin{equation} \label{eq:zps_hde}
-\begin{aligned}
- \delta_{i+1/2} T= 	\begin{cases}
-\ \ \ \widetilde {T}\quad\ -T^i	 	& \ \ \quad\quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$ } \\
-										\\
-\ \ \ T^{\,i+1}-\widetilde{T}		& \ \ \quad\quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   } 
-            		\end{cases}     \\
-\\
-\overline {T}^{\,i+1/2} \ = 	\begin{cases}
-( \widetilde {T}\ \ \;\,-T^{\,i})	 / 2	& \;\ \ \quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$ } \\
-										\\
-( T^{\,i+1}-\widetilde{T} ) / 2		& \;\ \ \quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   } 
-            \end{cases}
-\end{aligned}
+\begin{equation}
+  \label{eq:zps_hde}
+  \begin{aligned}
+    \delta_{i+1/2} T=
+    \begin{cases}
+      \ \ \ \widetilde {T}\quad\ -T^i	 	& \ \ \quad\quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$ } \\ \\
+      \ \ \ T^{\,i+1}-\widetilde{T}		& \ \ \quad\quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   }
+    \end{cases}
+    \\ \\
+    \overline {T}^{\,i+1/2} \ =
+    \begin{cases}
+      ( \widetilde {T}\ \ \;\,-T^{\,i})	 / 2	& \;\ \ \quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$ } \\ \\
+      ( T^{\,i+1}-\widetilde{T} ) / 2		& \;\ \ \quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   }
+    \end{cases}
+  \end{aligned}
 \end{equation}
 
 The computation of horizontal derivative of tracers as well as of density is performed once for all at
@@ -1448,10 +1484,11 @@ is not the same as that used for $T$ and $S$.
 Instead of forming a linear approximation of density, we compute $\widetilde{\rho }$ from the interpolated values of
 $T$ and $S$, and the pressure at a $u$-point
 (in the equation of state pressure is approximated by depth, see \autoref{subsec:TRA_eos} ): 
-\begin{equation} \label{eq:zps_hde_rho}
-\widetilde{\rho } = \rho ( {\widetilde{T},\widetilde {S},z_u }) 
-\quad \text{where }\  z_u = \min \left( {z_T^{i+1} ,z_T^i } \right)
-\end{equation} 
+\[
+  % \label{eq:zps_hde_rho}
+  \widetilde{\rho } = \rho ( {\widetilde{T},\widetilde {S},z_u })
+  \quad \text{where }\  z_u = \min \left( {z_T^{i+1} ,z_T^i } \right)
+\]
 
 This is a much better approximation as the variation of $\rho$ with depth (and thus pressure)
 is highly non-linear with a true equation of state and thus is badly approximated with a linear interpolation.
@@ -1470,4 +1507,7 @@ partial cells should be further investigated in the near future.
 %%%
 \gmcomment{gm :   this last remark has to be done}
 %%%
+
+\biblio
+
 \end{document}

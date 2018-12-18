@@ -1,15 +1,16 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
-% Chapter 1 Ñ Model Basics
+% Chapter 1 Model Basics
 % ================================================================
 
 \chapter{Model Basics}
 \label{chap:PE}
+
 \minitoc
 
 \newpage
-$\ $\newline    % force a new ligne
 
 % ================================================================
 % Primitive Equations
@@ -61,28 +62,35 @@ The vector invariant form of the primitive equations in the (\textbf{i},\textbf{
 provides the following six equations
 (namely the momentum balance, the hydrostatic equilibrium, the incompressibility equation,
 the heat and salt conservation equations and an equation of state):
-\begin{subequations} \label{eq:PE}
-  \begin{equation}     \label{eq:PE_dyn}
-\frac{\partial {\rm {\bf U}}_h }{\partial t}=
--\left[    {\left( {\nabla \times {\rm {\bf U}}} \right)\times {\rm {\bf U}}
-            +\frac{1}{2}\nabla \left( {{\rm {\bf U}}^2} \right)}    \right]_h
- -f\;{\rm {\bf k}}\times {\rm {\bf U}}_h 
--\frac{1}{\rho_o }\nabla _h p + {\rm {\bf D}}^{\rm {\bf U}} + {\rm {\bf F}}^{\rm {\bf U}}
+\begin{subequations}
+  \label{eq:PE}
+  \begin{equation}
+    \label{eq:PE_dyn}
+    \frac{\partial {\rm {\bf U}}_h }{\partial t}=
+    -\left[    {\left( {\nabla \times {\rm {\bf U}}} \right)\times {\rm {\bf U}}
+        +\frac{1}{2}\nabla \left( {{\rm {\bf U}}^2} \right)}    \right]_h
+    -f\;{\rm {\bf k}}\times {\rm {\bf U}}_h
+    -\frac{1}{\rho_o }\nabla _h p + {\rm {\bf D}}^{\rm {\bf U}} + {\rm {\bf F}}^{\rm {\bf U}}
   \end{equation}
-  \begin{equation}     \label{eq:PE_hydrostatic}
-\frac{\partial p }{\partial z} = - \rho \ g
+  \begin{equation}
+    \label{eq:PE_hydrostatic}
+    \frac{\partial p }{\partial z} = - \rho \ g
   \end{equation}
-  \begin{equation}     \label{eq:PE_continuity}
-\nabla \cdot {\bf U}=  0
+  \begin{equation}
+    \label{eq:PE_continuity}
+    \nabla \cdot {\bf U}=  0
   \end{equation}
-\begin{equation} \label{eq:PE_tra_T}
-\frac{\partial T}{\partial t} = - \nabla \cdot  \left( T \ \rm{\bf U} \right) + D^T + F^T
+  \begin{equation}
+    \label{eq:PE_tra_T}
+    \frac{\partial T}{\partial t} = - \nabla \cdot  \left( T \ \rm{\bf U} \right) + D^T + F^T
   \end{equation}
-  \begin{equation}     \label{eq:PE_tra_S}
-\frac{\partial S}{\partial t} = - \nabla \cdot  \left( S \ \rm{\bf U} \right) + D^S + F^S
+  \begin{equation}
+    \label{eq:PE_tra_S}
+    \frac{\partial S}{\partial t} = - \nabla \cdot  \left( S \ \rm{\bf U} \right) + D^S + F^S
   \end{equation}
-  \begin{equation}     \label{eq:PE_eos}
-\rho = \rho \left( T,S,p \right)
+  \begin{equation}
+    \label{eq:PE_eos}
+    \rho = \rho \left( T,S,p \right)
   \end{equation}
 \end{subequations}
 where $\nabla$ is the generalised derivative vector operator in $(\bf i,\bf j, \bf k)$ directions, $t$ is the time,
@@ -139,7 +147,8 @@ the other components of the earth system.
   It is usually specified as a fresh water flux at the air-sea interface in the vicinity of river mouths.
 \item[Solid earth - ocean interface:]
   heat and salt fluxes through the sea floor are small, except in special areas of little extent.
-  They are usually neglected in the model \footnote{
+  They are usually neglected in the model
+  \footnote{
     In fact, it has been shown that the heat flux associated with the solid Earth cooling
     ($i.e.$the geothermal heating) is not negligible for the thermohaline circulation of the world ocean
     (see \autoref{subsec:TRA_bbc}).
@@ -149,7 +158,8 @@ the other components of the earth system.
   $i.e.$ the velocity normal to the ocean bottom and coastlines is zero (in other words,
   the bottom velocity is parallel to solid boundaries). This kinematic boundary condition
   can be expressed as:
-  \begin{equation} \label{eq:PE_w_bbc}
+  \begin{equation}
+    \label{eq:PE_w_bbc}
     w = -{\rm {\bf U}}_h \cdot  \nabla _h \left( H \right)
   \end{equation}
   In addition, the ocean exchanges momentum with the earth through frictional processes.
@@ -161,11 +171,12 @@ the other components of the earth system.
 \item[Atmosphere - ocean interface:]
   the kinematic surface condition plus the mass flux of fresh water PE (the precipitation minus evaporation budget)
   leads to:
-  \begin{equation} \label{eq:PE_w_sbc}
+  \[
+    % \label{eq:PE_w_sbc}
     w = \frac{\partial \eta }{\partial t}
     + \left. {{\rm {\bf U}}_h } \right|_{z=\eta } \cdot  \nabla _h \left( \eta \right)
     + P-E
-  \end{equation}
+  \]
   The dynamic boundary condition, neglecting the surface tension (which removes capillary waves from the system)
   leads to the continuity of pressure across the interface $z=\eta$.
   The atmosphere and ocean also exchange horizontal momentum (wind stress), and heat.
@@ -178,7 +189,6 @@ the other components of the earth system.
 
 
 %\newpage
-%$\ $\newline    % force a new ligne
 
 % ================================================================
 % The Horizontal Pressure Gradient
@@ -198,10 +208,11 @@ $p(i,j,k,t)=p_s(i,j,t)+p_h(i,j,k,t)$.
 The latter is computed by integrating (\autoref{eq:PE_hydrostatic}),
 assuming that pressure in decibars can be approximated by depth in meters in (\autoref{eq:PE_eos}).
 The hydrostatic pressure is then given by:
-\begin{equation} \label{eq:PE_pressure}
-p_h \left( {i,j,z,t} \right)
- = \int_{\varsigma =z}^{\varsigma =0} {g\;\rho \left( {T,S,\varsigma} \right)\;d\varsigma } 
-\end{equation}
+\[
+  % \label{eq:PE_pressure}
+  p_h \left( {i,j,z,t} \right)
+  = \int_{\varsigma =z}^{\varsigma =0} {g\;\rho \left( {T,S,\varsigma} \right)\;d\varsigma }
+\]
 Two strategies can be considered for the surface pressure term:
 $(a)$ introduce of a  new variable $\eta$, the free-surface elevation,
 for which a prognostic equation can be established and solved;
@@ -230,10 +241,11 @@ In the free surface formulation, a variable $\eta$, the sea-surface height,
 is introduced which describes the shape of the air-sea interface.
 This variable is solution of a prognostic equation which is established by forming the vertical average of
 the kinematic surface condition (\autoref{eq:PE_w_bbc}):
-\begin{equation} \label{eq:PE_ssh}
-\frac{\partial \eta }{\partial t}=-D+P-E
- 	\quad \text{where} \ 
-D=\nabla \cdot \left[ {\left( {H+\eta } \right) \; {\rm{\bf \overline{U}}}_h \,} \right]
+\begin{equation}
+  \label{eq:PE_ssh}
+  \frac{\partial \eta }{\partial t}=-D+P-E
+  \quad \text{where} \
+  D=\nabla \cdot \left[ {\left( {H+\eta } \right) \; {\rm{\bf \overline{U}}}_h \,} \right]
 \end{equation}
 and using (\autoref{eq:PE_hydrostatic}) the surface pressure is given by: $p_s = \rho \, g \, \eta$.
 
@@ -274,7 +286,6 @@ a split-explicit scheme strongly inspired the one proposed by \citet{Shchepetkin
 (see \autoref{subsec:DYN_spg_ts}).
 
 %\newpage
-%$\ $\newline    % force a new line
 
 % ================================================================
 % Curvilinear z-coordinate System
@@ -317,7 +328,8 @@ the distance from the centre of the earth $a+z(k)$ where $a$ is the earth's radi
 $z$ the altitude above a reference sea level (\autoref{fig:referential}).
 The local deformation of the curvilinear coordinate system is given by $e_1$, $e_2$ and $e_3$,
 the three scale factors:
-\begin{equation} \label{eq:scale_factors}
+\begin{equation}
+  \label{eq:scale_factors}
   \begin{aligned}
     e_1 &=\left( {a+z} \right)\;\left[ {\left( {\frac{\partial \lambda}{\partial i}\cos \varphi } \right)^2
         +\left( {\frac{\partial \varphi }{\partial i}} \right)^2} \right]^{1/2} \\
@@ -345,38 +357,44 @@ the vertical scale factor is a single function of $k$ as \textbf{k} is parallel 
 The scalar and vector operators that appear in the primitive equations
 (\autoref{eq:PE_dyn} to \autoref{eq:PE_eos}) can be written in the tensorial form,
 invariant in any orthogonal horizontal curvilinear coordinate system transformation:
-\begin{subequations} \label{eq:PE_discrete_operators}
-\begin{equation} \label{eq:PE_grad}
-\nabla q=\frac{1}{e_1 }\frac{\partial q}{\partial i}\;{\rm {\bf 
-i}}+\frac{1}{e_2 }\frac{\partial q}{\partial j}\;{\rm {\bf j}}+\frac{1}{e_3 
-}\frac{\partial q}{\partial k}\;{\rm {\bf k}}    \\
-\end{equation}
-\begin{equation} \label{eq:PE_div}
-\nabla \cdot {\rm {\bf A}} 
-= \frac{1}{e_1 \; e_2} \left[ 
-  \frac{\partial \left(e_2 \; a_1\right)}{\partial i }
-+\frac{\partial \left(e_1 \; a_2\right)}{\partial j }    	\right]
-+ \frac{1}{e_3} \left[ \frac{\partial a_3}{\partial k }   \right]
-\end{equation}
-\begin{equation} \label{eq:PE_curl}
-   \begin{split}
-\nabla \times \vect{A} = 
-    \left[ {\frac{1}{e_2 }\frac{\partial a_3}{\partial j}
-            -\frac{1}{e_3 }\frac{\partial a_2 }{\partial k}} \right] \; \vect{i}
-&+\left[ {\frac{1}{e_3 }\frac{\partial a_1 }{\partial k}
-           -\frac{1}{e_1 }\frac{\partial a_3 }{\partial i}} \right] \; \vect{j} 		\\
-&+\frac{1}{e_1 e_2 } \left[ {\frac{\partial \left( {e_2 a_2 } \right)}{\partial i}
-                                       -\frac{\partial \left( {e_1 a_1 } \right)}{\partial j}} \right] \; \vect{k} 
-   \end{split}
-\end{equation}
-\begin{equation} \label{eq:PE_lap}
-\Delta q = \nabla \cdot \left(  \nabla q \right)
-\end{equation}
-\begin{equation} \label{eq:PE_lap_vector}
-\Delta {\rm {\bf A}} =
-  \nabla \left( \nabla \cdot {\rm {\bf A}} \right)
-- \nabla \times \left(  \nabla \times {\rm {\bf A}} \right)
-\end{equation}
+\begin{subequations}
+  % \label{eq:PE_discrete_operators}
+  \begin{equation}
+    \label{eq:PE_grad}
+    \nabla q=\frac{1}{e_1 }\frac{\partial q}{\partial i}\;{\rm {\bf
+        i}}+\frac{1}{e_2 }\frac{\partial q}{\partial j}\;{\rm {\bf j}}+\frac{1}{e_3
+    }\frac{\partial q}{\partial k}\;{\rm {\bf k}}    \\
+  \end{equation}
+  \begin{equation}
+    \label{eq:PE_div}
+    \nabla \cdot {\rm {\bf A}}
+    = \frac{1}{e_1 \; e_2} \left[
+      \frac{\partial \left(e_2 \; a_1\right)}{\partial i }
+      +\frac{\partial \left(e_1 \; a_2\right)}{\partial j }    	\right]
+    + \frac{1}{e_3} \left[ \frac{\partial a_3}{\partial k }   \right]
+  \end{equation}
+  \begin{equation}
+    \label{eq:PE_curl}
+    \begin{split}
+      \nabla \times \vect{A} =
+      \left[ {\frac{1}{e_2 }\frac{\partial a_3}{\partial j}
+          -\frac{1}{e_3 }\frac{\partial a_2 }{\partial k}} \right] \; \vect{i}
+      &+\left[ {\frac{1}{e_3 }\frac{\partial a_1 }{\partial k}
+          -\frac{1}{e_1 }\frac{\partial a_3 }{\partial i}} \right] \; \vect{j} 		\\
+      &+\frac{1}{e_1 e_2 } \left[ {\frac{\partial \left( {e_2 a_2 } \right)}{\partial i}
+          -\frac{\partial \left( {e_1 a_1 } \right)}{\partial j}} \right] \; \vect{k}
+    \end{split}
+  \end{equation}
+  \begin{equation}
+    \label{eq:PE_lap}
+    \Delta q = \nabla \cdot \left(  \nabla q \right)
+  \end{equation}
+  \begin{equation}
+    \label{eq:PE_lap_vector}
+    \Delta {\rm {\bf A}} =
+    \nabla \left( \nabla \cdot {\rm {\bf A}} \right)
+    - \nabla \times \left(  \nabla \times {\rm {\bf A}} \right)
+  \end{equation}
 \end{subequations}
 where $q$ is a scalar quantity and ${\rm {\bf A}}=(a_1,a_2,a_3)$ a vector in the $(i,j,k)$ coordinate system.
 
@@ -391,66 +409,79 @@ it is necessary to compute the horizontal component of the non-linear and viscou
 \autoref{eq:PE_grad}) to \autoref{eq:PE_lap_vector}.
 Let us set $\vect U=(u,v,w)={\vect{U}}_h +w\;\vect{k}$, the velocity in the $(i,j,k)$ coordinate system and
 define the relative vorticity $\zeta$ and the divergence of the horizontal velocity field $\chi$, by:
-\begin{equation} \label{eq:PE_curl_Uh}
-\zeta =\frac{1}{e_1 e_2 }\left[ {\frac{\partial \left( {e_2 \,v} 
-\right)}{\partial i}-\frac{\partial \left( {e_1 \,u} \right)}{\partial j}} 
-\right]
+\begin{equation}
+  \label{eq:PE_curl_Uh}
+  \zeta =\frac{1}{e_1 e_2 }\left[ {\frac{\partial \left( {e_2 \,v}
+        \right)}{\partial i}-\frac{\partial \left( {e_1 \,u} \right)}{\partial j}}
+  \right]
 \end{equation}
-\begin{equation} \label{eq:PE_div_Uh}
-\chi =\frac{1}{e_1 e_2 }\left[ {\frac{\partial \left( {e_2 \,u} 
-\right)}{\partial i}+\frac{\partial \left( {e_1 \,v} \right)}{\partial j}} 
-\right]
+\begin{equation}
+  \label{eq:PE_div_Uh}
+  \chi =\frac{1}{e_1 e_2 }\left[ {\frac{\partial \left( {e_2 \,u}
+        \right)}{\partial i}+\frac{\partial \left( {e_1 \,v} \right)}{\partial j}}
+  \right]
 \end{equation}
 
 Using the fact that the horizontal scale factors $e_1$ and $e_2$ are independent of $k$ and that
 $e_3$  is a function of the single variable $k$,
 the nonlinear term of \autoref{eq:PE_dyn} can be transformed as follows:
 \begin{flalign*}
-&\left[ {\left( {	\nabla \times {\rm {\bf U}}    } \right) \times {\rm {\bf U}}
-+\frac{1}{2}	\nabla \left( {{\rm {\bf U}}^2} \right)}	 \right]_h 			&
+  &\left[ {\left( {	\nabla \times {\rm {\bf U}}    } \right) \times {\rm {\bf U}}
+      +\frac{1}{2}	\nabla \left( {{\rm {\bf U}}^2} \right)}	 \right]_h 			&
 \end{flalign*}
 \begin{flalign*}
-&\qquad=\left( {{\begin{array}{*{20}c}
- {\left[ 	{	 \frac{1}{e_3}	\frac{\partial u	}{\partial k}
-			-\frac{1}{e_1}	\frac{\partial w	}{\partial i} } \right] w - \zeta \; v } 	 	\\
- 		{\zeta \; u - \left[ {	 \frac{1}{e_2} \frac{\partial w}{\partial j}
-							-\frac{1}{e_3} \frac{\partial v}{\partial k} } \right] \ w}	 \\
-		 \end{array} }} \right)			
-+\frac{1}{2}	\left( {{\begin{array}{*{20}c}
-		 {	\frac{1}{e_1}	\frac{\partial \left( u^2+v^2+w^2 \right)}{\partial i}} 	\hfill	 \\
-		 {	\frac{1}{e_2}	\frac{\partial \left( u^2+v^2+w^2 \right)}{\partial j}} 	\hfill	 \\
-		 \end{array} }} \right)			&
+  &\qquad=\left( {{
+        \begin{array}{*{20}c}
+          {\left[ 	{	 \frac{1}{e_3}	\frac{\partial u	}{\partial k}
+          -\frac{1}{e_1}	\frac{\partial w	}{\partial i} } \right] w - \zeta \; v } 	 	\\
+          {\zeta \; u - \left[ {	 \frac{1}{e_2} \frac{\partial w}{\partial j}
+          -\frac{1}{e_3} \frac{\partial v}{\partial k} } \right] \ w}	 \\
+        \end{array}
+      }} \right)
+  +\frac{1}{2}	\left( {{
+        \begin{array}{*{20}c}
+          {	\frac{1}{e_1}	\frac{\partial \left( u^2+v^2+w^2 \right)}{\partial i}} 	\hfill	 \\
+          {	\frac{1}{e_2}	\frac{\partial \left( u^2+v^2+w^2 \right)}{\partial j}} 	\hfill	 \\
+        \end{array}
+      }} \right)			&
 \end{flalign*}
 \begin{flalign*}
-& \qquad =\left( {{	\begin{array}{*{20}c}
- {-\zeta \; v} \hfill \\
- { \zeta \; u} \hfill \\
-			\end{array} }} \right)
-+\frac{1}{2}\left( {{	\begin{array}{*{20}c}
- {\frac{1}{e_1 }\frac{\partial \left( {u^2+v^2} \right)}{\partial i}} \hfill 	\\
- {\frac{1}{e_2 }\frac{\partial \left( {u^2+v^2} \right)}{\partial j}} \hfill 	\\
-						\end{array} }} \right)			
-+\frac{1}{e_3 }\left( {{		\begin{array}{*{20}c}
- { w \; \frac{\partial u}{\partial k}} 	\\
- { w \; \frac{\partial v}{\partial k}} 	\\
-							\end{array} }} \right)	
--\left( {{	\begin{array}{*{20}c}
- {\frac{w}{e_1}\frac{\partial w}{\partial i}
- -\frac{1}{2e_1}\frac{\partial w^2}{\partial i}} \hfill \\
- {\frac{w}{e_2}\frac{\partial w}{\partial j}
-  -\frac{1}{2e_2}\frac{\partial w^2}{\partial j}} \hfill \\
-			\end{array} }} \right) 			&
+  & \qquad =\left( {{
+        \begin{array}{*{20}c}
+          {-\zeta \; v} \hfill \\
+          { \zeta \; u} \hfill \\
+        \end{array}
+      }} \right)
+  +\frac{1}{2}\left( {{
+        \begin{array}{*{20}c}
+          {\frac{1}{e_1 }\frac{\partial \left( {u^2+v^2} \right)}{\partial i}} \hfill 	\\
+          {\frac{1}{e_2 }\frac{\partial \left( {u^2+v^2} \right)}{\partial j}} \hfill 	\\
+        \end{array}
+      }} \right)
+  +\frac{1}{e_3 }\left( {{
+        \begin{array}{*{20}c}
+          { w \; \frac{\partial u}{\partial k}} 	\\
+          { w \; \frac{\partial v}{\partial k}} 	\\
+        \end{array}
+      }} \right)
+  -\left( {{
+        \begin{array}{*{20}c}
+          {\frac{w}{e_1}\frac{\partial w}{\partial i} -\frac{1}{2e_1}\frac{\partial w^2}{\partial i}} \hfill \\
+          {\frac{w}{e_2}\frac{\partial w}{\partial j} -\frac{1}{2e_2}\frac{\partial w^2}{\partial j}} \hfill \\
+        \end{array}
+      }} \right) 			&
 \end{flalign*}
 
 The last term of the right hand side is obviously zero, and thus the nonlinear term of
 \autoref{eq:PE_dyn} is written in the $(i,j,k)$ coordinate system:
-\begin{equation} \label{eq:PE_vector_form}
-\left[ {\left( {	\nabla \times {\rm {\bf U}}    } \right) \times {\rm {\bf U}}
-+\frac{1}{2}	\nabla \left( {{\rm {\bf U}}^2} \right)}	 \right]_h 
-=\zeta 
-\;{\rm {\bf k}}\times {\rm {\bf U}}_h +\frac{1}{2}\nabla _h \left( {{\rm 
-{\bf U}}_h^2 } \right)+\frac{1}{e_3 }w\frac{\partial {\rm {\bf U}}_h 
-}{\partial k}   	
+\begin{equation}
+  \label{eq:PE_vector_form}
+  \left[ {\left( {	\nabla \times {\rm {\bf U}}    } \right) \times {\rm {\bf U}}
+      +\frac{1}{2}	\nabla \left( {{\rm {\bf U}}^2} \right)}	 \right]_h
+  =\zeta
+  \;{\rm {\bf k}}\times {\rm {\bf U}}_h +\frac{1}{2}\nabla _h \left( {{\rm
+        {\bf U}}_h^2 } \right)+\frac{1}{e_3 }w\frac{\partial {\rm {\bf U}}_h
+  }{\partial k}
 \end{equation}
 
 This is the so-called \textit{vector invariant form} of the momentum advection term.
@@ -458,104 +489,115 @@ For some purposes, it can be advantageous to write this term in the so-called fl
 $i.e.$ to write it as the divergence of fluxes.
 For example, the first component of \autoref{eq:PE_vector_form} (the $i$-component) is transformed as follows:
 \begin{flalign*}
-&{	\begin{array}{*{20}l}
-\left[ {\left( {\nabla \times \vect{U}} \right)\times \vect{U}
-          +\frac{1}{2}\nabla \left( {\vect{U}}^2 \right)} \right]_i   % \\
-%\\
-     = - \zeta \;v 
-     + \frac{1}{2\;e_1 } \frac{\partial \left( {u^2+v^2} \right)}{\partial i}
-     + \frac{1}{e_3}w \ \frac{\partial u}{\partial k} 			\\
-\\
-\qquad =\frac{1}{e_1 \; e_2} \left( 	-v\frac{\partial \left( {e_2 \,v} \right)}{\partial i}
-							+v\frac{\partial \left( {e_1 \,u} \right)}{\partial j}	 \right)
-+\frac{1}{e_1 e_2 }\left( 	+e_2 \; u\frac{\partial u}{\partial i}
- 							+e_2 \; v\frac{\partial v}{\partial i}	  				 \right) 
-+\frac{1}{e_3}       \left( 	w\;\frac{\partial u}{\partial k} 		\right)   \\
-\end{array} } 			&
+  &{
+    \begin{array}{*{20}l}
+      \left[ {\left( {\nabla \times \vect{U}} \right)\times \vect{U}
+      +\frac{1}{2}\nabla \left( {\vect{U}}^2 \right)} \right]_i   % \\
+  % \\
+      = - \zeta \;v
+      + \frac{1}{2\;e_1 } \frac{\partial \left( {u^2+v^2} \right)}{\partial i}
+      + \frac{1}{e_3}w \ \frac{\partial u}{\partial k} 			\\ \\
+      \qquad =\frac{1}{e_1 \; e_2} \left( 	-v\frac{\partial \left( {e_2 \,v} \right)}{\partial i}
+      +v\frac{\partial \left( {e_1 \,u} \right)}{\partial j}	 \right)
+      +\frac{1}{e_1 e_2 }\left( 	+e_2 \; u\frac{\partial u}{\partial i}
+      +e_2 \; v\frac{\partial v}{\partial i}	  				 \right)
+      +\frac{1}{e_3}       \left( 	w\;\frac{\partial u}{\partial k} 		\right)   \\
+    \end{array}
+  } 			&
 \end{flalign*}
 \begin{flalign*}
-&{	\begin{array}{*{20}l}
-\qquad =\frac{1}{e_1 \; e_2} 	\left\{ 
- -\left(   	    v^2 	\frac{\partial e_2                                }{\partial i} 
+  &{
+    \begin{array}{*{20}l}
+      \qquad =\frac{1}{e_1 \; e_2} 	\left\{
+      -\left(   	    v^2 	\frac{\partial e_2                                }{\partial i}
  		+e_2 \,v		\frac{\partial v                                   }{\partial i}  	\right)
-+\left( 				\frac{\partial \left( {e_1 \,u\,v} 	\right)}{\partial j}
-		-e_1 \,u		\frac{\partial v                                   }{\partial j} 	\right) 	\right. 
-\\  \left.	\qquad \qquad \quad
-+\left( 				\frac{\partial \left( {e_2 u\,u}     \right)}{\partial i}
+      +\left( 				\frac{\partial \left( {e_1 \,u\,v} 	\right)}{\partial j}
+		-e_1 \,u		\frac{\partial v                                   }{\partial j} 	\right) 	\right. \\
+      \left.	\qquad \qquad \quad
+      +\left( 				\frac{\partial \left( {e_2 u\,u}     \right)}{\partial i}
 		-u			\frac{\partial \left( {e_2 u}         \right)}{\partial i} 	\right)
-+e_2 v		 		\frac{\partial v                                    }{\partial i}
- 						\right\} 
-+\frac{1}{e_3} \left(
- 					\frac{\partial \left( {w\,u} \right)         }{\partial k}
-		 -u			\frac{\partial w 						   }{\partial k} 	\right) \\
-\end{array} } 		&
+      +e_2 v		 		\frac{\partial v                                    }{\partial i}
+      \right\}
+      +\frac{1}{e_3} \left(
+      \frac{\partial \left( {w\,u} \right)         }{\partial k}
+      -u			\frac{\partial w 						   }{\partial k} 	\right) \\
+    \end{array}
+  } 		&
 \end{flalign*}
 \begin{flalign*}
-&{	\begin{array}{*{20}l}
-\qquad =\frac{1}{e_1 \; e_2} 	\left( 
-					\frac{\partial \left( {e_2 \,u\,u} \right)}{\partial i}
+  &
+  {
+    \begin{array}{*{20}l}
+      \qquad =\frac{1}{e_1 \; e_2} 	\left(
+      \frac{\partial \left( {e_2 \,u\,u} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \,u\,v} \right)}{\partial j}	\right)
-+\frac{1}{e_3 }		\frac{\partial \left( {w\,u		 } \right)}{\partial k}
-\\  \qquad \qquad \quad
-+\frac{1}{e_1 e_2 }		\left( 
+      +\frac{1}{e_3 }		\frac{\partial \left( {w\,u		 } \right)}{\partial k} \\
+      \qquad \qquad \quad
+      +\frac{1}{e_1 e_2 }		\left(
  		-u	\left( 	\frac{\partial \left( {e_1 v	 } \right)}{\partial j}
-	 				-v\,\frac{\partial e_1 }{\partial j}				 \right)
+      -v\,\frac{\partial e_1 }{\partial j}				 \right)
 		-u			\frac{\partial \left( {e_2 u	 } \right)}{\partial i}
-						\right)
- -\frac{1}{e_3 }	 	\frac{\partial w}{\partial k}	u
- +\frac{1}{e_1 e_2 }\left( 	-v^2\frac{\partial e_2	 }{\partial i}		 \right)	
-\end{array} } 		&
+      \right)
+      -\frac{1}{e_3 }	 	\frac{\partial w}{\partial k}	u
+      +\frac{1}{e_1 e_2 }\left( 	-v^2\frac{\partial e_2	 }{\partial i}		 \right)
+    \end{array}
+  } 		&
 \end{flalign*}
 \begin{flalign*}
-&{	\begin{array}{*{20}l}
-\qquad = \nabla \cdot \left( {{\rm {\bf U}}\,u}	\right)
--   \left( \nabla \cdot {\rm {\bf U}} \right) \ u
-+\frac{1}{e_1 e_2 }\left( 
+  &{
+    \begin{array}{*{20}l}
+      \qquad = \nabla \cdot \left( {{\rm {\bf U}}\,u}	\right)
+      -   \left( \nabla \cdot {\rm {\bf U}} \right) \ u
+      +\frac{1}{e_1 e_2 }\left(
 		-v^2		\frac{\partial e_2 }{\partial i}
 		+uv	\,		\frac{\partial e_1 }{\partial j} 	\right) \\
-\end{array} } 		&
+    \end{array}
+  } 		&
 \end{flalign*}
 as $\nabla \cdot {\rm {\bf U}}\;=0$ (incompressibility) it comes:
 \begin{flalign*}
-&{	\begin{array}{*{20}l}
-\qquad = \nabla \cdot \left( 	{{\rm {\bf U}}\,u}		\right)
-+	\frac{1}{e_1 e_2 }   \left( v \; \frac{\partial e_2}{\partial i}
-						       -u \; \frac{\partial e_1}{\partial j} 	\right)  \left( -v \right)	
-\end{array} } 		&
+  &{
+    \begin{array}{*{20}l}
+      \qquad = \nabla \cdot \left( 	{{\rm {\bf U}}\,u}		\right)
+      +	\frac{1}{e_1 e_2 }   \left( v \; \frac{\partial e_2}{\partial i}
+      -u \; \frac{\partial e_1}{\partial j} 	\right)  \left( -v \right)
+    \end{array}
+  } 		&
 \end{flalign*}
 
 The flux form of the momentum advection term is therefore given by:
-\begin{multline} \label{eq:PE_flux_form}
-		\left[ 
-  \left( 	{\nabla \times {\rm {\bf U}}} 	\right) \times {\rm {\bf U}}
-+\frac{1}{2}	\nabla \left( 	{{\rm {\bf U}}^2} 	\right)
-		\right]_h 
-\\
-= \nabla \cdot 	\left( {{\begin{array}{*{20}c}	{\rm {\bf U}} \, u 	\hfill \\
-												{\rm {\bf U}} \, v	\hfill \\
-						\end{array} }} 	
-				\right)
-+\frac{1}{e_1 e_2 }		\left( 
-		 v\frac{\partial e_2}{\partial i}
-		-u\frac{\partial e_1}{\partial j} 
-						\right) {\rm {\bf k}} \times {\rm {\bf U}}_h
+\begin{multline}
+  \label{eq:PE_flux_form}
+  \left[
+    \left( 	{\nabla \times {\rm {\bf U}}} 	\right) \times {\rm {\bf U}}
+    +\frac{1}{2}	\nabla \left( 	{{\rm {\bf U}}^2} 	\right)
+  \right]_h \\
+  = \nabla \cdot 	\left( {{
+        \begin{array}{*{20}c}
+          {\rm {\bf U}} \, u 	\hfill \\
+          {\rm {\bf U}} \, v	\hfill \\
+        \end{array}
+      }}
+  \right)
+  +\frac{1}{e_1 e_2 }		\left(
+    v\frac{\partial e_2}{\partial i}
+    -u\frac{\partial e_1}{\partial j}
+  \right) {\rm {\bf k}} \times {\rm {\bf U}}_h
 \end{multline}
 
 The flux form has two terms,
 the first one is expressed as the divergence of momentum fluxes (hence the flux form name given to this formulation)
 and the second one is due to the curvilinear nature of the coordinate system used.
 The latter is called the \emph{metric} term and can be viewed as a modification of the Coriolis parameter: 
-\begin{equation} \label{eq:PE_cor+metric}
-f \to f + \frac{1}{e_1\;e_2}  \left(  v \frac{\partial e_2}{\partial i}
-					         -u \frac{\partial e_1}{\partial j}  \right)
-\end{equation}
+\[
+  % \label{eq:PE_cor+metric}
+  f \to f + \frac{1}{e_1\;e_2}  \left(  v \frac{\partial e_2}{\partial i}
+    -u \frac{\partial e_1}{\partial j}  \right)
+\]
 
 Note that in the case of geographical coordinate,
 $i.e.$ when $(i,j) \to (\lambda ,\varphi )$ and $(e_1 ,e_2) \to (a \,\cos \varphi ,a)$,
 we recover the commonly used modification of the Coriolis parameter $f \to f+(u/a) \tan \varphi$.
-
-
-$\ $\newline    % force a new ligne
 
 To sum up, the curvilinear $z$-coordinate equations solved by the ocean model can be written in
 the following tensorial formalism:
@@ -563,86 +605,98 @@ the following tensorial formalism:
 \vspace{+10pt}
 $\bullet$ \textbf{Vector invariant form of the momentum equations} :
 
-\begin{subequations} \label{eq:PE_dyn_vect}
-\begin{equation} \label{eq:PE_dyn_vect_u} \begin{split}
-\frac{\partial u}{\partial t} 
-= +   \left( {\zeta +f} \right)\,v                                    
-   -   \frac{1}{2\,e_1}           \frac{\partial}{\partial i} \left(  u^2+v^2   \right) 
-   -   \frac{1}{e_3    }  w     \frac{\partial u}{\partial k}      &      \\
-   -   \frac{1}{e_1    }            \frac{\partial}{\partial i} \left( \frac{p_s+p_h }{\rho_o}    \right)    
-   &+   D_u^{\vect{U}}  +   F_u^{\vect{U}}      \\
-\\
-\frac{\partial v}{\partial t} =
-       -   \left( {\zeta +f} \right)\,u   
-       -   \frac{1}{2\,e_2 }        \frac{\partial }{\partial j}\left(  u^2+v^2  \right)   
-       -   \frac{1}{e_3     }   w  \frac{\partial v}{\partial k}     &      \\
-       -   \frac{1}{e_2     }        \frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right)    
-    &+  D_v^{\vect{U}}  +   F_v^{\vect{U}}
-\end{split} \end{equation}
+\begin{subequations}
+  \label{eq:PE_dyn_vect}
+  \[
+    % \label{eq:PE_dyn_vect_u}
+    \begin{split}
+      \frac{\partial u}{\partial t}
+      = +   \left( {\zeta +f} \right)\,v
+      -   \frac{1}{2\,e_1}           \frac{\partial}{\partial i} \left(  u^2+v^2   \right)
+      -   \frac{1}{e_3    }  w     \frac{\partial u}{\partial k}      &      \\
+      -   \frac{1}{e_1    }            \frac{\partial}{\partial i} \left( \frac{p_s+p_h }{\rho_o}    \right)
+      &+   D_u^{\vect{U}}  +   F_u^{\vect{U}}      \\ \\
+      \frac{\partial v}{\partial t} =
+      -   \left( {\zeta +f} \right)\,u
+      -   \frac{1}{2\,e_2 }        \frac{\partial }{\partial j}\left(  u^2+v^2  \right)
+      -   \frac{1}{e_3     }   w  \frac{\partial v}{\partial k}     &      \\
+      -   \frac{1}{e_2     }        \frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right)
+      &+  D_v^{\vect{U}}  +   F_v^{\vect{U}}
+    \end{split}
+  \]
 \end{subequations}
 
 
 \vspace{+10pt}
 $\bullet$ \textbf{flux form of the momentum equations} :
-\begin{subequations} \label{eq:PE_dyn_flux}
-\begin{multline} \label{eq:PE_dyn_flux_u}
-\frac{\partial u}{\partial t}=
-+   \left( { f + \frac{1}{e_1 \; e_2}
-					\left( 	 v \frac{\partial e_2}{\partial i}
-						-u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, v    \\
-- \frac{1}{e_1 \; e_2} 	\left( 
-					\frac{\partial \left( {e_2 \,u\,u} \right)}{\partial i}
+\begin{subequations}
+  % \label{eq:PE_dyn_flux}
+  \begin{multline*}
+    % \label{eq:PE_dyn_flux_u}
+    \frac{\partial u}{\partial t}=
+    +   \left( { f + \frac{1}{e_1 \; e_2}
+        \left( 	 v \frac{\partial e_2}{\partial i}
+          -u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, v    \\
+    - \frac{1}{e_1 \; e_2} 	\left(
+      \frac{\partial \left( {e_2 \,u\,u} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \,v\,u} \right)}{\partial j}	\right)
-                 - \frac{1}{e_3 }\frac{\partial \left( {         w\,u} \right)}{\partial k}    \\
--   \frac{1}{e_1 }\frac{\partial}{\partial i}\left( \frac{p_s+p_h }{\rho_o}   \right)
-+   D_u^{\vect{U}} +   F_u^{\vect{U}}
-\end{multline}
-\begin{multline} \label{eq:PE_dyn_flux_v}
-\frac{\partial v}{\partial t}=
--   \left( { f + \frac{1}{e_1 \; e_2}
-					\left( 	 v \frac{\partial e_2}{\partial i}
-						-u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, u   \\
- \frac{1}{e_1 \; e_2} 	\left( 
-					\frac{\partial \left( {e_2 \,u\,v} \right)}{\partial i}
+    - \frac{1}{e_3 }\frac{\partial \left( {         w\,u} \right)}{\partial k}    \\
+    -   \frac{1}{e_1 }\frac{\partial}{\partial i}\left( \frac{p_s+p_h }{\rho_o}   \right)
+    +   D_u^{\vect{U}} +   F_u^{\vect{U}}
+  \end{multline*}
+  \begin{multline*}
+    % \label{eq:PE_dyn_flux_v}
+    \frac{\partial v}{\partial t}=
+    -   \left( { f + \frac{1}{e_1 \; e_2}
+        \left( 	 v \frac{\partial e_2}{\partial i}
+          -u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, u   \\
+    \frac{1}{e_1 \; e_2} 	\left(
+      \frac{\partial \left( {e_2 \,u\,v} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \,v\,v} \right)}{\partial j}	\right)
-                 - \frac{1}{e_3 } \frac{\partial \left( {        w\,v} \right)}{\partial k}    \\
--   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}    \right)
-+  D_v^{\vect{U}} +  F_v^{\vect{U}} 
-\end{multline}
+    - \frac{1}{e_3 } \frac{\partial \left( {        w\,v} \right)}{\partial k}    \\
+    -   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}    \right)
+    +  D_v^{\vect{U}} +  F_v^{\vect{U}}
+  \end{multline*}
 \end{subequations}
 where $\zeta$, the relative vorticity, is given by \autoref{eq:PE_curl_Uh} and
 $p_s $, the surface pressure, is given by:
-\begin{equation} \label{eq:PE_spg}
-p_s =  \rho \,g \,\eta 
-\end{equation}
+\[
+  % \label{eq:PE_spg}
+  p_s =  \rho \,g \,\eta
+\]
 with $\eta$ is solution of \autoref{eq:PE_ssh}.
 
 The vertical velocity and the hydrostatic pressure are diagnosed from the following equations:
-\begin{equation} \label{eq:w_diag}
-\frac{\partial w}{\partial k}=-\chi \;e_3 
-\end{equation}
-\begin{equation} \label{eq:hp_diag}
-\frac{\partial p_h }{\partial k}=-\rho \;g\;e_3 
-\end{equation}
+\[
+  % \label{eq:w_diag}
+  \frac{\partial w}{\partial k}=-\chi \;e_3
+\]
+\[
+  % \label{eq:hp_diag}
+  \frac{\partial p_h }{\partial k}=-\rho \;g\;e_3
+\]
 where the divergence of the horizontal velocity, $\chi$ is given by \autoref{eq:PE_div_Uh}.
 
 \vspace{+10pt}
 $\bullet$ \textit{tracer equations} :
-\begin{equation} \label{eq:S}
-\frac{\partial T}{\partial t} = 
--\frac{1}{e_1 e_2 }\left[ {	   \frac{\partial \left( {e_2 T\,u} \right)}{\partial i}
-						+\frac{\partial \left( {e_1 T\,v} \right)}{\partial j}} \right]
--\frac{1}{e_3 }\frac{\partial \left( {T\,w} \right)}{\partial k} + D^T + F^T
-\end{equation}
-\begin{equation} \label{eq:T}
-\frac{\partial S}{\partial t} = 
--\frac{1}{e_1 e_2 }\left[ 	  {\frac{\partial \left( {e_2 S\,u} \right)}{\partial i}
-						+\frac{\partial \left( {e_1 S\,v} \right)}{\partial j}} \right]
--\frac{1}{e_3 }\frac{\partial \left( {S\,w} \right)}{\partial k} + D^S + F^S
-\end{equation}
-\begin{equation} \label{eq:rho}
-\rho =\rho \left( {T,S,z(k)} \right)
-\end{equation}
+\[
+  % \label{eq:S}
+  \frac{\partial T}{\partial t} =
+  -\frac{1}{e_1 e_2 }\left[ {	   \frac{\partial \left( {e_2 T\,u} \right)}{\partial i}
+      +\frac{\partial \left( {e_1 T\,v} \right)}{\partial j}} \right]
+  -\frac{1}{e_3 }\frac{\partial \left( {T\,w} \right)}{\partial k} + D^T + F^T
+\]
+\[
+  % \label{eq:T}
+  \frac{\partial S}{\partial t} =
+  -\frac{1}{e_1 e_2 }\left[ 	  {\frac{\partial \left( {e_2 S\,u} \right)}{\partial i}
+      +\frac{\partial \left( {e_1 S\,v} \right)}{\partial j}} \right]
+  -\frac{1}{e_3 }\frac{\partial \left( {S\,w} \right)}{\partial k} + D^S + F^S
+\]
+\[
+  % \label{eq:rho}
+  \rho =\rho \left( {T,S,z(k)} \right)
+\]
 
 The expression of \textbf{D}$^{U}$, $D^{S}$ and $D^{T}$ depends on the subgrid scale parameterisation used.
 It will be defined in \autoref{eq:PE_zdf}.
@@ -651,7 +705,7 @@ are discussed in \autoref{chap:SBC}.
 
 
 \newpage 
-$\ $\newline    % force a new ligne
+
 % ================================================================
 % Curvilinear generalised vertical coordinate System
 % ================================================================
@@ -679,8 +733,9 @@ OPA (mixture of $z$-coordinate in vicinity the surface and steep topography area
 
 In fact one is totally free to choose any space and time vertical coordinate by
 introducing an arbitrary vertical coordinate :
-\begin{equation} \label{eq:PE_s}
-s=s(i,j,k,t)
+\begin{equation}
+  \label{eq:PE_s}
+  s=s(i,j,k,t)
 \end{equation}
 with the restriction that the above equation gives a single-valued monotonic relationship between $s$ and $k$,
 when $i$, $j$ and $t$ are held fixed.
@@ -749,97 +804,106 @@ which includes $z$-, \textit{z*}- and $\sigma-$coordinates as special cases
 A formal derivation of the transformed equations is given in \autoref{apdx:A}.
 Let us define the vertical scale factor by $e_3=\partial_s z$  ($e_3$ is now a function of $(i,j,k,t)$ ),
 and the slopes in the (\textbf{i},\textbf{j}) directions between $s-$ and $z-$surfaces by:
-\begin{equation} \label{eq:PE_sco_slope}
-\sigma _1 =\frac{1}{e_1 }\;\left. {\frac{\partial z}{\partial i}} \right|_s 
-\quad \text{, and } \quad 
-\sigma _2 =\frac{1}{e_2 }\;\left. {\frac{\partial z}{\partial j}} \right|_s
+\begin{equation}
+  \label{eq:PE_sco_slope}
+  \sigma_1 =\frac{1}{e_1 }\;\left. {\frac{\partial z}{\partial i}} \right|_s
+  \quad \text{, and } \quad
+  \sigma_2 =\frac{1}{e_2 }\;\left. {\frac{\partial z}{\partial j}} \right|_s
 \end{equation}
 We also introduce  $\omega $, a dia-surface velocity component, defined as the velocity 
 relative to the moving $s$-surfaces and normal to them:
-\begin{equation} \label{eq:PE_sco_w}
-\omega  = w - e_3 \, \frac{\partial s}{\partial t} - \sigma _1 \,u - \sigma _2 \,v    \\
-\end{equation}
+\[
+  % \label{eq:PE_sco_w}
+  \omega  = w - e_3 \, \frac{\partial s}{\partial t} - \sigma_1 \,u - \sigma_2 \,v    \\
+\]
 
 The equations solved by the ocean model \autoref{eq:PE} in $s-$coordinate can be written as follows
 (see \autoref{sec:A_momentum}):
 
  \vspace{0.5cm}
 $\bullet$ Vector invariant form of the momentum equation :
-\begin{multline} \label{eq:PE_sco_u_vector}
-\frac{\partial  u   }{\partial t}=
-	+   \left( {\zeta +f} \right)\,v                                    
-	-   \frac{1}{2\,e_1} \frac{\partial}{\partial i} \left(  u^2+v^2   \right) 
-	-   \frac{1}{e_3} \omega \frac{\partial u}{\partial k}       \\
-	-   \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho_o}    \right)    
-	+  g\frac{\rho }{\rho_o}\sigma _1 
-	+   D_u^{\vect{U}}  +   F_u^{\vect{U}} \quad
-\end{multline}
-\begin{multline} \label{eq:PE_sco_v_vector}
-\frac{\partial v }{\partial t}=
-	-   \left( {\zeta +f} \right)\,u   
-	-   \frac{1}{2\,e_2 }\frac{\partial }{\partial j}\left(  u^2+v^2  \right)     	
-	-   \frac{1}{e_3 } \omega \frac{\partial v}{\partial k}         \\
-	-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right) 
-	 +  g\frac{\rho }{\rho_o }\sigma _2   
-	+  D_v^{\vect{U}}  +   F_v^{\vect{U}} \quad
-\end{multline}
+\begin{multline*}
+  % \label{eq:PE_sco_u_vector}
+  \frac{\partial  u   }{\partial t}=
+  +   \left( {\zeta +f} \right)\,v
+  -   \frac{1}{2\,e_1} \frac{\partial}{\partial i} \left(  u^2+v^2   \right)
+  -   \frac{1}{e_3} \omega \frac{\partial u}{\partial k}       \\
+  -   \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho_o}    \right)
+  +  g\frac{\rho }{\rho_o}\sigma_1
+  +   D_u^{\vect{U}}  +   F_u^{\vect{U}} \quad
+\end{multline*}
+\begin{multline*}
+  % \label{eq:PE_sco_v_vector}
+  \frac{\partial v }{\partial t}=
+  -   \left( {\zeta +f} \right)\,u
+  -   \frac{1}{2\,e_2 }\frac{\partial }{\partial j}\left(  u^2+v^2  \right)
+  -   \frac{1}{e_3 } \omega \frac{\partial v}{\partial k}         \\
+  -   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right)
+  +  g\frac{\rho }{\rho_o }\sigma_2
+  +  D_v^{\vect{U}}  +   F_v^{\vect{U}} \quad
+\end{multline*}
 
  \vspace{0.5cm}
 $\bullet$ Flux form of the momentum equation :
-\begin{multline} \label{eq:PE_sco_u_flux}
-\frac{1}{e_3} \frac{\partial \left(  e_3\,u  \right) }{\partial t}=
-   +   \left( { f + \frac{1}{e_1 \; e_2 }
-					\left( 	 v \frac{\partial e_2}{\partial i}
-						-u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, v    \\
-   - \frac{1}{e_1 \; e_2 \; e_3 } 	\left( 
-					\frac{\partial \left( {e_2 \, e_3 \, u\,u} \right)}{\partial i}
-		+			\frac{\partial \left( {e_1 \, e_3 \, v\,u} \right)}{\partial j}	\right)
-   - \frac{1}{e_3 }\frac{\partial \left( { \omega\,u} \right)}{\partial k}    \\
-	- \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho_o}    \right)    
-	+  g\frac{\rho }{\rho_o}\sigma _1 
-	+   D_u^{\vect{U}}  +   F_u^{\vect{U}} \quad
-\end{multline}
-\begin{multline} \label{eq:PE_sco_v_flux}
-\frac{1}{e_3} \frac{\partial \left(  e_3\,v  \right) }{\partial t}=
-   -   \left( { f + \frac{1}{e_1 \; e_2}
-					\left( 	 v \frac{\partial e_2}{\partial i}
-						-u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, u   \\
-   - \frac{1}{e_1 \; e_2 \; e_3 } 	\left( 
-					\frac{\partial \left( {e_2 \; e_3  \,u\,v} \right)}{\partial i}
-		+			\frac{\partial \left( {e_1 \; e_3  \,v\,v} \right)}{\partial j}	\right)
-                 - \frac{1}{e_3 } \frac{\partial \left( { \omega\,v} \right)}{\partial k}    \\
-	-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right) 
-	 +  g\frac{\rho }{\rho_o }\sigma _2   
-	+  D_v^{\vect{U}}  +   F_v^{\vect{U}} \quad
-\end{multline}
+\begin{multline*}
+  % \label{eq:PE_sco_u_flux}
+  \frac{1}{e_3} \frac{\partial \left(  e_3\,u  \right) }{\partial t}=
+  +   \left( { f + \frac{1}{e_1 \; e_2 }
+      \left( 	 v \frac{\partial e_2}{\partial i}
+        -u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, v    \\
+  - \frac{1}{e_1 \; e_2 \; e_3 } 	\left(
+    \frac{\partial \left( {e_2 \, e_3 \, u\,u} \right)}{\partial i}
+    +			\frac{\partial \left( {e_1 \, e_3 \, v\,u} \right)}{\partial j}	\right)
+  - \frac{1}{e_3 }\frac{\partial \left( { \omega\,u} \right)}{\partial k}    \\
+  - \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho_o}    \right)
+  +  g\frac{\rho }{\rho_o}\sigma_1
+  +   D_u^{\vect{U}}  +   F_u^{\vect{U}} \quad
+\end{multline*}
+\begin{multline*}
+  % \label{eq:PE_sco_v_flux}
+  \frac{1}{e_3} \frac{\partial \left(  e_3\,v  \right) }{\partial t}=
+  -   \left( { f + \frac{1}{e_1 \; e_2}
+      \left( 	 v \frac{\partial e_2}{\partial i}
+        -u \frac{\partial e_1}{\partial j} 	\right)} 	\right) \, u   \\
+  - \frac{1}{e_1 \; e_2 \; e_3 } 	\left(
+    \frac{\partial \left( {e_2 \; e_3  \,u\,v} \right)}{\partial i}
+    +			\frac{\partial \left( {e_1 \; e_3  \,v\,v} \right)}{\partial j}	\right)
+  - \frac{1}{e_3 } \frac{\partial \left( { \omega\,v} \right)}{\partial k}    \\
+  -   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right)
+  +  g\frac{\rho }{\rho_o }\sigma_2
+  +  D_v^{\vect{U}}  +   F_v^{\vect{U}} \quad
+\end{multline*}
 
 where the relative vorticity, \textit{$\zeta $}, the surface pressure gradient,
 and the hydrostatic pressure have the same expressions as in $z$-coordinates although
 they do not represent exactly the same quantities.
 $\omega$ is provided by the continuity equation (see \autoref{apdx:A}):
-\begin{equation} \label{eq:PE_sco_continuity}
-\frac{\partial e_3}{\partial t} + e_3 \; \chi + \frac{\partial \omega }{\partial s} = 0   
-\qquad \text{with }\;\;  
-\chi =\frac{1}{e_1 e_2 e_3 }\left[ {\frac{\partial \left( {e_2 e_3 \,u} 
-\right)}{\partial i}+\frac{\partial \left( {e_1 e_3 \,v} \right)}{\partial 
-j}} \right]
-\end{equation}
+\[
+  % \label{eq:PE_sco_continuity}
+  \frac{\partial e_3}{\partial t} + e_3 \; \chi + \frac{\partial \omega }{\partial s} = 0
+  \qquad \text{with }\;\;
+  \chi =\frac{1}{e_1 e_2 e_3 }\left[ {\frac{\partial \left( {e_2 e_3 \,u}
+        \right)}{\partial i}+\frac{\partial \left( {e_1 e_3 \,v} \right)}{\partial
+        j}} \right]
+\]
 
  \vspace{0.5cm}
 $\bullet$ tracer equations:
-\begin{multline} \label{eq:PE_sco_t}
-\frac{1}{e_3} \frac{\partial \left(  e_3\,T  \right) }{\partial t}=
--\frac{1}{e_1 e_2 e_3 }\left[ {\frac{\partial \left( {e_2 e_3\,u\,T} \right)}{\partial i}
-                                           +\frac{\partial \left( {e_1 e_3\,v\,T} \right)}{\partial j}} \right]   \\
--\frac{1}{e_3 }\frac{\partial \left( {T\,\omega } \right)}{\partial k}   + D^T + F^S   \qquad
-\end{multline}
+\begin{multline*}
+  % \label{eq:PE_sco_t}
+  \frac{1}{e_3} \frac{\partial \left(  e_3\,T  \right) }{\partial t}=
+  -\frac{1}{e_1 e_2 e_3 }\left[ {\frac{\partial \left( {e_2 e_3\,u\,T} \right)}{\partial i}
+      +\frac{\partial \left( {e_1 e_3\,v\,T} \right)}{\partial j}} \right]   \\
+  -\frac{1}{e_3 }\frac{\partial \left( {T\,\omega } \right)}{\partial k}   + D^T + F^S   \qquad
+\end{multline*}
 
-\begin{multline} \label{eq:PE_sco_s}
-\frac{1}{e_3} \frac{\partial \left(  e_3\,S  \right) }{\partial t}=
--\frac{1}{e_1 e_2 e_3 }\left[ {\frac{\partial \left( {e_2 e_3\,u\,S} \right)}{\partial i}
-                                           +\frac{\partial \left( {e_1 e_3\,v\,S} \right)}{\partial j}} \right]    \\
--\frac{1}{e_3 }\frac{\partial \left( {S\,\omega } \right)}{\partial k}     + D^S + F^S   \qquad
-\end{multline}
+\begin{multline*}
+  % \label{eq:PE_sco_s}
+  \frac{1}{e_3} \frac{\partial \left(  e_3\,S  \right) }{\partial t}=
+  -\frac{1}{e_1 e_2 e_3 }\left[ {\frac{\partial \left( {e_2 e_3\,u\,S} \right)}{\partial i}
+      +\frac{\partial \left( {e_1 e_3\,v\,S} \right)}{\partial j}} \right]    \\
+  -\frac{1}{e_3 }\frac{\partial \left( {S\,\omega } \right)}{\partial k}     + D^S + F^S   \qquad
+\end{multline*}
 
 The equation of state has the same expression as in $z$-coordinate,
 and similar expressions are used for mixing and forcing terms.
@@ -888,16 +952,17 @@ The definition and modified oceanic equations for the rescaled vertical coordina
 including the treatment of fresh-water flux at the surface, are detailed in Adcroft and Campin (2004).
 The major points are summarized here.
 The position ( \textit{z*}) and vertical discretization (\textit{z*}) are expressed as:
-\begin{equation} \label{eq:z-star}
-H +  \textit{z*} = (H + z) / r \quad \text{and} \ \delta \textit{z*} = \delta z / r \quad \text{with} \ r = \frac{H+\eta} {H}
-\end{equation} 
+\[
+  % \label{eq:z-star}
+  H +  \textit{z*} = (H + z) / r \quad \text{and} \ \delta \textit{z*} = \delta z / r \quad \text{with} \ r = \frac{H+\eta} {H}
+\] 
 Since the vertical displacement of the free surface is incorporated in the vertical coordinate \textit{z*},
 the upper and lower boundaries are at fixed  \textit{z*} position,
 $\textit{z*} = 0$ and  $\textit{z*} = -H$ respectively.
 Also the divergence of the flow field is no longer zero as shown by the continuity equation:
 \[ 
-\frac{\partial r}{\partial t} = \nabla_{\textit{z*}} \cdot \left( r \; \rm{\bf U}_h \right)
-		\left( r \; w\textit{*} \right) = 0 
+  \frac{\partial r}{\partial t} = \nabla_{\textit{z*}} \cdot \left( r \; \rm{\bf U}_h \right)
+  \left( r \; w\textit{*} \right) = 0 
 \] 
 %}
 
@@ -905,9 +970,10 @@ Also the divergence of the flow field is no longer zero as shown by the continui
 % from MOM4p1 documentation
 
 To overcome problems with vanishing surface and/or bottom cells, we consider the zstar coordinate 
-\begin{equation} \label{eq:PE_}
-	z^\star = H \left( \frac{z-\eta}{H+\eta} \right)
-\end{equation}
+\[
+  % \label{eq:PE_}
+  z^\star = H \left( \frac{z-\eta}{H+\eta} \right)
+\]
 
 This coordinate is closely related to the "eta" coordinate used in many atmospheric models
 (see Black (1994) for a review of eta coordinate atmospheric models).
@@ -936,7 +1002,7 @@ Hence, all cells remain nonvanishing, so long as the surface height maintains $\
 This is a minor constraint relative to that encountered on the surface height when using $s = z$ or $s = z - \eta$. 
 
 Because $z^\star$ has a time independent range, all grid cells have static increments ds,
-and the sum of the ver tical increments yields the time independent ocean depth. %·k ds = H. 
+and the sum of the ver tical increments yields the time independent ocean depth. %k ds = H. 
 The $z^\star$ coordinate is therefore invisible to undulations of the free surface,
 since it moves along with the free surface.
 This proper ty means that no spurious vertical transport is induced across surfaces of constant $z^\star$ by
@@ -950,7 +1016,8 @@ the surface height, again so long as $\eta > -H$.
 
 
 
-\newpage 
+\newpage
+
 % -------------------------------------------------------------------------------------------------------------
 % Terrain following  coordinate System
 % -------------------------------------------------------------------------------------------------------------
@@ -993,9 +1060,10 @@ The main two problems come from the truncation error in the horizontal pressure 
 a possibly increased diapycnal diffusion.
 The horizontal pressure force in $s$-coordinate consists of two terms (see \autoref{apdx:A}),
 
-\begin{equation} \label{eq:PE_p_sco}
-\left. {\nabla p} \right|_z =\left. {\nabla p} \right|_s -\frac{\partial 
-p}{\partial s}\left. {\nabla z} \right|_s 
+\begin{equation}
+  \label{eq:PE_p_sco}
+  \left. {\nabla p} \right|_z =\left. {\nabla p} \right|_s -\frac{\partial
+    p}{\partial s}\left. {\nabla z} \right|_s 
 \end{equation}
 
 The second term in \autoref{eq:PE_p_sco} depends on the tilt of the coordinate surface and
@@ -1040,7 +1108,8 @@ it allows a representation of bottom topography with mixed full or partial step-
 It also offers a completely general transformation, $s=s(i,j,z)$ for the vertical coordinate.
 
 
-\newpage 
+\newpage
+
 % -------------------------------------------------------------------------------------------------------------
 % Curvilinear z-tilde coordinate System
 % -------------------------------------------------------------------------------------------------------------
@@ -1054,6 +1123,7 @@ Its use is therefore not recommended.
 
 
 \newpage 
+
 % ================================================================
 % Subgrid Scale Physics
 % ================================================================
@@ -1096,13 +1166,14 @@ This is quite clearly a necessary compromise: considering only the molecular vis
 large scale severely underestimates the role of turbulent diffusion and dissipation,
 while an accurate consideration of the details of turbulent motions is simply impractical.
 The resulting vertical momentum and tracer diffusive operators are of second order:
-\begin{equation} \label{eq:PE_zdf}
-   \begin{split}
-{\vect{D}}^{v \vect{U}} &=\frac{\partial }{\partial z}\left( {A^{vm}\frac{\partial {\vect{U}}_h }{\partial z}} \right) \ , \\         
-D^{vT}                         &= \frac{\partial }{\partial z}\left( {A^{vT}\frac{\partial T}{\partial z}} \right) \ ,
-\quad
-D^{vS}=\frac{\partial }{\partial z}\left( {A^{vT}\frac{\partial S}{\partial z}} \right)
-   \end{split}
+\begin{equation}
+  \label{eq:PE_zdf}
+  \begin{split}
+    {\vect{D}}^{v \vect{U}} &=\frac{\partial }{\partial z}\left( {A^{vm}\frac{\partial {\vect{U}}_h }{\partial z}} \right) \ , \\
+    D^{vT}                         &= \frac{\partial }{\partial z}\left( {A^{vT}\frac{\partial T}{\partial z}} \right) \ ,
+    \quad
+    D^{vS}=\frac{\partial }{\partial z}\left( {A^{vT}\frac{\partial S}{\partial z}} \right)
+  \end{split}
 \end{equation}
 where $A^{vm}$ and $A^{vT}$ are the vertical eddy viscosity and diffusivity coefficients, respectively.
 At the sea surface and at the bottom, turbulent fluxes of momentum, heat and salt must be specified
@@ -1172,13 +1243,16 @@ and UBS advection schemes when flux form is chosen for the momentum advection.
 \subsubsection{Lateral laplacian tracer diffusive operator}
 
 The lateral Laplacian tracer diffusive operator is defined by (see \autoref{apdx:B}):
-\begin{equation} \label{eq:PE_iso_tensor}
-D^{lT}=\nabla {\rm {\bf .}}\left( {A^{lT}\;\Re \;\nabla T} \right) \qquad 
-\mbox{with}\quad \;\;\Re =\left( {{\begin{array}{*{20}c}
- 1 \hfill & 0 \hfill & {-r_1 } \hfill \\
- 0 \hfill & 1 \hfill & {-r_2 } \hfill \\
- {-r_1 } \hfill & {-r_2 } \hfill & {r_1 ^2+r_2 ^2} \hfill \\
-\end{array} }} \right)
+\begin{equation}
+  \label{eq:PE_iso_tensor}
+  D^{lT}=\nabla {\rm {\bf .}}\left( {A^{lT}\;\Re \;\nabla T} \right) \qquad
+  \mbox{with}\quad \;\;\Re =\left( {{
+        \begin{array}{*{20}c}
+          1 \hfill & 0 \hfill & {-r_1 } \hfill \\
+          0 \hfill & 1 \hfill & {-r_2 } \hfill \\
+          {-r_1 } \hfill & {-r_2 } \hfill & {r_1 ^2+r_2 ^2} \hfill \\
+        \end{array}
+      }} \right)
 \end{equation}
 where $r_1 \;\mbox{and}\;r_2 $ are the slopes between the surface along which the diffusive operator acts and
 the model level ($e. g.$ $z$- or $s$-surfaces).
@@ -1196,45 +1270,50 @@ $\Re $ reduces to the identity in the horizontal direction, no rotation is appli
 
 For \textit{geopotential} diffusion,
 $r_1$ and $r_2 $ are the slopes between the geopotential and computational surfaces:
-they are equal to $\sigma _1$ and $\sigma _2$, respectively (see \autoref{eq:PE_sco_slope}).
+they are equal to $\sigma_1$ and $\sigma_2$, respectively (see \autoref{eq:PE_sco_slope}).
 
 For \textit{isoneutral} diffusion $r_1$ and $r_2$ are the slopes between the isoneutral and computational surfaces.
 Therefore, they are different quantities, but have similar expressions in $z$- and $s$-coordinates.
 In $z$-coordinates:
-\begin{equation} \label{eq:PE_iso_slopes}
-r_1 =\frac{e_3 }{e_1 }	\left( \pd[\rho]{i} \right) \left( \pd[\rho]{k} \right)^{-1} \, \quad
-r_2 =\frac{e_3 }{e_2 }	\left( \pd[\rho]{j} \right) \left( \pd[\rho]{k} \right)^{-1} \,
+\begin{equation}
+  \label{eq:PE_iso_slopes}
+  r_1 =\frac{e_3 }{e_1 }	\left( \pd[\rho]{i} \right) \left( \pd[\rho]{k} \right)^{-1} \, \quad
+  r_2 =\frac{e_3 }{e_2 }	\left( \pd[\rho]{j} \right) \left( \pd[\rho]{k} \right)^{-1} \,
 \end{equation}
 while in $s$-coordinates $\pd[]{k}$ is replaced by $\pd[]{s}$.
 
 \subsubsection{Eddy induced velocity}
 When the \textit{eddy induced velocity} parametrisation (eiv) \citep{Gent1990} is used,
 an additional tracer advection is introduced in combination with the isoneutral diffusion of tracers:
-\begin{equation} \label{eq:PE_iso+eiv}
-D^{lT}=\nabla \cdot \left( {A^{lT}\;\Re \;\nabla T} \right)
-           +\nabla \cdot \left( {{\vect{U}}^\ast \,T} \right)
-\end{equation}
+\[
+  % \label{eq:PE_iso+eiv}
+  D^{lT}=\nabla \cdot \left( {A^{lT}\;\Re \;\nabla T} \right)
+  +\nabla \cdot \left( {{\vect{U}}^\ast \,T} \right)
+\]
 where ${\vect{U}}^\ast =\left( {u^\ast ,v^\ast ,w^\ast } \right)$ is a non-divergent,
 eddy-induced transport velocity. This velocity field is defined by:
-\begin{equation} \label{eq:PE_eiv}
-   \begin{split}
- u^\ast  &= +\frac{1}{e_3       }\frac{\partial }{\partial k}\left[ {A^{eiv}\;\tilde{r}_1 } \right] \\ 
- v^\ast  &= +\frac{1}{e_3       }\frac{\partial }{\partial k}\left[ {A^{eiv}\;\tilde{r}_2 } \right] \\ 
- w^\ast &=  -\frac{1}{e_1 e_2 }\left[ 
-                      \frac{\partial }{\partial i}\left( {A^{eiv}\;e_2\,\tilde{r}_1 } \right)
-                     +\frac{\partial }{\partial j}\left( {A^{eiv}\;e_1\,\tilde{r}_2 } \right)      \right]
-   \end{split}
-\end{equation}
+\[
+  % \label{eq:PE_eiv}
+  \begin{split}
+    u^\ast  &= +\frac{1}{e_3       }\frac{\partial }{\partial k}\left[ {A^{eiv}\;\tilde{r}_1 } \right] \\
+    v^\ast  &= +\frac{1}{e_3       }\frac{\partial }{\partial k}\left[ {A^{eiv}\;\tilde{r}_2 } \right] \\
+    w^\ast &=  -\frac{1}{e_1 e_2 }\left[
+      \frac{\partial }{\partial i}\left( {A^{eiv}\;e_2\,\tilde{r}_1 } \right)
+      +\frac{\partial }{\partial j}\left( {A^{eiv}\;e_1\,\tilde{r}_2 } \right)      \right]
+  \end{split}
+\]
 where $A^{eiv}$ is the eddy induced velocity coefficient
 (or equivalently the isoneutral thickness diffusivity coefficient),
 and $\tilde{r}_1$ and $\tilde{r}_2$ are the slopes between isoneutral and \emph{geopotential} surfaces.
 Their values are thus independent of the vertical coordinate, but their expression depends on the coordinate: 
-\begin{align} \label{eq:PE_slopes_eiv}
-\tilde{r}_n = \begin{cases}
-   r_n            &      \text{in $z$-coordinate}    \\
-   r_n + \sigma_n &      \text{in \textit{z*} and $s$-coordinates}  
-              \end{cases}
-\quad \text{where } n=1,2
+\begin{align}
+  \label{eq:PE_slopes_eiv}
+  \tilde{r}_n =
+  \begin{cases}
+    r_n            &      \text{in $z$-coordinate}    \\
+    r_n + \sigma_n &      \text{in \textit{z*} and $s$-coordinates}
+  \end{cases}
+                     \quad \text{where } n=1,2
 \end{align}
 
 The normal component of the eddy induced velocity is zero at all the boundaries.
@@ -1245,10 +1324,11 @@ The latter strategy is used in \NEMO (cf. \autoref{chap:LDF}).
 \subsubsection{Lateral bilaplacian tracer diffusive operator}
 
 The lateral bilaplacian tracer diffusive operator is defined by:
-\begin{equation} \label{eq:PE_bilapT}
-D^{lT}= - \Delta \left( \;\Delta T \right) 
-\qquad \text{where} \;\; \Delta \bullet = \nabla \left( {\sqrt{B^{lT}\,}\;\Re \;\nabla \bullet} \right)
-\end{equation}
+\[
+  % \label{eq:PE_bilapT}
+  D^{lT}= - \Delta \left( \;\Delta T \right)
+  \qquad \text{where} \;\; \Delta \bullet = \nabla \left( {\sqrt{B^{lT}\,}\;\Re \;\nabla \bullet} \right)
+\]
 It is the Laplacian operator given by \autoref{eq:PE_iso_tensor} applied twice with
 the harmonic eddy diffusion coefficient set to the square root of the biharmonic one. 
 
@@ -1257,19 +1337,22 @@ the harmonic eddy diffusion coefficient set to the square root of the biharmonic
 
 The Laplacian momentum diffusive operator along $z$- or $s$-surfaces is found by
 applying \autoref{eq:PE_lap_vector} to the horizontal velocity vector (see \autoref{apdx:B}):
-\begin{equation} \label{eq:PE_lapU}
-\begin{split}
-{\rm {\bf D}}^{l{\rm {\bf U}}} 
-&= \quad \  \nabla _h \left( {A^{lm}\chi } \right)
-   \ - \ \nabla _h \times \left( {A^{lm}\,\zeta \;{\rm {\bf k}}} \right)     \\
-&=   \left(      \begin{aligned}
-             \frac{1}{e_1      } \frac{\partial \left( A^{lm} \chi          \right)}{\partial i} 
-         &-\frac{1}{e_2 e_3}\frac{\partial \left( {A^{lm} \;e_3 \zeta} \right)}{\partial j}  \\
-             \frac{1}{e_2      }\frac{\partial \left( {A^{lm} \chi         } \right)}{\partial j}   
-         &+\frac{1}{e_1 e_3}\frac{\partial \left( {A^{lm} \;e_3 \zeta} \right)}{\partial i}
-        \end{aligned}    \right)
-\end{split}
-\end{equation}
+\[
+  % \label{eq:PE_lapU}
+  \begin{split}
+    {\rm {\bf D}}^{l{\rm {\bf U}}}
+    &= \quad \  \nabla _h \left( {A^{lm}\chi } \right)
+    \ - \ \nabla _h \times \left( {A^{lm}\,\zeta \;{\rm {\bf k}}} \right)     \\
+    &=   \left(
+      \begin{aligned}
+        \frac{1}{e_1      } \frac{\partial \left( A^{lm} \chi          \right)}{\partial i}
+        &-\frac{1}{e_2 e_3}\frac{\partial \left( {A^{lm} \;e_3 \zeta} \right)}{\partial j}  \\
+        \frac{1}{e_2      }\frac{\partial \left( {A^{lm} \chi         } \right)}{\partial j}
+        &+\frac{1}{e_1 e_3}\frac{\partial \left( {A^{lm} \;e_3 \zeta} \right)}{\partial i}
+      \end{aligned}
+    \right)
+  \end{split}
+\]
 
 Such a formulation ensures a complete separation between the vorticity and horizontal divergence fields
 (see \autoref{apdx:C}).
@@ -1277,12 +1360,13 @@ Unfortunately, it is only available in \textit{iso-level} direction.
 When a rotation is required
 ($i.e.$ geopotential diffusion in $s-$coordinates or isoneutral diffusion in both $z$- and $s$-coordinates),
 the $u$ and $v-$fields are considered as independent scalar fields, so that the diffusive operator is given by:
-\begin{equation} \label{eq:PE_lapU_iso}
-\begin{split}
- D_u^{l{\rm {\bf U}}} &= \nabla .\left( {A^{lm} \;\Re \;\nabla u} \right) \\ 
- D_v^{l{\rm {\bf U}}} &= \nabla .\left( {A^{lm} \;\Re \;\nabla v} \right)
-\end{split}
-\end{equation}
+\[
+  % \label{eq:PE_lapU_iso}
+  \begin{split}
+    D_u^{l{\rm {\bf U}}} &= \nabla .\left( {A^{lm} \;\Re \;\nabla u} \right) \\
+    D_v^{l{\rm {\bf U}}} &= \nabla .\left( {A^{lm} \;\Re \;\nabla v} \right)
+  \end{split}
+\]
 where $\Re$ is given by \autoref{eq:PE_iso_tensor}.
 It is the same expression as those used for diffusive operator on tracers.
 It must be emphasised that such a formulation is only exact in a Cartesian coordinate system,
@@ -1295,6 +1379,8 @@ a geographical coordinate system \citep{Lengaigne_al_JGR03}.
 As for tracers, the bilaplacian order momentum diffusive operator is a re-entering Laplacian operator with
 the harmonic eddy diffusion coefficient set to the square root of the biharmonic one.
 Nevertheless it is currently not available in the iso-neutral case.
+
+\biblio
 
 \end{document}
 

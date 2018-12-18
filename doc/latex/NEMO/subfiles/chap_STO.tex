@@ -1,4 +1,5 @@
-\documentclass[../tex_main/NEMO_manual]{subfiles}
+\documentclass[../main/NEMO_manual]{subfiles}
+
 \begin{document}
 % ================================================================
 % Chapter stochastic parametrization of EOS (STO)
@@ -12,7 +13,6 @@ Authors: P.-A. Bouttier
 
 \newpage
 
-
 The stochastic parametrization module aims to explicitly simulate uncertainties in the model.
 More particularly, \cite{Brankart_OM2013} has shown that,
 because of the nonlinearity of the seawater equation of state, unresolved scales represent a major source of
@@ -22,15 +22,15 @@ random processes representing unresolved T/S fluctuations.
 
 The stochastic formulation of the equation of state can be written as:
 \begin{equation}
- \label{eq:eos_sto}
+  \label{eq:eos_sto}
   \rho = \frac{1}{2} \sum_{i=1}^m\{ \rho[T+\Delta T_i,S+\Delta S_i,p_o(z)] + \rho[T-\Delta T_i,S-\Delta S_i,p_o(z)] \}
 \end{equation}
 where $p_o(z)$ is the reference pressure depending on the depth and,
 $\Delta T_i$ and $\Delta S_i$ are a set of T/S perturbations defined as
 the scalar product of the respective local T/S gradients with random walks $\mathbf{\xi}$:
 \begin{equation}
- \label{eq:sto_pert}
- \Delta T_i = \mathbf{\xi}_i \cdot \nabla T \qquad \hbox{and} \qquad \Delta S_i = \mathbf{\xi}_i \cdot \nabla S
+  \label{eq:sto_pert}
+  \Delta T_i = \mathbf{\xi}_i \cdot \nabla T \qquad \hbox{and} \qquad \Delta S_i = \mathbf{\xi}_i \cdot \nabla S
 \end{equation}
 $\mathbf{\xi}_i$ are produced by a first-order autoregressive processes (AR-1) with
 a parametrized decorrelation time scale, and horizontal and vertical standard deviations $\sigma_s$.
@@ -52,8 +52,8 @@ independent Gaussian autoregressive processes~$\xi^{(i)},\,i=1,\ldots,m$ are fir
 the same basic equation:
 
 \begin{equation}
-\label{eq:autoreg}
-\xi^{(i)}_{k+1} = a^{(i)} \xi^{(i)}_k + b^{(i)} w^{(i)} + c^{(i)}
+  \label{eq:autoreg}
+  \xi^{(i)}_{k+1} = a^{(i)} \xi^{(i)}_k + b^{(i)} w^{(i)} + c^{(i)}
 \end{equation}
 
 \noindent
@@ -66,18 +66,16 @@ correlation timescale ($\tau^{(i)}$) of each process:
   for order~1 processes, $w^{(i)}$ is a Gaussian white noise, with zero mean and standard deviation equal to~1,
   and the parameters $a^{(i)}$, $b^{(i)}$, $c^{(i)}$ are given by:
 
-\begin{equation}
-\label{eq:ord1}
-\left\{
-\begin{array}{l}
-a^{(i)} = \varphi \\
-b^{(i)} = \sigma^{(i)} \sqrt{ 1 - \varphi^2 } 
- \qquad\qquad\mbox{with}\qquad\qquad
-\varphi = \exp \left( - 1 / \tau^{(i)} \right) \\
-c^{(i)} = \mu^{(i)} \left( 1 - \varphi \right) \\
-\end{array}
-\right.
-\end{equation}
+  \[
+    % \label{eq:ord1}
+    \left\{
+      \begin{array}{l}
+        a^{(i)} = \varphi \\
+        b^{(i)} = \sigma^{(i)} \sqrt{ 1 - \varphi^2 }        \qquad\qquad\mbox{with}\qquad\qquad \varphi = \exp \left( - 1 / \tau^{(i)} \right) \\
+        c^{(i)} = \mu^{(i)} \left( 1 - \varphi \right) \\
+      \end{array}
+    \right.
+  \]
 
 \item
   for order~$n>1$ processes, $w^{(i)}$ is an order~$n-1$ autoregressive process, with zero mean,
@@ -85,18 +83,18 @@ c^{(i)} = \mu^{(i)} \left( 1 - \varphi \right) \\
   correlation timescale equal to~$\tau^{(i)}$;
   and the parameters $a^{(i)}$, $b^{(i)}$, $c^{(i)}$ are given by:
 
-\begin{equation}
-\label{eq:ord2}
-\left\{
-\begin{array}{l}
-a^{(i)} = \varphi \\
-b^{(i)} = \frac{n-1}{2(4n-3)} \sqrt{ 1 - \varphi^2 } 
- \qquad\qquad\mbox{with}\qquad\qquad
-\varphi = \exp \left( - 1 / \tau^{(i)} \right) \\
-c^{(i)} = \mu^{(i)} \left( 1 - \varphi \right) \\
-\end{array}
-\right.
-\end{equation}
+  \begin{equation}
+    \label{eq:ord2}
+    \left\{
+      \begin{array}{l}
+        a^{(i)} = \varphi \\
+        b^{(i)} = \frac{n-1}{2(4n-3)} \sqrt{ 1 - \varphi^2 }
+        \qquad\qquad\mbox{with}\qquad\qquad
+        \varphi = \exp \left( - 1 / \tau^{(i)} \right) \\
+        c^{(i)} = \mu^{(i)} \left( 1 - \varphi \right) \\
+      \end{array}
+    \right.
+  \end{equation}
 
 \end{itemize}
 
@@ -172,5 +170,6 @@ The simulation will continue exactly as if it was not interrupted only
 when \np{ln\_rstseed} is set to \forcode{.true.},
 $i.e.$ when the state of the random number generator is read in the restart file.
 
+\biblio
 
 \end{document}
