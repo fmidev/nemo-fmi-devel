@@ -67,7 +67,7 @@ the heat and salt conservation equations and an equation of state):
 -\left[    {\left( {\nabla \times {\rm {\bf U}}} \right)\times {\rm {\bf U}}
             +\frac{1}{2}\nabla \left( {{\rm {\bf U}}^2} \right)}    \right]_h
  -f\;{\rm {\bf k}}\times {\rm {\bf U}}_h 
--\frac{1}{\rho _o }\nabla _h p + {\rm {\bf D}}^{\rm {\bf U}} + {\rm {\bf F}}^{\rm {\bf U}}
+-\frac{1}{\rho_o }\nabla _h p + {\rm {\bf D}}^{\rm {\bf U}} + {\rm {\bf F}}^{\rm {\bf U}}
   \end{equation}
   \begin{equation}     \label{eq:PE_hydrostatic}
 \frac{\partial p }{\partial z} = - \rho \ g
@@ -569,14 +569,14 @@ $\bullet$ \textbf{Vector invariant form of the momentum equations} :
 = +   \left( {\zeta +f} \right)\,v                                    
    -   \frac{1}{2\,e_1}           \frac{\partial}{\partial i} \left(  u^2+v^2   \right) 
    -   \frac{1}{e_3    }  w     \frac{\partial u}{\partial k}      &      \\
-   -   \frac{1}{e_1    }            \frac{\partial}{\partial i} \left( \frac{p_s+p_h }{\rho _o}    \right)    
+   -   \frac{1}{e_1    }            \frac{\partial}{\partial i} \left( \frac{p_s+p_h }{\rho_o}    \right)    
    &+   D_u^{\vect{U}}  +   F_u^{\vect{U}}      \\
 \\
 \frac{\partial v}{\partial t} =
        -   \left( {\zeta +f} \right)\,u   
        -   \frac{1}{2\,e_2 }        \frac{\partial }{\partial j}\left(  u^2+v^2  \right)   
        -   \frac{1}{e_3     }   w  \frac{\partial v}{\partial k}     &      \\
-       -   \frac{1}{e_2     }        \frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho _o}  \right)    
+       -   \frac{1}{e_2     }        \frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right)    
     &+  D_v^{\vect{U}}  +   F_v^{\vect{U}}
 \end{split} \end{equation}
 \end{subequations}
@@ -594,7 +594,7 @@ $\bullet$ \textbf{flux form of the momentum equations} :
 					\frac{\partial \left( {e_2 \,u\,u} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \,v\,u} \right)}{\partial j}	\right)
                  - \frac{1}{e_3 }\frac{\partial \left( {         w\,u} \right)}{\partial k}    \\
--   \frac{1}{e_1 }\frac{\partial}{\partial i}\left( \frac{p_s+p_h }{\rho _o}   \right)
+-   \frac{1}{e_1 }\frac{\partial}{\partial i}\left( \frac{p_s+p_h }{\rho_o}   \right)
 +   D_u^{\vect{U}} +   F_u^{\vect{U}}
 \end{multline}
 \begin{multline} \label{eq:PE_dyn_flux_v}
@@ -606,7 +606,7 @@ $\bullet$ \textbf{flux form of the momentum equations} :
 					\frac{\partial \left( {e_2 \,u\,v} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \,v\,v} \right)}{\partial j}	\right)
                  - \frac{1}{e_3 } \frac{\partial \left( {        w\,v} \right)}{\partial k}    \\
--   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho _o}    \right)
+-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}    \right)
 +  D_v^{\vect{U}} +  F_v^{\vect{U}} 
 \end{multline}
 \end{subequations}
@@ -770,8 +770,8 @@ $\bullet$ Vector invariant form of the momentum equation :
 	+   \left( {\zeta +f} \right)\,v                                    
 	-   \frac{1}{2\,e_1} \frac{\partial}{\partial i} \left(  u^2+v^2   \right) 
 	-   \frac{1}{e_3} \omega \frac{\partial u}{\partial k}       \\
-	-   \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho _o}    \right)    
-	+  g\frac{\rho }{\rho _o}\sigma _1 
+	-   \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho_o}    \right)    
+	+  g\frac{\rho }{\rho_o}\sigma _1 
 	+   D_u^{\vect{U}}  +   F_u^{\vect{U}} \quad
 \end{multline}
 \begin{multline} \label{eq:PE_sco_v_vector}
@@ -779,8 +779,8 @@ $\bullet$ Vector invariant form of the momentum equation :
 	-   \left( {\zeta +f} \right)\,u   
 	-   \frac{1}{2\,e_2 }\frac{\partial }{\partial j}\left(  u^2+v^2  \right)     	
 	-   \frac{1}{e_3 } \omega \frac{\partial v}{\partial k}         \\
-	-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho _o}  \right) 
-	 +  g\frac{\rho }{\rho _o }\sigma _2   
+	-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right) 
+	 +  g\frac{\rho }{\rho_o }\sigma _2   
 	+  D_v^{\vect{U}}  +   F_v^{\vect{U}} \quad
 \end{multline}
 
@@ -795,8 +795,8 @@ $\bullet$ Flux form of the momentum equation :
 					\frac{\partial \left( {e_2 \, e_3 \, u\,u} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \, e_3 \, v\,u} \right)}{\partial j}	\right)
    - \frac{1}{e_3 }\frac{\partial \left( { \omega\,u} \right)}{\partial k}    \\
-	- \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho _o}    \right)    
-	+  g\frac{\rho }{\rho _o}\sigma _1 
+	- \frac{1}{e_1} \frac{\partial}{\partial i} \left( \frac{p_s + p_h}{\rho_o}    \right)    
+	+  g\frac{\rho }{\rho_o}\sigma _1 
 	+   D_u^{\vect{U}}  +   F_u^{\vect{U}} \quad
 \end{multline}
 \begin{multline} \label{eq:PE_sco_v_flux}
@@ -808,8 +808,8 @@ $\bullet$ Flux form of the momentum equation :
 					\frac{\partial \left( {e_2 \; e_3  \,u\,v} \right)}{\partial i}
 		+			\frac{\partial \left( {e_1 \; e_3  \,v\,v} \right)}{\partial j}	\right)
                  - \frac{1}{e_3 } \frac{\partial \left( { \omega\,v} \right)}{\partial k}    \\
-	-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho _o}  \right) 
-	 +  g\frac{\rho }{\rho _o }\sigma _2   
+	-   \frac{1}{e_2 }\frac{\partial }{\partial j}\left( \frac{p_s+p_h }{\rho_o}  \right) 
+	 +  g\frac{\rho }{\rho_o }\sigma _2   
 	+  D_v^{\vect{U}}  +   F_v^{\vect{U}} \quad
 \end{multline}
 
@@ -895,10 +895,10 @@ Since the vertical displacement of the free surface is incorporated in the verti
 the upper and lower boundaries are at fixed  \textit{z*} position,
 $\textit{z*} = 0$ and  $\textit{z*} = -H$ respectively.
 Also the divergence of the flow field is no longer zero as shown by the continuity equation:
-\begin{equation*} 
+\[ 
 \frac{\partial r}{\partial t} = \nabla_{\textit{z*}} \cdot \left( r \; \rm{\bf U}_h \right)
 		\left( r \; w\textit{*} \right) = 0 
-\end{equation*} 
+\] 
 %}
 
 

@@ -162,7 +162,7 @@ but it becomes attractive since a value of 3 or more is needed for N in the forw
 For example, the finite difference approximation of the temperature equation is:
 \begin{equation} \label{eq:STP_imp_zdf}
 \frac{T(k)^{t+1}-T(k)^{t-1}}{2\;\rdt}\equiv \text{RHS}+\frac{1}{e_{3t} }\delta 
-_k \left[ {\frac{A_w^{vT} }{e_{3w} }\delta _{k+1/2} \left[ {T^{t+1}} \right]} 
+_k \left[ {\frac{A_w^{vT} }{e_{3w} }\delta_{k+1/2} \left[ {T^{t+1}} \right]} 
 \right]
 \end{equation}
 where RHS is the right hand side of the equation except for the vertical diffusion term.
@@ -351,10 +351,10 @@ Tracer case (NB for momentum in vector invariant form take care!)
 
 \begin{flalign*}
 &\frac{\left( e_{3t}\,T \right)_k^{t+1}-\left( e_{3t}\,T \right)_k^{t-1}}{2\rdt}
-\equiv \text{RHS}+ \delta _k \left[ {\frac{A_w^{vt} }{e_{3w}^{t+1} }\delta _{k+1/2} \left[ {T^{t+1}} \right]} 
+\equiv \text{RHS}+ \delta_k \left[ {\frac{A_w^{vt} }{e_{3w}^{t+1} }\delta_{k+1/2} \left[ {T^{t+1}} \right]} 
 \right]      \\
 &\left( e_{3t}\,T \right)_k^{t+1}-\left( e_{3t}\,T \right)_k^{t-1}
-\equiv {2\rdt} \ \text{RHS}+ {2\rdt} \ \delta _k \left[ {\frac{A_w^{vt} }{e_{3w}^{t+1} }\delta _{k+1/2} \left[ {T^{t+1}} \right]} 
+\equiv {2\rdt} \ \text{RHS}+ {2\rdt} \ \delta_k \left[ {\frac{A_w^{vt} }{e_{3w}^{t+1} }\delta_{k+1/2} \left[ {T^{t+1}} \right]} 
 \right]      \\
 &\left( e_{3t}\,T \right)_k^{t+1}-\left( e_{3t}\,T \right)_k^{t-1}
 \equiv 2\rdt \ \text{RHS}

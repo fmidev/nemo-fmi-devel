@@ -258,12 +258,12 @@ its expression in the curvilinear $s-$coordinate system:
 %
 Applying the time derivative chain rule (first equation of (\autoref{apdx:A_s_chain_rule})) to $u$ and
 using (\autoref{apdx:A_w_in_s}) provides the expression of the last term of the right hand side,
-\begin{equation*} {\begin{array}{*{20}l} 
+\[ {\begin{array}{*{20}l} 
 w_s  \;\frac{\partial u}{\partial s} 
 	= \frac{\partial s}{\partial t} \;  \frac{\partial u }{\partial s}
 	= \left. {\frac{\partial u }{\partial t}} \right|_s  - \left. {\frac{\partial u }{\partial t}} \right|_z \quad , 
 \end{array} } 		
-\end{equation*}
+\]
 leads to the $s-$coordinate formulation of the total $z-$coordinate time derivative,
 $i.e.$ the total $s-$coordinate time derivative :
 \begin{align} \label{apdx:A_sco_Dt_vect}
@@ -369,24 +369,24 @@ $\ $\newline    % force a new ligne
 $\bullet$ \textbf{horizontal pressure gradient}
 
 The horizontal pressure gradient term can be transformed as follows:
-\begin{equation*}
+\[
 \begin{split}
- -\frac{1}{\rho _o \, e_1 }\left. {\frac{\partial p}{\partial i}} \right|_z
- & =-\frac{1}{\rho _o e_1 }\left[ {\left. {\frac{\partial p}{\partial i}} \right|_s -\frac{e_1 }{e_3 }\sigma _1 \frac{\partial p}{\partial s}} \right] \\
-& =-\frac{1}{\rho _o \,e_1 }\left. {\frac{\partial p}{\partial i}} \right|_s +\frac{\sigma _1 }{\rho _o \,e_3 }\left( {-g\;\rho \;e_3 } \right) \\
-&=-\frac{1}{\rho _o \,e_1 }\left. {\frac{\partial p}{\partial i}} \right|_s -\frac{g\;\rho }{\rho _o }\sigma _1
+ -\frac{1}{\rho_o \, e_1 }\left. {\frac{\partial p}{\partial i}} \right|_z
+ & =-\frac{1}{\rho_o e_1 }\left[ {\left. {\frac{\partial p}{\partial i}} \right|_s -\frac{e_1 }{e_3 }\sigma _1 \frac{\partial p}{\partial s}} \right] \\
+& =-\frac{1}{\rho_o \,e_1 }\left. {\frac{\partial p}{\partial i}} \right|_s +\frac{\sigma _1 }{\rho_o \,e_3 }\left( {-g\;\rho \;e_3 } \right) \\
+&=-\frac{1}{\rho_o \,e_1 }\left. {\frac{\partial p}{\partial i}} \right|_s -\frac{g\;\rho }{\rho_o }\sigma _1
 \end{split}
-\end{equation*}
+\]
 Applying similar manipulation to the second component and
 replacing $\sigma _1$ and $\sigma _2$ by their expression \autoref{apdx:A_s_slope}, it comes:
 \begin{equation} \label{apdx:A_grad_p_1}
 \begin{split}
- -\frac{1}{\rho _o \, e_1 } \left. {\frac{\partial p}{\partial i}} \right|_z
-&=-\frac{1}{\rho _o \,e_1 } \left(     \left.              {\frac{\partial p}{\partial i}} \right|_s 
+ -\frac{1}{\rho_o \, e_1 } \left. {\frac{\partial p}{\partial i}} \right|_z
+&=-\frac{1}{\rho_o \,e_1 } \left(     \left.              {\frac{\partial p}{\partial i}} \right|_s 
                                                   + g\;\rho  \;\left. {\frac{\partial z}{\partial i}} \right|_s    \right) \\
 %
- -\frac{1}{\rho _o \, e_2 }\left. {\frac{\partial p}{\partial j}} \right|_z
-&=-\frac{1}{\rho _o \,e_2 } \left(    \left.               {\frac{\partial p}{\partial j}} \right|_s 
+ -\frac{1}{\rho_o \, e_2 }\left. {\frac{\partial p}{\partial j}} \right|_z
+&=-\frac{1}{\rho_o \,e_2 } \left(    \left.               {\frac{\partial p}{\partial j}} \right|_s 
                                                    + g\;\rho \;\left. {\frac{\partial z}{\partial j}} \right|_s   \right) \\
 \end{split}
 \end{equation}
@@ -399,30 +399,30 @@ the horizontal pressure gradient can be split in two parts following \citet{Mars
 Let defined a density anomaly, $d$, by $d=(\rho - \rho_o)/ \rho_o$,
 and a hydrostatic pressure anomaly, $p_h'$, by $p_h'= g \; \int_z^\eta d \; e_3 \; dk$.
 The pressure is then given by:
-\begin{equation*} 
+\[ 
 \begin{split}
 p &= g\; \int_z^\eta \rho \; e_3 \; dk = g\; \int_z^\eta \left(  \rho_o \, d + 1 \right) \; e_3 \; dk   \\
    &= g \, \rho_o \; \int_z^\eta d \; e_3 \; dk + g \, \int_z^\eta e_3 \; dk    
 \end{split}
-\end{equation*}
+\]
 Therefore, $p$ and $p_h'$ are linked through:
 \begin{equation} \label{apdx:A_pressure}
    p = \rho_o \; p_h' + g \, ( z + \eta )
 \end{equation}
 and the hydrostatic pressure balance expressed in terms of $p_h'$ and $d$ is:
-\begin{equation*} 
+\[ 
 \frac{\partial p_h'}{\partial k} = - d \, g \, e_3
-\end{equation*}
+\]
 
 Substituing \autoref{apdx:A_pressure} in \autoref{apdx:A_grad_p_1} and
 using the definition of the density anomaly it comes the expression in two parts:
 \begin{equation} \label{apdx:A_grad_p_2}
 \begin{split}
- -\frac{1}{\rho _o \, e_1 } \left. {\frac{\partial p}{\partial i}} \right|_z
+ -\frac{1}{\rho_o \, e_1 } \left. {\frac{\partial p}{\partial i}} \right|_z
 &=-\frac{1}{e_1 } \left(     \left.              {\frac{\partial p_h'}{\partial i}} \right|_s 
                                        + g\; d  \;\left. {\frac{\partial z}{\partial i}} \right|_s    \right)  - \frac{g}{e_1 } \frac{\partial \eta}{\partial i} \\
 %
- -\frac{1}{\rho _o \, e_2 }\left. {\frac{\partial p}{\partial j}} \right|_z
+ -\frac{1}{\rho_o \, e_2 }\left. {\frac{\partial p}{\partial j}} \right|_z
 &=-\frac{1}{e_2 } \left(    \left.               {\frac{\partial p_h'}{\partial j}} \right|_s 
                                         + g\; d \;\left. {\frac{\partial z}{\partial j}} \right|_s   \right)  - \frac{g}{e_2 } \frac{\partial \eta}{\partial j}\\
 \end{split}

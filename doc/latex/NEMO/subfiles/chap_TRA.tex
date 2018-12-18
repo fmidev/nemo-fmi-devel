@@ -26,10 +26,10 @@ the resulting field is multiplied by a mask.
 
 The two active tracers are potential temperature and salinity.
 Their prognostic equations can be summarized as follows:
-\begin{equation*}
+\[
 \text{NXT} = \text{ADV}+\text{LDF}+\text{ZDF}+\text{SBC}
                    \ (+\text{QSR})\ (+\text{BBC})\ (+\text{BBL})\ (+\text{DMP})
-\end{equation*}
+\]
 
 NXT stands for next, referring to the time-stepping.
 From left to right, the terms on the rhs of the tracer equations are the advection (ADV),
@@ -75,9 +75,9 @@ $i.e.$ as the divergence of the advective fluxes.
 Its discrete expression is given by :
 \begin{equation} \label{eq:tra_adv}
 ADV_\tau =-\frac{1}{b_t} \left( 
-\;\delta _i \left[ e_{2u}\,e_{3u} \;  u\; \tau _u  \right]
-+\delta _j \left[ e_{1v}\,e_{3v}  \;  v\; \tau _v  \right] \; \right)
--\frac{1}{e_{3t}} \;\delta _k \left[ w\; \tau _w \right]
+\;\delta_i \left[ e_{2u}\,e_{3u} \;  u\; \tau_u  \right]
++\delta_j \left[ e_{1v}\,e_{3v}  \;  v\; \tau_v  \right] \; \right)
+-\frac{1}{e_{3t}} \;\delta_k \left[ w\; \tau_w \right]
 \end{equation}
 where $\tau$ is either T or S, and $b_t= e_{1t}\,e_{2t}\,e_{3t}$ is the volume of $T$-cells.
 The flux form in \autoref{eq:tra_adv} implicitly requires the use of the continuity equation.
@@ -124,7 +124,7 @@ At the sea surface the boundary condition depends on the type of sea surface cho
   the first level thickness is constant in time:
   the vertical boundary condition is applied at the fixed surface $z=0$ rather than on the moving surface $z=\eta$.
   There is a non-zero advective flux which is set for all advection schemes as
-  $\left. {\tau _w } \right|_{k=1/2} =T_{k=1} $,
+  $\left. {\tau_w } \right|_{k=1/2} =T_{k=1} $,
   $i.e.$ the product of surface velocity (at $z=0$) by the first level tracer value.
 \item[non-linear free surface:]
   (\np{ln\_linssh}\forcode{ = .false.})
@@ -193,7 +193,7 @@ In the $2^{nd}$ order centred formulation (CEN2), the tracer at velocity points 
 the two neighbouring $T$-point values.
 For example, in the $i$-direction :
 \begin{equation} \label{eq:tra_adv_cen2}
-\tau _u^{cen2} =\overline T ^{i+1/2}
+\tau_u^{cen2} =\overline T ^{i+1/2}
 \end{equation}
 
 CEN2 is non diffusive ($i.e.$ it conserves the tracer variance, $\tau^2)$ but dispersive
@@ -212,8 +212,8 @@ In the $4^{th}$ order formulation (CEN4), tracer values are evaluated at u- and 
 a $4^{th}$ order interpolation, and thus depend on the four neighbouring $T$-points.
 For example, in the $i$-direction:
 \begin{equation} \label{eq:tra_adv_cen4}
-\tau _u^{cen4} 
-=\overline{   T - \frac{1}{6}\,\delta _i \left[ \delta_{i+1/2}[T] \,\right]   }^{\,i+1/2}
+\tau_u^{cen4} 
+=\overline{   T - \frac{1}{6}\,\delta_i \left[ \delta_{i+1/2}[T] \,\right]   }^{\,i+1/2}
 \end{equation}
 In the vertical direction (\np{nn\_cen\_v}\forcode{ = 4}),
 a $4^{th}$ COMPACT interpolation has been prefered \citep{Demange_PhD2014}.
@@ -237,7 +237,7 @@ As in CEN2 case, the time-stepping is performed using a leapfrog scheme in conju
 so $T$ in (\autoref{eq:tra_adv_cen4}) is the \textit{now} tracer.
 
 At a $T$-grid cell adjacent to a boundary (coastline, bottom and surface),
-an additional hypothesis must be made to evaluate $\tau _u^{cen4}$.
+an additional hypothesis must be made to evaluate $\tau_u^{cen4}$.
 This hypothesis usually reduces the order of the scheme.
 Here we choose to set the gradient of $T$ across the boundary to zero.
 Alternative conditions can be specified, such as a reduction to a second order scheme for
@@ -259,12 +259,12 @@ a centred scheme.
 For example, in the $i$-direction :
 \begin{equation} \label{eq:tra_adv_fct}
 \begin{split}
-\tau _u^{ups}&= \begin{cases}
+\tau_u^{ups}&= \begin{cases}
  					T_{i+1} 	& \text{if $\ u_{i+1/2} <     0$} \hfill \\
  					T_i   		& \text{if $\ u_{i+1/2} \geq 0$} \hfill \\
 				  \end{cases}     \\
 \\
-\tau _u^{fct}&=\tau _u^{ups} +c_u \;\left( {\tau _u^{cen} -\tau _u^{ups} } \right)
+\tau_u^{fct}&=\tau_u^{ups} +c_u \;\left( {\tau_u^{cen} -\tau_u^{ups} } \right)
 \end{split}
 \end{equation}
 where $c_u$ is a flux limiter function taking values between 0 and 1.
@@ -286,8 +286,8 @@ Note that in this case, a similar split-explicit time stepping should be used on
 insure a better stability (see \autoref{subsec:DYN_zad}).
 
 For stability reasons (see \autoref{chap:STP}),
-$\tau _u^{cen}$ is evaluated in (\autoref{eq:tra_adv_fct}) using the \textit{now} tracer while
-$\tau _u^{ups}$ is evaluated using the \textit{before} tracer.
+$\tau_u^{cen}$ is evaluated in (\autoref{eq:tra_adv_fct}) using the \textit{now} tracer while
+$\tau_u^{ups}$ is evaluated using the \textit{before} tracer.
 In other words, the advective part of the scheme is time stepped with a leap-frog scheme
 while a forward scheme is used for the diffusive part. 
 
@@ -305,10 +305,10 @@ In its formulation, the tracer at velocity points is evaluated assuming a linear
 two $T$-points (\autoref{fig:adv_scheme}).
 For example, in the $i$-direction :
 \begin{equation} \label{eq:tra_adv_mus}
-   \tau _u^{mus} = \left\{      \begin{aligned}
-         &\tau _i  &+ \frac{1}{2} \;\left( 1-\frac{u_{i+1/2} \;\rdt}{e_{1u}} \right)
+   \tau_u^{mus} = \left\{      \begin{aligned}
+         &\tau_i  &+ \frac{1}{2} \;\left( 1-\frac{u_{i+1/2} \;\rdt}{e_{1u}} \right)
          &\ \widetilde{\partial _i \tau}  & \quad \text{if }\;u_{i+1/2} \geqslant 0      \\
-         &\tau _{i+1/2} &+\frac{1}{2}\;\left( 1+\frac{u_{i+1/2} \;\rdt}{e_{1u} } \right)
+         &\tau_{i+1/2} &+\frac{1}{2}\;\left( 1+\frac{u_{i+1/2} \;\rdt}{e_{1u} } \right)
          &\ \widetilde{\partial_{i+1/2} \tau } & \text{if }\;u_{i+1/2} <0
    \end{aligned}    \right.
 \end{equation}
@@ -316,7 +316,7 @@ where $\widetilde{\partial _i \tau}$ is the slope of the tracer on which a limit
 ensure the \textit{positive} character of the scheme.
 
 The time stepping is performed using a forward scheme,
-that is the \textit{before} tracer field is used to evaluate $\tau _u^{mus}$.
+that is the \textit{before} tracer field is used to evaluate $\tau_u^{mus}$.
 
 For an ocean grid point adjacent to land and where the ocean velocity is directed toward land,
 an upstream flux is used.
@@ -338,13 +338,13 @@ The UBS scheme, often called UP3, is also known as the Cell Averaged QUICK schem
 It is an upstream-biased third order scheme based on an upstream-biased parabolic interpolation.
 For example, in the $i$-direction:
 \begin{equation} \label{eq:tra_adv_ubs}
-   \tau _u^{ubs} =\overline T ^{i+1/2}-\;\frac{1}{6} \left\{      
+   \tau_u^{ubs} =\overline T ^{i+1/2}-\;\frac{1}{6} \left\{      
    \begin{aligned}
          &\tau"_i        	& \quad \text{if }\ u_{i+1/2} \geqslant 0      \\
          &\tau"_{i+1}	& \quad \text{if }\ u_{i+1/2}       <       0
    \end{aligned}    \right.
 \end{equation}
-where $\tau "_i =\delta _i \left[ {\delta _{i+1/2} \left[ \tau \right]} \right]$.
+where $\tau "_i =\delta_i \left[ {\delta_{i+1/2} \left[ \tau \right]} \right]$.
 
 This results in a dissipatively dominant (i.e. hyper-diffusive) truncation error
 \citep{Shchepetkin_McWilliams_OM05}.
@@ -373,7 +373,7 @@ Nevertheless it is quite easy to make the substitution in the \mdl{traadv\_ubs} 
 
 Note that it is straightforward to rewrite \autoref{eq:tra_adv_ubs} as follows:
 \begin{equation} \label{eq:traadv_ubs2}
-\tau _u^{ubs} = \tau _u^{cen4} + \frac{1}{12} \left\{	 
+\tau_u^{ubs} = \tau_u^{cen4} + \frac{1}{12} \left\{	 
    \begin{aligned}
 	& + \tau"_i			& \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
 	&  - \tau"_{i+1}		& \quad \text{if }\ u_{i+1/2}       <       0
@@ -381,8 +381,8 @@ Note that it is straightforward to rewrite \autoref{eq:tra_adv_ubs} as follows:
 \end{equation}
 or equivalently 
 \begin{equation} \label{eq:traadv_ubs2b}
-u_{i+1/2} \ \tau _u^{ubs} 
-=u_{i+1/2} \ \overline{ T - \frac{1}{6}\,\delta _i\left[ \delta_{i+1/2}[T] \,\right] }^{\,i+1/2}
+u_{i+1/2} \ \tau_u^{ubs} 
+=u_{i+1/2} \ \overline{ T - \frac{1}{6}\,\delta_i\left[ \delta_{i+1/2}[T] \,\right] }^{\,i+1/2}
 - \frac{1}{2} |u|_{i+1/2} \;\frac{1}{6} \;\delta_{i+1/2}[\tau"_i]
 \end{equation}
 
@@ -520,8 +520,8 @@ the next two sub-sections.
 The laplacian diffusion operator acting along the model (\textit{i,j})-surfaces is given by: 
 \begin{equation} \label{eq:tra_ldf_lap}
 D_t^{lT} =\frac{1}{b_t} \left( \;
-   \delta _{i}\left[ A_u^{lT} \; \frac{e_{2u}\,e_{3u}}{e_{1u}} \;\delta _{i+1/2} [T] \right] 
-+ \delta _{j}\left[ A_v^{lT} \;  \frac{e_{1v}\,e_{3v}}{e_{2v}} \;\delta _{j+1/2} [T] \right]  \;\right)
+   \delta_{i}\left[ A_u^{lT} \; \frac{e_{2u}\,e_{3u}}{e_{1u}} \;\delta_{i+1/2} [T] \right] 
++ \delta_{j}\left[ A_v^{lT} \;  \frac{e_{1v}\,e_{3v}}{e_{2v}} \;\delta_{j+1/2} [T] \right]  \;\right)
 \end{equation}
 where  $b_t$=$e_{1t}\,e_{2t}\,e_{3t}$  is the volume of $T$-cells and
 where zero diffusive fluxes is assumed across solid boundaries,
@@ -727,8 +727,8 @@ $\bullet$ \textit{fwfisf}, the mass flux associated with ice shelf melt,
 The surface boundary condition on temperature and salinity is applied as follows:
 \begin{equation} \label{eq:tra_sbc}
 \begin{aligned}
- &F^T = \frac{ 1 }{\rho _o \;C_p \,\left. e_{3t} \right|_{k=1} }  &\overline{ Q_{ns}       }^t  & \\ 
-& F^S =\frac{ 1 }{\rho _o  \,      \left. e_{3t} \right|_{k=1} }  &\overline{ \textit{sfx} }^t   & \\   
+ &F^T = \frac{ 1 }{\rho_o \;C_p \,\left. e_{3t} \right|_{k=1} }  &\overline{ Q_{ns}       }^t  & \\ 
+& F^S =\frac{ 1 }{\rho_o  \,      \left. e_{3t} \right|_{k=1} }  &\overline{ \textit{sfx} }^t   & \\   
  \end{aligned}
 \end{equation} 
 where $\overline{x }^t$ means that $x$ is averaged over two consecutive time steps ($t-\rdt/2$ and $t+\rdt/2$).
@@ -742,10 +742,10 @@ the volume of the first level.
 The resulting surface boundary condition is applied as follows:
 \begin{equation} \label{eq:tra_sbc_lin}
 \begin{aligned}
- &F^T = \frac{ 1 }{\rho _o \;C_p \,\left. e_{3t} \right|_{k=1} }   
+ &F^T = \frac{ 1 }{\rho_o \;C_p \,\left. e_{3t} \right|_{k=1} }   
            &\overline{ \left( Q_{ns} - \textit{emp}\;C_p\,\left. T \right|_{k=1} \right) }^t  & \\ 
 %
-& F^S =\frac{ 1 }{\rho _o \,\left. e_{3t} \right|_{k=1} } 
+& F^S =\frac{ 1 }{\rho_o \,\left. e_{3t} \right|_{k=1} } 
            &\overline{ \left( \;\textit{sfx} - \textit{emp} \;\left. S \right|_{k=1}  \right) }^t   & \\   
  \end{aligned}
 \end{equation} 
@@ -1409,25 +1409,25 @@ For example, for temperature in the $i$-direction the needed interpolated temper
       (\protect\np{ln\_zps}\forcode{ = .true.}) in the case $( e3w_k^{i+1} - e3w_k^i  )>0$.
       A linear interpolation is used to estimate $\widetilde{T}_k^{i+1}$,
       the tracer value at the depth of the shallower tracer point of the two adjacent bottom $T$-points.
-      The horizontal difference is then given by: $\delta _{i+1/2} T_k=  \widetilde{T}_k^{\,i+1} -T_k^{\,i}$ and
+      The horizontal difference is then given by: $\delta_{i+1/2} T_k=  \widetilde{T}_k^{\,i+1} -T_k^{\,i}$ and
       the average by: $\overline{T}_k^{\,i+1/2}= ( \widetilde{T}_k^{\,i+1/2} - T_k^{\,i} ) / 2$.
     }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-\begin{equation*}
+\[
 \widetilde{T}= \left\{  \begin{aligned}  
-&T^{\,i+1}      -\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right)}{ e_{3w}^{i+1} }\;\delta _k T^{i+1}	
+&T^{\,i+1}      -\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right)}{ e_{3w}^{i+1} }\;\delta_k T^{i+1}	
  								&& \quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$   } 	\\
 										\\
-&T^{\,i} \ \ \ \,+\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right) }{e_{3w}^i       }\;\delta _k T^{i+1}
+&T^{\,i} \ \ \ \,+\frac{ \left( e_{3w}^{i+1} -e_{3w}^i \right) }{e_{3w}^i       }\;\delta_k T^{i+1}
 			 					&& \quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   } 
             \end{aligned}   \right.
-\end{equation*}
+\]
 and the resulting forms for the horizontal difference and the horizontal average value of $T$ at a $U$-point are: 
 \begin{equation} \label{eq:zps_hde}
 \begin{aligned}
- \delta _{i+1/2} T= 	\begin{cases}
+ \delta_{i+1/2} T= 	\begin{cases}
 \ \ \ \widetilde {T}\quad\ -T^i	 	& \ \ \quad\quad\text{if  $\ e_{3w}^{i+1} \geq e_{3w}^i$ } \\
 										\\
 \ \ \ T^{\,i+1}-\widetilde{T}		& \ \ \quad\quad\text{if  $\ e_{3w}^{i+1}    <   e_{3w}^i$   } 

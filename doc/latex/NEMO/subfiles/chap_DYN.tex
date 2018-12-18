@@ -18,11 +18,11 @@ One must be aware that all the quantities are masked fields and
 that each time an average or difference operator is used, the resulting field is multiplied by a mask.
 
 The prognostic ocean dynamics equation can be summarized as follows:
-\begin{equation*}
+\[
 \text{NXT} = \dbinom	{\text{VOR} + \text{KEG} + \text {ZAD} }
 						{\text{COR} + \text{ADV}                       }
 			+ \text{HPG} + \text{SPG} + \text{LDF} + \text{ZDF}
-\end{equation*}
+\]
 NXT stands for next, referring to the time-stepping.
 The first group of terms on the rhs of this equation corresponds to the Coriolis and advection terms that
 are decomposed into either a vorticity part (VOR), a kinetic energy part (KEG) and
@@ -72,16 +72,16 @@ $\ $\newline    % force a new ligne
 
 The vorticity is defined at an $f$-point ($i.e.$ corner point) as follows:
 \begin{equation} \label{eq:divcur_cur}
-\zeta =\frac{1}{e_{1f}\,e_{2f} }\left( {\;\delta _{i+1/2} \left[ {e_{2v}\;v} \right]
-						        -\delta _{j+1/2} \left[ {e_{1u}\;u} \right]\;} \right)
+\zeta =\frac{1}{e_{1f}\,e_{2f} }\left( {\;\delta_{i+1/2} \left[ {e_{2v}\;v} \right]
+						        -\delta_{j+1/2} \left[ {e_{1u}\;u} \right]\;} \right)
 \end{equation} 
 
 The horizontal divergence is defined at a $T$-point.
 It is given by:
 \begin{equation} \label{eq:divcur_div}
 \chi =\frac{1}{e_{1t}\,e_{2t}\,e_{3t} }
-		\left( {\delta _i \left[ {e_{2u}\,e_{3u}\,u} \right]
-		       +\delta _j \left[ {e_{1v}\,e_{3v}\,v} \right]} \right)
+		\left( {\delta_i \left[ {e_{2u}\,e_{3u}\,u} \right]
+		       +\delta_j \left[ {e_{1v}\,e_{3v}\,v} \right]} \right)
 \end{equation} 
 
 Note that although the vorticity has the same discrete expression in $z$- and $s$-coordinates,
@@ -108,15 +108,15 @@ The sea surface height is given by:
 \begin{equation} \label{eq:dynspg_ssh}
 \begin{aligned}
 \frac{\partial \eta }{\partial t}
-&\equiv    \frac{1}{e_{1t} e_{2t} }\sum\limits_k { \left\{  \delta _i \left[ {e_{2u}\,e_{3u}\;u} \right]
-                                                                                  +\delta _j \left[ {e_{1v}\,e_{3v}\;v} \right]  \right\} } 
-           -    \frac{\textit{emp}}{\rho _w }   \\
-&\equiv    \sum\limits_k {\chi \ e_{3t}}  -  \frac{\textit{emp}}{\rho _w }
+&\equiv    \frac{1}{e_{1t} e_{2t} }\sum\limits_k { \left\{  \delta_i \left[ {e_{2u}\,e_{3u}\;u} \right]
+                                                                                  +\delta_j \left[ {e_{1v}\,e_{3v}\;v} \right]  \right\} } 
+           -    \frac{\textit{emp}}{\rho_w }   \\
+&\equiv    \sum\limits_k {\chi \ e_{3t}}  -  \frac{\textit{emp}}{\rho_w }
 \end{aligned}
 \end{equation}
 where \textit{emp} is the surface freshwater budget (evaporation minus precipitation), 
 expressed in Kg/m$^2$/s (which is equal to mm/s),
-and $\rho _w$=1,035~Kg/m$^3$ is the reference density of sea water (Boussinesq approximation).
+and $\rho_w$=1,035~Kg/m$^3$ is the reference density of sea water (Boussinesq approximation).
 If river runoff is expressed as a surface freshwater flux (see \autoref{chap:SBC}) then
 \textit{emp} can be written as the evaporation minus precipitation, minus the river runoff. 
 The sea-surface height is evaluated using exactly the same time stepping scheme as
@@ -354,8 +354,8 @@ together with the formulation chosen for the vertical advection (see below),
 conserves the total kinetic energy:
 \begin{equation} \label{eq:dynkeg}
 \left\{ \begin{aligned}
- -\frac{1}{2 \; e_{1u} }  & \ \delta _{i+1/2} \left[ {\overline {u^2}^{\,i} + \overline{v^2}^{\,j}} \right]   \\
- -\frac{1}{2 \; e_{2v} }  & \ \delta _{j+1/2} \left[ {\overline {u^2}^{\,i} + \overline{v^2}^{\,j}} \right]    
+ -\frac{1}{2 \; e_{1u} }  & \ \delta_{i+1/2} \left[ {\overline {u^2}^{\,i} + \overline{v^2}^{\,j}} \right]   \\
+ -\frac{1}{2 \; e_{2v} }  & \ \delta_{j+1/2} \left[ {\overline {u^2}^{\,i} + \overline{v^2}^{\,j}} \right]    
 \end{aligned} \right.
 \end{equation} 
 
@@ -372,8 +372,8 @@ Indeed, the change of KE due to the vertical advection is exactly balanced by
 the change of KE due to the gradient of KE (see \autoref{apdx:C}).
 \begin{equation} \label{eq:dynzad}
 \left\{ 		\begin{aligned}
--\frac{1} {e_{1u}\,e_{2u}\,e_{3u}} &\ \overline{\ \overline{ e_{1t}\,e_{2t}\;w } ^{\,i+1/2}  \;\delta _{k+1/2} \left[ u \right]\  }^{\,k}  \\
--\frac{1} {e_{1v}\,e_{2v}\,e_{3v}}  &\ \overline{\ \overline{ e_{1t}\,e_{2t}\;w } ^{\,j+1/2}  \;\delta _{k+1/2} \left[ u \right]\  }^{\,k} 
+-\frac{1} {e_{1u}\,e_{2u}\,e_{3u}} &\ \overline{\ \overline{ e_{1t}\,e_{2t}\;w } ^{\,i+1/2}  \;\delta_{k+1/2} \left[ u \right]\  }^{\,k}  \\
+-\frac{1} {e_{1v}\,e_{2v}\,e_{3v}}  &\ \overline{\ \overline{ e_{1t}\,e_{2t}\;w } ^{\,j+1/2}  \;\delta_{k+1/2} \left[ u \right]\  }^{\,k} 
 \end{aligned}         \right.
 \end{equation} 
 When \np{ln\_dynzad\_zts}\forcode{ = .true.},
@@ -413,8 +413,8 @@ This altered Coriolis parameter is thus discretised at $f$-points.
 It is given by: 
 \begin{multline} \label{eq:dyncor_metric}
 f+\frac{1}{e_1 e_2 }\left( {v\frac{\partial e_2 }{\partial i}  -  u\frac{\partial e_1 }{\partial j}} \right)  \\
-   \equiv   f + \frac{1}{e_{1f} e_{2f} } \left( { \ \overline v ^{i+1/2}\delta _{i+1/2} \left[ {e_{2u} } \right]  
-                                                                 -  \overline u ^{j+1/2}\delta _{j+1/2} \left[ {e_{1u} } \right]  }  \ \right)
+   \equiv   f + \frac{1}{e_{1f} e_{2f} } \left( { \ \overline v ^{i+1/2}\delta_{i+1/2} \left[ {e_{2u} } \right]  
+                                                                 -  \overline u ^{j+1/2}\delta_{j+1/2} \left[ {e_{1u} } \right]  }  \ \right)
 \end{multline} 
 
 Any of the (\autoref{eq:dynvor_ens}), (\autoref{eq:dynvor_ene}) and (\autoref{eq:dynvor_een}) schemes can be used to
@@ -433,14 +433,14 @@ The discrete expression of the advection term is given by:
 \left\{ 
 \begin{aligned}
 \frac{1}{e_{1u}\,e_{2u}\,e_{3u}} 
-\left(      \delta _{i+1/2} \left[ \overline{e_{2u}\,e_{3u}\;u }^{i       }  \ u_t      \right]    
-          + \delta _{j       } \left[ \overline{e_{1u}\,e_{3u}\;v }^{i+1/2}  \ u_f      \right] \right.  \ \;   \\
-\left.   + \delta _{k      } \left[ \overline{e_{1w}\,e_{2w}\;w}^{i+1/2}  \ u_{uw} \right] \right)   \\
+\left(      \delta_{i+1/2} \left[ \overline{e_{2u}\,e_{3u}\;u }^{i       }  \ u_t      \right]    
+          + \delta_{j       } \left[ \overline{e_{1u}\,e_{3u}\;v }^{i+1/2}  \ u_f      \right] \right.  \ \;   \\
+\left.   + \delta_{k      } \left[ \overline{e_{1w}\,e_{2w}\;w}^{i+1/2}  \ u_{uw} \right] \right)   \\
 \\
 \frac{1}{e_{1v}\,e_{2v}\,e_{3v}} 
-\left(     \delta _{i       } \left[ \overline{e_{2u}\,e_{3u }\;u }^{j+1/2} \ v_f       \right] 
-         + \delta _{j+1/2} \left[ \overline{e_{1u}\,e_{3u }\;v }^{i       } \ v_t       \right] \right.  \ \, \, \\
-\left.  + \delta _{k      } \left[ \overline{e_{1w}\,e_{2w}\;w}^{j+1/2} \ v_{vw}  \right] \right) \\
+\left(     \delta_{i       } \left[ \overline{e_{2u}\,e_{3u }\;u }^{j+1/2} \ v_f       \right] 
+         + \delta_{j+1/2} \left[ \overline{e_{1u}\,e_{3u }\;v }^{i       } \ v_t       \right] \right.  \ \, \, \\
+\left.  + \delta_{k      } \left[ \overline{e_{1w}\,e_{2w}\;w}^{j+1/2} \ v_{vw}  \right] \right) \\
 \end{aligned}
 \right.
 \end{equation}
@@ -489,7 +489,7 @@ u_T^{ubs} =\overline u ^i-\;\frac{1}{6} 	\begin{cases}
 		u"_{i+1/2}& 	\text{if $\ \overline{e_{2u}\,e_{3u} \ u}^i  < 0$ }
 \end{cases}
 \end{equation}
-where $u"_{i+1/2} =\delta _{i+1/2} \left[ {\delta _i \left[ u \right]} \right]$.
+where $u"_{i+1/2} =\delta_{i+1/2} \left[ {\delta_i \left[ u \right]} \right]$.
 This results in a dissipatively dominant ($i.e.$ hyper-diffusive) truncation error
 \citep{Shchepetkin_McWilliams_OM05}.
 The overall performance of the advection scheme is similar to that reported in \citet{Farrow1995}.
@@ -561,22 +561,22 @@ Thus, the two horizontal components of the hydrostatic pressure gradient are com
 for $k=km$ (surface layer, $jk=1$ in the code)
 \begin{equation} \label{eq:dynhpg_zco_surf}
 \left\{ \begin{aligned}
-					\left. \delta _{i+1/2} \left[  p^h 			 \right] \right|_{k=km} 
-&= \frac{1}{2} g \ 	\left. \delta _{i+1/2} \left[  e_{3w} \ \rho \right] \right|_{k=km}   \\
-     					\left. \delta _{j+1/2} \left[  p^h  			 \right] \right|_{k=km} 
-&= \frac{1}{2} g \ 	\left. \delta _{j+1/2} \left[  e_{3w} \ \rho \right] \right|_{k=km}   \\
+					\left. \delta_{i+1/2} \left[  p^h 			 \right] \right|_{k=km} 
+&= \frac{1}{2} g \ 	\left. \delta_{i+1/2} \left[  e_{3w} \ \rho \right] \right|_{k=km}   \\
+     					\left. \delta_{j+1/2} \left[  p^h  			 \right] \right|_{k=km} 
+&= \frac{1}{2} g \ 	\left. \delta_{j+1/2} \left[  e_{3w} \ \rho \right] \right|_{k=km}   \\
 \end{aligned} \right.
 \end{equation} 
 
 for $1<k<km$ (interior layer)
 \begin{equation} \label{eq:dynhpg_zco}
 \left\{ \begin{aligned}
-					\left. \delta _{i+1/2} \left[  p^h 			 \right] \right|_{k} 
-&=					\left. \delta _{i+1/2} \left[  p^h 			 \right] \right|_{k-1} 
-+    \frac{1}{2}\;g\;	\left. \delta _{i+1/2} \left[  e_{3w} \ \overline {\rho}^{k+1/2} \right] \right|_{k}   \\
-     					\left. \delta _{j+1/2} \left[  p^h  			 \right] \right|_{k} 
-&=     				\left. \delta _{j+1/2} \left[  p^h  			 \right] \right|_{k-1} 
-+    \frac{1}{2}\;g\;	\left. \delta _{j+1/2} \left[  e_{3w} \ \overline {\rho}^{k+1/2} \right] \right|_{k}   \\
+					\left. \delta_{i+1/2} \left[  p^h 			 \right] \right|_{k} 
+&=					\left. \delta_{i+1/2} \left[  p^h 			 \right] \right|_{k-1} 
++    \frac{1}{2}\;g\;	\left. \delta_{i+1/2} \left[  e_{3w} \ \overline {\rho}^{k+1/2} \right] \right|_{k}   \\
+     					\left. \delta_{j+1/2} \left[  p^h  			 \right] \right|_{k} 
+&=     				\left. \delta_{j+1/2} \left[  p^h  			 \right] \right|_{k-1} 
++    \frac{1}{2}\;g\;	\left. \delta_{j+1/2} \left[  e_{3w} \ \overline {\rho}^{k+1/2} \right] \right|_{k}   \\
 \end{aligned} \right.
 \end{equation} 
 
@@ -621,10 +621,10 @@ density Jacobian with cubic polynomial method is currently disabled whilst known
 $\bullet$ Traditional coding (see for example \citet{Madec_al_JPO96}: (\np{ln\_dynhpg\_sco}\forcode{ = .true.})
 \begin{equation} \label{eq:dynhpg_sco}
 \left\{ \begin{aligned}
- - \frac{1}    					{\rho_o \, e_{1u}} \;	\delta _{i+1/2} \left[  p^h  \right] 
-+ \frac{g\; \overline {\rho}^{i+1/2}}	{\rho_o \, e_{1u}} \;	\delta _{i+1/2} \left[  z_t   \right]    \\
- - \frac{1}    					{\rho_o \, e_{2v}} \;	\delta _{j+1/2} \left[  p^h  \right]  
-+ \frac{g\; \overline {\rho}^{j+1/2}}	{\rho_o \, e_{2v}} \;	\delta _{j+1/2} \left[  z_t   \right]    \\
+ - \frac{1}    					{\rho_o \, e_{1u}} \;	\delta_{i+1/2} \left[  p^h  \right] 
++ \frac{g\; \overline {\rho}^{i+1/2}}	{\rho_o \, e_{1u}} \;	\delta_{i+1/2} \left[  z_t   \right]    \\
+ - \frac{1}    					{\rho_o \, e_{2v}} \;	\delta_{j+1/2} \left[  p^h  \right]  
++ \frac{g\; \overline {\rho}^{j+1/2}}	{\rho_o \, e_{2v}} \;	\delta_{j+1/2} \left[  z_t   \right]    \\
 \end{aligned} \right.
 \end{equation} 
 
@@ -694,13 +694,13 @@ $\bullet$ leapfrog scheme (\np{ln\_dynhpg\_imp}\forcode{ = .true.}):
 
 \begin{equation} \label{eq:dynhpg_lf}
 \frac{u^{t+\rdt}-u^{t-\rdt}}{2\rdt} = \;\cdots \;
-	-\frac{1}{\rho _o \,e_{1u} }\delta _{i+1/2} \left[ {p_h^t } \right]
+	-\frac{1}{\rho_o \,e_{1u} }\delta_{i+1/2} \left[ {p_h^t } \right]
 \end{equation}
 
 $\bullet$ semi-implicit scheme (\np{ln\_dynhpg\_imp}\forcode{ = .true.}):
 \begin{equation} \label{eq:dynhpg_imp}
 \frac{u^{t+\rdt}-u^{t-\rdt}}{2\rdt} = \;\cdots \;
-	-\frac{1}{4\,\rho _o \,e_{1u} } \delta_{i+1/2} \left[ p_h^{t+\rdt} +2\,p_h^t +p_h^{t-\rdt}  \right]
+	-\frac{1}{4\,\rho_o \,e_{1u} } \delta_{i+1/2} \left[ p_h^{t+\rdt} +2\,p_h^t +p_h^{t-\rdt}  \right]
 \end{equation}
 
 The semi-implicit time scheme \autoref{eq:dynhpg_imp} is made possible without
@@ -782,8 +782,8 @@ The surface pressure gradient, evaluated using a leap-frog scheme ($i.e.$ center
 is thus simply given by :
 \begin{equation} \label{eq:dynspg_exp}
 \left\{ \begin{aligned}
- - \frac{1}{e_{1u}\,\rho_o} \;	\delta _{i+1/2} \left[  \,\rho \,\eta\,  \right] 	\\
- - \frac{1}{e_{2v}\,\rho_o} \;	\delta _{j+1/2} \left[  \,\rho \,\eta\,  \right]  
+ - \frac{1}{e_{1u}\,\rho_o} \;	\delta_{i+1/2} \left[  \,\rho \,\eta\,  \right] 	\\
+ - \frac{1}{e_{2v}\,\rho_o} \;	\delta_{j+1/2} \left[  \,\rho \,\eta\,  \right]  
 \end{aligned} \right.
 \end{equation} 
 
@@ -1092,12 +1092,12 @@ no slip or partial slip boundary conditions are applied according to the user's 
 For lateral iso-level diffusion, the discrete operator is: 
 \begin{equation} \label{eq:dynldf_lap}
 \left\{ \begin{aligned}
- D_u^{l{\rm {\bf U}}} =\frac{1}{e_{1u} }\delta _{i+1/2} \left[ {A_T^{lm} 
-\;\chi } \right]-\frac{1}{e_{2u} {\kern 1pt}e_{3u} }\delta _j \left[ 
+ D_u^{l{\rm {\bf U}}} =\frac{1}{e_{1u} }\delta_{i+1/2} \left[ {A_T^{lm} 
+\;\chi } \right]-\frac{1}{e_{2u} {\kern 1pt}e_{3u} }\delta_j \left[ 
 {A_f^{lm} \;e_{3f} \zeta } \right] \\ 
 \\
- D_v^{l{\rm {\bf U}}} =\frac{1}{e_{2v} }\delta _{j+1/2} \left[ {A_T^{lm} 
-\;\chi } \right]+\frac{1}{e_{1v} {\kern 1pt}e_{3v} }\delta _i \left[ 
+ D_v^{l{\rm {\bf U}}} =\frac{1}{e_{2v} }\delta_{j+1/2} \left[ {A_T^{lm} 
+\;\chi } \right]+\frac{1}{e_{1v} {\kern 1pt}e_{3v} }\delta_i \left[ 
 {A_f^{lm} \;e_{3f} \zeta } \right] \\ 
 \end{aligned} \right.
 \end{equation} 
@@ -1126,14 +1126,14 @@ The resulting discrete representation is:
 \begin{equation} \label{eq:dyn_ldf_iso}
 \begin{split}
  D_u^{l\textbf{U}} &= \frac{1}{e_{1u} \, e_{2u} \, e_{3u} }	\\
-&  \left\{\quad  {\delta _{i+1/2} \left[ {A_T^{lm}  \left( 
-	 {\frac{e_{2t} \; e_{3t} }{e_{1t} } \,\delta _{i}[u]
-	-e_{2t} \; r_{1t} \,\overline{\overline {\delta _{k+1/2}[u]}}^{\,i,\,k}}
+&  \left\{\quad  {\delta_{i+1/2} \left[ {A_T^{lm}  \left( 
+	 {\frac{e_{2t} \; e_{3t} }{e_{1t} } \,\delta_{i}[u]
+	-e_{2t} \; r_{1t} \,\overline{\overline {\delta_{k+1/2}[u]}}^{\,i,\,k}}
  \right)} \right]} 	\right.
 \\ 
 & \qquad +\ \delta_j \left[ {A_f^{lm} \left( {\frac{e_{1f}\,e_{3f} }{e_{2f} 
-}\,\delta _{j+1/2} [u] - e_{1f}\, r_{2f} 
-\,\overline{\overline {\delta _{k+1/2} [u]}} ^{\,j+1/2,\,k}} 
+}\,\delta_{j+1/2} [u] - e_{1f}\, r_{2f} 
+\,\overline{\overline {\delta_{k+1/2} [u]}} ^{\,j+1/2,\,k}} 
 \right)} \right] 
 \\ 
 &\qquad +\ \delta_k \left[ {A_{uw}^{lm} \left( {-e_{2u} \, r_{1uw} \,\overline{\overline 
@@ -1149,14 +1149,14 @@ The resulting discrete representation is:
 \\
 \\
  D_v^{l\textbf{V}} &= \frac{1}{e_{1v} \, e_{2v} \, e_{3v} }    \\
-&  \left\{\quad  {\delta _{i+1/2} \left[ {A_f^{lm}  \left( 
-	 {\frac{e_{2f} \; e_{3f} }{e_{1f} } \,\delta _{i+1/2}[v]
-	-e_{2f} \; r_{1f} \,\overline{\overline {\delta _{k+1/2}[v]}}^{\,i+1/2,\,k}}
+&  \left\{\quad  {\delta_{i+1/2} \left[ {A_f^{lm}  \left( 
+	 {\frac{e_{2f} \; e_{3f} }{e_{1f} } \,\delta_{i+1/2}[v]
+	-e_{2f} \; r_{1f} \,\overline{\overline {\delta_{k+1/2}[v]}}^{\,i+1/2,\,k}}
  \right)} \right]} 	\right.
 \\ 
 & \qquad +\ \delta_j \left[ {A_T^{lm} \left( {\frac{e_{1t}\,e_{3t} }{e_{2t} 
-}\,\delta _{j} [v] - e_{1t}\, r_{2t} 
-\,\overline{\overline {\delta _{k+1/2} [v]}} ^{\,j,\,k}} 
+}\,\delta_{j} [v] - e_{1t}\, r_{2t} 
+\,\overline{\overline {\delta_{k+1/2} [v]}} ^{\,j,\,k}} 
 \right)} \right] 
 \\ 
 & \qquad +\ \delta_k \left[ {A_{vw}^{lm} \left( {-e_{2v} \, r_{1vw} \,\overline{\overline 
@@ -1212,11 +1212,11 @@ The formulation of the vertical subgrid scale physics is the same whatever the v
 The vertical diffusion operators given by \autoref{eq:PE_zdf} take the following semi-discrete space form:
 \begin{equation} \label{eq:dynzdf}
 \left\{   \begin{aligned}
-D_u^{vm} &\equiv \frac{1}{e_{3u}} \ \delta _k \left[ \frac{A_{uw}^{vm} }{e_{3uw} }
-                              \ \delta _{k+1/2} [\,u\,]         \right]     \\
+D_u^{vm} &\equiv \frac{1}{e_{3u}} \ \delta_k \left[ \frac{A_{uw}^{vm} }{e_{3uw} }
+                              \ \delta_{k+1/2} [\,u\,]         \right]     \\
 \\
-D_v^{vm} &\equiv \frac{1}{e_{3v}} \ \delta _k \left[ \frac{A_{vw}^{vm} }{e_{3vw} }
-                              \ \delta _{k+1/2} [\,v\,]         \right]
+D_v^{vm} &\equiv \frac{1}{e_{3v}} \ \delta_k \left[ \frac{A_{vw}^{vm} }{e_{3vw} }
+                              \ \delta_{k+1/2} [\,v\,]         \right]
 \end{aligned}   \right.
 \end{equation} 
 where $A_{uw}^{vm} $ and $A_{vw}^{vm} $ are the vertical eddy viscosity and diffusivity coefficients.
@@ -1227,9 +1227,9 @@ At the surface, the momentum fluxes are prescribed as the boundary condition on
 the vertical turbulent momentum fluxes,
 \begin{equation} \label{eq:dynzdf_sbc}
 \left.{\left( {\frac{A^{vm} }{e_3 }\ \frac{\partial \textbf{U}_h}{\partial k}} \right)} \right|_{z=1}
-	 = \frac{1}{\rho _o} \binom{\tau _u}{\tau _v }
+	 = \frac{1}{\rho_o} \binom{\tau_u}{\tau_v }
 \end{equation}
-where $\left( \tau _u ,\tau _v \right)$ are the two components of the wind stress vector in
+where $\left( \tau_u ,\tau_v \right)$ are the two components of the wind stress vector in
 the (\textbf{i},\textbf{j}) coordinate system.
 The high mixing coefficients in the surface mixed layer ensure that the surface wind stress is distributed in 
 the vertical over the mixed layer depth.

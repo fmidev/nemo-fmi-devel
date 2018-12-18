@@ -154,17 +154,17 @@ calculated from the averaged surrounding vertical density gradients.
 The total area-integrated skew-flux (flux per unit area in $ijk$ space) from tracer cell $i,k$ to $i+1,k$,
 noting that the $e_{{3}_{i+1/2}^k}$ in the area $e{_{3}}_{i+1/2}^k{e_{2}}_{i+1/2}i^k$ at the $u$-point cancels out with
 the $1/{e_{3}}_{i+1/2}^k$ associated with the vertical tracer gradient, is then \autoref{eq:tra_ldf_iso}
-\begin{equation*}
+\[
   \left(F_u^{13} \right)_{i+\hhalf}^k = \Alts_{i+\hhalf}^k
   {e_{2}}_{i+1/2}^k \overline{\overline
     r_1} ^{\,i,k}\,\overline{\overline{\delta_k T}}^{\,i,k},
-\end{equation*}
+\]
 where
-\begin{equation*}
+\[
   \overline{\overline
    r_1} ^{\,i,k} = -\frac{{e_{3u}}_{i+1/2}^k}{{e_{1u}}_{i+1/2}^k}
   \frac{\delta_{i+1/2} [\rho]}{\overline{\overline{\delta_k \rho}}^{\,i,k}},
-\end{equation*}
+\]
 and here and in the following we drop the $^{lT}$ superscript from $\Alt$ for simplicity.
 Unfortunately the resulting combination $\overline{\overline{\delta_k\bullet}}^{\,i,k}$ of a $k$ average and
 a $k$ difference of the tracer reduces to $\bullet_{k+1}-\bullet_{k-1}$,
@@ -199,11 +199,11 @@ The total area-integrated skew-flux from tracer cell $i,k$ to $i+1,k$
 \begin{multline}
   \label{eq:i13}
   \left( F_u^{13}  \right)_{i+\frac{1}{2}}^k = \Alts_{i+1}^k a_1 s_1
-  \delta _{k+\frac{1}{2}} \left[ T^{i+1}
+  \delta_{k+\frac{1}{2}} \left[ T^{i+1}
   \right]/e_{{3w}_{i+1}}^{k+\frac{1}{2}}  + \Alts _i^k a_2 s_2 \delta
   _{k+\frac{1}{2}} \left[ T^i
   \right]/e_{{3w}_{i+1}}^{k+\frac{1}{2}} \\
-   +\Alts _{i+1}^k a_3 s_3 \delta _{k-\frac{1}{2}} \left[ T^{i+1}
+   +\Alts _{i+1}^k a_3 s_3 \delta_{k-\frac{1}{2}} \left[ T^{i+1}
   \right]/e_{{3w}_{i+1}}^{k+\frac{1}{2}}  +\Alts _i^k a_4 s_4 \delta
   _{k-\frac{1}{2}} \left[ T^i \right]/e_{{3w}_{i+1}}^{k+\frac{1}{2}},
 \end{multline}
@@ -217,10 +217,10 @@ multiplying lateral tracer gradients from each of the four surrounding $u$-point
 \begin{multline}
   \label{eq:i31}
   \left( F_w^{31} \right) _i ^{k+\frac{1}{2}} =  \Alts_i^{k+1} a_{1}'
-  s_{1}' \delta _{i-\frac{1}{2}} \left[ T^{k+1} \right]/{e_{3u}}_{i-\frac{1}{2}}^{k+1}
-   +\Alts_i^{k+1} a_{2}' s_{2}' \delta _{i+\frac{1}{2}} \left[ T^{k+1} \right]/{e_{3u}}_{i+\frac{1}{2}}^{k+1}\\
-  + \Alts_i^k a_{3}' s_{3}' \delta _{i-\frac{1}{2}} \left[ T^k\right]/{e_{3u}}_{i-\frac{1}{2}}^k
-  +\Alts_i^k a_{4}' s_{4}' \delta _{i+\frac{1}{2}} \left[ T^k \right]/{e_{3u}}_{i+\frac{1}{2}}^k.
+  s_{1}' \delta_{i-\frac{1}{2}} \left[ T^{k+1} \right]/{e_{3u}}_{i-\frac{1}{2}}^{k+1}
+   +\Alts_i^{k+1} a_{2}' s_{2}' \delta_{i+\frac{1}{2}} \left[ T^{k+1} \right]/{e_{3u}}_{i+\frac{1}{2}}^{k+1}\\
+  + \Alts_i^k a_{3}' s_{3}' \delta_{i-\frac{1}{2}} \left[ T^k\right]/{e_{3u}}_{i-\frac{1}{2}}^k
+  +\Alts_i^k a_{4}' s_{4}' \delta_{i+\frac{1}{2}} \left[ T^k \right]/{e_{3u}}_{i+\frac{1}{2}}^k.
 \end{multline}
 
 We notate the triad slopes $s_i$ and $s'_i$ in terms of the `anchor point' $i,k$
@@ -274,7 +274,7 @@ tracer cell $i,k$ to $i+1,k$ coming from the $_{11}$ term of the diffusion tenso
   \left( F_u^{11} \right) _{i+\frac{1}{2}} ^{k} =
   - \left( \Alts_i^{k+1} a_{1} + \Alts_i^{k+1} a_{2} + \Alts_i^k
     a_{3} + \Alts_i^k a_{4} \right)
-  \frac{\delta _{i+1/2} \left[ T^k\right]}{{e_{1u}}_{\,i+1/2}^{\,k}},
+  \frac{\delta_{i+1/2} \left[ T^k\right]}{{e_{1u}}_{\,i+1/2}^{\,k}},
 \end{equation}
 where the areas $a_i$ are as in \autoref{eq:i13}.
 In this case, separating the total lateral flux, the sum of \autoref{eq:i13} and \autoref{eq:i11},
@@ -646,9 +646,9 @@ has a value of $1/100$ in the ocean interior.
 It is of course relevant to the iso-neutral slopes $\tilde{r}_i=r_i+\sigma_i$ relative to geopotentials
 (here the $\sigma_i$ are the slopes of the coordinate surfaces relative to geopotentials)
 \autoref{eq:PE_slopes_eiv} rather than the slope $r_i$ relative to coordinate surfaces, so we require
-\begin{equation*}
+\[
   |\tilde{r}_i|\leq \tilde{r}_\mathrm{max}=0.01.
-\end{equation*}
+\]
 and then recalculate the slopes $r_i$ relative to coordinates.
 Each individual triad slope
 \begin{equation}

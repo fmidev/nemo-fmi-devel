@@ -112,7 +112,7 @@ Given the values of a variable $q$ at adjacent points,
 the differencing and averaging operators at the midpoint between them are:
 \begin{subequations} \label{eq:di_mi}
 \begin{align}
- \delta _i [q]       &=  \  \    q(i+1/2)  - q(i-1/2)		\\
+ \delta_i [q]       &=  \  \    q(i+1/2)  - q(i-1/2)		\\
  \overline q^{\,i} &= \left\{ q(i+1/2) + q(i-1/2) \right\} \; / \; 2
 \end{align}
 \end{subequations}
@@ -123,9 +123,9 @@ a $t$-point has its three components defined at $u$-, $v$- and $w$-points while
 its Laplacien is defined at $t$-point.
 These operators have the following discrete forms in the curvilinear $s$-coordinate system:
 \begin{equation} \label{eq:DOM_grad}
-\nabla q\equiv 	\frac{1}{e_{1u} } \delta _{i+1/2 } [q] \;\,\mathbf{i}
-		+	\frac{1}{e_{2v} } \delta _{j+1/2 } [q] \;\,\mathbf{j}
-		+	\frac{1}{e_{3w}} \delta _{k+1/2} [q] \;\,\mathbf{k}
+\nabla q\equiv 	\frac{1}{e_{1u} } \delta_{i+1/2 } [q] \;\,\mathbf{i}
+		+	\frac{1}{e_{2v} } \delta_{j+1/2 } [q] \;\,\mathbf{j}
+		+	\frac{1}{e_{3w}} \delta_{k+1/2} [q] \;\,\mathbf{k}
 \end{equation}
 \begin{multline} \label{eq:DOM_lap}
 \Delta q\equiv \frac{1}{e_{1t}\,e_{2t}\,e_{3t} }
@@ -137,17 +137,17 @@ These operators have the following discrete forms in the curvilinear $s$-coordin
 Following \autoref{eq:PE_curl} and \autoref{eq:PE_div}, a vector ${\rm {\bf A}}=\left( a_1,a_2,a_3\right)$
 defined at vector points $(u,v,w)$ has its three curl components defined at $vw$-, $uw$, and $f$-points,
 and its divergence defined at $t$-points:
-\begin{eqnarray}  \label{eq:DOM_curl}
+\begin{align}  \label{eq:DOM_curl}
  \nabla \times {\rm{\bf A}}\equiv &
       \frac{1}{e_{2v}\,e_{3vw} } \ \left( \delta_{j +1/2} \left[e_{3w}\,a_3 \right] -\delta_{k+1/2} \left[e_{2v} \,a_2 \right] \right)  &\ \mathbf{i} \\ 
  +& \frac{1}{e_{2u}\,e_{3uw}} \ \left( \delta_{k+1/2} \left[e_{1u}\,a_1  \right] -\delta_{i +1/2} \left[e_{3w}\,a_3 \right] \right)  &\ \mathbf{j} \\
  +& \frac{1}{e_{1f} \,e_{2f}    } \ \left( \delta_{i +1/2} \left[e_{2v}\,a_2  \right] -\delta_{j +1/2} \left[e_{1u}\,a_1 \right] \right)  &\ \mathbf{k}
- \end{eqnarray}
-\begin{eqnarray} \label{eq:DOM_div}
+ \end{align}
+\begin{align} \label{eq:DOM_div}
 \nabla \cdot \rm{\bf A} \equiv 
     \frac{1}{e_{1t}\,e_{2t}\,e_{3t}} \left( \delta_i \left[e_{2u}\,e_{3u}\,a_1 \right]
                                            +\delta_j \left[e_{1v}\,e_{3v}\,a_2 \right] \right)+\frac{1}{e_{3t} }\delta_k \left[a_3 \right]
-\end{eqnarray}
+\end{align}
 
 The vertical average over the whole water column denoted by an overbar becomes for a quantity $q$ which
 is a masked field (i.e. equal to zero inside solid area):
@@ -180,8 +180,8 @@ $\overline{\,\cdot\,}^{\,k}$) are symmetric linear operators,
 $i.e.$
 \begin{align} 
 \label{eq:DOM_di_adj}
-\sum\limits_i { a_i \;\delta _i \left[ b \right]} 
-	&\equiv -\sum\limits_i {\delta _{i+1/2} \left[ a \right]\;b_{i+1/2} }      \\
+\sum\limits_i { a_i \;\delta_i \left[ b \right]} 
+	&\equiv -\sum\limits_i {\delta_{i+1/2} \left[ a \right]\;b_{i+1/2} }      \\
 \label{eq:DOM_mi_adj}
 \sum\limits_i { a_i \;\overline b^{\,i}} 
 	& \equiv \quad \sum\limits_i {\overline a ^{\,i+1/2}\;b_{i+1/2} } 

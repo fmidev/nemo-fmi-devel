@@ -25,24 +25,24 @@ an upstream-biased parabolic interpolation.
 It is also known as Cell Averaged QUICK scheme (Quadratic Upstream Interpolation for Convective Kinematics).
 For example, in the $i$-direction:
 \begin{equation} \label{eq:tra_adv_ubs2}
-\tau _u^{ubs} = \left\{	 \begin{aligned}
-  & \tau _u^{cen4} + \frac{1}{12} \,\tau"_i	   & \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
-  & \tau _u^{cen4} - \frac{1}{12} \,\tau"_{i+1} & \quad \text{if }\ u_{i+1/2}       <       0
+\tau_u^{ubs} = \left\{	 \begin{aligned}
+  & \tau_u^{cen4} + \frac{1}{12} \,\tau"_i	   & \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
+  & \tau_u^{cen4} - \frac{1}{12} \,\tau"_{i+1} & \quad \text{if }\ u_{i+1/2}       <       0
   						 \end{aligned}    \right.
 \end{equation}
 or equivalently, the advective flux is
 \begin{equation} \label{eq:tra_adv_ubs2}
-U_{i+1/2} \ \tau _u^{ubs} 
+U_{i+1/2} \ \tau_u^{ubs} 
 =U_{i+1/2} \ \overline{ T_i - \frac{1}{6}\,\tau"_i }^{\,i+1/2}
 - \frac{1}{2}\, |U|_{i+1/2} \;\frac{1}{6} \;\delta_{i+1/2}[\tau"_i]
 \end{equation}
 where $U_{i+1/2} = e_{1u}\,e_{3u}\,u_{i+1/2}$ and
-$\tau "_i =\delta _i \left[ {\delta _{i+1/2} \left[ \tau \right]} \right]$.
+$\tau "_i =\delta_i \left[ {\delta_{i+1/2} \left[ \tau \right]} \right]$.
 By choosing this expression for $\tau "$ we consider a fourth order approximation of $\partial_i^2$ with
 a constant i-grid spacing ($\Delta i=1$).
 
 Alternative choice: introduce the scale factors:  
-$\tau "_i =\frac{e_{1T}}{e_{2T}\,e_{3T}}\delta _i \left[ \frac{e_{2u} e_{3u} }{e_{1u} }\delta _{i+1/2}[\tau] \right]$.
+$\tau "_i =\frac{e_{1T}}{e_{2T}\,e_{3T}}\delta_i \left[ \frac{e_{2u} e_{3u} }{e_{1u} }\delta_{i+1/2}[\tau] \right]$.
 
 
 This results in a dissipatively dominant (i.e. hyper-diffusive) truncation error
@@ -75,22 +75,22 @@ This possibility have been implemented and validated in ORCA05-L301.
 It is not currently offered in the current reference version. 
 
 NB 2: In a forthcoming release four options will be proposed for the vertical component used in the UBS scheme.
-$\tau _w^{ubs}$ will be evaluated using either \textit{(a)} a centered $2^{nd}$ order scheme,
+$\tau_w^{ubs}$ will be evaluated using either \textit{(a)} a centered $2^{nd}$ order scheme,
 or \textit{(b)} a TVD scheme, or \textit{(c)} an interpolation based on conservative parabolic splines following
 \citet{Shchepetkin_McWilliams_OM05} implementation of UBS in ROMS, or \textit{(d)} an UBS.
 The $3^{rd}$ case has dispersion properties similar to an eight-order accurate conventional scheme.
 
 NB 3: It is straight forward to rewrite \autoref{eq:tra_adv_ubs} as follows:
 \begin{equation} \label{eq:tra_adv_ubs2}
-\tau _u^{ubs} = \left\{	 \begin{aligned}
-	& \tau _u^{cen4} + \frac{1}{12} \tau"_i		& \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
-	& \tau _u^{cen4} - \frac{1}{12} \tau"_{i+1}	& \quad \text{if }\ u_{i+1/2}       <       0
+\tau_u^{ubs} = \left\{	 \begin{aligned}
+	& \tau_u^{cen4} + \frac{1}{12} \tau"_i		& \quad \text{if }\ u_{i+1/2} \geqslant 0 \\
+	& \tau_u^{cen4} - \frac{1}{12} \tau"_{i+1}	& \quad \text{if }\ u_{i+1/2}       <       0
   						 \end{aligned}    \right.
 \end{equation}
 or equivalently 
 \begin{equation} \label{eq:tra_adv_ubs2}
 \begin{split}
-e_{2u} e_{3u}\,u_{i+1/2} \ \tau _u^{ubs} 
+e_{2u} e_{3u}\,u_{i+1/2} \ \tau_u^{ubs} 
 &= e_{2u} e_{3u}\,u_{i+1/2} \ \overline{ T - \frac{1}{6}\,\tau"_i }^{\,i+1/2} \\
 & - \frac{1}{2} e_{2u} e_{3u}\,|u|_{i+1/2} \;\frac{1}{6} \;\delta_{i+1/2}[\tau"_i]
 \end{split}
@@ -106,12 +106,12 @@ is simply proportional to the velocity.
 laplacian diffusion:
 \begin{equation} \label{eq:tra_ldf_lap}
 \begin{split}
-D_T^{lT} =\frac{1}{e_{1T} \; e_{2T}\;  e_{3T} } &\left[ {\quad \delta _i 
-\left[ {A_u^{lT} \frac{e_{2u} e_{3u} }{e_{1u} }\;\delta _{i+1/2} 
+D_T^{lT} =\frac{1}{e_{1T} \; e_{2T}\;  e_{3T} } &\left[ {\quad \delta_i 
+\left[ {A_u^{lT} \frac{e_{2u} e_{3u} }{e_{1u} }\;\delta_{i+1/2} 
 \left[ T \right]} \right]} \right.
 \\
-&\ \left. {+\; \delta _j \left[ 
-{A_v^{lT} \left( {\frac{e_{1v} e_{3v} }{e_{2v} }\;\delta _{j+1/2} \left[ T 
+&\ \left. {+\; \delta_j \left[ 
+{A_v^{lT} \left( {\frac{e_{1v} e_{3v} }{e_{2v} }\;\delta_{j+1/2} \left[ T 
 \right]} \right)} \right]\quad } \right]
 \end{split}
 \end{equation}
@@ -120,9 +120,9 @@ bilaplacian:
 \begin{equation} \label{eq:tra_ldf_lap}
 \begin{split}
 D_T^{lT} =&-\frac{1}{e_{1T} \; e_{2T}\;  e_{3T}} \\
-& \delta _i \left[  \sqrt{A_u^{lT}}\ \frac{e_{2u}\,e_{3u}}{e_{1u}}\;\delta _{i+1/2} 
+& \delta_i \left[  \sqrt{A_u^{lT}}\ \frac{e_{2u}\,e_{3u}}{e_{1u}}\;\delta_{i+1/2} 
 		  \left[ \frac{1}{e_{1T}\,e_{2T}\, e_{3T}}
-    \delta _i \left[ \sqrt{A_u^{lT}}\ \frac{e_{2u}\,e_{3u}}{e_{1u}}\;\delta _{i+1/2} 
+    \delta_i \left[ \sqrt{A_u^{lT}}\ \frac{e_{2u}\,e_{3u}}{e_{1u}}\;\delta_{i+1/2} 
     		  [T] \right] \right] \right]
 \end{split}
 \end{equation}
@@ -132,9 +132,9 @@ it comes:
 \begin{equation} \label{eq:tra_ldf_lap}
 \begin{split}
 D_T^{lT} =&-\frac{1}{12}\,\frac{1}{e_{1T} \; e_{2T}\;  e_{3T}} \\
-& \delta _i \left[ e_{2u}\,e_{3u}\,\sqrt{ e_{1u}\,|u|\,}\;\delta _{i+1/2} 
+& \delta_i \left[ e_{2u}\,e_{3u}\,\sqrt{ e_{1u}\,|u|\,}\;\delta_{i+1/2} 
 		 \left[ \frac{1}{e_{1T}\,e_{2T}\, e_{3T}} 
-    \delta _i \left[ e_{2u}\,e_{3u}\,\sqrt{ e_{1u}\,|u|\,}\;\delta _{i+1/2} 
+    \delta_i \left[ e_{2u}\,e_{3u}\,\sqrt{ e_{1u}\,|u|\,}\;\delta_{i+1/2} 
     		[T] \right] \right] \right]
 \end{split}
 \end{equation}
@@ -142,9 +142,9 @@ if the velocity is uniform ($i.e.$ $|u|=cst$) then the diffusive flux is
 \begin{equation} \label{eq:tra_ldf_lap}
 \begin{split}
 F_u^{lT} = - \frac{1}{12}
- e_{2u}\,e_{3u}\,|u| \;\sqrt{ e_{1u}}\,\delta _{i+1/2} 
+ e_{2u}\,e_{3u}\,|u| \;\sqrt{ e_{1u}}\,\delta_{i+1/2} 
 		 \left[ \frac{1}{e_{1T}\,e_{2T}\, e_{3T}} 
-    \delta _i \left[ e_{2u}\,e_{3u}\,\sqrt{ e_{1u}}\:\delta _{i+1/2} 
+    \delta_i \left[ e_{2u}\,e_{3u}\,\sqrt{ e_{1u}}\:\delta_{i+1/2} 
     		[T] \right] \right]
 \end{split}
 \end{equation}
@@ -157,13 +157,13 @@ F_u^{lT}
 \end{split}
 \end{equation}
 if the velocity is uniform ($i.e.$ $|u|=cst$) and
-choosing $\tau "_i =\frac{e_{1T}}{e_{2T}\,e_{3T}}\delta _i \left[ \frac{e_{2u} e_{3u} }{e_{1u} } \delta _{i+1/2}[\tau] \right]$
+choosing $\tau "_i =\frac{e_{1T}}{e_{2T}\,e_{3T}}\delta_i \left[ \frac{e_{2u} e_{3u} }{e_{1u} } \delta_{i+1/2}[\tau] \right]$
 
 sol 1 coefficient at T-point ( add $e_{1u}$ and $e_{1T}$ on both side of first $\delta$):
 \begin{equation} \label{eq:tra_adv_ubs2}
 \begin{split}
 F_u^{lT}
-&= - \frac{1}{12} \frac{e_{2u} e_{3u}}{e_{1u}}\;\delta_{i+1/2}\left[ \frac{e_{1T}^3\,|u|}{e_{1T}e_{2T}\,e_{3T}}\,\delta _i \left[ \frac{e_{2u} e_{3u} }{e_{1u} } \delta _{i+1/2}[\tau] \right] \right]
+&= - \frac{1}{12} \frac{e_{2u} e_{3u}}{e_{1u}}\;\delta_{i+1/2}\left[ \frac{e_{1T}^3\,|u|}{e_{1T}e_{2T}\,e_{3T}}\,\delta_i \left[ \frac{e_{2u} e_{3u} }{e_{1u} } \delta_{i+1/2}[\tau] \right] \right]
 \end{split}
 \end{equation}
 which leads to ${A_T^{lT}}^2 = \frac{1}{12} {e_{1T}}^3\ \overline{|u|}^{\,i+1/2}$
@@ -172,8 +172,8 @@ sol 2 coefficient at u-point: split $|u|$ into $\sqrt{|u|}$ and $e_{1T}$ into $\
 \begin{equation} \label{eq:tra_adv_ubs2}
 \begin{split}
 F_u^{lT}
-&= - \frac{1}{12} {e_{1u}}^1 \sqrt{e_{1u}|u|} \frac{e_{2u} e_{3u}}{e_{1u}}\;\delta_{i+1/2}\left[ \frac{1}{e_{2T}\,e_{3T}}\,\delta _i \left[ \sqrt{e_{1u}|u|} \frac{e_{2u} e_{3u} }{e_{1u} } \delta _{i+1/2}[\tau] \right] \right] \\
-&= - \frac{1}{12} e_{1u} \sqrt{e_{1u}|u|\,} \frac{e_{2u} e_{3u}}{e_{1u}}\;\delta_{i+1/2}\left[ \frac{1}{e_{1T}\,e_{2T}\,e_{3T}}\,\delta _i \left[ e_{1u} \sqrt{e_{1u}|u|\,} \frac{e_{2u} e_{3u} }{e_{1u}} \delta _{i+1/2}[\tau] \right] \right]
+&= - \frac{1}{12} {e_{1u}}^1 \sqrt{e_{1u}|u|} \frac{e_{2u} e_{3u}}{e_{1u}}\;\delta_{i+1/2}\left[ \frac{1}{e_{2T}\,e_{3T}}\,\delta_i \left[ \sqrt{e_{1u}|u|} \frac{e_{2u} e_{3u} }{e_{1u} } \delta_{i+1/2}[\tau] \right] \right] \\
+&= - \frac{1}{12} e_{1u} \sqrt{e_{1u}|u|\,} \frac{e_{2u} e_{3u}}{e_{1u}}\;\delta_{i+1/2}\left[ \frac{1}{e_{1T}\,e_{2T}\,e_{3T}}\,\delta_i \left[ e_{1u} \sqrt{e_{1u}|u|\,} \frac{e_{2u} e_{3u} }{e_{1u}} \delta_{i+1/2}[\tau] \right] \right]
 \end{split}
 \end{equation}
 which leads to ${A_u^{lT}} = \frac{1}{12} {e_{1u}}^3\ |u|$
@@ -190,7 +190,7 @@ Given the values of a variable $q$ at successive time step,
 the time derivation and averaging operators at the mid time step are:
 \begin{subequations} \label{eq:dt_mt}
 \begin{align}
- \delta _{t+\rdt/2} [q]     &=  \  \ \,   q^{t+\rdt}  - q^{t}		\\
+ \delta_{t+\rdt/2} [q]     &=  \  \ \,   q^{t+\rdt}  - q^{t}		\\
  \overline q^{\,t+\rdt/2} &= \left\{ q^{t+\rdt} + q^{t} \right\} \; / \; 2
 \end{align}
 \end{subequations}
@@ -201,7 +201,7 @@ $\overline{\cdot}^{\,t\,*}= \overline{\cdot}^{\,t+\Delta/2}$, respectively.
 The Leap-frog time stepping given by \autoref{eq:DOM_nxt} can be defined as:
 \begin{equation} \label{eq:LF}
    \frac{\partial q}{\partial t} 
-   		\equiv \frac{1}{\rdt} \overline{ \delta _{t+\rdt/2}[q]}^{\,t} 
+   		\equiv \frac{1}{\rdt} \overline{ \delta_{t+\rdt/2}[q]}^{\,t} 
 		=         \frac{q^{t+\rdt}-q^{t-\rdt}}{2\rdt}
 \end{equation} 
 Note that \autoref{chap:LF} shows that the leapfrog time step is $\rdt$,
@@ -218,11 +218,11 @@ Indeed,
 \begin{equation} \begin{split}
 \int_{t_0}^{t_1} {q\, \frac{\partial q}{\partial t} \;dt} 
 	&\equiv \sum\limits_{0}^{N} 
-			{\frac{1}{\rdt} q^t \ \overline{ \delta _{t+\rdt/2}[q]}^{\,t} \ \rdt} 
-	   \equiv \sum\limits_{0}^{N}  { q^t \ \overline{ \delta _{t+\rdt/2}[q]}^{\,t} } \\
-	&\equiv \sum\limits_{0}^{N}  { \overline{q}^{\,t+\Delta/2}{ \delta _{t+\rdt/2}[q]}}
-	   \equiv \sum\limits_{0}^{N}  { \frac{1}{2} \delta _{t+\rdt/2}[q^2] }\\
-	&\equiv \sum\limits_{0}^{N}  { \frac{1}{2} \delta _{t+\rdt/2}[q^2] }
+			{\frac{1}{\rdt} q^t \ \overline{ \delta_{t+\rdt/2}[q]}^{\,t} \ \rdt} 
+	   \equiv \sum\limits_{0}^{N}  { q^t \ \overline{ \delta_{t+\rdt/2}[q]}^{\,t} } \\
+	&\equiv \sum\limits_{0}^{N}  { \overline{q}^{\,t+\Delta/2}{ \delta_{t+\rdt/2}[q]}}
+	   \equiv \sum\limits_{0}^{N}  { \frac{1}{2} \delta_{t+\rdt/2}[q^2] }\\
+	&\equiv \sum\limits_{0}^{N}  { \frac{1}{2} \delta_{t+\rdt/2}[q^2] }
 	   \equiv \frac{1}{2} \left( {q_{t_1}}^2 - {q_{t_0}}^2 \right)
 \end{split} \end{equation}
 NB here pb of boundary condition when applying the adjoint!

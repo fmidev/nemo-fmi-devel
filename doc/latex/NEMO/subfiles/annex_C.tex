@@ -24,14 +24,14 @@ $\ $\newline    % force a new ligne
 Notation used in this appendix in the demonstations:
 
 fluxes at the faces of a $T$-box:
-\begin{equation*}
+\[
 U = e_{2u}\,e_{3u}\; u  \qquad  V = e_{1v}\,e_{3v}\; v  \qquad W = e_{1w}\,e_{2w}\; \omega     \\
-\end{equation*}
+\]
 
 volume of cells at $u$-, $v$-, and $T$-points:
-\begin{equation*}
+\[
 b_u = e_{1u}\,e_{2u}\,e_{3u}  \qquad  b_v = e_{1v}\,e_{2v}\,e_{3v}  \qquad b_t = e_{1t}\,e_{2t}\,e_{3t}     \\
-\end{equation*}
+\]
 
 partial derivative notation: $\partial_\bullet = \frac{\partial}{\partial \bullet}$
 
@@ -46,19 +46,19 @@ Let $k_s$ and $k_b$ be the ocean surface and bottom, resp.
 \end{flalign*}
 
 Continuity equation with the above notation:
-\begin{equation*}
+\[
 \frac{1}{e_{3t}} \partial_t (e_{3t})+ \frac{1}{b_t}  \biggl\{  \delta_i [U] + \delta_j [V] + \delta_k [W] \biggr\} = 0
-\end{equation*}
+\]
 
 A quantity, $Q$ is conserved when its domain averaged time change is zero, that is when:
-\begin{equation*}
+\[
 \partial_t \left( \int_D{ Q\;dv } \right) =0
-\end{equation*}
+\]
 Noting that the coordinate system used ....  blah blah
-\begin{equation*}
+\[
 \partial_t \left( \int_D {Q\;dv} \right) =  \int_D { \partial_t \left( e_3 \, Q \right) e_1e_2\;di\,dj\,dk }
                                                        =  \int_D { \frac{1}{e_3} \partial_t \left( e_3 \, Q \right) dv } =0
-\end{equation*}
+\]
 equation of evolution of $Q$ written as
 the time evolution of the vertical content of $Q$ like for tracers, or momentum in flux form,
 the quadratic quantity $\frac{1}{2}Q^2$ is conserved when:
@@ -161,11 +161,11 @@ where $\nabla_h = \left. \nabla \right|_k$ is the gradient along the $s$-surface
 blah blah....
 $\ $\newline    % force a new ligne
 The prognostic ocean dynamics equation can be summarized as follows:
-\begin{equation*}
+\[
 \text{NXT} = \dbinom	{\text{VOR} + \text{KEG} + \text {ZAD} }
 						{\text{COR} + \text{ADV}                       }
 			+ \text{HPG} + \text{SPG} + \text{LDF} + \text{ZDF}
-\end{equation*}
+\]
 $\ $\newline    % force a new ligne
 
 Vector invariant form:
@@ -364,7 +364,7 @@ Two discretisation of the vorticity term (ENE and EEN) allows the conservation o
 \label{subsec:C_vorENE} 
 
 For the ENE scheme, the two components of the vorticity term are given by:
-\begin{equation*}
+\[
 - e_3 \, q \;{\textbf{k}}\times {\textbf {U}}_h    \equiv 
 	\left( {{  \begin{array} {*{20}c}
 		+ \frac{1} {e_{1u}} \; 
@@ -372,7 +372,7 @@ For the ENE scheme, the two components of the vorticity term are given by:
 		- \frac{1} {e_{2v}} \; 
 		\overline {\, q \ \overline {\left( e_{2u}\,e_{3u}\,u \right)}^{\,j+1/2}} ^{\,i}       \hfill \\
 	\end{array}} }    \right)
-\end{equation*}
+\]
 
 This formulation does not conserve the enstrophy but it does conserve the total kinetic energy.
 Indeed, the kinetic energy tendency associated to the vorticity term and
@@ -470,11 +470,11 @@ in the neighbourhood  that contain a triad at the same ($i$,$j$) indices. It bec
 \label{subsec:C_zad} 
 
 The change of Kinetic Energy (KE) due to the vertical advection is exactly balanced by the change of KE due to the horizontal gradient of KE~:
-\begin{equation*}
+\[
     \int_D \textbf{U}_h \cdot \frac{1}{e_3 } \omega \partial_k \textbf{U}_h \;dv
 =  -   \int_D \textbf{U}_h \cdot \nabla_h \left( \frac{1}{2}\;{\textbf{U}_h}^2 \right)\;dv
    +   \frac{1}{2} \int_D {  \frac{{\textbf{U}_h}^2}{e_3} \partial_t ( e_3) \;dv }  \\
-\end{equation*}
+\]
 Indeed, using successively \autoref{eq:DOM_di_adj} ($i.e.$ the skew symmetry property of the $\delta$ operator)
 and the continuity equation, then \autoref{eq:DOM_di_adj} again,
 then the commutativity of operators $\overline {\,\cdot \,}$ and $\delta$, and finally \autoref{eq:DOM_mi_adj}
@@ -543,7 +543,7 @@ of the horizontal gradient of KE.
 Choosing one imposes the other.
 For example KE can also be discretized as $1/2\,({\overline u^{\,i}}^2 + {\overline v^{\,j}}^2)$.
 This leads to the following expression for the vertical advection:
-\begin{equation*}
+\[
 \frac{1} {e_3 }\; \omega\; \partial_k \textbf{U}_h
 \equiv \left( {{\begin{array} {*{20}c}
 \frac{1} {e_{1u}\,e_{2u}\,e_{3u}} \;  \overline{\overline {e_{1t}\,e_{2t} \,\omega\;\delta_{k+1/2} 
@@ -551,7 +551,7 @@ This leads to the following expression for the vertical advection:
 \frac{1} {e_{1v}\,e_{2v}\,e_{3v}} \;   \overline{\overline {e_{1t}\,e_{2t} \,\omega \;\delta_{k+1/2}
 \left[ \overline v^{\,j+1/2} \right]}}^{\,j+1/2,k} \hfill \\
 \end{array}} } \right)
-\end{equation*}
+\]
 a formulation that requires an additional horizontal mean in contrast with the one used in NEMO.
 Nine velocity points have to be used instead of 3.
 This is the reason why it has not been chosen.
@@ -587,11 +587,11 @@ When the equation of state is linear
 ($i.e.$ when an advection-diffusion equation for density can be derived from those of temperature and salinity)
 the change of KE due to the work of pressure forces is balanced by
 the change of potential energy due to buoyancy forces: 
-\begin{equation*}
+\[
 - \int_D  \left. \nabla p \right|_z \cdot \textbf{U}_h \;dv 
 = - \int_D \nabla \cdot \left( \rho \,\textbf {U} \right) \,g\,z \;dv
   + \int_D g\, \rho \; \partial_t (z)  \;dv
-\end{equation*}
+\]
 
 This property can be satisfied in a discrete sense for both $z$- and $s$-coordinates.
 Indeed, defining the depth of a $T$-point, $z_t$,
@@ -770,12 +770,12 @@ In flux from the vorticity term reduces to a Coriolis term in which
 the Coriolis parameter has been modified to account for the ``metric'' term.
 This altered Coriolis parameter is discretised at an f-point.
 It is given by:
-\begin{equation*}
+\[
 f+\frac{1} {e_1 e_2 } \left( v \frac{\partial e_2 } {\partial i} - u \frac{\partial e_1 } {\partial j}\right)\;
 \equiv \;
 f+\frac{1} {e_{1f}\,e_{2f}} \left( \overline v^{\,i+1/2} \delta_{i+1/2} \left[ e_{2u} \right] 
                                                -\overline u^{\,j+1/2} \delta_{j+1/2} \left[ e_{1u}  \right] \right)
-\end{equation*}
+\]
 
 Either the ENE or EEN scheme is then applied to obtain the vorticity term in flux form.
 It therefore conserves the total KE.
@@ -841,13 +841,13 @@ Let us first consider the first term of the scalar product
 	\biggl\{     \left(   \frac{1}{e_{3t}} \frac{\partial e_{3t}}{\partial t}   \right) \; b_t     \biggr\}    &&& \\
 \end{flalign*}
 Applying similar manipulation applied to the second term of the scalar product leads to:
-\begin{equation*}
+\[
  -  \int_D \textbf{U}_h \cdot     \left(                 {{\begin{array} {*{20}c}
 \nabla \cdot \left( \textbf{U}\,u \right) \hfill \\
 \nabla \cdot \left( \textbf{U}\,v \right) \hfill \\       \end{array}} }           \right)   \;dv     
 \equiv + \sum\limits_{i,j,k}  \frac{1}{2}  \left( \overline {u^2}^{\,i} + \overline {v^2}^{\,j} \right)
 	\biggl\{     \left(   \frac{1}{e_{3t}} \frac{\partial e_{3t}}{\partial t}   \right) \; b_t     \biggr\}    
-\end{equation*}
+\]
 which is the discrete form of $ \frac{1}{2} \int_D u \cdot \nabla \cdot \left(   \textbf{U}\,u   \right) \; dv $.
 \autoref{eq:C_ADV_KE_flux} is thus satisfied.
 
@@ -1031,10 +1031,10 @@ In practice, the mass is conserved to a very high accuracy.
 \label{subsec:C.5.1}
 
 conservation of a tracer, $T$:
-\begin{equation*}
+\[
 \frac{\partial }{\partial t} \left(   \int_D {T\;dv}   \right) 
 =  \int_D { \frac{1}{e_3}\frac{\partial \left( e_3 \, T \right)}{\partial t} \;dv }=0
-\end{equation*}
+\]
 
 conservation of its variance:
 \begin{flalign*} 
@@ -1155,7 +1155,7 @@ The lateral momentum diffusion term conserves the potential vorticity:
 
 The lateral momentum diffusion term dissipates the horizontal kinetic energy:
 %\begin{flalign*}
-\begin{equation*}
+\[
 \begin{split}
 \int_D \textbf{U}_h \cdot 
 	\left[ \nabla_h 		\right.   &     \left.       \left( A^{\,lm}\;\chi \right)      
@@ -1197,7 +1197,7 @@ The lateral momentum diffusion term dissipates the horizontal kinetic energy:
 	- A_f ^{\,lm}  \,\zeta^2 \;e_{1f }\,e_{2f }\,e_{3f}  
 \quad \leq 0       \\
 \end{split}
-\end{equation*}
+\]
 
 % -------------------------------------------------------------------------------------------------------------
 %       Dissipation of Enstrophy

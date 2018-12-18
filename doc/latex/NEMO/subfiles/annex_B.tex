@@ -19,13 +19,13 @@ $\ $\newline    % force a new ligne
 
 \subsubsection*{In z-coordinates}
 In $z$-coordinates, the horizontal/vertical second order tracer diffusion operator is given by:
-\begin{eqnarray} \label{apdx:B1}
+\begin{align} \label{apdx:B1}
  &D^T = \frac{1}{e_1 \, e_2}      \left[
   \left. \frac{\partial}{\partial i} \left( 	\frac{e_2}{e_1}A^{lT} \;\left. \frac{\partial T}{\partial i} \right|_z   \right)   \right|_z      \right.
   						     \left.
 + \left. \frac{\partial}{\partial j} \left(  \frac{e_1}{e_2}A^{lT} \;\left. \frac{\partial T}{\partial j} \right|_z   \right)   \right|_z      \right]
 + \frac{\partial }{\partial z}\left( {A^{vT} \;\frac{\partial T}{\partial z}} \right)
-\end{eqnarray}
+\end{align}
 
 \subsubsection*{In generalized vertical coordinates}
 In $s$-coordinates, we defined the slopes of $s$-surfaces, $\sigma_1$ and $\sigma_2$ by \autoref{apdx:A_s_slope} and
@@ -155,12 +155,12 @@ takes the following form \citep{Redi_JPO82}:
 \end{array} }} \right]
 \end{equation}
 where ($a_1$, $a_2$) are the isopycnal slopes in ($\textbf{i}$, $\textbf{j}$) directions, relative to geopotentials:
-\begin{equation*}
+\[
 a_1 =\frac{e_3 }{e_1 }\left( {\frac{\partial \rho }{\partial i}} \right)\left( {\frac{\partial \rho }{\partial k}} \right)^{-1}
 \qquad , \qquad
 a_2 =\frac{e_3 }{e_2 }\left( {\frac{\partial \rho }{\partial j}}
 \right)\left( {\frac{\partial \rho }{\partial k}} \right)^{-1}
-\end{equation*}
+\]
 
 In practice, isopycnal slopes are generally less than $10^{-2}$ in the ocean,
 so $\textbf {A}_{\textbf I}$ can be simplified appreciably \citep{Cox1987}:
@@ -203,10 +203,10 @@ The isopycnal diffusion operator \autoref{apdx:B4},
 \autoref{apdx:B_ldfiso} conserves tracer quantity and dissipates its square.
 The demonstration of the first property is trivial as \autoref{apdx:B4} is the divergence of fluxes.
 Let us demonstrate the second one:
-\begin{equation*}
+\[
 \iiint\limits_D T\;\nabla .\left( {\textbf{A}}_{\textbf{I}} \nabla T \right)\,dv
           = -\iiint\limits_D \nabla T\;.\left( {\textbf{A}}_{\textbf{I}} \nabla T \right)\,dv,
-\end{equation*}
+\]
 and since
 \begin{subequations}
 \begin{align*} {\begin{array}{*{20}l}
@@ -248,12 +248,12 @@ D^T = \left. \nabla \right|_s \cdot
 
 where ($r_1$, $r_2$) are the isopycnal slopes in ($\textbf{i}$, $\textbf{j}$) directions,
 relative to $s$-coordinate surfaces:
-\begin{equation*}
+\[
 r_1 =\frac{e_3 }{e_1 }\left( {\frac{\partial \rho }{\partial i}} \right)\left( {\frac{\partial \rho }{\partial s}} \right)^{-1}
 \qquad , \qquad
 r_2 =\frac{e_3 }{e_2 }\left( {\frac{\partial \rho }{\partial j}}
 \right)\left( {\frac{\partial \rho }{\partial s}} \right)^{-1}.
-\end{equation*}
+\]
 
 To prove \autoref{apdx:B5} by direct re-expression of \autoref{apdx:B_ldfiso} is straightforward, but laborious.
 An easier way is first to note (by reversing the derivation of \autoref{sec:B_2} from \autoref{sec:B_1} ) that
@@ -324,9 +324,9 @@ j}\left( {-\frac{e_1 }{e_3 }\frac{\partial v}{\partial k}} \right)} \right]}
 \end{align*}
 Using \autoref{eq:PE_div}, the definition of the horizontal divergence,
 the third componant of the second vector is obviously zero and thus :
-\begin{equation*}
+\[
 \Delta {\textbf{U}}_h = \nabla _h \left( \chi \right) - \nabla _h \times \left( \zeta \right) + \frac {1}{e_3 } \frac {\partial }{\partial k} \left( {\frac {1}{e_3 } \frac{\partial {\textbf{ U}}_h }{\partial k}} \right)
-\end{equation*}
+\]
 
 Note that this operator ensures a full separation between
 the vorticity and horizontal divergence fields (see \autoref{apdx:C}).

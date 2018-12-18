@@ -45,7 +45,7 @@ Evaluating this quantity as,
 
 \begin{equation} \label{eq:lbc_aaaa}
 \frac{A^{lT} }{e_1 }\frac{\partial T}{\partial i}\equiv \frac{A_u^{lT} 
-}{e_{1u} } \; \delta _{i+1 / 2} \left[ T \right]\;\;mask_u 
+}{e_{1u} } \; \delta_{i+1 / 2} \left[ T \right]\;\;mask_u 
 \end{equation}
 (where mask$_{u}$ is the mask array at a $u$-point) ensures that the heat flux is zero inside land and
 at the boundaries, since mask$_{u}$ is zero at solid boundaries which in this case are defined at $u$-points
@@ -105,15 +105,15 @@ These are:
   (\autoref{fig:LBC_shlat}-b).
   Therefore, the vorticity along the coastlines is given by: 
 
-\begin{equation*}
+\[
 \zeta \equiv 2 \left(\delta_{i+1/2} \left[e_{2v} v \right] - \delta_{j+1/2} \left[e_{1u} u \right] \right) / \left(e_{1f} e_{2f} \right) \ ,
-\end{equation*}
+\]
 where $u$ and $v$ are masked fields.
 Setting the mask$_{f}$ array to $2$ along the coastline provides a vorticity field computed with
 the no-slip boundary condition, simply by multiplying it by the mask$_{f}$ :
 \begin{equation} \label{eq:lbc_bbbb}
-\zeta \equiv \frac{1}{e_{1f} {\kern 1pt}e_{2f} }\left( {\delta _{i+1/2} 
-\left[ {e_{2v} \,v} \right]-\delta _{j+1/2} \left[ {e_{1u} \,u} \right]} 
+\zeta \equiv \frac{1}{e_{1f} {\kern 1pt}e_{2f} }\left( {\delta_{i+1/2} 
+\left[ {e_{2v} \,v} \right]-\delta_{j+1/2} \left[ {e_{1u} \,u} \right]} 
 \right)\;\mbox{mask}_f 
 \end{equation}
 
@@ -278,10 +278,10 @@ These dimensions include the internal domain and the overlapping rows.
 The number of rows to exchange (known as the halo) is usually set to one (\jp{jpreci}=1, in \mdl{par\_oce}).
 The whole domain dimensions are named \np{jpiglo}, \np{jpjglo} and \jp{jpk}.
 The relationship between the whole domain and a sub-domain is:
-\begin{eqnarray} 
+\begin{align} 
       jpi & = & ( jpiglo-2*jpreci + (jpni-1) ) / jpni + 2*jpreci  \nonumber \\
       jpj & = & ( jpjglo-2*jprecj + (jpnj-1) ) / jpnj + 2*jprecj  \label{eq:lbc_jpi}
-\end{eqnarray}
+\end{align}
 where \jp{jpni}, \jp{jpnj} are the number of processors following the i- and j-axis.
 
 One also defines variables nldi and nlei which correspond to the internal domain bounds, 

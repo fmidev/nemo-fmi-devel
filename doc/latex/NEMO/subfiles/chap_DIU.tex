@@ -60,12 +60,12 @@ The cool skin model, which is determined purely by the instantaneous fluxes, has
 
 The warm layer is calculated using the model of \citet{Takaya_al_JGR10} (TAKAYA10 model hereafter).
 This is a simple flux based model that is defined by the equations
-\begin{eqnarray}
+\begin{align}
 \frac{\partial{\Delta T_{\rm{wl}}}}{\partial{t}}&=&\frac{Q(\nu+1)}{D_T\rho_w c_p
 \nu}-\frac{(\nu+1)ku^*_{w}f(L_a)\Delta T}{D_T\Phi\!\left(\frac{D_T}{L}\right)} \mbox{,}
 \label{eq:ecmwf1} \\
 L&=&\frac{\rho_w c_p u^{*^3}_{w}}{\kappa g \alpha_w Q }\mbox{,}\label{eq:ecmwf2}
-\end{eqnarray}
+\end{align}
 where $\Delta T_{\rm{wl}}$ is the temperature difference between the top of the warm layer and the depth $D_T=3$\,m at which there is assumed to be no diurnal signal.
 In equation (\autoref{eq:ecmwf1}) $\alpha_w=2\times10^{-4}$ is the thermal expansion coefficient of water,
 $\kappa=0.4$ is von K\'{a}rm\'{a}n's constant, $c_p$ is the heat capacity at constant pressure of sea water,

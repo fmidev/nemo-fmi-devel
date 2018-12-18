@@ -105,27 +105,27 @@ In the explicit free surface formulation, the model time step is chosen small en
 describe the external gravity waves (typically a few ten seconds).
 The sea surface height is given by:
 \begin{equation} \label{eq:dynspg_ssh}
-\frac{\partial \eta }{\partial t}\equiv \frac{\text{EMP}}{\rho _w }+\frac{1}{e_{1T} 
-e_{2T} }\sum\limits_k {\left( {\delta _i \left[ {e_{2u} e_{3u} u} 
-\right]+\delta _j \left[ {e_{1v} e_{3v} v} \right]} \right)} 
+\frac{\partial \eta }{\partial t}\equiv \frac{\text{EMP}}{\rho_w }+\frac{1}{e_{1T} 
+e_{2T} }\sum\limits_k {\left( {\delta_i \left[ {e_{2u} e_{3u} u} 
+\right]+\delta_j \left[ {e_{1v} e_{3v} v} \right]} \right)} 
 \end{equation}
 
 where EMP is the surface freshwater budget (evaporation minus precipitation, and minus river runoffs
 (if the later are introduced as a surface freshwater flux, see \autoref{chap:SBC}) expressed in $Kg.m^{-2}.s^{-1}$,
-and $\rho _w =1,000\,Kg.m^{-3}$ is the volumic mass of pure water.
+and $\rho_w =1,000\,Kg.m^{-3}$ is the volumic mass of pure water.
 The sea-surface height is evaluated using a leapfrog scheme in combination with an Asselin time filter,
 i.e. the velocity appearing in (\autoref{eq:dynspg_ssh}) is centred in time (\textit{now} velocity). 
 
 The surface pressure gradient, also evaluated using a leap-frog scheme, is then simply given by:
 \begin{equation} \label{eq:dynspg_exp}
 \left\{ \begin{aligned}
- - \frac{1}    						{e_{1u}} \;	\delta _{i+1/2} \left[  \,\eta\,  \right] 	\\
+ - \frac{1}    						{e_{1u}} \;	\delta_{i+1/2} \left[  \,\eta\,  \right] 	\\
  \\
- - \frac{1}    						{e_{2v}} \;	\delta _{j+1/2} \left[  \,\eta\,  \right]  
+ - \frac{1}    						{e_{2v}} \;	\delta_{j+1/2} \left[  \,\eta\,  \right]  
 \end{aligned} \right.
 \end{equation} 
 
-Consistent with the linearization, a $\left. \rho \right|_{k=1} / \rho _o$ factor is omitted in
+Consistent with the linearization, a $\left. \rho \right|_{k=1} / \rho_o$ factor is omitted in
 (\autoref{eq:dynspg_exp}). 
 
 %-------------------------------------------------------------

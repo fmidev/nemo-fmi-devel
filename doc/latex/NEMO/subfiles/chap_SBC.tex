@@ -18,7 +18,7 @@ $\ $\newline    % force a new ligne
 The ocean needs six fields as surface boundary condition:
 \begin{itemize}
 \item
-  the two components of the surface ocean stress $\left( {\tau _u \;,\;\tau _v} \right)$
+  the two components of the surface ocean stress $\left( {\tau_u \;,\;\tau_v} \right)$
 \item
   the incoming solar and non solar heat fluxes $\left( {Q_{ns} \;,\;Q_{sr} } \right)$
 \item
@@ -390,13 +390,13 @@ Again there are two sets of variables: "src" and "wgt".
 But in this case there are 16 of each.
 The symbolic algorithm used to calculate values on the model grid is now:
 
-\begin{equation*} \begin{split}
+\[ \begin{split}
 f_{m}(i,j) =  f_{m}(i,j) +& \sum_{k=1}^{4} {wgt(k)f(idx(src(k)))}     
               +   \sum_{k=5}^{8} {wgt(k)\left.\frac{\partial f}{\partial i}\right| _{idx(src(k))} }    \\
               +& \sum_{k=9}^{12} {wgt(k)\left.\frac{\partial f}{\partial j}\right| _{idx(src(k))} }   
               +   \sum_{k=13}^{16} {wgt(k)\left.\frac{\partial ^2 f}{\partial i \partial j}\right| _{idx(src(k))} }
 \end{split}
-\end{equation*}
+\]
 The gradients here are taken with respect to the horizontal indices and not distances since
 the spatial dependency has been absorbed into the weights.
 
