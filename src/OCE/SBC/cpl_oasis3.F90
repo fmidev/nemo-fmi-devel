@@ -141,7 +141,7 @@ CONTAINS
       !
       INTEGER :: id_part
       INTEGER :: paral(5)       ! OASIS3 box partition
-      INTEGER :: ishape(2,2)    ! shape of arrays passed to PSMILe
+      INTEGER :: ishape(4)    ! shape of arrays passed to PSMILe
       INTEGER :: ji,jc,jm       ! local loop indicees
       CHARACTER(LEN=64) :: zclname
       CHARACTER(LEN=2) :: cli2
@@ -180,8 +180,10 @@ CONTAINS
       !     For serial configuration (key_mpp_mpi not being active)
       !     nl* is set to the global values 1 and jp*glo.
       !
-      ishape(:,1) = (/ 1, nlei-nldi+1 /)
-      ishape(:,2) = (/ 1, nlej-nldj+1 /)
+      ishape(1) = 1
+      ishape(2) = nlei-nldi+1
+      ishape(3) = 1
+      ishape(4) = nlej-nldj+1
       !
       ! ... Allocate memory for data exchange
       !
@@ -241,7 +243,7 @@ CONTAINS
                   END IF
 #endif
                   IF( ln_ctl ) WRITE(numout,*) "Define", ji, jc, jm, " "//TRIM(zclname), " for ", OASIS_Out
-                  CALL oasis_def_var (ssnd(ji)%nid(jc,jm), zclname, id_part   , (/ 2, 0 /),   &
+                  CALL oasis_def_var (ssnd(ji)%nid(jc,jm), zclname, id_part   , (/ 2, 1 /),   &
                      &                OASIS_Out          , ishape , OASIS_REAL, nerror )
                   IF ( nerror /= OASIS_Ok ) THEN
                      WRITE(numout,*) 'Failed to define transient ', ji, jc, jm, " "//TRIM(zclname)
@@ -286,7 +288,7 @@ CONTAINS
                   END IF
 #endif
                   IF( ln_ctl ) WRITE(numout,*) "Define", ji, jc, jm, " "//TRIM(zclname), " for ", OASIS_In
-                  CALL oasis_def_var (srcv(ji)%nid(jc,jm), zclname, id_part   , (/ 2, 0 /),   &
+                  CALL oasis_def_var (srcv(ji)%nid(jc,jm), zclname, id_part   , (/ 2, 1 /),   &
                      &                OASIS_In           , ishape , OASIS_REAL, nerror )
                   IF ( nerror /= OASIS_Ok ) THEN
                      WRITE(numout,*) 'Failed to define transient ', ji, jc, jm, " "//TRIM(zclname)

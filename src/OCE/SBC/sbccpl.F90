@@ -1666,6 +1666,9 @@ CONTAINS
          zemp_ice(:,:) = frcv(jpr_semp)%z3(:,:,1) * picefr(:,:)
          zsprecip(:,:) = frcv(jpr_ievp)%z3(:,:,1) - frcv(jpr_semp)%z3(:,:,1)
          ztprecip(:,:) = frcv(jpr_semp)%z3(:,:,1) - frcv(jpr_sbpr)%z3(:,:,1) + zsprecip(:,:)
+      CASE( 'none'      )       ! Not available as for now: needs additional coding below when computing zevap_oce 
+      !                         ! since fields received are not defined with none option
+         CALL ctl_stop( 'STOP', 'sbccpl/sbc_cpl_ice_flx: some fields are not defined. Change sn_rcv_emp value in namelist namsbc_cpl' )
       END SELECT
 
 #if defined key_si3
@@ -1942,6 +1945,9 @@ CONTAINS
          zqsr_ice(:,:,1) = frcv(jpr_qsrmix)%z3(:,:,1) * ( 1.- palbi(:,:,1) )   &
             &            / (  1.- ( alb_oce_mix(:,:  ) * ziceld(:,:)       &
             &                     + palbi      (:,:,1) * picefr(:,:) ) )
+      CASE( 'none'      )       ! Not available as for now: needs additional coding  
+      !                         ! since fields received, here zqsr_tot,  are not defined with none option
+         CALL ctl_stop( 'STOP', 'sbccpl/sbc_cpl_ice_flx: some fields are not defined. Change sn_rcv_qsr value in namelist namsbc_cpl' )
       END SELECT
       IF( ln_dm2dc .AND. ln_cpl ) THEN   ! modify qsr to include the diurnal cycle
          zqsr_tot(:,:  ) = sbc_dcy( zqsr_tot(:,:  ) )
