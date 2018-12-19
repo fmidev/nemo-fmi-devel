@@ -55,7 +55,6 @@ MODULE par_pisces
    INTEGER, PUBLIC ::   jpgon     !: Big nitrogen particles Concentration
    INTEGER, PUBLIC ::   jpgop     !: Big phosphorus particles Concentration
    INTEGER, PUBLIC ::   jplgw     !: Weak Ligands
-   INTEGER, PUBLIC ::   jpfep     !: Fe nanoparticle
 
    !!---------------------------------------------------------------------
    !!   Default                                   No CFC geochemical model

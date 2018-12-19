@@ -24,7 +24,6 @@ MODULE p4zligand
    REAL(wp), PUBLIC ::  rlgs     !: lifetime (years) of strong ligands
    REAL(wp), PUBLIC ::  rlig     !: Remin ligand production
    REAL(wp), PUBLIC ::  prlgw    !: Photochemical of weak ligand
-   REAL(wp), PUBLIC ::  rfep     !: Dissolution rate of FeP
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -42,7 +41,7 @@ CONTAINS
       INTEGER, INTENT(in) ::   kt, knt ! ocean time step
       !
       INTEGER  ::   ji, jj, jk
-      REAL(wp) ::   zlgwp, zlgwpr, zlgwr, zlablgw, zrfepa, zfepr
+      REAL(wp) ::   zlgwp, zlgwpr, zlgwr, zlablgw
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: zligrem, zligpr, zrligprod
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) ::   zw3d
       CHARACTER (len=25) ::   charout
@@ -70,18 +69,6 @@ CONTAINS
                zligrem(ji,jj,jk)   = zlgwr
                zligpr(ji,jj,jk)    = zlgwpr
                zrligprod(ji,jj,jk) = zlgwp
-               !
-               ! ----------------------------------------------------------
-               ! Dissolution of nanoparticle Fe
-               ! ----------------------------------------------------------
-               ! dissolution rate is maximal in the presence of light and 
-               ! lower in the aphotici zone
-               ! ! 25 Wm-2 constant
-               zrfepa = rfep * ( 1. - EXP( -1. * etot(ji,jj,jk) / 25. ) ) * (1.- fr_i(ji,jj))
-               zrfepa = MAX( (zrfepa / 10.0), zrfepa ) ! min of 10 days lifetime
-               zfepr  = rfep * xstep * trb(ji,jj,jk,jpfep)
-               tra(ji,jj,jk,jpfep) = tra(ji,jj,jk,jpfep) - zfepr
-               tra(ji,jj,jk,jpfer) = tra(ji,jj,jk,jpfer) + zfepr
                !
             END DO
          END DO
@@ -129,7 +116,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER ::   ios   ! Local integer 
       !
-      NAMELIST/nampislig/ rlgw, prlgw, rlgs, rfep, rlig
+      NAMELIST/nampislig/ rlgw, prlgw, rlgs, rlig
       !!----------------------------------------------------------------------
       !
       IF(lwp) THEN
@@ -147,7 +134,6 @@ CONTAINS
       !
       IF(lwp) THEN                         ! control print
          WRITE(numout,*) '   Namelist : nampislig'
-         WRITE(numout,*) '      Dissolution rate of FeP                      rfep  =', rfep
          WRITE(numout,*) '      Lifetime (years) of weak ligands             rlgw  =', rlgw
          WRITE(numout,*) '      Remin ligand production per unit C           rlig  =', rlig
          WRITE(numout,*) '      Photolysis of weak ligand                    prlgw =', prlgw

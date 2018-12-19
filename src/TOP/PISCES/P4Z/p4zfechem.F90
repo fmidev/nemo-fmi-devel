@@ -194,7 +194,6 @@ CONTAINS
                   zligco   = 0.5 * trn(ji,jj,jk,jplgw)
                   zaggliga = zlam1a * xstep * zligco
                   zaggligb = zlam1b * xstep * zligco
-                  tra(ji,jj,jk,jpfep) = tra(ji,jj,jk,jpfep) + precip(ji,jj,jk)
                   tra(ji,jj,jk,jplgw) = tra(ji,jj,jk,jplgw) - zaggliga - zaggligb
                   zlcoll3d(ji,jj,jk)  = zaggliga + zaggligb
                END DO

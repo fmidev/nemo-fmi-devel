@@ -188,8 +188,7 @@ CONTAINS
       INTEGER :: ios                 ! Local integer output status for namelist read
       !!
       NAMELIST/nampisbio/ nrdttrc, wsbio, xkmort, ferat3, wsbio2, wsbio2max, wsbio2scale,    &
-         &                   wfep, ldocp, ldocz, lthet,  &
-         &                   no3rat3, po4rat3
+         &                   ldocp, ldocz, lthet, no3rat3, po4rat3
          !
       NAMELIST/nampisdmp/ ln_pisdmp, nn_pisdmp
       NAMELIST/nampismass/ ln_check_mass
@@ -223,7 +222,6 @@ CONTAINS
          WRITE(numout,*) '      Big particles maximum sinking speed       wsbio2max   =', wsbio2max
          WRITE(numout,*) '      Big particles sinking speed length scale  wsbio2scale =', wsbio2scale
          IF( ln_ligand ) THEN
-            WRITE(numout,*) '      FeP sinking speed                              wfep   =', wfep
             IF( ln_p4z ) THEN
                WRITE(numout,*) '      Phyto ligand production per unit doc           ldocp  =', ldocp
                WRITE(numout,*) '      Zoo ligand production per unit doc             ldocz  =', ldocz
@@ -493,7 +491,6 @@ CONTAINS
          zwork(:,:,:) =   trn(:,:,:,jpfer) + trn(:,:,:,jpnfe) + trn(:,:,:,jpdfe)   &
             &         +   trn(:,:,:,jpbfe) + trn(:,:,:,jpsfe)                      &
             &         + ( trn(:,:,:,jpzoo) + trn(:,:,:,jpmes) )  * ferat3    
-         IF( ln_ligand)  zwork(:,:,:) = zwork(:,:,:) + trn(:,:,:,jpfep)                
          !
          ferbudget = glob_sum( zwork(:,:,:) * cvol(:,:,:)  )  
          ferbudget = ferbudget / areatot

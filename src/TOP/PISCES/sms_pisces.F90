@@ -46,7 +46,6 @@ MODULE sms_pisces
    REAL(wp) ::   wsbio2scale       !: ???
    REAL(wp) ::   xkmort            !: ???
    REAL(wp) ::   ferat3            !: ???
-   REAL(wp) ::   wfep              !: ???
    REAL(wp) ::   ldocp             !: ???
    REAL(wp) ::   ldocz             !: ???
    REAL(wp) ::   lthet             !: ???
@@ -89,9 +88,6 @@ MODULE sms_pisces
    !!*  Sinking speed
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wsbio3   !: POC sinking speed 
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wsbio4   !: GOC sinking speed
-   REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   wsfep
-
-
 
    !!*  SMS for the organic matter
    REAL(wp), ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   xfracal    !: ??
@@ -174,9 +170,8 @@ CONTAINS
             &                             STAT=ierr(7) )   
          ! 
          IF( ln_ligand ) THEN
-           ALLOCATE( plig(jpi,jpj,jpk)  , wsfep(jpi,jpj,jpk)  ,   STAT=ierr(8) )
+           ALLOCATE( plig(jpi,jpj,jpk)  ,                         STAT=ierr(8) )
          ENDIF
-         !
       ENDIF
       !
       IF( ln_p5z ) THEN

@@ -167,7 +167,6 @@ CONTAINS
         IF( cltra == 'PCHL'     )   jppch = jn      !: Diatoms Chlorophyll Concentration
         IF( cltra == 'PFe'      )   jppfe = jn      !: Picophytoplankton Fe biomass
         IF( cltra == 'LGW'      )   jplgw = jn      !: Weak ligands
-        IF( cltra == 'LFe'      )   jpfep = jn      !: Fe nanoparticle
       END DO
 
       CALL p4z_sms_init       !  Maint routine
@@ -215,7 +214,6 @@ CONTAINS
          trn(:,:,:,jpnh4) = bioma0
          IF( ln_ligand) THEN
             trn(:,:,:,jplgw) = 0.6E-9
-            trn(:,:,:,jpfep) = 0. * 5.e-6
          ENDIF
          IF( ln_p5z ) THEN
             trn(:,:,:,jpdon) = bioma0

@@ -34,7 +34,6 @@ MODULE p4zsink
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sinkcal, sinksil   !: CaCO3 and BSi sinking fluxes
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sinkfer            !: Small BFe sinking fluxes
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sinkfer2           !: Big iron sinking fluxes
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   sinkfep      !: Fep sinking fluxes
 
    INTEGER  :: ik100
 
@@ -125,13 +124,6 @@ CONTAINS
          CALL trc_sink( kt, wsbio4, sinking2p, jpgop, rfact2 )
       ENDIF
 
-      IF( ln_ligand ) THEN
-         wsfep (:,:,:) = wfep
-         !
-         sinkfep(:,:,:) = 0.e0
-         CALL trc_sink( kt, wsfep, sinkfep , jpfep, rfact2 )
-      ENDIF
-
      ! Total carbon export per year
      IF( iom_use( "tcexp" ) .OR. ( ln_check_mass .AND. kt == nitend .AND. knt == nrdttrc )  )  &
         &   t_oce_co2_exp = glob_sum( ( sinking(:,:,ik100) + sinking2(:,:,ik100) ) * e1e2t(:,:) * tmask(:,:,1) )
@@ -213,7 +205,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!                     ***  ROUTINE p4z_sink_alloc  ***
       !!----------------------------------------------------------------------
-      INTEGER :: ierr(3)
+      INTEGER :: ierr(2)
       !!----------------------------------------------------------------------
       !
       ierr(:) = 0
@@ -223,10 +215,8 @@ CONTAINS
          &      sinkfer2(jpi,jpj,jpk)                                           ,     &                
          &      sinkfer(jpi,jpj,jpk)                                            , STAT=ierr(1) )                
          !
-      IF( ln_ligand ) ALLOCATE( sinkfep(jpi,jpj,jpk)                            , STAT=ierr(2) )  
-         
       IF( ln_p5z    ) ALLOCATE( sinkingn(jpi,jpj,jpk), sinking2n(jpi,jpj,jpk)   ,     &
-         &                      sinkingp(jpi,jpj,jpk), sinking2p(jpi,jpj,jpk)   , STAT=ierr(3) )
+         &                      sinkingp(jpi,jpj,jpk), sinking2p(jpi,jpj,jpk)   , STAT=ierr(2) )
       !
       p4z_sink_alloc = MAXVAL( ierr )
       IF( p4z_sink_alloc /= 0 ) CALL ctl_warn('p4z_sink_alloc : failed to allocate arrays.')

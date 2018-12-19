@@ -30,7 +30,6 @@ MODULE p4zsbc
    REAL(wp), PUBLIC ::   sedfeinput   !: Coastal release of Iron
    REAL(wp), PUBLIC ::   dustsolub    !: Solubility of the dust
    REAL(wp), PUBLIC ::   mfrac        !: Mineral Content of the dust
-   REAL(wp), PUBLIC ::   rdustfep     !: Fraction of dust that is dissolvable
    REAL(wp), PUBLIC ::   icefeinput   !: Iron concentration in sea ice
    REAL(wp), PUBLIC ::   wdust        !: Sinking speed of the dust 
    REAL(wp), PUBLIC ::   nitrfix      !: Nitrogen fixation rate   
@@ -38,8 +37,6 @@ MODULE p4zsbc
    REAL(wp), PUBLIC ::   concfediaz   !: Fe half-saturation Cste for diazotrophs 
    REAL(wp)         ::   hratio       !: Fe:3He ratio assumed for vent iron supply
    REAL(wp)         ::   distcoast    !: Distance off the coast for Iron from sediments
-   REAL(wp), PUBLIC ::   fep_rats     !: Fep/Fer ratio from sed  sources
-   REAL(wp), PUBLIC ::   fep_rath     !: Fep/Fer ratio from hydro sources
    REAL(wp), PUBLIC ::   lgw_rath     !: Weak ligand ratio from hydro sources
 
    LOGICAL , PUBLIC ::   ll_sbc
@@ -227,7 +224,7 @@ CONTAINS
         &                sn_riverdip, sn_riverdop, sn_riverdsi, sn_ndepo, sn_ironsed, sn_hydrofe, &
         &                ln_dust, ln_solub, ln_river, ln_ndepo, ln_ironsed, ln_ironice, ln_hydrofe,    &
         &                sedfeinput, distcoast, dustsolub, icefeinput, wdust, mfrac, nitrfix, diazolight, concfediaz, &
-        &                hratio, fep_rats, fep_rath, rdustfep, lgw_rath
+        &                hratio, lgw_rath
       !!----------------------------------------------------------------------
       !
       IF(lwp) THEN
@@ -264,9 +261,6 @@ CONTAINS
          WRITE(numout,*) '      Fe half-saturation cste for diazotrophs  concfediaz  = ', concfediaz
          WRITE(numout,*) '      Fe to 3He ratio assumed for vent iron supply hratio  = ', hratio
          IF( ln_ligand ) THEN
-            WRITE(numout,*) '      Fep/Fer ratio from sed sources            fep_rats   = ', fep_rats
-            WRITE(numout,*) '      Fep/Fer ratio from sed hydro sources      fep_rath   = ', fep_rath
-            WRITE(numout,*) '      Fraction of dust that is dissolvable      rdustfep   = ', rdustfep
             WRITE(numout,*) '      Weak ligand ratio from sed hydro sources  lgw_rath   = ', lgw_rath
          ENDIF
       END IF

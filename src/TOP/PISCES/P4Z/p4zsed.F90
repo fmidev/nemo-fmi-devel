@@ -59,7 +59,6 @@ CONTAINS
       REAL(wp) ::  zwstpoc, zwstpon, zwstpop
       REAL(wp) ::  ztrfer, ztrpo4s, ztrdp, zwdust, zmudia, ztemp
       REAL(wp) ::  xdiano3, xdianh4
-      REAL(wp) ::  zwssfep
       !
       CHARACTER (len=25) :: charout
       REAL(wp), DIMENSION(jpi,jpj    ) :: zdenit2d, zbureff, zwork
@@ -67,7 +66,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj    ) :: zsedcal, zsedsi, zsedc
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: zsoufer, zlight
       REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: ztrpo4, ztrdop, zirondep, zpdep
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:  ) :: zsidep, zwsfep, zironice
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:  ) :: zsidep, zironice
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )  CALL timing_start('p4z_sed')
@@ -86,7 +85,6 @@ CONTAINS
       ! Allocate temporary workspace
       ALLOCATE( ztrpo4(jpi,jpj,jpk) )
       IF( ln_p5z )    ALLOCATE( ztrdop(jpi,jpj,jpk) )
-      IF( ln_ligand ) ALLOCATE( zwsfep(jpi,jpj) )
 
       zdenit2d(:,:) = 0.e0
       zbureff (:,:) = 0.e0
@@ -130,13 +128,6 @@ CONTAINS
             zirondep(:,:,1) = solub(:,:) * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85 + 3.e-10 * r1_ryyss 
          ELSE
             zirondep(:,:,1) = dustsolub  * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85 + 3.e-10 * r1_ryyss 
-         ENDIF
-         IF ( ln_ligand ) THEN
-            IF( ln_solub ) THEN
-               tra(:,:,1,jpfep) = tra(:,:,1,jpfep) + rdustfep * (1.0 - solub(:,:)) * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85
-            ELSE
-               tra(:,:,1,jpfep) = tra(:,:,1,jpfep) + rdustfep * (1.0 - dustsolub) * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 55.85
-            ENDIF
          ENDIF
          zsidep(:,:)   = 8.8 * 0.075 * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 28.1 
          zpdep (:,:,1) = 0.1 * 0.021 * dust(:,:) * mfrac * rfact2 / e3t_n(:,:,1) / 31. / po4r 
@@ -215,7 +206,6 @@ CONTAINS
       IF( ln_hydrofe ) THEN
             tra(:,:,:,jpfer) = tra(:,:,:,jpfer) + hydrofe(:,:,:) * rfact2
          IF( ln_ligand ) THEN
-            tra(:,:,:,jpfep) = tra(:,:,:,jpfep) + ( hydrofe(:,:,:) * fep_rath ) * rfact2
             tra(:,:,:,jplgw) = tra(:,:,:,jplgw) + ( hydrofe(:,:,:) * lgw_rath ) * rfact2
          ENDIF
          !
@@ -234,23 +224,12 @@ CONTAINS
          END DO
       END DO
       !
-      IF( ln_ligand ) THEN
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               ikt  = mbkt(ji,jj)
-               zdep = e3t_n(ji,jj,ikt) / xstep
-               zwsfep(ji,jj)  = MIN( 0.99 * zdep, wsfep(ji,jj,ikt)  )
-            END DO
-         ENDDO
-      ENDIF
-
       IF( .NOT.lk_sed ) THEN
 !
          ! Add the external input of iron from sediment mobilization
          ! ------------------------------------------------------
          IF( ln_ironsed ) THEN
                             tra(:,:,:,jpfer) = tra(:,:,:,jpfer) + ironsed(:,:,:) * rfact2
-            IF( ln_ligand ) tra(:,:,:,jpfep) = tra(:,:,:,jpfep) + ( ironsed(:,:,:) * fep_rats ) * rfact2
             !
             IF( lk_iomput .AND. knt == nrdttrc .AND. iom_use( "Ironsed" ) )   &
                &   CALL iom_put( "Ironsed", ironsed(:,:,:) * 1.e+3 * tmask(:,:,:) ) ! iron inputs from sediments
@@ -333,17 +312,6 @@ CONTAINS
             tra(ji,jj,ikt,jpsfe) = tra(ji,jj,ikt,jpsfe) - trb(ji,jj,ikt,jpsfe) * zws3
          END DO
       END DO
-      !
-      IF( ln_ligand ) THEN
-         DO jj = 1, jpj
-            DO ji = 1, jpi
-               ikt     = mbkt(ji,jj)
-               zdep    = xstep / e3t_n(ji,jj,ikt) 
-               zwssfep = zwsfep(ji,jj) * zdep
-               tra(ji,jj,ikt,jpfep) = tra(ji,jj,ikt,jpfep) - trb(ji,jj,ikt,jpfep) * zwssfep
-            END DO
-         END DO
-      ENDIF
       !
       IF( ln_p5z ) THEN
          DO jj = 1, jpj
@@ -523,7 +491,6 @@ CONTAINS
       ENDIF
       !
       IF( ln_p5z )    DEALLOCATE( ztrpo4, ztrdop )
-      IF( ln_ligand ) DEALLOCATE( zwsfep )
       !
       IF( ln_timing )  CALL timing_stop('p4z_sed')
       !
