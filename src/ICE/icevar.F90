@@ -953,7 +953,7 @@ CONTAINS
 
    FUNCTION ice_var_sshdyn(pssh, psnwice_mass, psnwice_mass_b)
       !!---------------------------------------------------------------------
-      !!                   ***  ROUTINE rhg_evp_rst  ***
+      !!                   ***  ROUTINE ice_var_sshdyn  ***
       !!                     
       !! ** Purpose :  compute the equivalent ssh in lead when sea ice is embedded
       !!
@@ -962,7 +962,6 @@ CONTAINS
       !! ** Reference : Jean-Michel Campin, John Marshall, David Ferreira,
       !!                Sea ice-ocean coupling using a rescaled vertical coordinate z*, 
       !!                Ocean Modelling, Volume 24, Issues 1-2, 2008
-      !!
       !!----------------------------------------------------------------------
       !
       ! input

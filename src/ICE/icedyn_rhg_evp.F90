@@ -146,9 +146,9 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zds                             ! shear
       REAL(wp), DIMENSION(jpi,jpj) ::   zs1, zs2, zs12                  ! stress tensor components
       REAL(wp), DIMENSION(jpi,jpj) ::   zu_ice, zv_ice, zresr           ! check convergence
-      REAL(wp), DIMENSION(jpi,jpj) ::   zssh_lead_m                     ! array used for the calculation of ice surface slope:
+      REAL(wp), DIMENSION(jpi,jpj) ::   zsshdyn                         ! array used for the calculation of ice surface slope:
       !                                                                 !    ocean surface (ssh_m) if ice is not embedded
-      !                                                                 !    ice top surface if ice is embedded   
+      !                                                                 !    ice bottom surface if ice is embedded   
       REAL(wp), DIMENSION(jpi,jpj) ::   zCorx, zCory                    ! Coriolis stress array
       REAL(wp), DIMENSION(jpi,jpj) ::   ztaux_oi, ztauy_oi              ! Ocean-to-ice stress array
       !
@@ -267,10 +267,10 @@ CONTAINS
       !------------------------------------------------------------------------------!
       ! 2) Wind / ocean stress, mass terms, coriolis terms
       !------------------------------------------------------------------------------!
-
-      !== embedded sea ice: compute representative ice top surface      ==!
-      !== non-embedded sea ice: use ocean surface for slope calculation ==!
-      zssh_lead_m(:,:) = ice_var_sshdyn( ssh_m, snwice_mass, snwice_mass_b)
+      ! sea surface height
+      !    embedded sea ice: compute representative ice top surface
+      !    non-embedded sea ice: use ocean surface for slope calculation
+      zsshdyn(:,:) = ice_var_sshdyn( ssh_m, snwice_mass, snwice_mass_b)
 
       DO jj = 2, jpjm1
          DO ji = fs_2, fs_jpim1
@@ -308,8 +308,8 @@ CONTAINS
             zTauV_ia(ji,jj) = zaV(ji,jj) * vtau_ice(ji,jj)
 
             ! Surface pressure gradient (- m*g*GRAD(ssh)) at U-V points
-            zspgU(ji,jj)    = - zmassU * grav * ( zssh_lead_m(ji+1,jj) - zssh_lead_m(ji,jj) ) * r1_e1u(ji,jj)
-            zspgV(ji,jj)    = - zmassV * grav * ( zssh_lead_m(ji,jj+1) - zssh_lead_m(ji,jj) ) * r1_e2v(ji,jj)
+            zspgU(ji,jj)    = - zmassU * grav * ( zsshdyn(ji+1,jj) - zsshdyn(ji,jj) ) * r1_e1u(ji,jj)
+            zspgV(ji,jj)    = - zmassV * grav * ( zsshdyn(ji,jj+1) - zsshdyn(ji,jj) ) * r1_e2v(ji,jj)
 
             ! masks
             zmaskU(ji,jj) = 1._wp - MAX( 0._wp, SIGN( 1._wp, -zmassU ) )  ! 0 if no ice

@@ -49,7 +49,7 @@ CONTAINS
       !! ** Method  : - Save the time step in numstp
       !!              - Print it each 50 time steps
       !!              - Stop the run IF problem encountered by setting indic=-3
-      !!                Problems checked: |ssh| maximum larger than 10 m
+      !!                Problems checked: |ssh| maximum larger than 20 m
       !!                                  |U|   maximum larger than 10 m/s 
       !!                                  negative sea surface salinity
       !!
@@ -135,7 +135,7 @@ CONTAINS
             &                                     ' S min: '    , - zmax(3), ' S max: ', zmax(4)
       ENDIF
       !
-      IF (  zmax(1) >   15._wp .OR.   &                    ! too large sea surface height ( > 15 m )
+      IF (  zmax(1) >   20._wp .OR.   &                    ! too large sea surface height ( > 20 m )
          &  zmax(2) >   10._wp .OR.   &                    ! too large velocity ( > 10 m/s)
          &  zmax(3) >=   0._wp .OR.   &                    ! negative or zero sea surface salinity
          &  zmax(4) >= 100._wp .OR.   &                    ! too large sea surface salinity ( > 100 )
@@ -158,7 +158,7 @@ CONTAINS
          ENDIF
          IF(lwp) THEN
             WRITE(numout,cform_err)
-            WRITE(numout,*) ' stp_ctl: |ssh| > 10 m  or  |U| > 10 m/s  or  S <= 0  or  S >= 100  or  NaN encounter in the tests'
+            WRITE(numout,*) ' stp_ctl: |ssh| > 20 m  or  |U| > 10 m/s  or  S <= 0  or  S >= 100  or  NaN encounter in the tests'
             WRITE(numout,*) ' ======= '
             WRITE(numout,9100) kt,   zmax(1), iih , ijh
             WRITE(numout,9200) kt,   zmax(2), iiu , iju , iku

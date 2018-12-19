@@ -75,7 +75,7 @@ CONTAINS
       !!
       INTEGER  ::   ji, jj, jl        ! dummy loop indices
       REAL(wp) ::   zcoefu, zcoefv
-      REAL(wp),              DIMENSION(jpi,jpj,jpl) ::   zhi_max, zhs_max
+      REAL(wp),              DIMENSION(jpi,jpj,jpl) ::   zhi_max, zhs_max, zhip_max
       REAL(wp), ALLOCATABLE, DIMENSION(:,:)         ::   zdivu_i
       !!--------------------------------------------------------------------
       !
@@ -100,32 +100,36 @@ CONTAINS
       DO jl = 1, jpl
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1
-               zhi_max(ji,jj,jl) = MAX( epsi20, h_i_b(ji,jj,jl), h_i_b(ji+1,jj  ,jl), h_i_b(ji  ,jj+1,jl), &
-                  &                                              h_i_b(ji-1,jj  ,jl), h_i_b(ji  ,jj-1,jl), &
-                  &                                              h_i_b(ji+1,jj+1,jl), h_i_b(ji-1,jj-1,jl), &
-                  &                                              h_i_b(ji+1,jj-1,jl), h_i_b(ji-1,jj+1,jl) )
-               zhs_max(ji,jj,jl) = MAX( epsi20, h_s_b(ji,jj,jl), h_s_b(ji+1,jj  ,jl), h_s_b(ji  ,jj+1,jl), &
-                  &                                              h_s_b(ji-1,jj  ,jl), h_s_b(ji  ,jj-1,jl), &
-                  &                                              h_s_b(ji+1,jj+1,jl), h_s_b(ji-1,jj-1,jl), &
-                  &                                              h_s_b(ji+1,jj-1,jl), h_s_b(ji-1,jj+1,jl) )
+               zhip_max(ji,jj,jl) = MAX( epsi20, h_ip_b(ji,jj,jl), h_ip_b(ji+1,jj  ,jl), h_ip_b(ji  ,jj+1,jl), &
+                  &                                                h_ip_b(ji-1,jj  ,jl), h_ip_b(ji  ,jj-1,jl), &
+                  &                                                h_ip_b(ji+1,jj+1,jl), h_ip_b(ji-1,jj-1,jl), &
+                  &                                                h_ip_b(ji+1,jj-1,jl), h_ip_b(ji-1,jj+1,jl) )
+               zhi_max (ji,jj,jl) = MAX( epsi20, h_i_b (ji,jj,jl), h_i_b (ji+1,jj  ,jl), h_i_b (ji  ,jj+1,jl), &
+                  &                                                h_i_b (ji-1,jj  ,jl), h_i_b (ji  ,jj-1,jl), &
+                  &                                                h_i_b (ji+1,jj+1,jl), h_i_b (ji-1,jj-1,jl), &
+                  &                                                h_i_b (ji+1,jj-1,jl), h_i_b (ji-1,jj+1,jl) )
+               zhs_max (ji,jj,jl) = MAX( epsi20, h_s_b (ji,jj,jl), h_s_b (ji+1,jj  ,jl), h_s_b (ji  ,jj+1,jl), &
+                  &                                                h_s_b (ji-1,jj  ,jl), h_s_b (ji  ,jj-1,jl), &
+                  &                                                h_s_b (ji+1,jj+1,jl), h_s_b (ji-1,jj-1,jl), &
+                  &                                                h_s_b (ji+1,jj-1,jl), h_s_b (ji-1,jj+1,jl) )
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( zhi_max(:,:,:), 'T', 1., zhs_max(:,:,:), 'T', 1. )
+      CALL lbc_lnk_multi( zhi_max(:,:,:), 'T', 1., zhs_max(:,:,:), 'T', 1., zhip_max(:,:,:), 'T', 1. )
       !
       !
       SELECT CASE( nice_dyn )           !-- Set which dynamics is running
 
       CASE ( np_dynALL )           !==  all dynamical processes  ==!
-         CALL ice_dyn_rhg   ( kt )                                       ! -- rheology  
-         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max )   ! -- advection of ice + correction on ice thickness
-         CALL ice_dyn_rdgrft( kt )                                       ! -- ridging/rafting 
-         CALL ice_cor       ( kt , 1 )                                   ! -- Corrections
+         CALL ice_dyn_rhg   ( kt )                                                 ! -- rheology  
+         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max, zhip_max )   ! -- advection of ice + correction on ice thickness
+         CALL ice_dyn_rdgrft( kt )                                                 ! -- ridging/rafting 
+         CALL ice_cor       ( kt , 1 )                                             ! -- Corrections
 
       CASE ( np_dynRHGADV  )       !==  no ridge/raft & no corrections ==!
-         CALL ice_dyn_rhg   ( kt )                                       ! -- rheology  
-         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max )   ! -- advection of ice + correction on ice thickness
-         CALL Hpiling                                                    ! -- simple pile-up (replaces ridging/rafting)
+         CALL ice_dyn_rhg   ( kt )                                                 ! -- rheology  
+         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max, zhip_max )   ! -- advection of ice + correction on ice thickness
+         CALL Hpiling                                                              ! -- simple pile-up (replaces ridging/rafting)
 
       CASE ( np_dynADV1D )         !==  pure advection ==!   (1D)
          ALLOCATE( zdivu_i(jpi,jpj) )
@@ -162,7 +166,7 @@ CONTAINS
          !CALL RANDOM_NUMBER(u_ice(:,:)) ; u_ice(:,:) = u_ice(:,:) * 0.1 + rn_uice * 0.9 * umask(:,:,1)
          !CALL RANDOM_NUMBER(v_ice(:,:)) ; v_ice(:,:) = v_ice(:,:) * 0.1 + rn_vice * 0.9 * vmask(:,:,1)
          ! ---
-         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max )   ! -- advection of ice + correction on ice thickness
+         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max, zhip_max )   ! -- advection of ice + correction on ice thickness
 
          ! diagnostics: divergence at T points 
          DO jj = 2, jpjm1
@@ -185,7 +189,7 @@ CONTAINS
    END SUBROUTINE ice_dyn
 
 
-   SUBROUTINE Hbig( phi_max, phs_max )
+   SUBROUTINE Hbig( phi_max, phs_max, phip_max )
       !!-------------------------------------------------------------------
       !!                  ***  ROUTINE Hbig  ***
       !!
@@ -202,10 +206,10 @@ CONTAINS
       !!
       !! ** input   : Max thickness of the surrounding 9-points
       !!-------------------------------------------------------------------
-      REAL(wp), DIMENSION(:,:,:), INTENT(in) ::   phi_max, phs_max   ! max ice thick from surrounding 9-pts
+      REAL(wp), DIMENSION(:,:,:), INTENT(in) ::   phi_max, phs_max, phip_max   ! max ice thick from surrounding 9-pts
       !
       INTEGER  ::   ji, jj, jl         ! dummy loop indices
-      REAL(wp) ::   zhi, zhs, zvs_excess, zfra
+      REAL(wp) ::   zhip, zhi, zhs, zvs_excess, zfra
       !!-------------------------------------------------------------------
       !
       CALL ice_var_zapsmall                       !-- zap small areas
@@ -215,12 +219,18 @@ CONTAINS
             DO ji = 1, jpi
                IF ( v_i(ji,jj,jl) > 0._wp ) THEN
                   !
+                  !                               ! -- check h_ip -- !
+                  ! if h_ip is larger than the surrounding 9 pts => reduce h_ip and increase a_ip
+                  IF( ln_pnd_H12 .AND. v_ip(ji,jj,jl) > 0._wp ) THEN
+                     zhip = v_ip(ji,jj,jl) / MAX( epsi20, a_ip(ji,jj,jl) )
+                     IF( zhip > phip_max(ji,jj,jl) .AND. a_ip(ji,jj,jl) < 0.15 ) THEN
+                        a_ip(ji,jj,jl) = v_ip(ji,jj,jl) / phip_max(ji,jj,jl)
+                     ENDIF
+                  ENDIF
+                  !
                   !                               ! -- check h_i -- !
                   ! if h_i is larger than the surrounding 9 pts => reduce h_i and increase a_i
                   zhi = v_i(ji,jj,jl) / a_i(ji,jj,jl)
-!!clem                  zdv = v_i(ji,jj,jl) - v_i_b(ji,jj,jl)  
-!!clem                  IF ( ( zdv >  0.0 .AND. zh > phmax(ji,jj,jl) .AND. at_i_b(ji,jj) < 0.80 ) .OR. &
-!!clem                     & ( zdv <= 0.0 .AND. zh > phmax(ji,jj,jl) ) ) THEN
                   IF( zhi > phi_max(ji,jj,jl) .AND. a_i(ji,jj,jl) < 0.15 ) THEN
                      a_i(ji,jj,jl) = v_i(ji,jj,jl) / MIN( phi_max(ji,jj,jl), hi_max(jpl) )   !-- bound h_i to hi_max (99 m)
                   ENDIF
@@ -232,24 +242,24 @@ CONTAINS
                      zfra = a_i(ji,jj,jl) * phs_max(ji,jj,jl) / MAX( v_s(ji,jj,jl), epsi20 )
                      !
                      wfx_res(ji,jj) = wfx_res(ji,jj) + ( v_s(ji,jj,jl) - a_i(ji,jj,jl) * phs_max(ji,jj,jl) ) * rhos * r1_rdtice
-                     hfx_res(ji,jj) = hfx_res(ji,jj) - e_s(ji,jj,1,jl) * ( 1._wp - zfra ) * r1_rdtice ! W.m-2 <0
+                     hfx_res(ji,jj) = hfx_res(ji,jj) - SUM( e_s(ji,jj,1:nlay_s,jl) ) * ( 1._wp - zfra ) * r1_rdtice ! W.m-2 <0
                      !
-                     e_s(ji,jj,1,jl) = e_s(ji,jj,1,jl) * zfra
-                     v_s(ji,jj,jl)   = a_i(ji,jj,jl) * phs_max(ji,jj,jl)
+                     e_s(ji,jj,1:nlay_s,jl) = e_s(ji,jj,1:nlay_s,jl) * zfra
+                     v_s(ji,jj,jl)          = a_i(ji,jj,jl) * phs_max(ji,jj,jl)
                   ENDIF           
                   !
                   !                               ! -- check snow load -- !
                   ! if snow load makes snow-ice interface to deplet below the ocean surface => put the snow excess in the ocean
                   !    this correction is crucial because of the call to routine icecor afterwards which imposes a mini of ice thick. (rn_himin)
-                  !    this imposed mini can artificially make the snow thickness very high (if concentration decreases drastically)
+                  !    this imposed mini can artificially make the snow very thick (if concentration decreases drastically)
                   zvs_excess = MAX( 0._wp, v_s(ji,jj,jl) - v_i(ji,jj,jl) * (rau0-rhoi) * r1_rhos )
                   IF( zvs_excess > 0._wp ) THEN
                      zfra = zvs_excess / MAX( v_s(ji,jj,jl), epsi20 )
                      wfx_res(ji,jj) = wfx_res(ji,jj) + zvs_excess * rhos * r1_rdtice
-                     hfx_res(ji,jj) = hfx_res(ji,jj) - e_s(ji,jj,1,jl) * ( 1._wp - zfra ) * r1_rdtice ! W.m-2 <0
+                     hfx_res(ji,jj) = hfx_res(ji,jj) - SUM( e_s(ji,jj,1:nlay_s,jl) ) * ( 1._wp - zfra ) * r1_rdtice ! W.m-2 <0
                      !
-                     e_s(ji,jj,1,jl) = e_s(ji,jj,1,jl) * zfra
-                     v_s(ji,jj,jl)   = v_s(ji,jj,jl) - zvs_excess
+                     e_s(ji,jj,1:nlay_s,jl) = e_s(ji,jj,1:nlay_s,jl) * zfra
+                     v_s(ji,jj,jl)          = v_s(ji,jj,jl) - zvs_excess
                   ENDIF
                   
                ENDIF

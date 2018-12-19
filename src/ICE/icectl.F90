@@ -189,9 +189,7 @@ CONTAINS
       zsfx  = glob_sum( ( sfx + diag_sice ) * e1e2t ) * zconv * rday
 
       ! heat flux
-      zhfx  = glob_sum( ( qt_atm_oi - qt_oce_ai - diag_heat - diag_trp_ei - diag_trp_es   &
-      !  &              - SUM( qevap_ice * a_i_b, dim=3 )                           & !!clem: I think this line must be commented (but need check)
-         &              ) * e1e2t ) * zconv
+      zhfx  = glob_sum( ( qt_atm_oi - qt_oce_ai - diag_heat ) * e1e2t ) * zconv
 
       ! set threshold values and calculate the ice area (+epsi10 to set a threshold > 0 when there is no ice) 
       zarea   = glob_sum( SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2

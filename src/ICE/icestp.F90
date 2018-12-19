@@ -193,15 +193,8 @@ CONTAINS
                                         CALL ice_var_glo2eqv          ! necessary calls (at least for coupling)
                                         CALL ice_var_agg( 2 )         ! necessary calls (at least for coupling)
          !
-!! clem: one should switch the calculation of the fluxes onto the parent grid but the following calls do not work
-!!       moreover it should only be called at the update frequency (as in agrif_ice_update.F90)
-!# if defined key_agrif
-!         IF( .NOT. Agrif_Root() )     CALL Agrif_ChildGrid_To_ParentGrid()
-!# endif
                                         CALL ice_update_flx( kt )     ! -- Update ocean surface mass, heat and salt fluxes
-!# if defined key_agrif
-!         IF( .NOT. Agrif_Root() )     CALL Agrif_ParentGrid_To_ChildGrid()
-!# endif
+         !
          IF( ln_icediahsb )             CALL ice_dia( kt )            ! -- Diagnostics outputs 
          !
                                         CALL ice_wri( kt )            ! -- Ice outputs 
@@ -367,11 +360,17 @@ CONTAINS
       e_s_b (:,:,:,:) = e_s (:,:,:,:)   ! snow thermal energy
       e_i_b (:,:,:,:) = e_i (:,:,:,:)   ! ice thermal energy
       WHERE( a_i_b(:,:,:) >= epsi20 )
-         h_i_b(:,:,:) = v_i_b (:,:,:) / a_i_b(:,:,:)   ! ice thickness
-         h_s_b(:,:,:) = v_s_b (:,:,:) / a_i_b(:,:,:)   ! snw thickness
+         h_i_b(:,:,:) = v_i_b(:,:,:) / a_i_b(:,:,:)   ! ice thickness
+         h_s_b(:,:,:) = v_s_b(:,:,:) / a_i_b(:,:,:)   ! snw thickness
       ELSEWHERE
          h_i_b(:,:,:) = 0._wp
          h_s_b(:,:,:) = 0._wp
+      END WHERE
+      
+      WHERE( a_ip(:,:,:) >= epsi20 )
+         h_ip_b(:,:,:) = v_ip(:,:,:) / a_ip(:,:,:)   ! ice pond thickness
+      ELSEWHERE
+         h_ip_b(:,:,:) = 0._wp
       END WHERE
       !
       ! ice velocities & total concentration
