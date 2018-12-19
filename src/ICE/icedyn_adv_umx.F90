@@ -34,10 +34,8 @@ MODULE icedyn_adv_umx
    REAL(wp) ::   z1_6   = 1._wp /   6._wp   ! =1/6
    REAL(wp) ::   z1_120 = 1._wp / 120._wp   ! =1/120
 
-   REAL(wp), DIMENSION(:,:), ALLOCATABLE :: z1_ai, amaxu, amaxv
+   REAL(wp), DIMENSION(:,:), ALLOCATABLE :: amaxu, amaxv
    
-   LOGICAL ll_dens
-
    ! advect H all the way (and get V=H*A at the end)
    LOGICAL :: ll_thickness = .FALSE.
    
@@ -123,7 +121,7 @@ CONTAINS
       REAL(wp) ::   zcfl , zdt
       REAL(wp), DIMENSION(jpi,jpj) ::   zudy, zvdx, zcu_box, zcv_box, zua_ho, zva_ho
       REAL(wp), DIMENSION(jpi,jpj) ::   zhvar
-      REAL(wp), DIMENSION(jpi,jpj) ::   zai_b, zai_a, z1_ai_b
+      REAL(wp), DIMENSION(jpi,jpj) ::   zati1, zati2, z1_ai, z1_aip
       !!----------------------------------------------------------------------
       !
       IF( kt == nit000 .AND. lwp )   WRITE(numout,*) '-- ice_dyn_adv_umx: Ultimate-Macho advection scheme'
@@ -159,7 +157,6 @@ CONTAINS
          END DO
       END DO
 
-      IF(.NOT. ALLOCATED(z1_ai))       ALLOCATE(z1_ai(jpi,jpj))
       IF( ll_zeroup2 ) THEN
          IF(.NOT. ALLOCATED(amaxu))       ALLOCATE(amaxu (jpi,jpj))
          IF(.NOT. ALLOCATED(amaxv))       ALLOCATE(amaxv (jpi,jpj))
@@ -170,17 +167,21 @@ CONTAINS
       DO jt = 1, icycle
 
          IF( ll_ADVopw ) THEN
-            ll_dens=.FALSE.
             zamsk = 1._wp
             CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zudy, zvdx, zcu_box, zcv_box, pato_i(:,:), pato_i(:,:) )   ! Open water area 
+            zamsk = 0._wp
          ELSE
-            zai_b(:,:) = SUM( pa_i(:,:,:), dim=3 )
+            zati1(:,:) = SUM( pa_i(:,:,:), dim=3 )
          ENDIF
          
          DO jl = 1, jpl
             !
-            WHERE( pa_i(:,:,jl) >= epsi20 )   ;   z1_ai_b(:,:) = 1._wp / pa_i(:,:,jl)
-            ELSEWHERE                         ;   z1_ai_b(:,:) = 0.
+            WHERE( pa_i(:,:,jl) >= epsi20 )   ;   z1_ai(:,:) = 1._wp / pa_i(:,:,jl)
+            ELSEWHERE                         ;   z1_ai(:,:) = 0.
+            END WHERE
+            !
+            WHERE( pa_ip(:,:,jl) >= epsi20 )  ;   z1_aip(:,:) = 1._wp / pa_ip(:,:,jl)
+            ELSEWHERE                         ;   z1_aip(:,:) = 0.
             END WHERE
             !
             IF( ll_zeroup2 ) THEN
@@ -196,76 +197,64 @@ CONTAINS
             ENDIF
             !
             zamsk = 1._wp
-            ll_dens=.TRUE.
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zudy, zvdx, zcu_box, zcv_box, pa_i(:,:,jl), pa_i(:,:,jl), zua_ho, zva_ho ) ! Ice area
-            ll_dens=.FALSE.
-
-            WHERE( pa_i(:,:,jl) >= epsi20 )   ;   z1_ai(:,:) = 1._wp / pa_i(:,:,jl)
-            ELSEWHERE                         ;   z1_ai(:,:) = 0.
-            END WHERE              
-
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zudy, zvdx, zcu_box, zcv_box, pa_i(:,:,jl), pa_i(:,:,jl), &        ! Ice area
+               &          zua_ho, zva_ho )
+            zamsk = 0._wp
+            !
             IF( ll_thickness ) THEN
                zua_ho(:,:) = zudy(:,:)
                zva_ho(:,:) = zvdx(:,:)
             ENDIF
-            
-            zamsk = 0._wp ; zhvar(:,:) = pv_i (:,:,jl) * z1_ai_b(:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), pv_i (:,:,jl) )              ! Ice volume
+            !
+            zhvar(:,:) = pv_i(:,:,jl) * z1_ai(:,:)
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), pv_i (:,:,jl) )    ! Ice volume
             IF( ll_thickness )   pv_i(:,:,jl) = zhvar(:,:) * pa_i(:,:,jl)
-            
-            zamsk = 0._wp ; zhvar(:,:) = pv_s (:,:,jl) * z1_ai_b(:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), pv_s (:,:,jl) )              ! Snw volume
+            !
+            zhvar(:,:) = pv_s(:,:,jl) * z1_ai(:,:)
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), pv_s (:,:,jl) )    ! Snw volume
             IF( ll_thickness )   pv_s(:,:,jl) = zhvar(:,:) * pa_i(:,:,jl)
-
-            zamsk = 0._wp ; zhvar(:,:) = psv_i(:,:,jl) * z1_ai_b(:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), psv_i(:,:,jl) )              ! Salt content
-
-            zamsk = 0._wp ; zhvar(:,:) = poa_i(:,:,jl) * z1_ai_b(:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), poa_i(:,:,jl) )              ! Age content
-
+            !
+            zhvar(:,:) = psv_i(:,:,jl) * z1_ai(:,:)
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), psv_i(:,:,jl) )    ! Salt content
+            !
+            zhvar(:,:) = poa_i(:,:,jl) * z1_ai(:,:)
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), poa_i(:,:,jl) )    ! Age content
+            !
             DO jk = 1, nlay_i
-               zamsk = 0._wp ; zhvar(:,:) = pe_i(:,:,jk,jl) * z1_ai_b(:,:)
-               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar(:,:), pe_i(:,:,jk,jl) )           ! Ice heat content
-            END DO
-
-            DO jk = 1, nlay_s
-               zamsk = 0._wp ; zhvar(:,:) = pe_s(:,:,jk,jl) * z1_ai_b(:,:)
-               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar(:,:), pe_s(:,:,jk,jl) )           ! Snw heat content
+               zhvar(:,:) = pe_i(:,:,jk,jl) * z1_ai(:,:)
+               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar(:,:), pe_i(:,:,jk,jl) ) ! Ice heat content
             END DO
             !
-            IF ( ln_pnd_H12 ) THEN   ! melt ponds (must be the last ones to be advected because of z1_ai_b...)
-               !
-               WHERE( pa_ip(:,:,jl) >= epsi20 )   ;   z1_ai_b(:,:) = 1._wp / pa_ip(:,:,jl)
-               ELSEWHERE                          ;   z1_ai_b(:,:) = 0.
-               END WHERE
+            DO jk = 1, nlay_s
+               zhvar(:,:) = pe_s(:,:,jk,jl) * z1_ai(:,:)
+               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar(:,:), pe_s(:,:,jk,jl) ) ! Snw heat content
+            END DO
+            !
+            IF ( ln_pnd_H12 ) THEN
                !
                zamsk = 1._wp
-               ll_dens=.TRUE.
-               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zudy, zvdx, zcu_box, zcv_box, pa_ip(:,:,jl), pa_ip(:,:,jl), zua_ho, zva_ho ) ! mp fractio!n
-               ll_dens=.FALSE.
+               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zudy, zvdx, zcu_box, zcv_box, pa_ip(:,:,jl), pa_ip(:,:,jl), &   ! mp fraction
+                  &          zua_ho, zva_ho )
+               zamsk = 0._wp
 
-               WHERE( pa_ip(:,:,jl) >= epsi20 )   ;   z1_ai(:,:) = 1._wp / pa_ip(:,:,jl)
-               ELSEWHERE                          ;   z1_ai(:,:) = 0.
-               END WHERE              
-
-               zamsk = 0._wp ; zhvar(:,:) = pv_ip(:,:,jl) * z1_ai_b(:,:)
-               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), pv_ip(:,:,jl) )              ! mp volume
+               zhvar(:,:) = pv_ip(:,:,jl) * z1_ai(:,:)
+               CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho , zva_ho , zcu_box, zcv_box, zhvar(:,:), pv_ip(:,:,jl) ) ! mp volume
             ENDIF
             !
             !
          END DO
-
+         !
          IF( .NOT. ll_ADVopw ) THEN
-            zai_a(:,:) = SUM( pa_i(:,:,:), dim=3 )
+            zati2(:,:) = SUM( pa_i(:,:,:), dim=3 )
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
-                  pato_i(ji,jj) = pato_i(ji,jj) - ( zai_a(ji,jj) - zai_b(ji,jj) ) &
-                     &                          - ( zudy(ji,jj) - zudy(ji-1,jj) + zvdx(ji,jj) - zvdx(ji,jj-1) ) * r1_e1e2t(ji,jj) * zdt
+                  pato_i(ji,jj) = pato_i(ji,jj) - ( zati2(ji,jj) - zati1(ji,jj) ) &                                                  ! Open water area
+                     &                          - ( zudy(ji,jj) - zudy(ji-1,jj) + zvdx(ji,jj) - zvdx(ji,jj-1) )*r1_e1e2t(ji,jj)*zdt
                END DO
             END DO
             CALL lbc_lnk( pato_i(:,:), 'T',  1. )
          ENDIF
-         
+         !
       END DO
       !
    END SUBROUTINE ice_dyn_adv_umx
@@ -305,7 +294,6 @@ CONTAINS
       !
       !  upstream (_ups) advection with initial mass fluxes
       ! ---------------------------------------------------
-      IF( ll_clem )    zfu_ups=0.; zfv_ups=0.
 
       IF( ll_gurvan .AND. pamsk==0. ) THEN
          DO jj = 2, jpjm1
@@ -320,7 +308,7 @@ CONTAINS
       
       IF( .NOT. ll_upsxy ) THEN
 
-         ! fluxes
+         ! fluxes in both x-y directions
          DO jj = 1, jpjm1
             DO ji = 1, fs_jpim1
                IF( ll_clem ) THEN
@@ -334,9 +322,6 @@ CONTAINS
          END DO
 
       ELSE
-         ! 1 if advection of A
-         ! z1_ai already defined IF advection of other tracers
-         IF( pamsk == 1. )   z1_ai(:,:) = 1._wp
          !
          IF( MOD( (kt - 1) / nn_fsbc , 2 ) ==  MOD( (jt - 1) , 2 ) ) THEN   !==  odd ice time step:  adv_x then adv_y  ==!
             ! flux in x-direction
@@ -358,8 +343,8 @@ CONTAINS
                         zpt(ji,jj) = ( pt(ji,jj) - ( zfu_ups(ji,jj) - zfu_ups(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                      ELSE
                         zpt(ji,jj) = ( pt(ji,jj) - ( zfu_ups(ji,jj) - zfu_ups(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)  &
-                           &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) &
-                           &         * tmask(ji,jj,1)
+                           &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                           &         ) * tmask(ji,jj,1)
                      ENDIF
                   ELSE
                      zpt(ji,jj) = ( ptc(ji,jj) - ( zfu_ups(ji,jj) - zfu_ups(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) ) &
@@ -456,8 +441,9 @@ CONTAINS
                IF( ll_gurvan ) THEN
                   zt_ups(ji,jj) = ( pt (ji,jj) + pdt * ztra ) * tmask(ji,jj,1)
                ELSE
-                  zt_ups(ji,jj) = ( pt (ji,jj) + pdt * ztra + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
-                     &                                      + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                  zt_ups(ji,jj) = ( pt (ji,jj) + pdt * ztra + ( pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) )   &
+                     &                                      +   pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) ) &
+                     &                                        * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
                ENDIF
             ELSE
                zt_ups(ji,jj) = ( ptc(ji,jj) + pdt * ztra ) * tmask(ji,jj,1)
@@ -516,7 +502,7 @@ CONTAINS
    
       ! Rachid trick
       ! ------------
-     IF( ll_clem ) THEN
+      IF( ll_clem ) THEN
          IF( pamsk == 0. ) THEN
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
@@ -556,18 +542,15 @@ CONTAINS
          CALL lbc_lnk_multi( zfu_ho, 'U',  -1., zfv_ho, 'V',  -1. )
       ENDIF
 
-      ! output upstream trend of concentration and high order fluxes
-      ! ------------------------------------------------------------
-      IF( ll_dens ) THEN
-         ! high order u*a
+      ! output high order fluxes u*a
+      ! ----------------------------
+      IF( PRESENT( pua_ho ) ) THEN
          DO jj = 1, jpjm1
             DO ji = 1, fs_jpim1
-               pua_ho (ji,jj) = zfu_ho (ji,jj)
-               pva_ho (ji,jj) = zfv_ho (ji,jj)
+               pua_ho(ji,jj) = zfu_ho(ji,jj)
+               pva_ho(ji,jj) = zfv_ho(ji,jj)
             END DO
          END DO
-         !!CALL lbc_lnk( pua_ho, 'U',  -1. ) ! clem: not needed I think
-         !!CALL lbc_lnk( pva_ho, 'V',  -1. )
       ENDIF
 
 
@@ -576,17 +559,7 @@ CONTAINS
          ! ------------------------------------
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1 
-               ztra = - ( zfu_ho(ji,jj) - zfu_ho(ji-1,jj) + zfv_ho(ji,jj) - zfv_ho(ji,jj-1) )  &  !        Div(uaH) or        Div(ua)
-                  &     * r1_e1e2t(ji,jj) * pdt  
-
-               !!IF( ptc(ji,jj)+ztra < 0._wp ) THEN
-               !!   ztra = - ( zfu_ups(ji,jj) - zfu_ups(ji-1,jj) + zfv_ups(ji,jj) - zfv_ups(ji,jj-1) )  &  !        Div(uaH) or        Div(ua)
-               !!      &     * r1_e1e2t(ji,jj) * pdt                 
-               !!ENDIF
-               !!IF( ptc(ji,jj)+ztra < 0._wp ) THEN
-               !!   WRITE(numout,*) 'Tc<0 ',ptc(ji,jj)+ztra
-               !!   ztra = 0._wp
-               !!ENDIF
+               ztra = - ( zfu_ho(ji,jj) - zfu_ho(ji-1,jj) + zfv_ho(ji,jj) - zfv_ho(ji,jj-1) ) * r1_e1e2t(ji,jj) * pdt  
 
                ptc(ji,jj) = ( ptc(ji,jj) + ztra ) * tmask(ji,jj,1)
                              
@@ -636,8 +609,13 @@ CONTAINS
          !
          DO jj = 1, jpjm1
             DO ji = 1, fs_jpim1
-               pfu_ho(ji,jj) = 0.5 * puc(ji,jj) * ( pt(ji,jj) + pt(ji+1,jj) )
-               pfv_ho(ji,jj) = 0.5 * pvc(ji,jj) * ( pt(ji,jj) + pt(ji,jj+1) )
+               IF( ll_clem ) THEN
+                  pfu_ho(ji,jj) = 0.5 * pu(ji,jj) * ( pt(ji,jj) + pt(ji+1,jj) )
+                  pfv_ho(ji,jj) = 0.5 * pv(ji,jj) * ( pt(ji,jj) + pt(ji,jj+1) )
+               ELSE
+                  pfu_ho(ji,jj) = 0.5 * puc(ji,jj) * ( pt(ji,jj) + pt(ji+1,jj) )
+                  pfv_ho(ji,jj) = 0.5 * pvc(ji,jj) * ( pt(ji,jj) + pt(ji,jj+1) )
+               ENDIF
             END DO
          END DO
          IF    ( kn_limiter == 1 ) THEN
@@ -656,14 +634,16 @@ CONTAINS
          !
       ELSE                    !-- alternate directions --!
          !
-         IF( pamsk == 1. )   z1_ai(:,:) = 1._wp
-         !
          IF( MOD( (kt - 1) / nn_fsbc , 2 ) ==  MOD( (jt - 1) , 2 ) ) THEN   !==  odd ice time step:  adv_x then adv_y  ==!
             !
             ! flux in x-direction
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
-                  pfu_ho(ji,jj) = 0.5 * puc(ji,jj) * ( pt(ji,jj) + pt(ji+1,jj) )
+                  IF( ll_clem ) THEN
+                     pfu_ho(ji,jj) = 0.5 * pu(ji,jj) * ( pt(ji,jj) + pt(ji+1,jj) )
+                  ELSE
+                     pfu_ho(ji,jj) = 0.5 * puc(ji,jj) * ( pt(ji,jj) + pt(ji+1,jj) )
+                  ENDIF
                END DO
             END DO
             IF( kn_limiter == 2 )   CALL limiter_x( pdt, pu, puc, pt, pfu_ho )
@@ -673,9 +653,11 @@ CONTAINS
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1   ! vector opt.
                   IF( ll_clem ) THEN
-                     zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) * z1_ai(ji,jj) ) * tmask(ji,jj,1)
+                     zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)        &
+                           &                  + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) &
+                           &         * tmask(ji,jj,1)
                   ELSE                     
-                     zzt(ji,jj) = ( ptc(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1) * z1_ai(ji,jj)
+                     zzt(ji,jj) = ( ptc(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                   ENDIF
                END DO
             END DO
@@ -684,7 +666,11 @@ CONTAINS
             ! flux in y-direction
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
-                  pfv_ho(ji,jj) = 0.5 * pvc(ji,jj) * ( zzt(ji,jj) + zzt(ji,jj+1) )
+                  IF( ll_clem ) THEN
+                     pfv_ho(ji,jj) = 0.5 * pv(ji,jj) * ( zzt(ji,jj) + zzt(ji,jj+1) )
+                  ELSE                     
+                     pfv_ho(ji,jj) = 0.5 * pvc(ji,jj) * ( zzt(ji,jj) + zzt(ji,jj+1) )
+                  ENDIF
                END DO
             END DO
             IF( kn_limiter == 2 )   CALL limiter_y( pdt, pv, pvc, pt, pfv_ho )
@@ -695,7 +681,11 @@ CONTAINS
             ! flux in y-direction
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
-                  pfv_ho(ji,jj) = 0.5 * pvc(ji,jj) * ( pt(ji,jj) + pt(ji,jj+1) )
+                  IF( ll_clem ) THEN
+                     pfv_ho(ji,jj) = 0.5 * pv(ji,jj) * ( pt(ji,jj) + pt(ji,jj+1) )
+                  ELSE                     
+                     pfv_ho(ji,jj) = 0.5 * pvc(ji,jj) * ( pt(ji,jj) + pt(ji,jj+1) )
+                  ENDIF
                END DO
             END DO
             IF( kn_limiter == 2 )   CALL limiter_y( pdt, pv, pvc, pt, pfv_ho )
@@ -705,9 +695,11 @@ CONTAINS
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1   ! vector opt.
                   IF( ll_clem ) THEN
-                     zzt(ji,jj) = ( pt(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) * z1_ai(ji,jj) ) * tmask(ji,jj,1)
+                     zzt(ji,jj) = ( pt(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) &
+                        &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) &
+                        &         * tmask(ji,jj,1)
                   ELSE
-                     zzt(ji,jj) = ( ptc(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1) * z1_ai(ji,jj)
+                     zzt(ji,jj) = ( ptc(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                   ENDIF
                END DO
             END DO
@@ -716,7 +708,11 @@ CONTAINS
             ! flux in x-direction
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
-                  pfu_ho(ji,jj) = 0.5 * puc(ji,jj) * ( zzt(ji,jj) + zzt(ji+1,jj) )
+                  IF( ll_clem ) THEN
+                     pfu_ho(ji,jj) = 0.5 * pu(ji,jj) * ( zzt(ji,jj) + zzt(ji+1,jj) )
+                  ELSE
+                     pfu_ho(ji,jj) = 0.5 * puc(ji,jj) * ( zzt(ji,jj) + zzt(ji+1,jj) )
+                  ENDIF
                END DO
             END DO
             IF( kn_limiter == 2 )   CALL limiter_x( pdt, pu, puc, pt, pfu_ho )
@@ -786,7 +782,8 @@ CONTAINS
                         zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                      ELSE
                         zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)  &
-                           &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                           &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                           &         ) * tmask(ji,jj,1)
                      ENDIF
                   ELSE
                      zzt(ji,jj) = ( ptc(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
@@ -841,7 +838,8 @@ CONTAINS
                         zzt(ji,jj) = ( pt(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                      ELSE
                         zzt(ji,jj) = ( pt(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) &
-                           &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                           &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                           &         ) * tmask(ji,jj,1)
                      ENDIF
                   ELSE
                      zzt(ji,jj) = ( ptc(ji,jj) - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj) ) &
@@ -1258,7 +1256,8 @@ CONTAINS
                   zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)  &
                      &                     - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj)  &
                      &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
-                     &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                     &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                     &         ) * tmask(ji,jj,1)
                ENDIF
                IF( zzt(ji,jj) < 0._wp ) THEN
                   pfu_ho(ji,jj)   = pfu_low(ji,jj)
@@ -1279,7 +1278,8 @@ CONTAINS
                   zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)  &
                      &                     - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj)  &
                      &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
-                     &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                     &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                     &         ) * tmask(ji,jj,1)
                ENDIF
                IF( zzt(ji,jj) < 0._wp ) THEN
                   pfu_ho(ji-1,jj) = pfu_low(ji-1,jj)
@@ -1293,7 +1293,8 @@ CONTAINS
                   zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)  &
                      &                     - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj)  &
                      &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
-                     &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                     &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                     &         ) * tmask(ji,jj,1)
                ENDIF
                IF( zzt(ji,jj) < 0._wp ) THEN
                   WRITE(numout,*) '*** 3 negative high order zzt ***',ji,jj,zzt(ji,jj)
@@ -1331,8 +1332,7 @@ CONTAINS
          END DO
          CALL lbc_lnk_multi( zti_low, 'T', 1., ztj_low, 'T', 1. )
 
-
-         !! this does not work
+         !! this does not work ??
          !!            DO jj = 2, jpjm1
          !!               DO ji = fs_2, fs_jpim1
          !!                  IF( SIGN( 1., pfu_ho(ji,jj) ) /= SIGN( 1., pt_low (ji+1,jj  ) - pt_low (ji  ,jj) ) .AND.     &
@@ -1439,16 +1439,15 @@ CONTAINS
                & + MAX( 0., pfv_ho(ji,jj  ) ) - MIN( 0., pfv_ho(ji,jj-1) )
             !
             IF( ll_HgradU .AND. .NOT.ll_gurvan ) THEN
-               zneg2 = (   pt(ji,jj) * MAX( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj) * MAX( 0., pv(ji,jj) - pv(ji,jj-1) ) ) * ( 1. - pamsk )
-               zpos2 = ( - pt(ji,jj) * MIN( 0., pu(ji,jj) - pu(ji-1,jj) ) - pt(ji,jj) * MIN( 0., pv(ji,jj) - pv(ji,jj-1) ) ) * ( 1. - pamsk )
+               zneg2 = (   pt(ji,jj) * MAX( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj) * MAX( 0., pv(ji,jj) - pv(ji,jj-1) ) &
+                  &    ) * ( 1. - pamsk )
+               zpos2 = ( - pt(ji,jj) * MIN( 0., pu(ji,jj) - pu(ji-1,jj) ) - pt(ji,jj) * MIN( 0., pv(ji,jj) - pv(ji,jj-1) ) &
+                  &    ) * ( 1. - pamsk )
             ELSE
                zneg2 = 0. ; zpos2 = 0.
             ENDIF
             !
             !                                  ! up & down beta terms
-!            zbetup(ji,jj) = ( zup - pt_low(ji,jj) ) / ( zpos + zsml ) * e1e2t(ji,jj) * z1_dt
-!            zbetdo(ji,jj) = ( pt_low(ji,jj) - zdo ) / ( zneg + zsml ) * e1e2t(ji,jj) * z1_dt
-
             IF( (zpos+zpos2) > 0. ) THEN ; zbetup(ji,jj) = MAX( 0._wp, zup - pt_low(ji,jj) ) / (zpos+zpos2) * e1e2t(ji,jj) * z1_dt
             ELSE                         ; zbetup(ji,jj) = 0. ! zbig
             ENDIF
@@ -1543,7 +1542,8 @@ CONTAINS
                zzt(ji,jj) = ( pt(ji,jj) - ( pfu_ho(ji,jj) - pfu_ho(ji-1,jj) ) * pdt * r1_e1e2t(ji,jj)  &
                   &                     - ( pfv_ho(ji,jj) - pfv_ho(ji,jj-1) ) * pdt * r1_e1e2t(ji,jj)  &
                   &                     + pt(ji,jj) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
-                  &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
+                  &                     + pt(ji,jj) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
+                  &         ) * tmask(ji,jj,1)
             ENDIF
             IF( zzt(ji,jj) < -epsi20 ) THEN
                WRITE(numout,*) 'T<0 nonosc',zzt(ji,jj)
