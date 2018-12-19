@@ -1132,7 +1132,7 @@ CONTAINS
             bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
          END DO
       END DO
-      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
+      CALL lbc_lnk_multi( 'bdyini', bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
 
       ! bdy masks are now set to zero on boundary points:
       !
@@ -1168,8 +1168,8 @@ CONTAINS
       END DO
 
       ! Lateral boundary conditions
-      CALL lbc_lnk( zfmask, 'F', 1. ) 
-      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1., bdytmask, 'T', 1. )
+      CALL lbc_lnk( 'bdyini', zfmask, 'F', 1. ) 
+      CALL lbc_lnk_multi( 'bdyini', bdyumask, 'U', 1. , bdyvmask, 'V', 1., bdytmask, 'T', 1. )
       DO ib_bdy = 1, nb_bdy       ! Indices and directions of rim velocity components
 
          idx_bdy(ib_bdy)%flagu(:,:) = 0._wp
@@ -1279,7 +1279,7 @@ CONTAINS
             END DO
          END DO
          !
-         IF( lk_mpp )   CALL mpp_sum( bdysurftot )      ! sum over the global domain
+         CALL mpp_sum( 'bdyini', bdysurftot )      ! sum over the global domain
       END IF   
       !
       ! Tidy up
@@ -1519,7 +1519,7 @@ CONTAINS
                &  ((jj + njmpp - 1) == jpjwft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF (ztestmask(1)==1) THEN 
             IF (icornw(ib,1)==0) THEN
@@ -1563,7 +1563,7 @@ CONTAINS
                &  ((jj + njmpp - 1) == jpjeft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF (ztestmask(1)==1) THEN
             IF (icorne(ib,1)==0) THEN
@@ -1607,7 +1607,7 @@ CONTAINS
                &  ((ji + nimpp - 1) == jpisft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF ((ztestmask(1)==1).AND.(icorns(ib,1)==0)) THEN
             IF(lwp) WRITE(numout,*)
@@ -1637,7 +1637,7 @@ CONTAINS
                &  ((ji + nimpp - 1) == jpinft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF ((ztestmask(1)==1).AND.(icornn(ib,1)==0)) THEN
             IF(lwp) WRITE(numout,*)

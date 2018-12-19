@@ -11,7 +11,6 @@ MODULE bdy_oce
    !!            4.0  !  2018     (C. Rousset) SI3 compatibility
    !!----------------------------------------------------------------------
    USE par_oce         ! ocean parameters
-   USE lib_mpp         ! distributed memory computing
 
    IMPLICIT NONE
    PUBLIC
@@ -147,7 +146,7 @@ CONTAINS
 
    FUNCTION bdy_oce_alloc()
       !!----------------------------------------------------------------------
-      USE lib_mpp, ONLY: ctl_warn, mpp_sum
+      USE lib_mpp, ONLY: ctl_stop, mpp_sum
       !
       INTEGER :: bdy_oce_alloc
       !!----------------------------------------------------------------------
@@ -160,8 +159,8 @@ CONTAINS
       bdyumask(:,:) = 1._wp
       bdyvmask(:,:) = 1._wp
       ! 
-      IF( lk_mpp             )   CALL mpp_sum ( bdy_oce_alloc )
-      IF( bdy_oce_alloc /= 0 )   CALL ctl_warn('bdy_oce_alloc: failed to allocate arrays.')
+      CALL mpp_sum ( 'bdy_oce', bdy_oce_alloc )
+      IF( bdy_oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'bdy_oce_alloc: failed to allocate arrays.' )
       !
    END FUNCTION bdy_oce_alloc
 

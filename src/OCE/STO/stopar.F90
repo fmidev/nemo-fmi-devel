@@ -171,7 +171,7 @@ CONTAINS
           CALL sto_par_white( sto2d(:,:,jsto) )
           ! Apply horizontal Laplacian filter to w
           DO jflt = 1, sto2d_flt(jsto)
-            CALL lbc_lnk( sto2d(:,:,jsto), sto2d_typ(jsto), sto2d_sgn(jsto) )
+            CALL lbc_lnk( 'stopar', sto2d(:,:,jsto), sto2d_typ(jsto), sto2d_sgn(jsto) )
             CALL sto_par_flt( sto2d(:,:,jsto) )
           END DO
           ! Factor to restore standard deviation after filtering
@@ -194,7 +194,7 @@ CONTAINS
         sto2d(:,:,jsto) = sto2d(:,:,jsto) + sto2d_ave(jsto)
 
         ! Lateral boundary conditions on sto2d
-        CALL lbc_lnk( sto2d(:,:,jsto), sto2d_typ(jsto), sto2d_sgn(jsto) )
+        CALL lbc_lnk( 'stopar', sto2d(:,:,jsto), sto2d_typ(jsto), sto2d_sgn(jsto) )
       END DO
       !
       ! Update 3D stochastic arrays
@@ -209,7 +209,7 @@ CONTAINS
              CALL sto_par_white( sto3d(:,:,jk,jsto) )
              ! Apply horizontal Laplacian filter to w
              DO jflt = 1, sto3d_flt(jsto)
-               CALL lbc_lnk( sto3d(:,:,jk,jsto), sto3d_typ(jsto), sto3d_sgn(jsto) )
+               CALL lbc_lnk( 'stopar', sto3d(:,:,jk,jsto), sto3d_typ(jsto), sto3d_sgn(jsto) )
                CALL sto_par_flt( sto3d(:,:,jk,jsto) )
              END DO
              ! Factor to restore standard deviation after filtering
@@ -232,7 +232,7 @@ CONTAINS
            sto3d(:,:,jk,jsto) = sto3d(:,:,jk,jsto) + sto3d_ave(jsto)
          END DO
          ! Lateral boundary conditions on sto3d
-         CALL lbc_lnk( sto3d(:,:,:,jsto), sto3d_typ(jsto), sto3d_sgn(jsto) )
+         CALL lbc_lnk( 'stopar', sto3d(:,:,:,jsto), sto3d_typ(jsto), sto3d_sgn(jsto) )
       END DO
       !
    END SUBROUTINE sto_par
@@ -641,7 +641,7 @@ CONTAINS
          CALL sto_par_white( sto2d(:,:,jsto) )
          ! Apply horizontal Laplacian filter to w
          DO jflt = 1, sto2d_flt(jsto)
-            CALL lbc_lnk( sto2d(:,:,jsto), sto2d_typ(jsto), sto2d_sgn(jsto) )
+            CALL lbc_lnk( 'stopar', sto2d(:,:,jsto), sto2d_typ(jsto), sto2d_sgn(jsto) )
             CALL sto_par_flt( sto2d(:,:,jsto) )
          END DO
          ! Factor to restore standard deviation after filtering
@@ -658,7 +658,7 @@ CONTAINS
             CALL sto_par_white( sto3d(:,:,jk,jsto) )
             ! Apply horizontal Laplacian filter to w
             DO jflt = 1, sto3d_flt(jsto)
-               CALL lbc_lnk( sto3d(:,:,jk,jsto), sto3d_typ(jsto), sto3d_sgn(jsto) )
+               CALL lbc_lnk( 'stopar', sto3d(:,:,jk,jsto), sto3d_typ(jsto), sto3d_sgn(jsto) )
                CALL sto_par_flt( sto3d(:,:,jk,jsto) )
             END DO
             ! Factor to restore standard deviation after filtering
@@ -700,7 +700,7 @@ CONTAINS
          ENDIF
 
          ! Open the restart file
-         CALL iom_open( cn_storst_in, numstor, kiolib = jprstlib )
+         CALL iom_open( cn_storst_in, numstor )
 
          ! Get stochastic parameters from restart file:
          ! 2D stochastic parameters
@@ -805,7 +805,7 @@ CONTAINS
                ENDIF
             ENDIF
             ! open the restart file
-            CALL iom_open( clname, numstow, ldwrt = .TRUE., kiolib = jprstlib )
+            CALL iom_open( clname, numstow, ldwrt = .TRUE. )
          ENDIF
          ENDIF
 

@@ -81,7 +81,7 @@ CONTAINS
       IF ( ln_hsb ) THEN
          cfile='correction'
          cfile = TRIM( cfile )
-         CALL iom_open  ( cfile, inum0, ldwrt = .TRUE., kiolib = jprstlib )
+         CALL iom_open  ( cfile, inum0, ldwrt = .TRUE. )
          CALL iom_rstput( 0, 0, inum0, 'vol_cor', hdiv_iscpl(:,:,:) )
          CALL iom_rstput( 0, 0, inum0, 'tem_cor', htsc_iscpl(:,:,:,jp_tem) )
          CALL iom_rstput( 0, 0, inum0, 'sal_cor', htsc_iscpl(:,:,:,jp_sal) )
@@ -174,7 +174,7 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk_multi( sshn, 'T', 1., zsmask1, 'T', 1. )
+         CALL lbc_lnk_multi( 'iscplrst', sshn, 'T', 1., zsmask1, 'T', 1. )
          zssh0   = sshn
          zsmask0 = zsmask1
       END DO
@@ -343,7 +343,7 @@ CONTAINS
               END DO
           END DO
           
-          CALL lbc_lnk_multi( tsn(:,:,:,jp_tem), 'T', 1., tsn(:,:,:,jp_sal), 'T', 1., ztmask1, 'T', 1.)
+          CALL lbc_lnk_multi( 'iscplrst', tsn(:,:,:,jp_tem), 'T', 1., tsn(:,:,:,jp_sal), 'T', 1., ztmask1, 'T', 1.)
 
           ! update
           zts0(:,:,:,:) = tsn(:,:,:,:)

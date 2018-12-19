@@ -31,6 +31,7 @@ MODULE stpctl
    PUBLIC stp_ctl           ! routine called by step.F90
 
    INTEGER  ::   idrun, idtime, idssh, idu, ids, istatus
+   LOGICAL  ::   lsomeoce
    !!----------------------------------------------------------------------
    !! NEMO/SAS 4.0 , NEMO Consortium (2018)
    !! $Id$
@@ -56,6 +57,7 @@ CONTAINS
       INTEGER, INTENT( inout ) ::   kindic   ! indicator of solver convergence
       !!
       REAL(wp), DIMENSION(3) ::   zmax
+      CHARACTER(len=20) :: clname
       !!----------------------------------------------------------------------
 
       IF( kt == nit000 .AND. lwp ) THEN
@@ -63,11 +65,12 @@ CONTAINS
          WRITE(numout,*) 'stp_ctl : time-stepping control'
          WRITE(numout,*) '~~~~~~~'
          !                                ! open time.step file
-         CALL ctl_opn( numstp, 'time.step', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
+         IF( lwm ) CALL ctl_opn( numstp, 'time.step', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
          !                                ! open run.stat file
-         CALL ctl_opn( numrun, 'run.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
-
-         IF( lwm ) THEN
+         IF( ln_ctl .AND. lwm ) THEN
+            CALL ctl_opn( numrun, 'run.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
+            clname = 'run.stat.nc'
+            IF( .NOT. Agrif_Root() )   clname = TRIM(Agrif_CFixed())//"_"//TRIM(clname)
             istatus = NF90_CREATE( 'run.stat.nc', NF90_CLOBBER, idrun )
             istatus = NF90_DEF_DIM( idrun, 'time'     , NF90_UNLIMITED, idtime )
             istatus = NF90_DEF_VAR( idrun, 'vt_i_max' , NF90_DOUBLE, (/ idtime /), idssh )
@@ -75,29 +78,23 @@ CONTAINS
             istatus = NF90_DEF_VAR( idrun, 'tm_i_min' , NF90_DOUBLE, (/ idtime /), ids )
             istatus = NF90_ENDDEF(idrun)
          ENDIF
-         
       ENDIF
+      IF( kt == nit000 )   lsomeoce = COUNT( ssmask(:,:) == 1._wp ) > 0
       !
-      IF(lwp) THEN                        !==  current time step  ==!   ("time.step" file)
+      IF(lwm) THEN                        !==  current time step  ==!   ("time.step" file)
          WRITE ( numstp, '(1x, i8)' )   kt
          REWIND( numstp )
       ENDIF
       !                                   !==  test of extrema  ==!
-      zmax(1) = MAXVAL(      vt_i (:,:) )                                           ! max ice thickness
-      zmax(2) = MAXVAL( ABS( u_ice(:,:) ) )                                         ! max ice velocity (zonal only)
-      zmax(3) = MAXVAL(     -tm_i (:,:)+273.15_wp , mask = ssmask(:,:) == 1._wp )   ! min ice temperature
-      !
-      IF( lk_mpp ) THEN
-         CALL mpp_max_multiple( zmax(:), 3 )    ! max over the global domain
-      ENDIF
-      !
-      IF( MOD( kt, nwrite ) == 1 .AND. lwp ) THEN
-         WRITE(numout,*) ' ==>> time-step= ', kt, ' vt_i max: ',  zmax(1), ' |u_ice| max: ', zmax(2), ' tm_i min: ', -zmax(3)
-      ENDIF
-
+      IF( ln_ctl ) THEN   ! must be done by all processes because of the mpp_max
+         zmax(1) = MAXVAL(      vt_i (:,:) )                                           ! max ice thickness
+         zmax(2) = MAXVAL( ABS( u_ice(:,:) ) )                                         ! max ice velocity (zonal only)
+         zmax(3) = MAXVAL(     -tm_i (:,:)+273.15_wp , mask = ssmask(:,:) == 1._wp )   ! min ice temperature
+         CALL mpp_max( "stpctl", zmax )                                   ! max over the global domain
+      END IF
       !                                            !==  run statistics  ==!   ("run.stat" file)
-      IF(lwp) WRITE(numrun,9400) kt, zmax(1), zmax(2), - zmax(3)
-      IF( lwm ) THEN
+      IF( ln_ctl .AND. lwm ) THEN
+         IF(lwp) WRITE(numrun,9500) kt, zmax(1), zmax(2), - zmax(3)
          istatus = NF90_PUT_VAR( idrun, idssh, (/ zmax(1)/), (/kt/), (/1/) )
          istatus = NF90_PUT_VAR( idrun,   idu, (/ zmax(2)/), (/kt/), (/1/) )
          istatus = NF90_PUT_VAR( idrun,   ids, (/-zmax(3)/), (/kt/), (/1/) )
@@ -105,7 +102,7 @@ CONTAINS
          IF( kt == nitend         ) istatus = NF90_CLOSE(idrun)
       END IF
       !
-9400  FORMAT(' it :', i8, '    vt_i_max: ', D23.16, ' |u|_max: ', D23.16,' tm_i_min: ', D23.16)
+9500  FORMAT(' it :', i8, '    vt_i_max: ', D23.16, ' |u|_max: ', D23.16,' tm_i_min: ', D23.16)
       !
    END SUBROUTINE stp_ctl
 

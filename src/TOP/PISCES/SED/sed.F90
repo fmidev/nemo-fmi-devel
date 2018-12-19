@@ -153,7 +153,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       !!                    *** ROUTINE sed_alloc ***
       !!-------------------------------------------------------------------
-      USE lib_mpp, ONLY: ctl_warn
+      USE lib_mpp, ONLY: ctl_stop
       !!-------------------------------------------------------------------
       !
       ALLOCATE( trc_data(jpi,jpj,jpdta)                                   ,   &
@@ -165,7 +165,7 @@ CONTAINS
          &      flxsedi2d(jpi,jpj,jpdia2dsed)                             ,   &
          &      mol_wgt(jpsol),                                           STAT=sed_alloc )
 
-      IF( sed_alloc /= 0 )   CALL ctl_warn('sed_alloc: failed to allocate arrays')
+      IF( sed_alloc /= 0 )   CALL ctl_stop( 'STOP', 'sed_alloc: failed to allocate arrays' )
       !
    END FUNCTION sed_alloc
 

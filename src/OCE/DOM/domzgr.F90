@@ -306,12 +306,12 @@ CONTAINS
          END DO
       END DO
       ! converte into REAL to use lbc_lnk ; impose a min value of 1 as a zero can be set in lbclnk 
-      zk(:,:) = REAL( miku(:,:), wp )   ;   CALL lbc_lnk( zk, 'U', 1. )   ;   miku(:,:) = MAX( NINT( zk(:,:) ), 1 )
-      zk(:,:) = REAL( mikv(:,:), wp )   ;   CALL lbc_lnk( zk, 'V', 1. )   ;   mikv(:,:) = MAX( NINT( zk(:,:) ), 1 )
-      zk(:,:) = REAL( mikf(:,:), wp )   ;   CALL lbc_lnk( zk, 'F', 1. )   ;   mikf(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( miku(:,:), wp )   ;   CALL lbc_lnk( 'domzgr', zk, 'U', 1. )   ;   miku(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mikv(:,:), wp )   ;   CALL lbc_lnk( 'domzgr', zk, 'V', 1. )   ;   mikv(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mikf(:,:), wp )   ;   CALL lbc_lnk( 'domzgr', zk, 'F', 1. )   ;   mikf(:,:) = MAX( NINT( zk(:,:) ), 1 )
       !
-      zk(:,:) = REAL( mbku(:,:), wp )   ;   CALL lbc_lnk( zk, 'U', 1. )   ;   mbku(:,:) = MAX( NINT( zk(:,:) ), 1 )
-      zk(:,:) = REAL( mbkv(:,:), wp )   ;   CALL lbc_lnk( zk, 'V', 1. )   ;   mbkv(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mbku(:,:), wp )   ;   CALL lbc_lnk( 'domzgr', zk, 'U', 1. )   ;   mbku(:,:) = MAX( NINT( zk(:,:) ), 1 )
+      zk(:,:) = REAL( mbkv(:,:), wp )   ;   CALL lbc_lnk( 'domzgr', zk, 'V', 1. )   ;   mbkv(:,:) = MAX( NINT( zk(:,:) ), 1 )
       !
    END SUBROUTINE zgr_top_bot
 

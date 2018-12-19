@@ -309,7 +309,7 @@ CONTAINS
          &      soa(4,jp_cfc)    ,  sob(3,jp_cfc)   ,  sca(5,jp_cfc)     ,    &
          &      STAT=trc_sms_cfc_alloc )
          !
-      IF( trc_sms_cfc_alloc /= 0 ) CALL ctl_warn('trc_sms_cfc_alloc : failed to allocate arrays.')
+      IF( trc_sms_cfc_alloc /= 0 ) CALL ctl_stop( 'STOP', 'trc_sms_cfc_alloc : failed to allocate arrays.' )
       !
    END FUNCTION trc_sms_cfc_alloc
 

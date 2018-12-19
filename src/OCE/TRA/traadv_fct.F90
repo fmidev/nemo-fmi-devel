@@ -168,7 +168,6 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( zwi, 'T', 1. )  ! Lateral boundary conditions on zwi  (unchanged sign)
          !                
          IF( l_trd .OR. l_hst )  THEN             ! trend diagnostics (contribution of upstream fluxes)
             ztrdx(:,:,:) = zwx(:,:,:)   ;   ztrdy(:,:,:) = zwy(:,:,:)   ;   ztrdz(:,:,:) = zwz(:,:,:)
@@ -207,7 +206,7 @@ CONTAINS
                   END DO
                END DO
             END DO
-            CALL lbc_lnk_multi( zltu, 'T', 1. , zltv, 'T', 1. )   ! Lateral boundary cond. (unchanged sgn)
+            CALL lbc_lnk_multi( 'traadv_fct', zltu, 'T', 1. , zltv, 'T', 1. )   ! Lateral boundary cond. (unchanged sgn)
             !
             DO jk = 1, jpkm1                 ! Horizontal advective fluxes
                DO jj = 1, jpjm1
@@ -232,7 +231,7 @@ CONTAINS
                   END DO
                END DO
             END DO
-            CALL lbc_lnk_multi( ztu, 'U', -1. , ztv, 'V', -1. )   ! Lateral boundary cond. (unchanged sgn)
+            CALL lbc_lnk_multi( 'traadv_fct', ztu, 'U', -1. , ztv, 'V', -1. )   ! Lateral boundary cond. (unchanged sgn)
             !
             DO jk = 1, jpkm1                 ! Horizontal advective fluxes
                DO jj = 2, jpjm1
@@ -278,7 +277,7 @@ CONTAINS
             zwz(:,:,1) = 0._wp   ! only ocean surface as interior zwz values have been w-masked
          ENDIF
          !
-         CALL lbc_lnk_multi( zwx, 'U', -1. , zwy, 'V', -1.,  zwz, 'W',  1. )
+         CALL lbc_lnk_multi( 'traadv_fct', zwi, 'T', 1., zwx, 'U', -1. , zwy, 'V', -1.,  zwz, 'W',  1. )
          !
          !        !==  monotonicity algorithm  ==!
          !
@@ -398,7 +397,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( zbetup, 'T', 1. , zbetdo, 'T', 1. )   ! lateral boundary cond. (unchanged sign)
+      CALL lbc_lnk_multi( 'traadv_fct', zbetup, 'T', 1. , zbetdo, 'T', 1. )   ! lateral boundary cond. (unchanged sign)
 
       ! 3. monotonic flux in the i & j direction (paa & pbb)
       ! ----------------------------------------
@@ -424,7 +423,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( paa, 'U', -1. , pbb, 'V', -1. )   ! lateral boundary condition (changed sign)
+      CALL lbc_lnk_multi( 'traadv_fct', paa, 'U', -1. , pbb, 'V', -1. )   ! lateral boundary condition (changed sign)
       !
    END SUBROUTINE nonosc
 

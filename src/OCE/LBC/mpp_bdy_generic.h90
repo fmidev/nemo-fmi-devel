@@ -20,7 +20,7 @@
 #      define L_SIZE(ptab)          SIZE(ptab,4)
 #   endif
 
-   SUBROUTINE ROUTINE_BDY( ptab, cd_nat, psgn      , kb_bdy )
+   SUBROUTINE ROUTINE_BDY( cdname, ptab, cd_nat, psgn      , kb_bdy )
       !!----------------------------------------------------------------------
       !!                  ***  routine mpp_lnk_bdy_3d  ***
       !!
@@ -41,6 +41,7 @@
       !! ** Action  :   ptab with update value at its periphery
       !!
       !!----------------------------------------------------------------------
+      CHARACTER(len=*)            , INTENT(in   ) ::   cdname      ! name of the calling subroutine
       ARRAY_TYPE(:,:,:,:,:)   ! array or pointer of arrays on which the boundary condition is applied
       CHARACTER(len=1)            , INTENT(in   ) ::   NAT_IN(:)   ! nature of array grid-points
       REAL(wp)                    , INTENT(in   ) ::   SGN_IN(:)   ! sign used across the north fold boundary
@@ -60,6 +61,8 @@
       ipk = K_SIZE(ptab)   ! 3rd dimension
       ipl = L_SIZE(ptab)   ! 4th    -
       ipf = F_SIZE(ptab)   ! 5th    -      use in "multi" case (array of pointers)
+      !
+      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ipk, ipl, ipf, ld_lbc = .TRUE. )
       !      
       ALLOCATE( zt3ns(jpi,nn_hls,ipk,ipl,ipf,2), zt3sn(jpi,nn_hls,ipk,ipl,ipf,2),   &
          &      zt3ew(jpj,nn_hls,ipk,ipl,ipf,2), zt3we(jpj,nn_hls,ipk,ipl,ipf,2)  )
@@ -131,6 +134,8 @@
 !!gm      imigr = nn_hls * jpj * ipk * ipl * ipf
          imigr = nn_hls * jpj * ipk * ipl
          !
+         IF( ln_timing ) CALL tic_tac(.TRUE.)
+         !
          SELECT CASE ( nbondi_bdy(IBD_IN(jf)) )
          CASE ( -1 )
             CALL mppsend( 2, zt3we(1,1,1,1,1,1), imigr, noea, ml_req1 )
@@ -148,6 +153,8 @@
             CALL mpprecv( 2, zt3we(1,1,1,1,1,2), imigr, nowe )
             IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
          END SELECT
+         !
+         IF( ln_timing ) CALL tic_tac(.FALSE.)
          !
          !                           ! Write Dirichlet lateral conditions
          iihom = nlci-nn_hls
@@ -204,6 +211,8 @@
 !!gm      imigr = nn_hls * jpi * ipk * ipl * ipf
          imigr = nn_hls * jpi * ipk * ipl
          !
+         IF( ln_timing ) CALL tic_tac(.TRUE.)
+         ! 
          SELECT CASE ( nbondj_bdy(IBD_IN(jf)) )
          CASE ( -1 )
             CALL mppsend( 4, zt3sn(1,1,1,1,1,1), imigr, nono, ml_req1 )
@@ -221,6 +230,8 @@
             CALL mpprecv( 4, zt3sn(1,1,1,1,1,2), imigr, noso )
             IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
          END SELECT
+         !
+         IF( ln_timing ) CALL tic_tac(.FALSE.)
          !
          !                           ! Write Dirichlet lateral conditions
          ijhom = nlcj-nn_hls

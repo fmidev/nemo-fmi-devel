@@ -82,7 +82,7 @@ CONTAINS
          &      h_rnf (jpi,jpj)         , nk_rnf  (jpi,jpj)      ,     &
          &      rnf_tsc_b(jpi,jpj,jpts) , rnf_tsc (jpi,jpj,jpts) , STAT=sbc_rnf_alloc )
          !
-      IF( lk_mpp            )   CALL mpp_sum ( sbc_rnf_alloc )
+      CALL mpp_sum ( 'sbcrnf', sbc_rnf_alloc )
       IF( sbc_rnf_alloc > 0 )   CALL ctl_warn('sbc_rnf_alloc: allocation of arrays failed')
    END FUNCTION sbc_rnf_alloc
 
@@ -422,7 +422,7 @@ CONTAINS
          !
          IF( nn_rnf_depth_file == 1 ) THEN      !  save  output nb levels for runoff
             IF(lwp) WRITE(numout,*) '   ==>>>   create runoff depht file'
-            CALL iom_open  ( TRIM( sn_dep_rnf%clname ), inum, ldwrt = .TRUE., kiolib = jprstlib )
+            CALL iom_open  ( TRIM( sn_dep_rnf%clname ), inum, ldwrt = .TRUE. )
             CALL iom_rstput( 0, 0, inum, 'rodepth', h_rnf )
             CALL iom_close ( inum )
          ENDIF

@@ -47,7 +47,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( htsc_iscpl(jpi,jpj,jpk,jpts) , hdiv_iscpl(jpi,jpj,jpk) , STAT=iscpl_alloc )
          !
-      IF( lk_mpp          )   CALL mpp_sum ( iscpl_alloc )
+      CALL mpp_sum ( 'iscplini', iscpl_alloc )
       IF( iscpl_alloc > 0 )   CALL ctl_warn('iscpl_alloc: allocation of arrays failed')
    END FUNCTION iscpl_alloc
 

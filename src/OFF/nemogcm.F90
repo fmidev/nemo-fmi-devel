@@ -94,7 +94,7 @@ CONTAINS
 
       ! check that all process are still there... If some process have an error,
       ! they will never enter in step and other processes will wait until the end of the cpu time!
-      IF( lk_mpp )   CALL mpp_max( nstop )
+      CALL mpp_max( 'nemogcm', nstop )
 
       !                            !-----------------------!
       !                            !==   time stepping   ==!
@@ -440,7 +440,7 @@ CONTAINS
       ierr = ierr + zdf_oce_alloc()          ! ocean vertical physics
       ierr = ierr + trc_oce_alloc()          ! shared TRC / TRA arrays
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'nemogcm', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'nemo_alloc: unable to allocate standard ocean arrays' )
       !
    END SUBROUTINE nemo_alloc
@@ -480,7 +480,7 @@ CONTAINS
       INTEGER, INTENT(inout) ::   kindic  ! indicator of solver convergence
       !!----------------------------------------------------------------------
       !
-      IF( kt == nit000 .AND. lwp ) THEN
+      IF( kt == nit000 .AND. lwm ) THEN
          WRITE(numout,*)
          WRITE(numout,*) 'stp_ctl : time-stepping control'
          WRITE(numout,*) '~~~~~~~'
@@ -488,8 +488,8 @@ CONTAINS
          CALL ctl_opn( numstp, 'time.step', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
       ENDIF
       !
-      IF(lwp) WRITE ( numstp, '(1x, i8)' )   kt      !* save the current time step in numstp
-      IF(lwp) REWIND( numstp )                       ! --------------------------
+      IF(lwm) WRITE ( numstp, '(1x, i8)' )   kt      !* save the current time step in numstp
+      IF(lwm) REWIND( numstp )                       ! --------------------------
       !
    END SUBROUTINE stp_ctl
    !!======================================================================

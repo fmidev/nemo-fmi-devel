@@ -223,7 +223,7 @@ CONTAINS
       IF( .NOT. ln_apr_dyn ) ALLOCATE( ssh_ib(jpi,jpj), ssh_ibb(jpi,jpj), apr(jpi, jpj), STAT=ierr(4) ) 
 
       sbc_cpl_alloc = MAXVAL( ierr )
-      IF( lk_mpp            )   CALL mpp_sum ( sbc_cpl_alloc )
+      CALL mpp_sum ( 'sbccpl', sbc_cpl_alloc )
       IF( sbc_cpl_alloc > 0 )   CALL ctl_warn('sbc_cpl_alloc: allocation of arrays failed')
       !
    END FUNCTION sbc_cpl_alloc
@@ -1161,7 +1161,7 @@ CONTAINS
                      frcv(jpr_oty1)%z3(ji,jj,1) = 0.5 * ( frcv(jpr_oty1)%z3(ji  ,jj+1,1) + frcv(jpr_oty1)%z3(ji,jj,1) )
                   END DO
                END DO
-               CALL lbc_lnk_multi( frcv(jpr_otx1)%z3(:,:,1), 'U',  -1., frcv(jpr_oty1)%z3(:,:,1), 'V',  -1. )
+               CALL lbc_lnk_multi( 'sbccpl', frcv(jpr_otx1)%z3(:,:,1), 'U',  -1., frcv(jpr_oty1)%z3(:,:,1), 'V',  -1. )
             ENDIF
             llnewtx = .TRUE.
          ELSE
@@ -1188,7 +1188,7 @@ CONTAINS
                   frcv(jpr_taum)%z3(ji,jj,1) = 0.5 * SQRT( zzx * zzx + zzy * zzy )
                END DO
             END DO
-            CALL lbc_lnk( frcv(jpr_taum)%z3(:,:,1), 'T', 1. )
+            CALL lbc_lnk( 'sbccpl', frcv(jpr_taum)%z3(:,:,1), 'T', 1. )
             llnewtau = .TRUE.
          ELSE
             llnewtau = .FALSE.
@@ -1569,7 +1569,7 @@ CONTAINS
             END DO
          END SELECT
          IF( srcv(jpr_itx1)%clgrid /= 'U' ) THEN 
-            CALL lbc_lnk_multi( p_taui, 'U',  -1., p_tauj, 'V',  -1. )
+            CALL lbc_lnk_multi( 'sbccpl', p_taui, 'U',  -1., p_tauj, 'V',  -1. )
          ENDIF
          
       ENDIF
@@ -2334,7 +2334,7 @@ CONTAINS
                      zity1(ji,jj) = 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj)
                   END DO
                END DO
-               CALL lbc_lnk_multi( zitx1, 'T', -1., zity1, 'T', -1. )
+               CALL lbc_lnk_multi( 'sbccpl', zitx1, 'T', -1., zity1, 'T', -1. )
             CASE( 'mixed oce-ice'        )      ! Ocean and Ice on C-grid ==> T
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1   ! vector opt.
@@ -2345,7 +2345,7 @@ CONTAINS
                   END DO
                END DO
             END SELECT
-            CALL lbc_lnk_multi( zotx1, ssnd(jps_ocx1)%clgrid, -1.,  zoty1, ssnd(jps_ocy1)%clgrid, -1. )
+            CALL lbc_lnk_multi( 'sbccpl', zotx1, ssnd(jps_ocx1)%clgrid, -1.,  zoty1, ssnd(jps_ocy1)%clgrid, -1. )
             !
          ENDIF
          !
@@ -2417,7 +2417,7 @@ CONTAINS
                    zity1(ji,jj) = 0.5 * ( v_ice(ji,jj  ) + v_ice(ji  ,jj-1  ) ) *  fr_i(ji,jj) 
                 END DO
              END DO
-             CALL lbc_lnk_multi( zitx1, 'T', -1.,  zity1, 'T', -1. ) 
+             CALL lbc_lnk_multi( 'sbccpl', zitx1, 'T', -1.,  zity1, 'T', -1. ) 
           CASE( 'mixed oce-ice'        )      ! Ocean and Ice on C-grid ==> T  
              DO jj = 2, jpjm1 
                 DO ji = fs_2, fs_jpim1   ! vector opt. 
@@ -2428,7 +2428,7 @@ CONTAINS
                 END DO
              END DO
           END SELECT
-         CALL lbc_lnk_multi( zotx1, ssnd(jps_ocxw)%clgrid, -1., zoty1, ssnd(jps_ocyw)%clgrid, -1. ) 
+         CALL lbc_lnk_multi( 'sbccpl', zotx1, ssnd(jps_ocxw)%clgrid, -1., zoty1, ssnd(jps_ocyw)%clgrid, -1. ) 
          ! 
          ! 
          IF( TRIM( sn_snd_crtw%clvor ) == 'eastward-northward' ) THEN             ! Rotation of the components 

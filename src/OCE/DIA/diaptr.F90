@@ -548,7 +548,7 @@ CONTAINS
 
          !
       dia_ptr_alloc = MAXVAL( ierr )
-      IF(lk_mpp)   CALL mpp_sum( dia_ptr_alloc )
+      CALL mpp_sum( 'diaptr', dia_ptr_alloc )
       !
    END FUNCTION dia_ptr_alloc
 
@@ -594,7 +594,7 @@ CONTAINS
          END DO
       ENDIF
 #if defined key_mpp_mpi
-      IF(lk_mpp)   CALL mpp_sum( p_fval, ijpj, ncomm_znl)
+      CALL mpp_sum( 'diaptr', p_fval, ijpj, ncomm_znl)
 #endif
       !
    END FUNCTION ptr_sj_3d
@@ -637,7 +637,7 @@ CONTAINS
          END DO
       ENDIF
 #if defined key_mpp_mpi
-      CALL mpp_sum( p_fval, ijpj, ncomm_znl )
+      CALL mpp_sum( 'diaptr', p_fval, ijpj, ncomm_znl )
 #endif
       ! 
    END FUNCTION ptr_sj_2d
@@ -695,7 +695,7 @@ CONTAINS
       ijpjjpk = jpj*jpk
       ish(1) = ijpjjpk  ;   ish2(1) = jpj   ;   ish2(2) = jpk
       zwork(1:ijpjjpk) = RESHAPE( p_fval, ish )
-      CALL mpp_sum( zwork, ijpjjpk, ncomm_znl )
+      CALL mpp_sum( 'diaptr', zwork, ijpjjpk, ncomm_znl )
       p_fval(:,:) = RESHAPE( zwork, ish2 )
 #endif
       !

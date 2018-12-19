@@ -140,7 +140,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       !!                    *** ROUTINE trc_alloc ***
       !!-------------------------------------------------------------------
-      USE lib_mpp, ONLY: ctl_warn
+      USE lib_mpp, ONLY: ctl_stop
       !!-------------------------------------------------------------------
       INTEGER :: ierr(4)
       !!-------------------------------------------------------------------
@@ -165,7 +165,7 @@ CONTAINS
       IF (jp_dia2d > 0 )   ALLOCATE( trc2d(jpi,jpj,jpk,jp_dia2d), STAT = ierr(4) )
       ! 
       trc_alloc = MAXVAL( ierr )
-      IF( trc_alloc /= 0 )   CALL ctl_warn('trc_alloc: failed to allocate arrays')
+      IF( trc_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trc_alloc: failed to allocate arrays' )
       !
    END FUNCTION trc_alloc
 

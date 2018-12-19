@@ -19,6 +19,7 @@ MODULE trcstp
    USE trcsub         !
    USE trdtrc_oce
    USE trdmxl_trc
+   USE sms_pisces,  ONLY : ln_check_mass
    !
    USE prtctl_trc     ! Print control for debbuging
    USE iom            !
@@ -72,7 +73,10 @@ CONTAINS
          DO jk = 1, jpk
             cvol(:,:,jk) = e1e2t(:,:) * e3t_n(:,:,jk) * tmask(:,:,jk)
          END DO
-         areatot         = glob_sum( cvol(:,:,:) )
+         IF ( ln_ctl .OR. kt == nitrst .OR. ( ln_check_mass .AND. kt == nitend )              &
+            & .OR. iom_use( "pno3tot" ) .OR. iom_use( "ppo4tot" ) .OR. iom_use( "psiltot" )   &
+            & .OR. iom_use( "palktot" ) .OR. iom_use( "pfertot" ) )                           &
+            &     areatot = glob_sum( 'trcstp', cvol(:,:,:) )
       ENDIF
       !
       IF( l_trcdm2dc )   CALL trc_mean_qsr( kt )
@@ -104,11 +108,13 @@ CONTAINS
          !
       ENDIF
       !
-      ztrai = 0._wp                                                   !  content of all tracers
-      DO jn = 1, jptra
-         ztrai = ztrai + glob_sum( trn(:,:,:,jn) * cvol(:,:,:)   )
-      END DO
-      IF( lwp ) WRITE(numstr,9300) kt,  ztrai / areatot
+      IF (ln_ctl ) THEN
+         ztrai = 0._wp                                                   !  content of all tracers
+         DO jn = 1, jptra
+            ztrai = ztrai + glob_sum( 'trcstp', trn(:,:,:,jn) * cvol(:,:,:)   )
+         END DO
+         IF( lwm ) WRITE(numstr,9300) kt,  ztrai / areatot
+      ENDIF
 9300  FORMAT(i10,D23.16)
       !
       IF( ln_timing )   CALL timing_stop('trc_stp')

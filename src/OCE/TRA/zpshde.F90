@@ -143,9 +143,9 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk_multi( pgtu(:,:,jn), 'U', -1. , pgtv(:,:,jn), 'V', -1. )   ! Lateral boundary cond.
-         !
       END DO
+      !
+      CALL lbc_lnk_multi( 'zpshde', pgtu(:,:,:), 'U', -1. , pgtv(:,:,:), 'V', -1. )   ! Lateral boundary cond.
       !                
       IF( PRESENT( prd ) ) THEN    !==  horizontal derivative of density anomalies (rd)  ==!    (optional part)
          pgru(:,:) = 0._wp
@@ -182,7 +182,7 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk_multi( pgru , 'U', -1. , pgrv , 'V', -1. )   ! Lateral boundary conditions
+         CALL lbc_lnk_multi( 'zpshde', pgru , 'U', -1. , pgrv , 'V', -1. )   ! Lateral boundary conditions
          !
       END IF
       !
@@ -304,9 +304,9 @@ CONTAINS
 
             END DO
          END DO
-         CALL lbc_lnk_multi( pgtu(:,:,jn), 'U', -1. , pgtv(:,:,jn), 'V', -1. )   ! Lateral boundary cond.
-         !
       END DO
+      !
+      CALL lbc_lnk_multi( 'zpshde', pgtu(:,:,:), 'U', -1. , pgtv(:,:,:), 'V', -1. )   ! Lateral boundary cond.
 
       ! horizontal derivative of density anomalies (rd)
       IF( PRESENT( prd ) ) THEN         ! depth of the partial step level
@@ -352,7 +352,7 @@ CONTAINS
             END DO
          END DO
 
-         CALL lbc_lnk_multi( pgru , 'U', -1. , pgrv , 'V', -1. )   ! Lateral boundary conditions
+         CALL lbc_lnk_multi( 'zpshde', pgru , 'U', -1. , pgrv , 'V', -1. )   ! Lateral boundary conditions
          !
       END IF
       !
@@ -405,7 +405,7 @@ CONTAINS
          END DO
          !
       END DO
-      CALL lbc_lnk_multi( pgtui(:,:,:), 'U', -1. , pgtvi(:,:,:), 'V', -1. )   ! Lateral boundary cond.
+      CALL lbc_lnk_multi( 'zpshde', pgtui(:,:,:), 'U', -1. , pgtvi(:,:,:), 'V', -1. )   ! Lateral boundary cond.
 
       IF( PRESENT( prd ) ) THEN    !==  horizontal derivative of density anomalies (rd)  ==!    (optional part)
          !
@@ -448,7 +448,7 @@ CONTAINS
 
             END DO
          END DO
-         CALL lbc_lnk_multi( pgrui, 'U', -1. , pgrvi, 'V', -1. )   ! Lateral boundary conditions
+         CALL lbc_lnk_multi( 'zpshde', pgrui, 'U', -1. , pgrvi, 'V', -1. )   ! Lateral boundary conditions
          !
       END IF  
       !

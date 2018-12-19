@@ -23,10 +23,6 @@ MODULE iom_def
    INTEGER, PARAMETER, PUBLIC ::   jpdom_autoglo_xy    = 9   !: Automatically set horizontal dimensions only
    INTEGER, PARAMETER, PUBLIC ::   jpdom_autodta       = 10  !: 
 
-   INTEGER, PARAMETER, PUBLIC ::   jpnf90      = 101      !: Use nf90 library
-
-   INTEGER, PARAMETER, PUBLIC ::   jprstlib  = jpnf90     !: restarts io library
-
    INTEGER, PARAMETER, PUBLIC ::   jp_r8    = 200      !: write REAL(8)
    INTEGER, PARAMETER, PUBLIC ::   jp_r4    = 201      !: write REAL(4)
    INTEGER, PARAMETER, PUBLIC ::   jp_i4    = 202      !: write INTEGER(4)
@@ -54,7 +50,6 @@ MODULE iom_def
    TYPE, PUBLIC ::   file_descriptor
       CHARACTER(LEN=240)                        ::   name     !: name of the file
       INTEGER                                   ::   nfid     !: identifier of the file (0 if closed)
-      INTEGER                                   ::   iolib    !: library used to read the file (jpnf90 or new formats,
                                                               !: jpioipsl option has been removed)
       INTEGER                                   ::   nvars    !: number of identified varibles in the file
       INTEGER                                   ::   iduld    !: id of the unlimited dimension

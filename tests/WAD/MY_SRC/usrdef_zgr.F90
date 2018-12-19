@@ -233,7 +233,7 @@ CONTAINS
       DO ji = 1, jpim1
          zhu(ji,:) = 0.5_wp * ( zht(ji,:) + zht(ji+1,:) )
       END DO
-      CALL lbc_lnk( zhu, 'U', 1. )     ! boundary condition: this mask the surrounding grid-points
+      CALL lbc_lnk( 'usrdef_zgr', zhu, 'U', 1. )     ! boundary condition: this mask the surrounding grid-points
       !                                ! ==>>>  set by hand non-zero value on first/last columns & rows 
       DO ji = mi0(1), mi1(1)              ! first row of global domain only
          zhu(ji,:) = zht(1,:)
@@ -246,7 +246,7 @@ CONTAINS
       DO jj = 1, jpjm1
          zhv(:,jj) = 0.5_wp * ( zht(:,jj) + zht(:,jj+1) )
       END DO
-      CALL lbc_lnk( zhv, 'V', 1. )     ! boundary condition: this mask the surrounding grid-points
+      CALL lbc_lnk( 'usrdef_zgr', zhv, 'V', 1. )     ! boundary condition: this mask the surrounding grid-points
       DO jj = mj0(1), mj1(1)   ! first  row of global domain only
          zhv(:,jj) = zht(:,jj)
       END DO
@@ -271,7 +271,7 @@ CONTAINS
 
 
 
-      CALL lbc_lnk( z2d, 'T', 1. )        ! closed basin since jperio = 0 (see userdef_nam.F90)
+      CALL lbc_lnk( 'usrdef_zgr', z2d, 'T', 1. )        ! closed basin since jperio = 0 (see userdef_nam.F90)
       k_top(:,:) = NINT( z2d(:,:) )
       !
       !                              
@@ -310,15 +310,15 @@ CONTAINS
               END DO      
            END DO      
          END DO      
-         CALL lbc_lnk( pdept, 'T', 1. )
-         CALL lbc_lnk( pdepw, 'T', 1. )
-         CALL lbc_lnk( pe3t , 'T', 1. )
-         CALL lbc_lnk( pe3w , 'T', 1. )
-         CALL lbc_lnk( pe3u , 'U', 1. )
-         CALL lbc_lnk( pe3uw, 'U', 1. )
-         CALL lbc_lnk( pe3f , 'F', 1. )
-         CALL lbc_lnk( pe3v , 'V', 1. )
-         CALL lbc_lnk( pe3vw, 'V', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pdept, 'T', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pdepw, 'T', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3t , 'T', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3w , 'T', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3u , 'U', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3uw, 'U', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3f , 'F', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3v , 'V', 1. )
+         CALL lbc_lnk( 'usrdef_zgr', pe3vw, 'V', 1. )
          WHERE( pe3t (:,:,:) == 0._wp )   pe3t (:,:,:) = 1._wp
          WHERE( pe3u (:,:,:) == 0._wp )   pe3u (:,:,:) = 1._wp
          WHERE( pe3v (:,:,:) == 0._wp )   pe3v (:,:,:) = 1._wp

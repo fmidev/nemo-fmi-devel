@@ -54,8 +54,8 @@ CONTAINS
       !!---------------------------------------------------------------------
       ALLOCATE( trdtx(jpi,jpj,jpk) , trdty(jpi,jpj,jpk) , trdt(jpi,jpj,jpk) , avt_evd(jpi,jpj,jpk), STAT= trd_tra_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( trd_tra_alloc )
-      IF( trd_tra_alloc /= 0 )   CALL ctl_warn('trd_tra_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'trdtra', trd_tra_alloc )
+      IF( trd_tra_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trd_tra_alloc: failed to allocate arrays' )
    END FUNCTION trd_tra_alloc
 
 

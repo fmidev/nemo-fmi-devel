@@ -82,7 +82,9 @@ CONTAINS
       !
       INTEGER, DIMENSION(jpij) ::   jm_min    ! reference number of top equation
       INTEGER, DIMENSION(jpij) ::   jm_max    ! reference number of bottom equation
-      !
+
+      LOGICAL, DIMENSION(jpij) ::   l_T_converged   ! true when T converges (per grid point)
+!
       REAL(wp) ::   zg1s      =  2._wp        ! for the tridiagonal system
       REAL(wp) ::   zg1       =  2._wp        !
       REAL(wp) ::   zgamma    =  18009._wp    ! for specific heat
@@ -112,6 +114,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpij,nlay_i)     ::   ztib        ! Temporary temperature in the ice to check the convergence
       REAL(wp), DIMENSION(jpij,nlay_s)     ::   ztsb        ! Temporary temperature in the snow to check the convergence
       REAL(wp), DIMENSION(jpij,0:nlay_i)   ::   ztcond_i    ! Ice thermal conductivity
+      REAL(wp), DIMENSION(jpij,0:nlay_i)   ::   ztcond_i_cp ! copy
       REAL(wp), DIMENSION(jpij,0:nlay_i)   ::   zradtr_i    ! Radiation transmitted through the ice
       REAL(wp), DIMENSION(jpij,0:nlay_i)   ::   zradab_i    ! Radiation absorbed in the ice
       REAL(wp), DIMENSION(jpij,0:nlay_i)   ::   zkappa_i    ! Kappa factor in the ice
@@ -200,10 +203,14 @@ CONTAINS
       qtr_ice_bot_1d(1:npti) = zradtr_i(1:npti,nlay_i)   ! record radiation transmitted below the ice
       !
       iconv    = 0          ! number of iterations
-      zdti_max = 1000._wp   ! maximal value of error on all points
       !
+      l_T_converged(:) = .FALSE.
       !                                                          !============================!
-      DO WHILE ( zdti_max > zdti_bnd .AND. iconv < iconv_max )   ! Iterative procedure begins !
+      ! Convergence calculated until all sub-domain grid points have converged
+      ! Calculations keep going for all grid points until sub-domain convergence (vectorisation optimisation)
+      ! but values are not taken into account (results independant of MPI partitioning)
+      !
+      DO WHILE ( ( .NOT. ALL (l_T_converged(1:npti)) ) .AND. iconv < iconv_max )   ! Iterative procedure begins !
          !                                                       !============================!
          iconv = iconv + 1
          !
@@ -216,34 +223,40 @@ CONTAINS
          IF( ln_cndi_U64 ) THEN         !-- Untersteiner (1964) formula: k = k0 + beta.S/T
             !
             DO ji = 1, npti
-               ztcond_i(ji,0)      = rcnd_i + zbeta * sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )
-               ztcond_i(ji,nlay_i) = rcnd_i + zbeta * sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )
+               ztcond_i_cp(ji,0)      = rcnd_i + zbeta * sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )
+               ztcond_i_cp(ji,nlay_i) = rcnd_i + zbeta * sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )
             END DO
             DO jk = 1, nlay_i-1
                DO ji = 1, npti
-                  ztcond_i(ji,jk) = rcnd_i + zbeta * 0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /  &
-                     &                       MIN( -epsi10, 0.5_wp * (t_i_1d(ji,jk) + t_i_1d(ji,jk+1)) - rt0 )
+                  ztcond_i_cp(ji,jk) = rcnd_i + zbeta * 0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /  &
+                     &                         MIN( -epsi10, 0.5_wp * (t_i_1d(ji,jk) + t_i_1d(ji,jk+1)) - rt0 )
                END DO
             END DO
             !
          ELSEIF( ln_cndi_P07 ) THEN     !-- Pringle et al formula: k = k0 + beta1.S/T - beta2.T
             !
             DO ji = 1, npti
-               ztcond_i(ji,0)      = rcnd_i + 0.09_wp  *  sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )  &
-                  &                         - 0.011_wp * ( t_i_1d(ji,1) - rt0 )
-               ztcond_i(ji,nlay_i) = rcnd_i + 0.09_wp  *  sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )  &
-                  &                         - 0.011_wp * ( t_bo_1d(ji) - rt0 )
+               ztcond_i_cp(ji,0)      = rcnd_i + 0.09_wp  *  sz_i_1d(ji,1)      / MIN( -epsi10, t_i_1d(ji,1) - rt0 )  &
+                  &                           - 0.011_wp * ( t_i_1d(ji,1) - rt0 )
+               ztcond_i_cp(ji,nlay_i) = rcnd_i + 0.09_wp  *  sz_i_1d(ji,nlay_i) / MIN( -epsi10, t_bo_1d(ji)  - rt0 )  &
+                  &                           - 0.011_wp * ( t_bo_1d(ji) - rt0 )
             END DO
             DO jk = 1, nlay_i-1
                DO ji = 1, npti
-                  ztcond_i(ji,jk) = rcnd_i + 0.09_wp  *   0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /        &
-                     &                      MIN( -epsi10, 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )  &
-                     &                     - 0.011_wp * ( 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )
+                  ztcond_i_cp(ji,jk) = rcnd_i + 0.09_wp  *   0.5_wp * ( sz_i_1d(ji,jk) + sz_i_1d(ji,jk+1) ) /        &
+                     &                        MIN( -epsi10, 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )  &
+                     &                       - 0.011_wp * ( 0.5_wp * ( t_i_1d (ji,jk) + t_i_1d (ji,jk+1) ) - rt0 )
                END DO
             END DO
             !
          ENDIF
-         ztcond_i(1:npti,:) = MAX( zkimin, ztcond_i(1:npti,:) )        
+
+         ! Variable used after iterations
+         ! Value must be frozen after convergence for MPP independance reason
+         DO ji = 1, npti
+            IF ( .NOT. l_T_converged(ji) ) &
+               ztcond_i(ji,:) = MAX( zkimin, ztcond_i_cp(ji,:) )        
+         END DO
          !
          !--- G(he) : enhancement of thermal conductivity in mono-category case
          ! Computation of effective thermal conductivity G(h)
@@ -269,28 +282,37 @@ CONTAINS
          ! 4) kappa factors
          !-----------------
          !--- Snow
+         ! Variable used after iterations
+         ! Value must be frozen after convergence for MPP independance reason
          DO jk = 0, nlay_s-1
             DO ji = 1, npti
-               zkappa_s(ji,jk) = zghe(ji) * rn_cnd_s * z1_h_s(ji)
+               IF ( .NOT. l_T_converged(ji) ) &
+                  zkappa_s(ji,jk) = zghe(ji) * rn_cnd_s * z1_h_s(ji)
             END DO
          END DO
          DO ji = 1, npti   ! Snow-ice interface
-            zfac = 0.5_wp * ( ztcond_i(ji,0) * zh_s(ji) + rn_cnd_s * zh_i(ji) )
-            IF( zfac > epsi10 ) THEN
-               zkappa_s(ji,nlay_s) = zghe(ji) * rn_cnd_s * ztcond_i(ji,0) / zfac
-            ELSE
-               zkappa_s(ji,nlay_s) = 0._wp
+            IF ( .NOT. l_T_converged(ji) ) THEN
+               zfac = 0.5_wp * ( ztcond_i(ji,0) * zh_s(ji) + rn_cnd_s * zh_i(ji) )
+               IF( zfac > epsi10 ) THEN
+                  zkappa_s(ji,nlay_s) = zghe(ji) * rn_cnd_s * ztcond_i(ji,0) / zfac
+               ELSE
+                  zkappa_s(ji,nlay_s) = 0._wp
+               ENDIF
             ENDIF
          END DO
 
          !--- Ice
+         ! Variable used after iterations
+         ! Value must be frozen after convergence for MPP independance reason
          DO jk = 0, nlay_i
             DO ji = 1, npti
-               zkappa_i(ji,jk) = zghe(ji) * ztcond_i(ji,jk) * z1_h_i(ji)
+               IF ( .NOT. l_T_converged(ji) ) &
+                  zkappa_i(ji,jk) = zghe(ji) * ztcond_i(ji,jk) * z1_h_i(ji)
             END DO
          END DO
          DO ji = 1, npti   ! Snow-ice interface
-            zkappa_i(ji,0) = zkappa_s(ji,nlay_s) * isnow(ji) + zkappa_i(ji,0) * ( 1._wp - isnow(ji) )
+            IF ( .NOT. l_T_converged(ji) ) &
+               zkappa_i(ji,0) = zkappa_s(ji,nlay_s) * isnow(ji) + zkappa_i(ji,0) * ( 1._wp - isnow(ji) )
          END DO
          !
          !--------------------------------------
@@ -325,7 +347,10 @@ CONTAINS
             !----------------------------
             ! update of the non solar flux according to the update in T_su
             DO ji = 1, npti
-               qns_ice_1d(ji) = qns_ice_1d(ji) + dqns_ice_1d(ji) * ( t_su_1d(ji) - ztsub(ji) )
+               ! Variable used after iterations
+               ! Value must be frozen after convergence for MPP independance reason
+               IF ( .NOT. l_T_converged(ji) ) &
+                  qns_ice_1d(ji) = qns_ice_1d(ji) + dqns_ice_1d(ji) * ( t_su_1d(ji) - ztsub(ji) )
             END DO
 
             DO ji = 1, npti
@@ -495,26 +520,34 @@ CONTAINS
 
             ! ice temperatures
             DO ji = 1, npti
-               t_i_1d(ji,nlay_i) = zindtbis(ji,jm_max(ji)) / zdiagbis(ji,jm_max(ji))
+               ! Variable used after iterations
+               ! Value must be frozen after convergence for MPP independance reason
+               IF ( .NOT. l_T_converged(ji) ) &
+                  t_i_1d(ji,nlay_i) = zindtbis(ji,jm_max(ji)) / zdiagbis(ji,jm_max(ji))
             END DO
 
             DO jm = nlay_i + nlay_s, nlay_s + 2, -1
                DO ji = 1, npti
                   jk = jm - nlay_s - 1
-                  t_i_1d(ji,jk) = ( zindtbis(ji,jm) - ztrid(ji,jm,3) * t_i_1d(ji,jk+1) ) / zdiagbis(ji,jm)
+                  IF ( .NOT. l_T_converged(ji) ) &
+                     t_i_1d(ji,jk) = ( zindtbis(ji,jm) - ztrid(ji,jm,3) * t_i_1d(ji,jk+1) ) / zdiagbis(ji,jm)
                END DO
             END DO
 
             DO ji = 1, npti
-               ! snow temperatures      
-               IF( h_s_1d(ji) > 0._wp ) THEN
-                  t_s_1d(ji,nlay_s) = ( zindtbis(ji,nlay_s+1) - ztrid(ji,nlay_s+1,3) * t_i_1d(ji,1) ) / zdiagbis(ji,nlay_s+1)
-               ENDIF
-               ! surface temperature
-               ztsub(ji) = t_su_1d(ji)
-               IF( t_su_1d(ji) < rt0 ) THEN
-                  t_su_1d(ji) = ( zindtbis(ji,jm_min(ji)) - ztrid(ji,jm_min(ji),3) *  &
-                     &          ( isnow(ji) * t_s_1d(ji,1) + ( 1._wp - isnow(ji) ) * t_i_1d(ji,1) ) ) / zdiagbis(ji,jm_min(ji))
+               ! Variables used after iterations
+               ! Value must be frozen after convergence for MPP independance reason
+               IF ( .NOT. l_T_converged(ji) ) THEN
+                  ! snow temperatures      
+                  IF( h_s_1d(ji) > 0._wp ) THEN
+                     t_s_1d(ji,nlay_s) = ( zindtbis(ji,nlay_s+1) - ztrid(ji,nlay_s+1,3) * t_i_1d(ji,1) ) / zdiagbis(ji,nlay_s+1)
+                  ENDIF
+                  ! surface temperature
+                  ztsub(ji) = t_su_1d(ji)
+                  IF( t_su_1d(ji) < rt0 ) THEN
+                     t_su_1d(ji) = ( zindtbis(ji,jm_min(ji)) - ztrid(ji,jm_min(ji),3) *  &
+                        &          ( isnow(ji) * t_s_1d(ji,1) + ( 1._wp - isnow(ji) ) * t_i_1d(ji,1) ) ) / zdiagbis(ji,jm_min(ji))
+                  ENDIF
                ENDIF
             END DO
             !
@@ -523,31 +556,30 @@ CONTAINS
             !--------------------------------------------------------------
             ! check that nowhere it has started to melt
             ! zdti_max is a measure of error, it has to be under zdti_bnd
-            zdti_max = 0._wp
+
             DO ji = 1, npti
-               t_su_1d(ji) = MAX( MIN( t_su_1d(ji) , rt0 ) , rt0 - 100._wp )
-               zdti_max    = MAX( zdti_max, ABS( t_su_1d(ji) - ztsub(ji) ) )     
+
+               zdti_max = 0._wp
+
+               IF ( .NOT. l_T_converged(ji) ) THEN
+                  t_su_1d(ji) = MAX( MIN( t_su_1d(ji) , rt0 ) , rt0 - 100._wp )
+                  zdti_max    = MAX( zdti_max, ABS( t_su_1d(ji) - ztsub(ji) ) )
+
+                  t_s_1d(ji,1:nlay_s) = MAX( MIN( t_s_1d(ji,1:nlay_s), rt0 ), rt0 - 100._wp )
+                  zdti_max = MAX ( zdti_max , MAXVAL( ABS( t_s_1d(ji,1:nlay_s) - ztsb(ji,1:nlay_s) ) ) )
+
+                  DO jk = 1, nlay_i
+                     ztmelts       = -rTmlt * sz_i_1d(ji,jk) + rt0
+                     t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelts ), rt0 - 100._wp )
+                     zdti_max      =  MAX( zdti_max, ABS( t_i_1d(ji,jk) - ztib(ji,jk) ) )
+                  END DO
+
+                  IF ( zdti_max < zdti_bnd ) l_T_converged(ji) = .TRUE.
+
+               ENDIF
+
             END DO
 
-            DO jk = 1, nlay_s
-               DO ji = 1, npti
-                  t_s_1d(ji,jk) = MAX( MIN( t_s_1d(ji,jk), rt0 ), rt0 - 100._wp )
-                  zdti_max      = MAX( zdti_max, ABS( t_s_1d(ji,jk) - ztsb(ji,jk) ) )
-               END DO
-            END DO
-
-            DO jk = 1, nlay_i
-               DO ji = 1, npti
-                  ztmelts       = -rTmlt * sz_i_1d(ji,jk) + rt0 
-                  t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelts ), rt0 - 100._wp )
-                  zdti_max      =  MAX( zdti_max, ABS( t_i_1d(ji,jk) - ztib(ji,jk) ) )
-               END DO
-            END DO
-
-            ! Compute spatial maximum over all errors
-            ! note that this could be optimized substantially by iterating only the non-converging points
-            IF( lk_mpp ) CALL mpp_max( zdti_max, kcom=ncomm_ice )
-         !
          !----------------------------------------!
          !                                        !
          !      JULES COUPLING IS ACTIVE          !
@@ -669,21 +701,30 @@ CONTAINS
             END DO
             
             ! ice temperatures
-           DO ji = 1, npti
-               t_i_1d(ji,nlay_i) = zindtbis(ji,jm_max(ji)) / zdiagbis(ji,jm_max(ji))
+            DO ji = 1, npti
+               ! Variable used after iterations
+               ! Value must be frozen after convergence for MPP independance reason
+               IF ( .NOT. l_T_converged(ji) ) &
+                  t_i_1d(ji,nlay_i) = zindtbis(ji,jm_max(ji)) / zdiagbis(ji,jm_max(ji))
             END DO
 
             DO jm = nlay_i + nlay_s, nlay_s + 2, -1
                DO ji = 1, npti
-                  jk = jm - nlay_s - 1
-                  t_i_1d(ji,jk) = ( zindtbis(ji,jm) - ztrid(ji,jm,3) * t_i_1d(ji,jk+1) ) / zdiagbis(ji,jm)
+                  IF ( .NOT. l_T_converged(ji) ) THEN
+                     jk = jm - nlay_s - 1
+                     t_i_1d(ji,jk) = ( zindtbis(ji,jm) - ztrid(ji,jm,3) * t_i_1d(ji,jk+1) ) / zdiagbis(ji,jm)
+                  ENDIF
                END DO
             END DO
             
             ! snow temperatures      
             DO ji = 1, npti
-               IF( h_s_1d(ji) > 0._wp ) THEN
-                  t_s_1d(ji,nlay_s) = ( zindtbis(ji,nlay_s+1) - ztrid(ji,nlay_s+1,3) * t_i_1d(ji,1) ) / zdiagbis(ji,nlay_s+1)
+               ! Variable used after iterations
+               ! Value must be frozen after convergence for MPP independance reason
+               IF ( .NOT. l_T_converged(ji) ) THEN
+                  IF( h_s_1d(ji) > 0._wp ) THEN
+                     t_s_1d(ji,nlay_s) = ( zindtbis(ji,nlay_s+1) - ztrid(ji,nlay_s+1,3) * t_i_1d(ji,1) ) / zdiagbis(ji,nlay_s+1)
+                  ENDIF
                ENDIF
             END DO
             !
@@ -692,26 +733,27 @@ CONTAINS
             !--------------------------------------------------------------
             ! check that nowhere it has started to melt
             ! zdti_max is a measure of error, it has to be under zdti_bnd
-            zdti_max = 0._wp
 
-            DO jk = 1, nlay_s
-               DO ji = 1, npti
-                  t_s_1d(ji,jk) = MAX( MIN( t_s_1d(ji,jk), rt0 ), rt0 - 100._wp )
-                  zdti_max = MAX( zdti_max, ABS( t_s_1d(ji,jk) - ztsb(ji,jk) ) )
-               END DO
-            END DO
-            
-            DO jk = 1, nlay_i
-               DO ji = 1, npti
-                  ztmelts       = -rTmlt * sz_i_1d(ji,jk) + rt0 
-                  t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelts ), rt0 - 100._wp )
-                  zdti_max      =  MAX( zdti_max, ABS( t_i_1d(ji,jk) - ztib(ji,jk) ) )
-               END DO
-            END DO
+            DO ji = 1, npti
 
-            ! Compute spatial maximum over all errors
-            ! note that this could be optimized substantially by iterating only the non-converging points
-            IF( lk_mpp )   CALL mpp_max( zdti_max, kcom=ncomm_ice )
+               zdti_max = 0._wp
+
+               IF ( .NOT. l_T_converged(ji) ) THEN
+                  ! t_s
+                  t_s_1d(ji,1:nlay_s) = MAX( MIN( t_s_1d(ji,1:nlay_s), rt0 ), rt0 - 100._wp )
+                  zdti_max = MAX ( zdti_max , MAXVAL( ABS( t_s_1d(ji,1:nlay_s) - ztsb(ji,1:nlay_s) ) ) )
+                  ! t_i
+                  DO jk = 0, nlay_i
+                     ztmelts       = -rTmlt * sz_i_1d(ji,jk) + rt0 
+                     t_i_1d(ji,jk) =  MAX( MIN( t_i_1d(ji,jk), ztmelts ), rt0 - 100._wp )
+                     zdti_max      =  MAX ( zdti_max, ABS( t_i_1d(ji,jk) - ztib(ji,jk) ) )
+                  END DO
+
+                  IF ( zdti_max < zdti_bnd ) l_T_converged(ji) = .TRUE.
+
+               ENDIF
+
+            END DO
 
          ENDIF ! k_jules
          

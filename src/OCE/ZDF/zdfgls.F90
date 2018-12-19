@@ -118,8 +118,8 @@ CONTAINS
       ALLOCATE( hmxl_n(jpi,jpj,jpk) , ustar2_surf(jpi,jpj) ,                     &
          &      zwall (jpi,jpj,jpk) , ustar2_top (jpi,jpj) , ustar2_bot(jpi,jpj) , STAT= zdf_gls_alloc )
          !
-      IF( lk_mpp             )   CALL mpp_sum ( zdf_gls_alloc )
-      IF( zdf_gls_alloc /= 0 )   CALL ctl_warn('zdf_gls_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'zdfgls', zdf_gls_alloc )
+      IF( zdf_gls_alloc /= 0 )   CALL ctl_stop( 'STOP', 'zdf_gls_alloc: failed to allocate arrays' )
    END FUNCTION zdf_gls_alloc
 
 

@@ -122,7 +122,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( zlu_uu(:,:,:,1), 'U', 1. , zlu_uv(:,:,:,1), 'U', 1.,  &
+      CALL lbc_lnk_multi( 'dynadv_ubs', zlu_uu(:,:,:,1), 'U', 1. , zlu_uv(:,:,:,1), 'U', 1.,  &
                       &   zlu_uu(:,:,:,2), 'U', 1. , zlu_uv(:,:,:,2), 'U', 1.,  & 
                       &   zlv_vv(:,:,:,1), 'V', 1. , zlv_vu(:,:,:,1), 'V', 1.,  &
                       &   zlv_vv(:,:,:,2), 'V', 1. , zlv_vu(:,:,:,2), 'V', 1.   )

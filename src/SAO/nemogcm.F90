@@ -371,7 +371,7 @@ CONTAINS
       ierr = ierr + dia_wri_alloc   ()
       ierr = ierr + dom_oce_alloc   ()          ! ocean domain
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'nemogcm', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'nemo_alloc : unable to allocate standard ocean arrays' )
       !
    END SUBROUTINE nemo_alloc

@@ -143,7 +143,7 @@ CONTAINS
       CALL Agrif_dyn( kt )             !* AGRIF zoom boundaries
 # endif
       !
-      CALL lbc_lnk_multi( ua, 'U', -1., va, 'V', -1. )     !* local domain boundaries
+      CALL lbc_lnk_multi( 'dynnxt', ua, 'U', -1., va, 'V', -1. )     !* local domain boundaries
       !
       !                                !* BDY open boundaries
       IF( ln_bdy .AND. ln_dynspg_exp )   CALL bdy_dyn( kt )

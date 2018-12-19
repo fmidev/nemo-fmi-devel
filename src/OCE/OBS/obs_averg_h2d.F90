@@ -615,8 +615,8 @@ CONTAINS
          ze2min = MINVAL( e2t(:,:), mask = pmask(:,:) == 1._wp )
          
          IF(lk_mpp) THEN
-            CALL mpp_min( ze1min )
-            CALL mpp_min( ze2min )
+            CALL mpp_min( 'obs_averg_h2d', ze1min )
+            CALL mpp_min( 'obs_averg_h2d', ze2min )
          ENDIF
 
          kmaxifp = ceiling(zlamscl_m/ze1min) + 1

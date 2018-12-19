@@ -135,7 +135,7 @@ CONTAINS
       !
       CALL dyn_ldf_lap( kt, pub, pvb, zulap, zvlap, 1 )   ! rotated laplacian applied to ptb (output in zlap)
       !
-      CALL lbc_lnk_multi( zulap, 'U', -1., zvlap, 'V', -1. )             ! Lateral boundary conditions
+      CALL lbc_lnk_multi( 'dynldf_lap_blp', zulap, 'U', -1., zvlap, 'V', -1. )             ! Lateral boundary conditions
       !
       CALL dyn_ldf_lap( kt, zulap, zvlap, pua, pva, 2 )   ! rotated laplacian applied to zlap (output in pta)
       !

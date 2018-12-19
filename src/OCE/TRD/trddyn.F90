@@ -128,7 +128,7 @@ CONTAINS
                                     END DO
                                  END DO
                               END DO
-                              CALL lbc_lnk_multi( z3dx, 'U', -1., z3dy, 'V', -1. )
+                              CALL lbc_lnk_multi( 'trddyn', z3dx, 'U', -1., z3dy, 'V', -1. )
                               CALL iom_put( "utrd_udx", z3dx  )
                               CALL iom_put( "vtrd_vdy", z3dy  )
                               DEALLOCATE( z3dx , z3dy )
@@ -164,7 +164,7 @@ CONTAINS
 !                                    END DO
 !                                 END DO
 !                              END DO
-!                              CALL lbc_lnk_multi( z3dx, 'U', -1., z3dy, 'V', -1. )
+!                              CALL lbc_lnk_multi( 'trddyn', z3dx, 'U', -1., z3dy, 'V', -1. )
 !                              CALL iom_put( "utrd_bfr", z3dx )
 !                              CALL iom_put( "vtrd_bfr", z3dy )
 !                                 DEALLOCATE( z3dx , z3dy )

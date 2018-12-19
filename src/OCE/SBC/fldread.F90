@@ -668,10 +668,10 @@ CONTAINS
             IF( lk_c1d .AND. lmoor ) THEN
                IF( sdjf%ln_tint ) THEN
                   CALL iom_get( sdjf%num, sdjf%clvar, sdjf%fdta(2,2,1,2), sdjf%nrec_a(1) )
-                  CALL lbc_lnk( sdjf%fdta(:,:,1,2),'Z',1. )
+                  CALL lbc_lnk( 'fldread', sdjf%fdta(:,:,1,2),'Z',1. )
                ELSE
                   CALL iom_get( sdjf%num, sdjf%clvar, sdjf%fnow(2,2,1  ), sdjf%nrec_a(1) )
-                  CALL lbc_lnk( sdjf%fnow(:,:,1  ),'Z',1. )
+                  CALL lbc_lnk( 'fldread', sdjf%fnow(:,:,1  ),'Z',1. )
                ENDIF
             ELSE
                IF( sdjf%ln_tint ) THEN   ;   CALL iom_get( sdjf%num, ipdom, sdjf%clvar, sdjf%fdta(:,:,1,2), sdjf%nrec_a(1) )
@@ -682,10 +682,10 @@ CONTAINS
             IF (lk_c1d .AND. lmoor ) THEN
                IF( sdjf%ln_tint ) THEN
                   CALL iom_get( sdjf%num, jpdom_unknown, sdjf%clvar, sdjf%fdta(2,2,:,2), sdjf%nrec_a(1) )
-                  CALL lbc_lnk( sdjf%fdta(:,:,:,2),'Z',1. )
+                  CALL lbc_lnk( 'fldread', sdjf%fdta(:,:,:,2),'Z',1. )
                ELSE
                   CALL iom_get( sdjf%num, jpdom_unknown, sdjf%clvar, sdjf%fnow(2,2,:  ), sdjf%nrec_a(1) )
-                  CALL lbc_lnk( sdjf%fnow(:,:,:  ),'Z',1. )
+                  CALL lbc_lnk( 'fldread', sdjf%fnow(:,:,:  ),'Z',1. )
                ENDIF
             ELSE
                IF( sdjf%ln_tint ) THEN   ;   CALL iom_get( sdjf%num, ipdom, sdjf%clvar, sdjf%fdta(:,:,:,2), sdjf%nrec_a(1) )

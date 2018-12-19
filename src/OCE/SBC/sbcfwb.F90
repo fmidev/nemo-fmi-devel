@@ -70,6 +70,8 @@ CONTAINS
       REAL(wp) ::   zsurf_neg, zsurf_pos, zsurf_tospread, zcoef          !   -      -
       REAL(wp), ALLOCATABLE, DIMENSION(:,:) ::   ztmsk_neg, ztmsk_pos, z_wgt ! 2D workspaces
       REAL(wp), ALLOCATABLE, DIMENSION(:,:) ::   ztmsk_tospread, zerp_cor    !   -      -
+      REAL(wp)   ,DIMENSION(1) ::   z_fwfprv  
+      COMPLEX(wp),DIMENSION(1) ::   y_fwfnow  
       !!----------------------------------------------------------------------
       !
       IF( kt == nit000 ) THEN
@@ -85,7 +87,7 @@ CONTAINS
          IF( kn_fwb == 3 .AND. nn_sssr /= 2 )   CALL ctl_stop( 'sbc_fwb: nn_fwb = 3 requires nn_sssr = 2, we stop ' )
          IF( kn_fwb == 3 .AND. ln_isfcav    )   CALL ctl_stop( 'sbc_fwb: nn_fwb = 3 with ln_isfcav = .TRUE. not working, we stop ' )
          !
-         area = glob_sum( e1e2t(:,:) * tmask(:,:,1))           ! interior global domain surface
+         area = glob_sum( 'sbcfwb', e1e2t(:,:) * tmask(:,:,1))           ! interior global domain surface
          ! isf cavities are excluded because it can feedback to the melting with generation of inhibition of plumes
          ! and in case of no melt, it can generate HSSW.
          !
@@ -101,9 +103,11 @@ CONTAINS
       CASE ( 1 )                             !==  global mean fwf set to zero  ==!
          !
          IF( MOD( kt-1, kn_fsbc ) == 0 ) THEN
-            z_fwf = glob_sum( e1e2t(:,:) * ( emp(:,:) - rnf(:,:) + fwfisf(:,:) - snwice_fmass(:,:) ) ) / area   ! sum over the global domain
-            zcoef = z_fwf * rcp
-            emp(:,:) = emp(:,:) - z_fwf              * tmask(:,:,1)
+            y_fwfnow(1) = local_sum( e1e2t(:,:) * ( emp(:,:) - rnf(:,:) + fwfisf(:,:) - snwice_fmass(:,:) ) )
+            CALL mpp_delay_sum( 'sbcfwb', 'fwb', y_fwfnow(:), z_fwfprv(:), kt == nitend - nn_fsbc + 1 )
+            z_fwfprv(1) = z_fwfprv(1) / area
+            zcoef = z_fwfprv(1) * rcp
+            emp(:,:) = emp(:,:) - z_fwfprv(1)        * tmask(:,:,1)
             qns(:,:) = qns(:,:) + zcoef * sst_m(:,:) * tmask(:,:,1) ! account for change to the heat budget due to fw correction
          ENDIF
          !
@@ -126,7 +130,7 @@ CONTAINS
          IF( MOD( kt, ikty ) == 0 ) THEN
             a_fwb_b = a_fwb                           ! mean sea level taking into account the ice+snow
                                                       ! sum over the global domain
-            a_fwb   = glob_sum( e1e2t(:,:) * ( sshn(:,:) + snwice_mass(:,:) * r1_rau0 ) )
+            a_fwb   = glob_sum( 'sbcfwb', e1e2t(:,:) * ( sshn(:,:) + snwice_mass(:,:) * r1_rau0 ) )
             a_fwb   = a_fwb * 1.e+3 / ( area * rday * 365. )     ! convert in Kg/m3/s = mm/s
 !!gm        !                                                      !!bug 365d year 
             fwfold =  a_fwb                           ! current year freshwater budget correction
@@ -153,31 +157,30 @@ CONTAINS
             ztmsk_pos(:,:) = tmask_i(:,:)                      ! Select <0 and >0 area of erp
             WHERE( erp < 0._wp )   ztmsk_pos = 0._wp
             ztmsk_neg(:,:) = tmask_i(:,:) - ztmsk_pos(:,:)
-            !
-            zsurf_neg = glob_sum( e1e2t(:,:)*ztmsk_neg(:,:) )  ! Area filled by <0 and >0 erp 
-            zsurf_pos = glob_sum( e1e2t(:,:)*ztmsk_pos(:,:) )
             !                                                  ! fwf global mean (excluding ocean to ice/snow exchanges) 
-            z_fwf     = glob_sum( e1e2t(:,:) * ( emp(:,:) - rnf(:,:) + fwfisf(:,:) - snwice_fmass(:,:) ) ) / area
+            z_fwf     = glob_sum( 'sbcfwb', e1e2t(:,:) * ( emp(:,:) - rnf(:,:) + fwfisf(:,:) - snwice_fmass(:,:) ) ) / area
             !            
             IF( z_fwf < 0._wp ) THEN         ! spread out over >0 erp area to increase evaporation
-                zsurf_tospread      = zsurf_pos
-                ztmsk_tospread(:,:) = ztmsk_pos(:,:)
+               zsurf_pos = glob_sum( 'sbcfwb', e1e2t(:,:)*ztmsk_pos(:,:) )
+               zsurf_tospread      = zsurf_pos
+               ztmsk_tospread(:,:) = ztmsk_pos(:,:)
             ELSE                             ! spread out over <0 erp area to increase precipitation
-                zsurf_tospread      = zsurf_neg
-                ztmsk_tospread(:,:) = ztmsk_neg(:,:)
+               zsurf_neg = glob_sum( 'sbcfwb', e1e2t(:,:)*ztmsk_neg(:,:) )  ! Area filled by <0 and >0 erp 
+               zsurf_tospread      = zsurf_neg
+               ztmsk_tospread(:,:) = ztmsk_neg(:,:)
             ENDIF
             !
-            zsum_fwf   = glob_sum( e1e2t(:,:) * z_fwf )         ! fwf global mean over <0 or >0 erp area
+            zsum_fwf   = glob_sum( 'sbcfwb', e1e2t(:,:) * z_fwf )         ! fwf global mean over <0 or >0 erp area
 !!gm :  zsum_fwf   = z_fwf * area   ???  it is right?  I think so....
             z_fwf_nsrf =  zsum_fwf / ( zsurf_tospread + rsmall )
             !                                                  ! weight to respect erp field 2D structure 
-            zsum_erp   = glob_sum( ztmsk_tospread(:,:) * erp(:,:) * e1e2t(:,:) )
+            zsum_erp   = glob_sum( 'sbcfwb', ztmsk_tospread(:,:) * erp(:,:) * e1e2t(:,:) )
             z_wgt(:,:) = ztmsk_tospread(:,:) * erp(:,:) / ( zsum_erp + rsmall )
             !                                                  ! final correction term to apply
             zerp_cor(:,:) = -1. * z_fwf_nsrf * zsurf_tospread * z_wgt(:,:)
             !
 !!gm   ===>>>>  lbc_lnk should be useless as all the computation is done over the whole domain !
-            CALL lbc_lnk( zerp_cor, 'T', 1. )
+            CALL lbc_lnk( 'sbcfwb', zerp_cor, 'T', 1. )
             !
             emp(:,:) = emp(:,:) + zerp_cor(:,:)
             qns(:,:) = qns(:,:) - zerp_cor(:,:) * rcp * sst_m(:,:)  ! account for change to the heat budget due to fw correction

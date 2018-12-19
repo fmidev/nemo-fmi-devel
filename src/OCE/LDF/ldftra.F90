@@ -706,7 +706,7 @@ CONTAINS
             zaeiw(ji,jj) = MIN( zzaei , paei0 )                                  ! Max value = paei0
          END DO
       END DO
-      CALL lbc_lnk( zaeiw(:,:), 'W', 1. )       ! lateral boundary condition
+      CALL lbc_lnk( 'ldftra', zaeiw(:,:), 'W', 1. )       ! lateral boundary condition
       !               
       DO jj = 2, jpjm1                          !== aei at u- and v-points  ==!
          DO ji = fs_2, fs_jpim1   ! vector opt.
@@ -714,7 +714,7 @@ CONTAINS
             paeiv(ji,jj,1) = 0.5_wp * ( zaeiw(ji,jj) + zaeiw(ji  ,jj+1) ) * vmask(ji,jj,1)
          END DO 
       END DO 
-      CALL lbc_lnk_multi( paeiu(:,:,1), 'U', 1. , paeiv(:,:,1), 'V', 1. )      ! lateral boundary condition
+      CALL lbc_lnk_multi( 'ldftra', paeiu(:,:,1), 'U', 1. , paeiv(:,:,1), 'V', 1. )      ! lateral boundary condition
 
       DO jk = 2, jpkm1                          !==  deeper values equal the surface one  ==!
          paeiu(:,:,jk) = paeiu(:,:,1) * umask(:,:,jk)
@@ -820,7 +820,7 @@ CONTAINS
 !!gm I don't like this routine....   Crazy  way of doing things, not optimal at all...
 !!gm     to be redesigned....   
       !                                                  !==  eiv stream function: output  ==!
-      CALL lbc_lnk_multi( psi_uw, 'U', -1. , psi_vw, 'V', -1. )
+      CALL lbc_lnk_multi( 'ldftra', psi_uw, 'U', -1. , psi_vw, 'V', -1. )
       !
 !!gm      CALL iom_put( "psi_eiv_uw", psi_uw )                 ! output
 !!gm      CALL iom_put( "psi_eiv_vw", psi_vw )
@@ -847,7 +847,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk( zw3d, 'T', 1. )      ! lateral boundary condition
+      CALL lbc_lnk( 'ldftra', zw3d, 'T', 1. )      ! lateral boundary condition
       CALL iom_put( "woce_eiv", zw3d )
       !
       !
@@ -864,8 +864,8 @@ CONTAINS
               END DO
            END DO
         END DO
-        CALL lbc_lnk( zw2d, 'U', -1. )
-        CALL lbc_lnk( zw3d, 'U', -1. )
+        CALL lbc_lnk( 'ldftra', zw2d, 'U', -1. )
+        CALL lbc_lnk( 'ldftra', zw3d, 'U', -1. )
         CALL iom_put( "ueiv_heattr"  , zztmp * zw2d )                  ! heat transport in i-direction
         CALL iom_put( "ueiv_heattr3d", zztmp * zw3d )                  ! heat transport in i-direction
       ENDIF
@@ -880,7 +880,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk( zw2d, 'V', -1. )
+      CALL lbc_lnk( 'ldftra', zw2d, 'V', -1. )
       CALL iom_put( "veiv_heattr", zztmp * zw2d )                  !  heat transport in j-direction
       CALL iom_put( "veiv_heattr", zztmp * zw3d )                  !  heat transport in j-direction
       !
@@ -899,8 +899,8 @@ CONTAINS
               END DO
            END DO
         END DO
-        CALL lbc_lnk( zw2d, 'U', -1. )
-        CALL lbc_lnk( zw3d, 'U', -1. )
+        CALL lbc_lnk( 'ldftra', zw2d, 'U', -1. )
+        CALL lbc_lnk( 'ldftra', zw3d, 'U', -1. )
         CALL iom_put( "ueiv_salttr", zztmp * zw2d )                  ! salt transport in i-direction
         CALL iom_put( "ueiv_salttr3d", zztmp * zw3d )                  ! salt transport in i-direction
       ENDIF
@@ -915,7 +915,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk( zw2d, 'V', -1. )
+      CALL lbc_lnk( 'ldftra', zw2d, 'V', -1. )
       CALL iom_put( "veiv_salttr", zztmp * zw2d )                  !  salt transport in j-direction
       CALL iom_put( "veiv_salttr", zztmp * zw3d )                  !  salt transport in j-direction
       !

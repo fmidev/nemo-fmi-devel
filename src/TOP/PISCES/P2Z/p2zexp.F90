@@ -112,7 +112,7 @@ CONTAINS
          END DO
       END DO
 
-      CALL lbc_lnk( sedpocn, 'T', 1. )
+      CALL lbc_lnk( 'p2zexp', sedpocn, 'T', 1. )
  
       ! Oa & Ek: diagnostics depending on jpdia2d !          left as example
       IF( lk_iomput )  CALL iom_put( "SEDPOC" , sedpocn )
@@ -228,8 +228,8 @@ CONTAINS
             END IF
          END DO
       END DO
-      CALL lbc_lnk( cmask , 'T', 1. )      ! lateral boundary conditions on cmask   (sign unchanged)
-      areacot = glob_sum( e1e2t(:,:) * cmask(:,:) )
+      CALL lbc_lnk( 'p2zexp', cmask , 'T', 1. )      ! lateral boundary conditions on cmask   (sign unchanged)
+      areacot = glob_sum( 'p2zexp', e1e2t(:,:) * cmask(:,:) )
       !
       IF( ln_rsttr ) THEN
          CALL iom_get( numrtr, jpdom_autoglo, 'SEDB'//ctrcnm(jpdet), sedpocb(:,:) )
@@ -247,7 +247,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( cmask(jpi,jpj) , dminl(jpi,jpj) , dmin3(jpi,jpj,jpk), &
          &      sedpocb(jpi,jpj) , sedpocn(jpi,jpj),   STAT=p2z_exp_alloc )
-      IF( p2z_exp_alloc /= 0 ) CALL ctl_warn('p2z_exp_alloc : failed to allocate arrays.')
+      IF( p2z_exp_alloc /= 0 ) CALL ctl_stop( 'STOP', 'p2z_exp_alloc : failed to allocate arrays.' )
       !
    END FUNCTION p2z_exp_alloc
 

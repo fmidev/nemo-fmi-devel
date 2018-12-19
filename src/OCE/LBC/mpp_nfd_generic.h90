@@ -55,13 +55,18 @@
       INTEGER  ::   ji,  jj,  jk,  jl, jh, jf, jr   ! dummy loop indices
       INTEGER  ::   ipi, ipj, ipk, ipl, ipf         ! dimension of the input array
       INTEGER  ::   imigr, iihom, ijhom             ! local integers
-      INTEGER  ::   ierr, itaille, ilci, ildi, ilei, iilb
+      INTEGER  ::   ierr, ibuffsize, ilci, ildi, ilei, iilb
       INTEGER  ::   ij, iproc
       INTEGER, DIMENSION (jpmaxngh)       ::   ml_req_nf   ! for mpi_isend when avoiding mpi_allgather
       INTEGER                             ::   ml_err      ! for mpi_isend when avoiding mpi_allgather
       INTEGER, DIMENSION(MPI_STATUS_SIZE) ::   ml_stat     ! for mpi_isend when avoiding mpi_allgather
       !                                                    ! Workspace for message transfers avoiding mpi_allgather
-      REAL(wp), DIMENSION(:,:,:,:,:)  , ALLOCATABLE ::   ztab, ztabl, ztabr
+      INTEGER                             ::   ipf_j       ! sum of lines for all multi fields
+      INTEGER                             ::   js          ! counter
+      INTEGER, DIMENSION(:,:),          ALLOCATABLE ::   jj_s  ! position of sent lines
+      INTEGER, DIMENSION(:),            ALLOCATABLE ::   ipj_s ! number of sent lines
+      REAL(wp), DIMENSION(:,:,:)      , ALLOCATABLE ::   ztabl
+      REAL(wp), DIMENSION(:,:,:,:,:)  , ALLOCATABLE ::   ztab, ztabr
       REAL(wp), DIMENSION(:,:,:,:,:)  , ALLOCATABLE ::   znorthloc, zfoldwk      
       REAL(wp), DIMENSION(:,:,:,:,:,:), ALLOCATABLE ::   znorthgloio
       !!----------------------------------------------------------------------
@@ -70,57 +75,92 @@
       ipl = L_SIZE(ptab)   ! 4th    -
       ipf = F_SIZE(ptab)   ! 5th    -      use in "multi" case (array of pointers)
       !
-      ipj   = 4            ! 2nd dimension of message transfers (last j-lines)
-      !
-      ALLOCATE( znorthloc(jpimax,4,ipk,ipl,ipf) )
-      !
-      znorthloc(:,:,:,:,:) = 0._wp
-      !
-      DO jf = 1, ipf                ! put in znorthloc the last ipj j-lines of ptab
-         DO jl = 1, ipl
-            DO jk = 1, ipk
-               DO jj = nlcj - ipj +1, nlcj
-                  ij = jj - nlcj + ipj
-                  znorthloc(1:jpi,ij,jk,jl,jf) = ARRAY_IN(1:jpi,jj,jk,jl,jf)
-               END DO
-            END DO
-         END DO
-      END DO
-      !
-      !
-      itaille = jpimax * ipj * ipk * ipl * ipf
-      !
       IF( l_north_nogather ) THEN      !==  ????  ==!
-         ALLOCATE( zfoldwk(jpimax,4,ipk,ipl,ipf) )
-         ALLOCATE( ztabl(jpimax   ,4,ipk,ipl,ipf) , ztabr(jpimax*jpmaxngh,4,ipk,ipl,ipf) ) 
+
+         ALLOCATE(ipj_s(ipf))
+
+         ipj      = 2            ! Max 2nd dimension of message transfers (last two j-line only)
+         ipj_s(:) = 1            ! Real 2nd dimension of message transfers (depending on perf requirement)
+                                 ! by default, only one line is exchanged
+
+         ALLOCATE( jj_s(ipf,2) )
+
+         ! re-define number of exchanged lines :
+         !  must be two during the first two time steps
+         !  to correct possible incoherent values on North fold lines from restart 
+
+         !!!!!!!!! temporary switch off this optimisation ==> force TRUE !!!!!!!!
+         l_full_nf_update = .TRUE.
+
+         ! Two lines update (slower but necessary to avoid different values ion identical grid points
+         IF ( l_full_nf_update .OR.                          &    ! if coupling fields
+              ( ncom_stp == nit000 .AND. .NOT. ln_rstart ) ) &    ! at first time step, if not restart
+            ipj_s(:) = 2
+
+         ! Index of modifying lines in input
+         DO jf = 1, ipf                      ! Loop over the number of arrays to be processed
+            !
+            SELECT CASE ( npolj )
+            !
+            CASE ( 3, 4 )                       ! *  North fold  T-point pivot
+               !
+               SELECT CASE ( NAT_IN(jf) )
+               !
+               CASE ( 'T' , 'W' ,'U' )                            ! T-, U-, W-point
+                  jj_s(jf,1) = nlcj - 2 ;  jj_s(jf,2) = nlcj - 1
+               CASE ( 'V' , 'F' )                                 ! V-, F-point
+                  jj_s(jf,1) = nlcj - 3 ;  jj_s(jf,2) = nlcj - 2
+               END SELECT
+            !
+            CASE ( 5, 6 )                        ! *  North fold  F-point pivot
+               SELECT CASE ( NAT_IN(jf) )
+               !
+               CASE ( 'T' , 'W' ,'U' )                            ! T-, U-, W-point
+                  jj_s(jf,1) = nlcj - 1      
+                  ipj_s(jf) = 1                  ! need only one line anyway
+               CASE ( 'V' , 'F' )                                 ! V-, F-point
+                  jj_s(jf,1) = nlcj - 2 ;  jj_s(jf,2) = nlcj - 1
+               END SELECT
+            !
+            END SELECT
+            !
+         ENDDO
+         ! 
+         ipf_j = sum (ipj_s(:))      ! Total number of lines to be exchanged
          !
-         ! when some processors of the north fold are suppressed, 
-         ! values of ztab* arrays corresponding to these suppressed domain won't be defined 
-         ! and we need a default definition to 0.
-         ! a better test should be: a testing if "suppressed land-processors" belongs to the north-pole folding
-         IF ( jpni*jpnj /= jpnij ) THEN
-            ztabr(:,:,:,:,:) = 0._wp
-            ztabl(:,:,:,:,:) = 0._wp
-         END IF
+         ALLOCATE( znorthloc(jpimax,ipf_j,ipk,ipl,1) )
          !
-         DO jf = 1, ipf
-            DO jl = 1, ipl
-               DO jk = 1, ipk
-                  DO jj = nlcj-ipj+1, nlcj          ! First put local values into the global array
-                     ij = jj - nlcj + ipj
-                     DO ji = nfsloop, nfeloop
-                        ztabl(ji,ij,jk,jl,jf) = ARRAY_IN(ji,jj,jk,jl,jf)
-                     END DO
+         js = 0
+         DO jf = 1, ipf                      ! Loop over the number of arrays to be processed
+            DO jj = 1, ipj_s(jf)
+               js = js + 1
+               DO jl = 1, ipl
+                  DO jk = 1, ipk
+                     znorthloc(1:jpi,js,jk,jl,1) = ARRAY_IN(1:jpi,jj_s(jf,jj),jk,jl,jf)
                   END DO
                END DO
             END DO
          END DO
          !
+         ibuffsize = jpimax * ipf_j * ipk * ipl
+         !
+         ALLOCATE( zfoldwk(jpimax,ipf_j,ipk,ipl,1) )
+         ALLOCATE( ztabr(jpimax*jpmaxngh,ipj,ipk,ipl,ipf) ) 
+         ! when some processors of the north fold are suppressed, 
+         ! values of ztab* arrays corresponding to these suppressed domain won't be defined 
+         ! and we need a default definition to 0.
+         ! a better test should be: a testing if "suppressed land-processors" belongs to the north-pole folding
+         IF ( jpni*jpnj /= jpnij ) ztabr(:,:,:,:,:) = 0._wp
+         !
+         ! start waiting time measurement
+         IF( ln_timing ) CALL tic_tac(.TRUE.)
+         !
          DO jr = 1, nsndto
             IF( nfipproc(isendto(jr),jpnj) /= narea-1 .AND. nfipproc(isendto(jr),jpnj) /= -1 ) THEN
-              CALL mppsend( 5, znorthloc, itaille, nfipproc(isendto(jr),jpnj), ml_req_nf(jr) )
+               CALL mppsend( 5, znorthloc, ibuffsize, nfipproc(isendto(jr),jpnj), ml_req_nf(jr) )
             ENDIF
          END DO
+         !
          DO jr = 1,nsndto
             iproc = nfipproc(isendto(jr),jpnj)
             IF(iproc /= -1) THEN
@@ -133,69 +173,85 @@
                iilb = nfiimpp(isendto(jr),jpnj) - nfiimpp(isendto(1),jpnj)
             ENDIF
             IF( iproc /= narea-1 .AND. iproc /= -1 ) THEN
-              CALL mpprecv(5, zfoldwk, itaille, iproc)
-               DO jf = 1, ipf
+               CALL mpprecv(5, zfoldwk, ibuffsize, iproc)
+               js = 0
+               DO jf = 1, ipf ; DO jj = 1, ipj_s(jf)
+                  js = js + 1
                   DO jl = 1, ipl
                      DO jk = 1, ipk
-                        DO jj = 1, ipj
-                           DO ji = ildi, ilei
-                              ztabr(iilb+ji,jj,jk,jl,jf) = zfoldwk(ji,jj,jk,jl,jf)
-                           END DO
+                        DO ji = ildi, ilei
+                           ztabr(iilb+ji,jj,jk,jl,jf) = zfoldwk(ji,js,jk,jl,1)
                         END DO
                      END DO
                   END DO
-               END DO
+               END DO; END DO
             ELSE IF( iproc == narea-1 ) THEN
-               DO jf = 1, ipf
+               DO jf = 1, ipf ; DO jj = 1, ipj_s(jf)
                   DO jl = 1, ipl
                      DO jk = 1, ipk
-                        DO jj = 1, ipj
-                           DO ji = ildi, ilei
-                              ztabr(iilb+ji,jj,jk,jl,jf) = ARRAY_IN(ji,nlcj-ipj+jj,jk,jl,jf)
-                           END DO
+                        DO ji = ildi, ilei
+                           ztabr(iilb+ji,jj,jk,jl,jf) = ARRAY_IN(ji,jj_s(jf,jj),jk,jl,jf)
                         END DO
                      END DO
                   END DO
-               END DO
+               END DO; END DO
             ENDIF
          END DO
          IF( l_isend ) THEN
             DO jr = 1,nsndto
                IF( nfipproc(isendto(jr),jpnj) /= narea-1 .AND. nfipproc(isendto(jr),jpnj) /= -1 ) THEN
                   CALL mpi_wait( ml_req_nf(jr), ml_stat, ml_err )
-               ENDIF    
+               ENDIF
             END DO
          ENDIF
+         !
+         IF( ln_timing ) CALL tic_tac(.FALSE.)
+         !
+         ! North fold boundary condition
+         !
          DO jf = 1, ipf
-            CALL lbc_nfd_nogather( ztabl(:,:,:,:,jf), ztabr(:,:,:,:,jf), cd_nat LBC_ARG, psgn LBC_ARG )   ! North fold boundary condition
+            CALL lbc_nfd_nogather(ARRAY_IN(:,:,:,:,jf), ztabr(:,1:ipj_s(jf),:,:,jf), cd_nat LBC_ARG, psgn LBC_ARG )
          END DO
-         DO jf = 1, ipf
+         !
+         DEALLOCATE( zfoldwk )
+         DEALLOCATE( ztabr ) 
+         DEALLOCATE( jj_s ) 
+         DEALLOCATE( ipj_s ) 
+      ELSE                             !==  ????  ==!
+         !
+         ipj   = 4            ! 2nd dimension of message transfers (last j-lines)
+         !
+         ALLOCATE( znorthloc(jpimax,ipj,ipk,ipl,ipf) )
+         !
+         DO jf = 1, ipf                ! put in znorthloc the last ipj j-lines of ptab
             DO jl = 1, ipl
                DO jk = 1, ipk
-                  DO jj = nlcj-ipj+1, nlcj             ! Scatter back to ARRAY_IN
+                  DO jj = nlcj - ipj +1, nlcj
                      ij = jj - nlcj + ipj
-                     DO ji= 1, nlci
-                        ARRAY_IN(ji,jj,jk,jl,jf) = ztabl(ji,ij,jk,jl,jf)
-                     END DO
+                     znorthloc(1:jpi,ij,jk,jl,jf) = ARRAY_IN(1:jpi,jj,jk,jl,jf)
                   END DO
                END DO
             END DO
          END DO
          !
-         DEALLOCATE( zfoldwk )
-         DEALLOCATE( ztabl, ztabr ) 
-      ELSE                             !==  ????  ==!
-         ALLOCATE( ztab       (jpiglo,4,ipk,ipl,ipf     ) )
-         ALLOCATE( znorthgloio(jpimax,4,ipk,ipl,ipf,jpni) )
+         ibuffsize = jpimax * ipj * ipk * ipl * ipf
+         !
+         ALLOCATE( ztab       (jpiglo,ipj,ipk,ipl,ipf     ) )
+         ALLOCATE( znorthgloio(jpimax,ipj,ipk,ipl,ipf,jpni) )
          !
          ! when some processors of the north fold are suppressed,
          ! values of ztab* arrays corresponding to these suppressed domain won't be defined
          ! and we need a default definition to 0.
          ! a better test should be: a testing if "suppressed land-processors" belongs to the north-pole folding
-         IF ( jpni*jpnj /= jpnij ) ztab(:,:,:,:,:)=0._wp
+         IF ( jpni*jpnj /= jpnij ) ztab(:,:,:,:,:) = 0._wp
          !
-         CALL MPI_ALLGATHER( znorthloc  , itaille, MPI_DOUBLE_PRECISION,                &
-            &                znorthgloio, itaille, MPI_DOUBLE_PRECISION, ncomm_north, ierr )
+         ! start waiting time measurement
+         IF( ln_timing ) CALL tic_tac(.TRUE.)
+         CALL MPI_ALLGATHER( znorthloc  , ibuffsize, MPI_DOUBLE_PRECISION,                &
+            &                znorthgloio, ibuffsize, MPI_DOUBLE_PRECISION, ncomm_north, ierr )
+         !
+         ! stop waiting time measurement
+         IF( ln_timing ) CALL tic_tac(.FALSE.)
          !
          DO jr = 1, ndim_rank_north         ! recover the global north array
             iproc = nrank_north(jr) + 1

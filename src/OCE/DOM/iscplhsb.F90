@@ -205,7 +205,7 @@ CONTAINS
       END DO
 
       ! build array of total problematic point on each cpu (share to each cpu)
-      CALL mpp_max(inpts,jpnij) 
+      CALL mpp_max('iscplhsb', inpts,jpnij) 
 
       ! size of the new variable
       npts  = SUM(inpts)    
@@ -242,14 +242,14 @@ CONTAINS
 
       ! build array of total problematic point on each cpu (share to each cpu)
       ! point coordinates
-      CALL mpp_max(zlat ,npts)
-      CALL mpp_max(zlon ,npts)
-      CALL mpp_max(izpts,npts)
+      CALL mpp_max('iscplhsb', zlat ,npts)
+      CALL mpp_max('iscplhsb', zlon ,npts)
+      CALL mpp_max('iscplhsb', izpts,npts)
 
       ! correction values 
-      CALL mpp_max(zcorr_vol,npts)
-      CALL mpp_max(zcorr_sal,npts)
-      CALL mpp_max(zcorr_tem,npts)
+      CALL mpp_max('iscplhsb', zcorr_vol,npts)
+      CALL mpp_max('iscplhsb', zcorr_sal,npts)
+      CALL mpp_max('iscplhsb', zcorr_tem,npts)
 
       ! put correction term in the closest cell          
       DO jpts = 1,npts

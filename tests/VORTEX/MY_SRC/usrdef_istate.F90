@@ -135,8 +135,8 @@ CONTAINS
          END DO
       END DO
 
-      CALL lbc_lnk( pu, 'U', -1. )
-      CALL lbc_lnk( pv, 'V', -1. )
+      CALL lbc_lnk( 'usrdef_istate', pu, 'U', -1. )
+      CALL lbc_lnk( 'usrdef_istate', pv, 'V', -1. )
       !   
    END SUBROUTINE usr_def_istate
 

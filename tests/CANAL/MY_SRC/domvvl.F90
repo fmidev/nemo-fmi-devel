@@ -78,15 +78,15 @@ CONTAINS
          ALLOCATE( tilde_e3t_b(jpi,jpj,jpk)  , tilde_e3t_n(jpi,jpj,jpk) , tilde_e3t_a(jpi,jpj,jpk) ,   &
             &      dtilde_e3t_a(jpi,jpj,jpk) , un_td  (jpi,jpj,jpk)     , vn_td  (jpi,jpj,jpk)     ,   &
             &      STAT = dom_vvl_alloc        )
-         IF( lk_mpp             )   CALL mpp_sum ( dom_vvl_alloc )
-         IF( dom_vvl_alloc /= 0 )   CALL ctl_warn('dom_vvl_alloc: failed to allocate arrays')
+         CALL mpp_sum ( 'domvvl', dom_vvl_alloc )
+         IF( dom_vvl_alloc /= 0 )   CALL ctl_stop( 'STOP', 'dom_vvl_alloc: failed to allocate arrays' )
          un_td = 0._wp
          vn_td = 0._wp
       ENDIF
       IF( ln_vvl_ztilde ) THEN
          ALLOCATE( frq_rst_e3t(jpi,jpj) , frq_rst_hdv(jpi,jpj) , hdiv_lf(jpi,jpj,jpk) , STAT= dom_vvl_alloc )
-         IF( lk_mpp             )   CALL mpp_sum ( dom_vvl_alloc )
-         IF( dom_vvl_alloc /= 0 )   CALL ctl_warn('dom_vvl_alloc: failed to allocate arrays')
+         CALL mpp_sum ( 'domvvl', dom_vvl_alloc )
+         IF( dom_vvl_alloc /= 0 )   CALL ctl_stop( 'STOP', 'dom_vvl_alloc: failed to allocate arrays' )
       ENDIF
       !
    END FUNCTION dom_vvl_alloc
@@ -146,6 +146,11 @@ CONTAINS
       CALL dom_vvl_interpol( e3u_b(:,:,:), e3uw_b(:,:,:), 'UW' )
       CALL dom_vvl_interpol( e3v_n(:,:,:), e3vw_n(:,:,:), 'VW' )  ! from V to UW
       CALL dom_vvl_interpol( e3v_b(:,:,:), e3vw_b(:,:,:), 'VW' )
+
+      ! We need to define e3[tuv]_a for AGRIF initialisation (should not be a problem for the restartability...)
+      e3t_a(:,:,:) = e3t_n(:,:,:)
+      e3u_a(:,:,:) = e3u_n(:,:,:)
+      e3v_a(:,:,:) = e3v_n(:,:,:)
       !
       !                    !==  depth of t and w-point  ==!   (set the isf depth as it is in the initial timestep)
       gdept_n(:,:,1) = 0.5_wp * e3w_n(:,:,1)       ! reference to the ocean surface (used for MLD and light penetration)
@@ -228,13 +233,33 @@ CONTAINS
                   ENDIF
                END DO
             END DO
-            IF( cn_cfg == "orca" .AND. nn_cfg == 3 ) THEN   ! ORCA2: Suppress ztilde in the Foxe Basin for ORCA2
-               ii0 = 103   ;   ii1 = 111       
-               ij0 = 128   ;   ij1 = 135   ;   
-               frq_rst_e3t( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  0.0_wp
-               frq_rst_hdv( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  1.e0_wp / rdt
+            IF( cn_cfg == "orca" .OR. cn_cfg == "ORCA" ) THEN
+               IF( nn_cfg == 3 ) THEN   ! ORCA2: Suppress ztilde in the Foxe Basin for ORCA2
+                  ii0 = 103   ;   ii1 = 111       
+                  ij0 = 128   ;   ij1 = 135   ;   
+                  frq_rst_e3t( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  0.0_wp
+                  frq_rst_hdv( mi0(ii0):mi1(ii1) , mj0(ij0):mj1(ij1) ) =  1.e0_wp / rdt
+               ENDIF
             ENDIF
          ENDIF
+      ENDIF
+      !
+      IF(lwxios) THEN
+! define variables in restart file when writing with XIOS
+         CALL iom_set_rstw_var_active('e3t_b')
+         CALL iom_set_rstw_var_active('e3t_n')
+         !                                           ! ----------------------- !
+         IF( ln_vvl_ztilde .OR. ln_vvl_layer ) THEN  ! z_tilde and layer cases !
+            !                                        ! ----------------------- !
+            CALL iom_set_rstw_var_active('tilde_e3t_b')
+            CALL iom_set_rstw_var_active('tilde_e3t_n')
+         END IF
+         !                                           ! -------------!    
+         IF( ln_vvl_ztilde ) THEN                    ! z_tilde case !
+            !                                        ! ------------ !
+            CALL iom_set_rstw_var_active('hdiv_lf')
+         ENDIF
+         !
       ENDIF
       !
    END SUBROUTINE dom_vvl_init
@@ -384,7 +409,7 @@ CONTAINS
          END DO
          !                       ! d - thickness diffusion transport: boundary conditions
          !                             (stored for tracer advction and continuity equation)
-         CALL lbc_lnk_multi( un_td , 'U' , -1._wp, vn_td , 'V' , -1._wp)
+         CALL lbc_lnk_multi( 'domvvl', un_td , 'U' , -1._wp, vn_td , 'V' , -1._wp)
 
          ! 4 - Time stepping of baroclinic scale factors
          ! ---------------------------------------------
@@ -395,7 +420,7 @@ CONTAINS
          ELSE
             z2dt = 2.0_wp * rdt
          ENDIF
-         CALL lbc_lnk( tilde_e3t_a(:,:,:), 'T', 1._wp )
+         CALL lbc_lnk( 'domvvl', tilde_e3t_a(:,:,:), 'T', 1._wp )
          tilde_e3t_a(:,:,:) = tilde_e3t_b(:,:,:) + z2dt * tmask(:,:,:) * tilde_e3t_a(:,:,:)
 
          ! Maximum deformation control
@@ -405,14 +430,14 @@ CONTAINS
             ze3t(:,:,jk) = tilde_e3t_a(:,:,jk) / e3t_0(:,:,jk) * tmask(:,:,jk) * tmask_i(:,:)
          END DO
          z_tmax = MAXVAL( ze3t(:,:,:) )
-         IF( lk_mpp )   CALL mpp_max( z_tmax )                 ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                 ! max over the global domain
          z_tmin = MINVAL( ze3t(:,:,:) )
-         IF( lk_mpp )   CALL mpp_min( z_tmin )                 ! min over the global domain
+         CALL mpp_min( 'domvvl', z_tmin )                 ! min over the global domain
          ! - ML - test: for the moment, stop simulation for too large e3_t variations
          IF( ( z_tmax >  rn_zdef_max ) .OR. ( z_tmin < - rn_zdef_max ) ) THEN
             IF( lk_mpp ) THEN
-               CALL mpp_maxloc( ze3t, tmask, z_tmax, ijk_max(1), ijk_max(2), ijk_max(3) )
-               CALL mpp_minloc( ze3t, tmask, z_tmin, ijk_min(1), ijk_min(2), ijk_min(3) )
+               CALL mpp_maxloc( 'domvvl', ze3t, tmask, z_tmax, ijk_max )
+               CALL mpp_minloc( 'domvvl', ze3t, tmask, z_tmin, ijk_min )
             ELSE
                ijk_max = MAXLOC( ze3t(:,:,:) )
                ijk_max(1) = ijk_max(1) + nimpp - 1
@@ -426,7 +451,7 @@ CONTAINS
                WRITE(numout, *) 'at i, j, k=', ijk_max
                WRITE(numout, *) 'MIN( tilde_e3t_a(:,:,:) / e3t_0(:,:,:) ) =', z_tmin
                WRITE(numout, *) 'at i, j, k=', ijk_min            
-               CALL ctl_warn('MAX( ABS( tilde_e3t_a(:,:,:) ) / e3t_0(:,:,:) ) too high')
+               CALL ctl_stop( 'STOP', 'MAX( ABS( tilde_e3t_a(:,:,: ) ) / e3t_0(:,:,:) ) too high')
             ENDIF
          ENDIF
          ! - ML - end test
@@ -469,7 +494,7 @@ CONTAINS
          IF( lwp ) WRITE(numout, *) 'kt =', kt
          IF ( ln_vvl_ztilde .OR. ln_vvl_layer ) THEN
             z_tmax = MAXVAL( tmask(:,:,1) * tmask_i(:,:) * ABS( zht(:,:) ) )
-            IF( lk_mpp ) CALL mpp_max( z_tmax )                             ! max over the global domain
+            CALL mpp_max( 'domvvl', z_tmax )                             ! max over the global domain
             IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(SUM(tilde_e3t_a))) =', z_tmax
          END IF
          !
@@ -478,7 +503,7 @@ CONTAINS
             zht(:,:) = zht(:,:) + e3t_n(:,:,jk) * tmask(:,:,jk)
          END DO
          z_tmax = MAXVAL( tmask(:,:,1) * tmask_i(:,:) * ABS( ht_0(:,:) + sshn(:,:) - zht(:,:) ) )
-         IF( lk_mpp ) CALL mpp_max( z_tmax )                                ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                                ! max over the global domain
          IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(ht_0+sshn-SUM(e3t_n))) =', z_tmax
          !
          zht(:,:) = 0.0_wp
@@ -486,7 +511,7 @@ CONTAINS
             zht(:,:) = zht(:,:) + e3t_a(:,:,jk) * tmask(:,:,jk)
          END DO
          z_tmax = MAXVAL( tmask(:,:,1) * tmask_i(:,:) * ABS( ht_0(:,:) + ssha(:,:) - zht(:,:) ) )
-         IF( lk_mpp ) CALL mpp_max( z_tmax )                                ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                                ! max over the global domain
          IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(ht_0+ssha-SUM(e3t_a))) =', z_tmax
          !
          zht(:,:) = 0.0_wp
@@ -494,19 +519,19 @@ CONTAINS
             zht(:,:) = zht(:,:) + e3t_b(:,:,jk) * tmask(:,:,jk)
          END DO
          z_tmax = MAXVAL( tmask(:,:,1) * tmask_i(:,:) * ABS( ht_0(:,:) + sshb(:,:) - zht(:,:) ) )
-         IF( lk_mpp ) CALL mpp_max( z_tmax )                                ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                                ! max over the global domain
          IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(ht_0+sshb-SUM(e3t_b))) =', z_tmax
          !
          z_tmax = MAXVAL( tmask(:,:,1) *  ABS( sshb(:,:) ) )
-         IF( lk_mpp ) CALL mpp_max( z_tmax )                                ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                                ! max over the global domain
          IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(sshb))) =', z_tmax
          !
          z_tmax = MAXVAL( tmask(:,:,1) *  ABS( sshn(:,:) ) )
-         IF( lk_mpp ) CALL mpp_max( z_tmax )                                ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                                ! max over the global domain
          IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(sshn))) =', z_tmax
          !
          z_tmax = MAXVAL( tmask(:,:,1) *  ABS( ssha(:,:) ) )
-         IF( lk_mpp ) CALL mpp_max( z_tmax )                                ! max over the global domain
+         CALL mpp_max( 'domvvl', z_tmax )                                ! max over the global domain
          IF( lwp    ) WRITE(numout, *) kt,' MAXVAL(abs(ssha))) =', z_tmax
       END IF
 
@@ -687,7 +712,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( pe3_out(:,:,:), 'U', 1._wp )
+         CALL lbc_lnk( 'domvvl', pe3_out(:,:,:), 'U', 1._wp )
          pe3_out(:,:,:) = pe3_out(:,:,:) + e3u_0(:,:,:)
          !
       CASE( 'V' )                   !* from T- to V-point : hor. surface weighted mean
@@ -700,7 +725,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( pe3_out(:,:,:), 'V', 1._wp )
+         CALL lbc_lnk( 'domvvl', pe3_out(:,:,:), 'V', 1._wp )
          pe3_out(:,:,:) = pe3_out(:,:,:) + e3v_0(:,:,:)
          !
       CASE( 'F' )                   !* from U-point to F-point : hor. surface weighted mean
@@ -714,7 +739,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( pe3_out(:,:,:), 'F', 1._wp )
+         CALL lbc_lnk( 'domvvl', pe3_out(:,:,:), 'F', 1._wp )
          pe3_out(:,:,:) = pe3_out(:,:,:) + e3f_0(:,:,:)
          !
       CASE( 'W' )                   !* from T- to W-point : vertical simple mean
@@ -780,7 +805,7 @@ CONTAINS
          !                                   ! ===============
          IF( ln_rstart ) THEN                   !* Read the restart file
             CALL rst_read_open                  !  open the restart file if necessary
-            CALL iom_get( numror, jpdom_autoglo, 'sshn'   , sshn    )
+            CALL iom_get( numror, jpdom_autoglo, 'sshn'   , sshn, ldxios = lrxios    )
             !
             id1 = iom_varid( numror, 'e3t_b', ldstop = .FALSE. )
             id2 = iom_varid( numror, 'e3t_n', ldstop = .FALSE. )
@@ -791,8 +816,8 @@ CONTAINS
             !                             ! all cases !
             !                             ! --------- !
             IF( MIN( id1, id2 ) > 0 ) THEN       ! all required arrays exist
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:) )
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:) )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:), ldxios = lrxios )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:), ldxios = lrxios )
                ! needed to restart if land processor not computed 
                IF(lwp) write(numout,*) 'dom_vvl_rst : e3t_b and e3t_n found in restart files'
                WHERE ( tmask(:,:,:) == 0.0_wp ) 
@@ -806,14 +831,14 @@ CONTAINS
                IF(lwp) write(numout,*) 'dom_vvl_rst WARNING : e3t_n not found in restart files'
                IF(lwp) write(numout,*) 'e3t_n set equal to e3t_b.'
                IF(lwp) write(numout,*) 'neuler is forced to 0'
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:) )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_b', e3t_b(:,:,:), ldxios = lrxios )
                e3t_n(:,:,:) = e3t_b(:,:,:)
                neuler = 0
             ELSE IF( id2 > 0 ) THEN
                IF(lwp) write(numout,*) 'dom_vvl_rst WARNING : e3t_b not found in restart files'
                IF(lwp) write(numout,*) 'e3t_b set equal to e3t_n.'
                IF(lwp) write(numout,*) 'neuler is forced to 0'
-               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:) )
+               CALL iom_get( numror, jpdom_autoglo, 'e3t_n', e3t_n(:,:,:), ldxios = lrxios )
                e3t_b(:,:,:) = e3t_n(:,:,:)
                neuler = 0
             ELSE
@@ -838,8 +863,8 @@ CONTAINS
             ELSE                          ! z_tilde and layer cases !
                !                          ! ----------------------- !
                IF( MIN( id3, id4 ) > 0 ) THEN  ! all required arrays exist
-                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_b', tilde_e3t_b(:,:,:) )
-                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_n', tilde_e3t_n(:,:,:) )
+                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_b', tilde_e3t_b(:,:,:), ldxios = lrxios )
+                  CALL iom_get( numror, jpdom_autoglo, 'tilde_e3t_n', tilde_e3t_n(:,:,:), ldxios = lrxios )
                ELSE                            ! one at least array is missing
                   tilde_e3t_b(:,:,:) = 0.0_wp
                   tilde_e3t_n(:,:,:) = 0.0_wp
@@ -848,7 +873,7 @@ CONTAINS
                IF( ln_vvl_ztilde ) THEN   ! z_tilde case !
                   !                       ! ------------ !
                   IF( id5 > 0 ) THEN  ! required array exists
-                     CALL iom_get( numror, jpdom_autoglo, 'hdiv_lf', hdiv_lf(:,:,:) )
+                     CALL iom_get( numror, jpdom_autoglo, 'hdiv_lf', hdiv_lf(:,:,:), ldxios = lrxios )
                   ELSE                ! array is missing
                      hdiv_lf(:,:,:) = 0.0_wp
                   ENDIF
@@ -928,23 +953,25 @@ CONTAINS
       ELSEIF( TRIM(cdrw) == 'WRITE' ) THEN   ! Create restart file
          !                                   ! ===================
          IF(lwp) WRITE(numout,*) '---- dom_vvl_rst ----'
+         IF( lwxios ) CALL iom_swap(      cwxios_context          )
          !                                           ! --------- !
          !                                           ! all cases !
          !                                           ! --------- !
-         CALL iom_rstput( kt, nitrst, numrow, 'e3t_b', e3t_b(:,:,:) )
-         CALL iom_rstput( kt, nitrst, numrow, 'e3t_n', e3t_n(:,:,:) )
+         CALL iom_rstput( kt, nitrst, numrow, 'e3t_b', e3t_b(:,:,:), ldxios = lwxios )
+         CALL iom_rstput( kt, nitrst, numrow, 'e3t_n', e3t_n(:,:,:), ldxios = lwxios )
          !                                           ! ----------------------- !
          IF( ln_vvl_ztilde .OR. ln_vvl_layer ) THEN  ! z_tilde and layer cases !
             !                                        ! ----------------------- !
-            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_b', tilde_e3t_b(:,:,:) )
-            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_n', tilde_e3t_n(:,:,:) )
+            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_b', tilde_e3t_b(:,:,:), ldxios = lwxios)
+            CALL iom_rstput( kt, nitrst, numrow, 'tilde_e3t_n', tilde_e3t_n(:,:,:), ldxios = lwxios)
          END IF
          !                                           ! -------------!    
          IF( ln_vvl_ztilde ) THEN                    ! z_tilde case !
             !                                        ! ------------ !
-            CALL iom_rstput( kt, nitrst, numrow, 'hdiv_lf', hdiv_lf(:,:,:) )
+            CALL iom_rstput( kt, nitrst, numrow, 'hdiv_lf', hdiv_lf(:,:,:), ldxios = lwxios)
          ENDIF
          !
+         IF( lwxios ) CALL iom_swap(      cxios_context          )
       ENDIF
       !
    END SUBROUTINE dom_vvl_rst

@@ -185,7 +185,7 @@ CONTAINS
       ALLOCATE( e3t_m(jpi,jpj) , STAT=ierr(5) )
          !
       sbc_oce_alloc = MAXVAL( ierr )
-      IF( lk_mpp            )   CALL mpp_sum ( sbc_oce_alloc )
+      CALL mpp_sum ( 'sbc_oce', sbc_oce_alloc )
       IF( sbc_oce_alloc > 0 )   CALL ctl_warn('sbc_oce_alloc: allocation of arrays failed')
       !
    END FUNCTION sbc_oce_alloc
@@ -215,7 +215,7 @@ CONTAINS
             wndm(ji,jj) = SQRT ( ztau * zcoef ) * tmask(ji,jj,1)
          END DO
       END DO
-      CALL lbc_lnk( wndm(:,:) , 'T', 1. )
+      CALL lbc_lnk( 'sbc_oce', wndm(:,:) , 'T', 1. )
       !
    END SUBROUTINE sbc_tau2wnd
 

@@ -142,7 +142,7 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~'
       ENDIF
       !
-      CALL lbc_lnk( pfmsk, 'F', 1._wp )      ! Lateral boundary conditions on fmask
+      CALL lbc_lnk( 'usrdef_fmask', pfmsk, 'F', 1._wp )      ! Lateral boundary conditions on fmask
       !
    END SUBROUTINE usr_def_fmask
    

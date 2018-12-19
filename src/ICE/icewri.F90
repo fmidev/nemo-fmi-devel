@@ -140,7 +140,7 @@ CONTAINS
                z2d(ji,jj) = 0.5_wp * SQRT( z2da * z2da + z2db * z2db )
            END DO
          END DO
-         CALL lbc_lnk( z2d, 'T', 1. )
+         CALL lbc_lnk( 'icewri', z2d, 'T', 1. )
          IF( iom_use('icevel') )   CALL iom_put( "icevel" , z2d )
 
         ! record presence of fast ice
@@ -190,13 +190,13 @@ CONTAINS
          WHERE( ff_t > 0._wp )   ;   zmsk00(:,:) = 1.0e-12
          ELSEWHERE               ;   zmsk00(:,:) = 0.
          END WHERE 
-         zdiag_area_nh = glob_sum( at_i(:,:) * zmsk00(:,:) * e1e2t(:,:) )
-         zdiag_volu_nh = glob_sum( vt_i(:,:) * zmsk00(:,:) * e1e2t(:,:) )
+         zdiag_area_nh = glob_sum( 'icewri', at_i(:,:) * zmsk00(:,:) * e1e2t(:,:) )
+         zdiag_volu_nh = glob_sum( 'icewri', vt_i(:,:) * zmsk00(:,:) * e1e2t(:,:) )
          !
          WHERE( ff_t > 0._wp .AND. at_i > 0.15 )   ; zmsk00(:,:) = 1.0e-12
          ELSEWHERE                                 ; zmsk00(:,:) = 0.
          END WHERE 
-         zdiag_extt_nh = glob_sum( zmsk00(:,:) * e1e2t(:,:) )
+         zdiag_extt_nh = glob_sum( 'icewri', zmsk00(:,:) * e1e2t(:,:) )
          !
          IF( iom_use('NH_icearea') )   CALL iom_put( "NH_icearea" ,  zdiag_area_nh )
          IF( iom_use('NH_icevolu') )   CALL iom_put( "NH_icevolu" ,  zdiag_volu_nh )
@@ -209,13 +209,13 @@ CONTAINS
          WHERE( ff_t < 0._wp ); zmsk00(:,:) = 1.0e-12; 
          ELSEWHERE            ; zmsk00(:,:) = 0.
          END WHERE 
-         zdiag_area_sh = glob_sum( at_i(:,:) * zmsk00(:,:) * e1e2t(:,:) ) 
-         zdiag_volu_sh = glob_sum( vt_i(:,:) * zmsk00(:,:) * e1e2t(:,:) )
+         zdiag_area_sh = glob_sum( 'icewri', at_i(:,:) * zmsk00(:,:) * e1e2t(:,:) ) 
+         zdiag_volu_sh = glob_sum( 'icewri', vt_i(:,:) * zmsk00(:,:) * e1e2t(:,:) )
          !
          WHERE( ff_t < 0._wp .AND. at_i > 0.15 ); zmsk00(:,:) = 1.0e-12
          ELSEWHERE                              ; zmsk00(:,:) = 0.
          END WHERE 
-         zdiag_extt_sh = glob_sum( zmsk00(:,:) * e1e2t(:,:) )
+         zdiag_extt_sh = glob_sum( 'icewri', zmsk00(:,:) * e1e2t(:,:) )
          !
          IF( iom_use('SH_icearea') ) CALL iom_put( "SH_icearea", zdiag_area_sh )
          IF( iom_use('SH_icevolu') ) CALL iom_put( "SH_icevolu", zdiag_volu_sh )
@@ -233,7 +233,7 @@ CONTAINS
    END SUBROUTINE ice_wri
 
  
-   SUBROUTINE ice_wri_state( kt, kid, kh_i )
+   SUBROUTINE ice_wri_state( kid )
       !!---------------------------------------------------------------------
       !!                 ***  ROUTINE ice_wri_state  ***
       !!        
@@ -244,65 +244,31 @@ CONTAINS
       !!
       !! History :   4.0  !  2013-06  (C. Rousset)
       !!----------------------------------------------------------------------
-      INTEGER, INTENT( in ) ::   kt               ! ocean time-step index
-      INTEGER, INTENT( in ) ::   kid , kh_i
-      INTEGER               ::   nz_i, jl
-      REAL(wp), DIMENSION(jpl) ::   jcat
+      INTEGER, INTENT( in ) ::   kid 
       !!----------------------------------------------------------------------
       !
-      DO jl = 1, jpl
-         jcat(jl) = REAL(jl)
-      END DO
-      
-      CALL histvert( kid, "ncatice", "Ice Categories","", jpl, jcat, nz_i, "up")
+      !! The file is open in dia_wri_state (ocean routine)
 
-      CALL histdef( kid, "sithic", "Ice thickness"          , "m"      , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "siconc", "Ice concentration"      , "%"      , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "sitemp", "Ice temperature"        , "C"      , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "sivelu", "i-Ice speed "           , "m/s"    , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "sivelv", "j-Ice speed "           , "m/s"    , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "sistru", "i-Wind stress over ice" , "Pa"     , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "sistrv", "j-Wind stress over ice" , "Pa"     , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "sisflx", "Solar flx over ocean"   , "W/m2"   , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "sinflx", "NonSolar flx over ocean", "W/m2"   , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "snwpre", "Snow precipitation"     , "kg/m2/s", jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "sisali", "Ice salinity"           , "PSU"    , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "sivolu", "Ice volume"             , "m"      , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "sidive", "Ice divergence"         , "10-8s-1", jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt ) 
-      CALL histdef( kid, "si_amp", "Melt pond fraction"     , "%"      , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "si_vmp", "Melt pond volume"       ,  "m"     , jpi,jpj, kh_i, 1, 1, 1, -99, 32, "inst(x)", rdt, rdt )
-      !
-      CALL histdef( kid, "sithicat", "Ice thickness"        , "m"      , jpi,jpj, kh_i, jpl, 1, jpl, nz_i, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "siconcat", "Ice concentration"    , "%"      , jpi,jpj, kh_i, jpl, 1, jpl, nz_i, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "sisalcat", "Ice salinity"         , ""       , jpi,jpj, kh_i, jpl, 1, jpl, nz_i, 32, "inst(x)", rdt, rdt )
-      CALL histdef( kid, "snthicat", "Snw thickness"        , "m"      , jpi,jpj, kh_i, jpl, 1, jpl, nz_i, 32, "inst(x)", rdt, rdt )
+      CALL iom_rstput( 0, 0, kid, 'sithic', hm_i         )   ! Ice thickness
+      CALL iom_rstput( 0, 0, kid, 'siconc', at_i         )   ! Ice concentration
+      CALL iom_rstput( 0, 0, kid, 'sitemp', tm_i - rt0   )   ! Ice temperature
+      CALL iom_rstput( 0, 0, kid, 'sivelu', u_ice        )   ! i-Ice speed
+      CALL iom_rstput( 0, 0, kid, 'sivelv', v_ice        )   ! j-Ice speed
+      CALL iom_rstput( 0, 0, kid, 'sistru', utau_ice     )   ! i-Wind stress over ice
+      CALL iom_rstput( 0, 0, kid, 'sistrv', vtau_ice     )   ! i-Wind stress over ice
+      CALL iom_rstput( 0, 0, kid, 'sisflx', qsr          )   ! Solar flx over ocean
+      CALL iom_rstput( 0, 0, kid, 'sinflx', qns          )   ! NonSolar flx over ocean
+      CALL iom_rstput( 0, 0, kid, 'snwpre', sprecip      )   ! Snow precipitation
+      CALL iom_rstput( 0, 0, kid, 'sisali', sm_i         )   ! Ice salinity
+      CALL iom_rstput( 0, 0, kid, 'sivolu', vt_i         )   ! Ice volume
+      CALL iom_rstput( 0, 0, kid, 'sidive', divu_i*1.0e8 )   ! Ice divergence
+      CALL iom_rstput( 0, 0, kid, 'si_amp', at_ip        )   ! Melt pond fraction
+      CALL iom_rstput( 0, 0, kid, 'si_vmp', vt_ip        )   ! Melt pond volume
+      CALL iom_rstput( 0, 0, kid, 'sithicat', h_i        )   ! Ice thickness
+      CALL iom_rstput( 0, 0, kid, 'siconcat', a_i        )   ! Ice concentration
+      CALL iom_rstput( 0, 0, kid, 'sisalcat', s_i        )   ! Ice salinity
+      CALL iom_rstput( 0, 0, kid, 'snthicat', h_s        )   ! Snw thickness
 
-      CALL histend( kid, snc4set )   ! end of the file definition
-
-      CALL histwrite( kid, "sithic", kt, hm_i          , jpi*jpj, (/1/) )    
-      CALL histwrite( kid, "siconc", kt, at_i          , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sitemp", kt, tm_i - rt0    , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sivelu", kt, u_ice         , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sivelv", kt, v_ice         , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sistru", kt, utau_ice      , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sistrv", kt, vtau_ice      , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sisflx", kt, qsr           , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sinflx", kt, qns           , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "snwpre", kt, sprecip       , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sisali", kt, sm_i          , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sivolu", kt, vt_i          , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "sidive", kt, divu_i*1.0e8  , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "si_amp", kt, at_ip         , jpi*jpj, (/1/) )
-      CALL histwrite( kid, "si_vmp", kt, vt_ip         , jpi*jpj, (/1/) )
-      !
-      CALL histwrite( kid, "sithicat", kt, h_i         , jpi*jpj*jpl, (/1/) )    
-      CALL histwrite( kid, "siconcat", kt, a_i         , jpi*jpj*jpl, (/1/) )    
-      CALL histwrite( kid, "sisalcat", kt, s_i         , jpi*jpj*jpl, (/1/) )    
-      CALL histwrite( kid, "snthicat", kt, h_s         , jpi*jpj*jpl, (/1/) )    
-
-      !! The file is closed in dia_wri_state (ocean routine)
-      !! CALL histclo( kid )
-      !
     END SUBROUTINE ice_wri_state
 
 #else

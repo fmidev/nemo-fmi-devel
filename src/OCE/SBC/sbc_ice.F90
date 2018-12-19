@@ -149,7 +149,7 @@ CONTAINS
 #endif
 
       sbc_ice_alloc = MAXVAL( ierr )
-      IF( lk_mpp            )   CALL mpp_sum ( sbc_ice_alloc )
+      CALL mpp_sum ( 'sbc_ice', sbc_ice_alloc )
       IF( sbc_ice_alloc > 0 )   CALL ctl_warn('sbc_ice_alloc: allocation of arrays failed')
    END FUNCTION sbc_ice_alloc
 
@@ -196,7 +196,7 @@ CONTAINS
       ierr(:) = 0
       ALLOCATE( snwice_mass(jpi,jpj) , snwice_mass_b(jpi,jpj), snwice_fmass(jpi,jpj) , STAT=ierr(1) )
       sbc_ice_alloc = MAXVAL( ierr )
-      IF( lk_mpp            )   CALL mpp_sum ( sbc_ice_alloc )
+      CALL mpp_sum ( 'sbc_ice', sbc_ice_alloc )
       IF( sbc_ice_alloc > 0 )   CALL ctl_warn('sbc_ice_alloc: allocation of arrays failed')
    END FUNCTION sbc_ice_alloc
 #endif

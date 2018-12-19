@@ -96,7 +96,7 @@ CONTAINS
       CALL Agrif_trc                   ! AGRIF zoom boundaries
 #endif
       ! Update after tracer on domain lateral boundaries
-      CALL lbc_lnk( tra(:,:,:,:), 'T', 1. )   
+      CALL lbc_lnk( 'trcnxt', tra(:,:,:,:), 'T', 1. )   
 
       IF( ln_bdy )  CALL trc_bdy( kt )
 
@@ -163,7 +163,7 @@ CONTAINS
                                        CALL trc_nxt_off( kt )       ! offline 
          ENDIF
          !
-         CALL lbc_lnk_multi( trb(:,:,:,:), 'T', 1._wp, trn(:,:,:,:), 'T', 1._wp, tra(:,:,:,:), 'T', 1._wp )
+         CALL lbc_lnk_multi( 'trcnxt', trb(:,:,:,:), 'T', 1._wp, trn(:,:,:,:), 'T', 1._wp, tra(:,:,:,:), 'T', 1._wp )
       ENDIF
       !
       IF( l_trdtrc .AND. ln_linssh ) THEN      ! trend of the Asselin filter (tb filtered - tb)/dt )

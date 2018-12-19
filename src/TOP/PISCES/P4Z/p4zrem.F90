@@ -362,7 +362,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( denitr(jpi,jpj,jpk), STAT=p4z_rem_alloc )
       !
-      IF( p4z_rem_alloc /= 0 )   CALL ctl_warn('p4z_rem_alloc: failed to allocate arrays')
+      IF( p4z_rem_alloc /= 0 )   CALL ctl_stop( 'STOP', 'p4z_rem_alloc: failed to allocate arrays' )
       !
    END FUNCTION p4z_rem_alloc
 

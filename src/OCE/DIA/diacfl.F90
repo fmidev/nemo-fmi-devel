@@ -53,9 +53,9 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! ocean time-step index
       !
-      INTEGER :: ji, jj, jk   ! dummy loop indices
-      REAL(wp)::   z2dt, zCu_max, zCv_max, zCw_max       ! local scalars
-      INTEGER , DIMENSION(3)           ::   iloc_u , iloc_v , iloc_w , iloc   ! workspace
+      INTEGER                ::   ji, jj, jk                            ! dummy loop indices
+      REAL(wp)               ::   z2dt, zCu_max, zCv_max, zCw_max       ! local scalars
+      INTEGER , DIMENSION(3) ::   iloc_u , iloc_v , iloc_w , iloc       ! workspace
 !!gm this does not work      REAL(wp), DIMENSION(jpi,jpj,jpk) ::   zCu_cfl, zCv_cfl, zCw_cfl         ! workspace
       !!----------------------------------------------------------------------
       !
@@ -79,9 +79,9 @@ CONTAINS
       !
       !                    ! calculate maximum values and locations
       IF( lk_mpp ) THEN
-         CALL mpp_maxloc( zCu_cfl, umask, zCu_max, iloc_u(1), iloc_u(2), iloc_u(3) )
-         CALL mpp_maxloc( zCv_cfl, vmask, zCv_max, iloc_v(1), iloc_v(2), iloc_v(3) )
-         CALL mpp_maxloc( zCw_cfl, wmask, zCw_max, iloc_w(1), iloc_w(2), iloc_w(3) )
+         CALL mpp_maxloc( 'diacfl', zCu_cfl, umask, zCu_max, iloc_u )
+         CALL mpp_maxloc( 'diacfl', zCv_cfl, vmask, zCv_max, iloc_v )
+         CALL mpp_maxloc( 'diacfl', zCw_cfl, wmask, zCw_max, iloc_w )
       ELSE
          iloc = MAXLOC( ABS( zcu_cfl(:,:,:) ) )
          iloc_u(1) = iloc(1) + nimpp - 1

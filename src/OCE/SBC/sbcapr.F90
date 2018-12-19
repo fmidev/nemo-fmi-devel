@@ -93,7 +93,7 @@ CONTAINS
       ENDIF
       !
       IF( ln_ref_apr ) THEN                        !* Compute whole inner domain mean masked ocean surface
-         tarea = glob_sum( e1e2t(:,:) )
+         tarea = glob_sum( 'sbcapr', e1e2t(:,:) )
          IF(lwp) WRITE(numout,*) '         Variable ref. Patm computed over a ocean surface of ', tarea*1e-6, 'km2'
       ELSE
          IF(lwp) WRITE(numout,*) '         Reference Patm used : ', rn_pref, ' N/m2'
@@ -140,7 +140,7 @@ CONTAINS
          CALL fld_read( kt, nn_fsbc, sf_apr )               !* input Patm provided at kt + nn_fsbc/2
          !
          !                                                  !* update the reference atmospheric pressure (if necessary)
-         IF( ln_ref_apr )   rn_pref = glob_sum( sf_apr(1)%fnow(:,:,1) * e1e2t(:,:) ) / tarea
+         IF( ln_ref_apr )   rn_pref = glob_sum( 'sbcapr', sf_apr(1)%fnow(:,:,1) * e1e2t(:,:) ) / tarea
          !
          !                                                  !* Patm related forcing at kt
          ssh_ib(:,:) = - ( sf_apr(1)%fnow(:,:,1) - rn_pref ) * r1_grau    ! equivalent ssh (inverse barometer)

@@ -68,10 +68,7 @@ CONTAINS
             IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath)//'/'
             IF(lwp) THEN
                WRITE(numout,*)
-               SELECT CASE ( jprstlib )
-               CASE DEFAULT
-                  WRITE(numout,*) '             open ice restart NetCDF file: ',TRIM(clpath)//clname
-               END SELECT
+               WRITE(numout,*) '             open ice restart NetCDF file: ',TRIM(clpath)//clname
                IF( kt == nitrst - 2*nn_fsbc + 1 ) THEN
                   WRITE(numout,*) '             kt = nitrst - 2*nn_fsbc + 1 = ', kt,' date= ', ndastp
                ELSE
@@ -79,7 +76,7 @@ CONTAINS
                ENDIF
             ENDIF
             !
-            CALL iom_open( TRIM(clpath)//TRIM(clname), numriw, ldwrt = .TRUE., kiolib = jprstlib, kdlev = jpl )
+            CALL iom_open( TRIM(clpath)//TRIM(clname), numriw, ldwrt = .TRUE., kdlev = jpl )
             lrst_ice = .TRUE.
          ENDIF
       ENDIF
@@ -97,7 +94,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt     ! number of iteration
       !!
-      INTEGER ::   jk ,jl   ! dummy loop indices
+      INTEGER ::   jk    ! dummy loop indices
       INTEGER ::   iter
       CHARACTER(len=25) ::   znam
       CHARACTER(len=2)  ::   zchar, zchar1
@@ -117,6 +114,7 @@ CONTAINS
       !                                                                        ! calendar control
       CALL iom_rstput( iter, nitrst, numriw, 'nn_fsbc', REAL( nn_fsbc, wp ) )      ! time-step 
       CALL iom_rstput( iter, nitrst, numriw, 'kt_ice' , REAL( iter   , wp ) )      ! date
+      CALL iom_delay_rst( 'WRITE', 'ICE', numriw )   ! save only ice delayed global communication variables
 
       ! Prognostic variables
       CALL iom_rstput( iter, nitrst, numriw, 'v_i' , v_i  )
@@ -168,10 +166,9 @@ CONTAINS
       !!
       !! ** purpose  :   read restart file
       !!----------------------------------------------------------------------
-      INTEGER           ::   jk, jl
+      INTEGER           ::   jk
       LOGICAL           ::   llok
       INTEGER           ::   id1            ! local integer
-      INTEGER           ::   jlibalt = jprstlib
       CHARACTER(len=25) ::   znam
       CHARACTER(len=2)  ::   zchar, zchar1
       REAL(wp)          ::   zfice, ziter
@@ -184,7 +181,7 @@ CONTAINS
          WRITE(numout,*) '~~~~~~~~~~~~'
       ENDIF
 
-      CALL iom_open ( TRIM(cn_icerst_indir)//'/'//cn_icerst_in, numrir, kiolib = jprstlib, kdlev = jpl )
+      CALL iom_open ( TRIM(cn_icerst_indir)//'/'//cn_icerst_in, numrir, kdlev = jpl )
 
       CALL iom_get( numrir, 'nn_fsbc', zfice )
       CALL iom_get( numrir, 'kt_ice' , ziter )    
@@ -235,6 +232,9 @@ CONTAINS
       ! ice velocity
       CALL iom_get( numrir, jpdom_autoglo, 'u_ice', u_ice )
       CALL iom_get( numrir, jpdom_autoglo, 'v_ice', v_ice )
+
+      CALL iom_delay_rst( 'READ', 'ICE', numrir )   ! read only ice delayed global communication variables
+
       ! fields needed for Met Office (Jules) coupling
       IF( ln_cpl ) THEN
          CALL iom_get( numrir, jpdom_autoglo, 'cnd_ice', cnd_ice )

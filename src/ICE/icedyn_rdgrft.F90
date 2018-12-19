@@ -90,8 +90,8 @@ CONTAINS
          &      hrmax(jpij,jpl), hi_hrdg(jpij,jpl)  , araft (jpij,jpl),  &
          &      ze_i_2d(jpij,nlay_i,jpl), ze_s_2d(jpij,nlay_s,jpl), STAT=ice_dyn_rdgrft_alloc )
 
-      IF( lk_mpp                    )   CALL mpp_sum ( ice_dyn_rdgrft_alloc )
-      IF( ice_dyn_rdgrft_alloc /= 0 )   CALL ctl_warn( 'ice_dyn_rdgrft_alloc: failed to allocate arrays' )
+      CALL mpp_sum ( 'icedyn_rdgrft', ice_dyn_rdgrft_alloc )
+      IF( ice_dyn_rdgrft_alloc /= 0 )   CALL ctl_stop( 'STOP',  'ice_dyn_rdgrft_alloc: failed to allocate arrays'  )
       !
    END FUNCTION ice_dyn_rdgrft_alloc
 
@@ -268,7 +268,7 @@ CONTAINS
             END DO
             !
             iter = iter + 1
-            IF( iter  >  jp_itermax )    CALL ctl_warn( 'icedyn_rdgrft: non-converging ridging scheme' )
+            IF( iter  >  jp_itermax )    CALL ctl_stop( 'STOP',  'icedyn_rdgrft: non-converging ridging scheme'  )
             !
          END DO
 
@@ -792,7 +792,7 @@ CONTAINS
                strength(ji,jj) = zworka(ji,jj)
             END DO
          END DO
-         CALL lbc_lnk( strength, 'T', 1. )
+         CALL lbc_lnk( 'icedyn_rdgrft', strength, 'T', 1. )
          !
       CASE( 2 )               !--- Temporal smoothing
          IF ( kt_ice == nit000 ) THEN
@@ -813,7 +813,7 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk( strength, 'T', 1. )
+         CALL lbc_lnk( 'icedyn_rdgrft', strength, 'T', 1. )
          !
       END SELECT
       !

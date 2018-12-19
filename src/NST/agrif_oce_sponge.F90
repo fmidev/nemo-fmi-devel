@@ -163,8 +163,8 @@ CONTAINS
                fsaht_spv(ji,jj) = 0.5_wp * visc_tra * ( ztabramp(ji,jj) + ztabramp(ji  ,jj+1) )
             END DO
          END DO
-         CALL lbc_lnk( fsaht_spu, 'U', 1. )   ! Lateral boundary conditions
-         CALL lbc_lnk( fsaht_spv, 'V', 1. )
+         CALL lbc_lnk( 'agrif_oce_sponge', fsaht_spu, 'U', 1. )   ! Lateral boundary conditions
+         CALL lbc_lnk( 'agrif_oce_sponge', fsaht_spv, 'V', 1. )
          
          spongedoneT = .TRUE.
       ENDIF
@@ -180,8 +180,8 @@ CONTAINS
                                                      &  +ztabramp(ji+1,jj+1) + ztabramp(ji+1,jj  ) )
             END DO
          END DO
-         CALL lbc_lnk( fsahm_spt, 'T', 1. )   ! Lateral boundary conditions
-         CALL lbc_lnk( fsahm_spf, 'F', 1. )
+         CALL lbc_lnk( 'agrif_oce_sponge', fsahm_spt, 'T', 1. )   ! Lateral boundary conditions
+         CALL lbc_lnk( 'agrif_oce_sponge', fsahm_spf, 'F', 1. )
          
          spongedoneU = .TRUE.
       ENDIF

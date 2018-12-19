@@ -114,6 +114,9 @@ CONTAINS
 902   IF( ios >  0 )   CALL ctl_nam ( ios , 'namsbc in configuration namelist', lwp )
       IF(lwm) WRITE( numond, namsbc )
       !
+#if defined key_mpp_mpi
+      ncom_fsbc = nn_fsbc    ! make nn_fsbc available for lib_mpp
+#endif
       !                             !* overwrite namelist parameter using CPP key information
 #if defined key_agrif
       IF( Agrif_Root() ) THEN                ! AGRIF zoom (cf r1242: possibility to run without ice in fine grid)
@@ -439,7 +442,7 @@ CONTAINS
                                      CALL icb_stp( kt )           ! compute icebergs
          ! icebergs may advect into haloes during the icb step and alter emp.
          ! A lbc_lnk is necessary here to ensure restartability (#2113)
-         IF( .NOT. ln_passive_mode ) CALL lbc_lnk( emp, 'T', 1. ) ! ensure restartability with icebergs
+         IF( .NOT. ln_passive_mode ) CALL lbc_lnk( 'sbcmod', emp, 'T', 1. ) ! ensure restartability with icebergs
       ENDIF
 
       IF( ln_isf         )   CALL sbc_isf( kt )                   ! compute iceshelves
@@ -456,7 +459,7 @@ CONTAINS
 
 !!$!RBbug do not understand why see ticket 667
 !!$!clem: it looks like it is necessary for the north fold (in certain circumstances). Don't know why.
-!!$      CALL lbc_lnk( emp, 'T', 1. )
+!!$      CALL lbc_lnk( 'sbcmod', emp, 'T', 1. )
       !
       IF( kt == nit000 ) THEN                          !   set the forcing field at nit000 - 1    !
          !                                             ! ---------------------------------------- !

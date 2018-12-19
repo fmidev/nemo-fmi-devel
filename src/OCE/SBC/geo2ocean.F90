@@ -151,7 +151,7 @@ CONTAINS
          &      gsinu(jpi,jpj), gcosu(jpi,jpj),   & 
          &      gsinv(jpi,jpj), gcosv(jpi,jpj),   &  
          &      gsinf(jpi,jpj), gcosf(jpi,jpj), STAT=ierr )
-      IF(lk_mpp)   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'geo2ocean', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'angle: unable to allocate arrays' )
       !
       ! ============================= !
@@ -275,7 +275,7 @@ CONTAINS
       ! Lateral boundary conditions !
       ! =========================== !
       !           ! lateral boundary cond.: T-, U-, V-, F-pts, sgn
-      CALL lbc_lnk_multi( gcost, 'T', -1., gsint, 'T', -1., gcosu, 'U', -1., gsinu, 'U', -1., & 
+      CALL lbc_lnk_multi( 'geo2ocean', gcost, 'T', -1., gsint, 'T', -1., gcosu, 'U', -1., gsinu, 'U', -1., & 
                       &   gcosv, 'V', -1., gsinv, 'V', -1., gcosf, 'F', -1., gsinf, 'F', -1.  )
       !
    END SUBROUTINE angle
@@ -303,7 +303,7 @@ CONTAINS
       IF( .NOT. ALLOCATED( gsinlon ) ) THEN
          ALLOCATE( gsinlon(jpi,jpj,4) , gcoslon(jpi,jpj,4) ,   &
             &      gsinlat(jpi,jpj,4) , gcoslat(jpi,jpj,4) , STAT=ierr )
-         IF( lk_mpp    )   CALL mpp_sum( ierr )
+         CALL mpp_sum( 'geo2ocean', ierr )
          IF( ierr /= 0 )   CALL ctl_stop('geo2oce: unable to allocate arrays' )
       ENDIF
       !
@@ -380,7 +380,7 @@ CONTAINS
       IF( .NOT. ALLOCATED( gsinlon ) ) THEN
          ALLOCATE( gsinlon(jpi,jpj,4) , gcoslon(jpi,jpj,4) ,   &
             &      gsinlat(jpi,jpj,4) , gcoslat(jpi,jpj,4) , STAT=ierr )
-         IF( lk_mpp    )   CALL mpp_sum( ierr )
+         CALL mpp_sum( 'geo2ocean', ierr )
          IF( ierr /= 0 )   CALL ctl_stop('oce2geo: unable to allocate arrays' )
       ENDIF
 

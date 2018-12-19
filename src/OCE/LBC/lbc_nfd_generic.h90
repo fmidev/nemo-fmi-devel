@@ -128,7 +128,7 @@
                   iju = jpiglo-ji
                   ARRAY_IN(ji,ipj,:,:,jf) = SGN_IN(jf)  * ARRAY_IN(iju,ipj-1,:,:,jf)
                END DO
-               ARRAY_IN(jpiglo,ipj,:,:,jf) = SGN_IN(jf)  * ARRAY_IN(1,ipj-1,:,:,jf)
+               ARRAY_IN(jpiglo,ipj,:,:,jf) = SGN_IN(jf) * ARRAY_IN(jpiglo-2,ipj-1,:,:,jf)
             CASE ( 'V' )                               ! V-point
                DO ji = 1, jpiglo
                   ijt = jpiglo-ji+1
@@ -143,7 +143,7 @@
                   iju = jpiglo-ji
                   ARRAY_IN(ji,ipj  ,:,:,jf) = SGN_IN(jf)  * ARRAY_IN(iju,ipj-2,:,:,jf)
                END DO
-               ARRAY_IN(jpiglo,ipj,:,:,jf) = SGN_IN(jf)  * ARRAY_IN(1,ipj-2,:,:,jf)
+               ARRAY_IN(jpiglo,ipj,:,:,jf) = SGN_IN(jf)   * ARRAY_IN(jpiglo-2,ipj-2,:,:,jf)
                DO ji = jpiglo/2+1, jpiglo-1
                   iju = jpiglo-ji
                   ARRAY_IN(ji,ipjm1,:,:,jf) = SGN_IN(jf)  * ARRAY_IN(iju,ipjm1,:,:,jf)

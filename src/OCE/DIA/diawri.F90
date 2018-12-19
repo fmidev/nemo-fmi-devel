@@ -51,6 +51,7 @@ MODULE diawri
    USE ioipsl         ! 
 
 #if defined key_si3
+   USE ice 
    USE icewri 
 #endif
    USE lib_mpp         ! MPP library
@@ -118,7 +119,7 @@ CONTAINS
       ! 
       ! Output the initial state and forcings
       IF( ninist == 1 ) THEN                       
-         CALL dia_wri_state( 'output.init', kt )
+         CALL dia_wri_state( 'output.init' )
          ninist = 0
       ENDIF
 
@@ -180,7 +181,7 @@ CONTAINS
                !
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'T', 1. )
+         CALL lbc_lnk( 'diawri', z2d, 'T', 1. )
          CALL iom_put( "taubot", z2d )           
       ENDIF
          
@@ -236,7 +237,7 @@ CONTAINS
                   &              * umask(ji,jj,1) * umask(ji-1,jj,1) * vmask(ji,jj,1) * umask(ji,jj-1,1)
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'T', 1. )
+         CALL lbc_lnk( 'diawri', z2d, 'T', 1. )
          CALL iom_put( "sstgrad2",  z2d )          ! square of module of sst gradient
          z2d(:,:) = SQRT( z2d(:,:) )
          CALL iom_put( "sstgrad" ,  z2d )          ! module of sst gradient
@@ -280,7 +281,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z3d, 'T', 1. )
+         CALL lbc_lnk( 'diawri', z3d, 'T', 1. )
          CALL iom_put( "eken", z3d )                 ! kinetic energy
       ENDIF
       !
@@ -306,7 +307,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'U', -1. )
+         CALL lbc_lnk( 'diawri', z2d, 'U', -1. )
          CALL iom_put( "u_heattr", 0.5*rcp * z2d )    ! heat transport in i-direction
       ENDIF
 
@@ -319,7 +320,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'U', -1. )
+         CALL lbc_lnk( 'diawri', z2d, 'U', -1. )
          CALL iom_put( "u_salttr", 0.5 * z2d )        ! heat transport in i-direction
       ENDIF
 
@@ -341,7 +342,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'V', -1. )
+         CALL lbc_lnk( 'diawri', z2d, 'V', -1. )
          CALL iom_put( "v_heattr", 0.5*rcp * z2d )    !  heat transport in j-direction
       ENDIF
 
@@ -354,7 +355,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'V', -1. )
+         CALL lbc_lnk( 'diawri', z2d, 'V', -1. )
          CALL iom_put( "v_salttr", 0.5 * z2d )        !  heat transport in j-direction
       ENDIF
 
@@ -367,7 +368,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'T', -1. )
+         CALL lbc_lnk( 'diawri', z2d, 'T', -1. )
          CALL iom_put( "tosmint", rau0 * z2d )        ! Vertical integral of temperature
       ENDIF
       IF( iom_use("somint") ) THEN
@@ -379,7 +380,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z2d, 'T', -1. )
+         CALL lbc_lnk( 'diawri', z2d, 'T', -1. )
          CALL iom_put( "somint", rau0 * z2d )         ! Vertical integral of salinity
       ENDIF
 
@@ -409,7 +410,7 @@ CONTAINS
          &      ndex_hV(jpi*jpj) , ndex_V(jpi*jpj*jpk) , STAT=ierr(1) )
          !
       dia_wri_alloc = MAXVAL(ierr)
-      IF( lk_mpp )   CALL mpp_sum( dia_wri_alloc )
+      CALL mpp_sum( 'diawri', dia_wri_alloc )
       !
    END FUNCTION dia_wri_alloc
 
@@ -444,7 +445,7 @@ CONTAINS
       IF( ln_timing )   CALL timing_start('dia_wri')
       !
       IF( ninist == 1 ) THEN     !==  Output the initial state and forcings  ==!
-         CALL dia_wri_state( 'output.init', kt )
+         CALL dia_wri_state( 'output.init' )
          ninist = 0
       ENDIF
       !
@@ -518,7 +519,7 @@ CONTAINS
             !! allocation cant go in dia_wri_alloc because ln_icebergs is only set after 
             !! that routine is called from nemogcm, so do it here immediately before its needed
             ALLOCATE( ndex_bT(jpi*jpj*nclasses), STAT=ierror )
-            IF( lk_mpp )   CALL mpp_sum( ierror )
+            CALL mpp_sum( 'diawri', ierror )
             IF( ierror /= 0 ) THEN
                CALL ctl_stop('dia_wri: failed to allocate iceberg diagnostic array')
                RETURN
@@ -867,7 +868,7 @@ CONTAINS
    END SUBROUTINE dia_wri
 #endif
 
-   SUBROUTINE dia_wri_state( cdfile_name, kt )
+   SUBROUTINE dia_wri_state( cdfile_name )
       !!---------------------------------------------------------------------
       !!                 ***  ROUTINE dia_wri_state  ***
       !!        
@@ -881,160 +882,58 @@ CONTAINS
       !!      File 'output.abort.nc' is created in case of abnormal job end
       !!----------------------------------------------------------------------
       CHARACTER (len=* ), INTENT( in ) ::   cdfile_name      ! name of the file created
-      INTEGER           , INTENT( in ) ::   kt               ! ocean time-step index
-      !! 
-      CHARACTER (len=32) :: clname
-      CHARACTER (len=40) :: clop
-      INTEGER  ::   id_i , nz_i, nh_i       
-      INTEGER, DIMENSION(1) ::   idex             ! local workspace
-      REAL(wp) ::   zsto, zout, zmax, zjulian
+      !!
+      INTEGER :: inum
       !!----------------------------------------------------------------------
       ! 
-      ! 0. Initialisation
-      ! -----------------
-
-      ! Define name, frequency of output and means
-      clname = cdfile_name
-      IF( .NOT. Agrif_Root() ) clname = TRIM(Agrif_CFixed())//'_'//TRIM(clname)
-      zsto = rdt
-      clop = "inst(x)"           ! no use of the mask value (require less cpu time)
-      zout = rdt
-      zmax = ( nitend - nit000 + 1 ) * rdt
-
       IF(lwp) WRITE(numout,*)
       IF(lwp) WRITE(numout,*) 'dia_wri_state : single instantaneous ocean state'
       IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~   and forcing fields file created '
-      IF(lwp) WRITE(numout,*) '                and named :', clname, '.nc'
-
-
-      ! 1. Define NETCDF files and fields at beginning of first time step
-      ! -----------------------------------------------------------------
-
-      ! Compute julian date from starting date of the run
-      CALL ymds2ju( nyear, nmonth, nday, rdt, zjulian )         ! time axis 
-      zjulian = zjulian - adatrj   !   set calendar origin to the beginning of the experiment
-      CALL histbeg( clname, jpi, glamt, jpj, gphit,   &
-          1, jpi, 1, jpj, nit000-1, zjulian, rdt, nh_i, id_i, domain_id=nidom, snc4chunks=snc4set ) ! Horizontal grid : glamt and gphit
-      CALL histvert( id_i, "deptht", "Vertical T levels",   &    ! Vertical grid : gdept
-          "m", jpk, gdept_1d, nz_i, "down")
-
-      ! Declare all the output fields as NetCDF variables
-
-      CALL histdef( id_i, "vosaline", "Salinity"              , "PSU"    ,   &   ! salinity
-         &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-      CALL histdef( id_i, "votemper", "Temperature"           , "C"      ,   &   ! temperature
-         &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-      CALL histdef( id_i, "sossheig", "Sea Surface Height"    , "m"      ,   &  ! ssh
-         &          jpi, jpj, nh_i, 1  , 1, 1  , nz_i, 32, clop, zsto, zout )
-      CALL histdef( id_i, "vozocrtx", "Zonal Current"         , "m/s"    ,   &   ! zonal current
-         &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-      CALL histdef( id_i, "vomecrty", "Meridional Current"    , "m/s"    ,   &   ! meridonal current
-         &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout ) 
-      CALL histdef( id_i, "vovecrtz", "Vertical Velocity"     , "m/s"    ,   &   ! vertical current
-         &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout ) 
-         !
-      IF( ALLOCATED(ahtu) ) THEN
-         CALL histdef( id_i, "ahtu"    , "u-eddy diffusivity"    , "m2/s"    ,   &   ! zonal current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-         CALL histdef( id_i, "ahtv"    , "v-eddy diffusivity"    , "m2/s"    ,   &   ! meridonal current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout ) 
-      ENDIF
-      IF( ALLOCATED(ahmt) ) THEN 
-         CALL histdef( id_i, "ahmt"    , "t-eddy viscosity"      , "m2/s"    ,   &   ! zonal current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-         CALL histdef( id_i, "ahmf"    , "f-eddy viscosity"      , "m2/s"    ,   &   ! meridonal current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout ) 
-      ENDIF
-         !
-      CALL histdef( id_i, "sowaflup", "Net Upward Water Flux" , "Kg/m2/S",   &   ! net freshwater 
-         &          jpi, jpj, nh_i, 1  , 1, 1  , -99 , 32, clop, zsto, zout )
-      CALL histdef( id_i, "sohefldo", "Net Downward Heat Flux", "W/m2"   ,   &   ! net heat flux
-         &          jpi, jpj, nh_i, 1  , 1, 1  , -99 , 32, clop, zsto, zout )
-      CALL histdef( id_i, "soshfldo", "Shortwave Radiation"   , "W/m2"   ,   &   ! solar flux
-         &          jpi, jpj, nh_i, 1  , 1, 1  , -99 , 32, clop, zsto, zout )
-      CALL histdef( id_i, "soicecov", "Ice fraction"          , "[0,1]"  ,   &   ! fr_i
-         &          jpi, jpj, nh_i, 1  , 1, 1  , -99 , 32, clop, zsto, zout )
-      CALL histdef( id_i, "sozotaux", "Zonal Wind Stress"     , "N/m2"   ,   &   ! i-wind stress
-         &          jpi, jpj, nh_i, 1  , 1, 1  , -99 , 32, clop, zsto, zout )
-      CALL histdef( id_i, "sometauy", "Meridional Wind Stress", "N/m2"   ,   &   ! j-wind stress
-         &          jpi, jpj, nh_i, 1  , 1, 1  , -99 , 32, clop, zsto, zout )
-      IF( .NOT.ln_linssh ) THEN
-         CALL histdef( id_i, "vovvldep", "T point depth"         , "m"      , &   ! t-point depth
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-         CALL histdef( id_i, "vovvle3t", "T point thickness"     , "m"      , &   ! t-point depth
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-      ENDIF
-      !
-      IF( ln_wave .AND. ln_sdw ) THEN
-         CALL histdef( id_i, "sdzocrtx", "Stokes Drift Zonal"    , "m/s"    , &   ! StokesDrift zonal current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-         CALL histdef( id_i, "sdmecrty", "Stokes Drift Merid"    , "m/s"    , &   ! StokesDrift meridonal current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-         CALL histdef( id_i, "sdvecrtz", "Stokes Drift Vert"     , "m/s"    , &   ! StokesDrift vertical current
-            &          jpi, jpj, nh_i, jpk, 1, jpk, nz_i, 32, clop, zsto, zout )
-      ENDIF
+      IF(lwp) WRITE(numout,*) '                and named :', cdfile_name, '...nc'
 
 #if defined key_si3
-      IF( nn_ice == 2 ) THEN   ! condition needed in case agrif + ice-model but no-ice in child grid
-         CALL ice_wri_state( kt, id_i, nh_i )
-      ENDIF
+     CALL iom_open( TRIM(cdfile_name), inum, ldwrt = .TRUE., kdlev = jpl )
 #else
-      CALL histend( id_i, snc4chunks=snc4set )
+     CALL iom_open( TRIM(cdfile_name), inum, ldwrt = .TRUE. )
 #endif
 
-      ! 2. Start writing data
-      ! ---------------------
-      ! idex(1) est utilise ssi l'avant dernier argument est diffferent de 
-      ! la taille du tableau en sortie. Dans ce cas , l'avant dernier argument
-      ! donne le nombre d'elements, et idex la liste des indices a sortir
-      idex(1) = 1   ! init to avoid compil warning
-
-      ! Write all fields on T grid
-      CALL histwrite( id_i, "votemper", kt, tsn(:,:,:,jp_tem), jpi*jpj*jpk, idex )    ! now temperature
-      CALL histwrite( id_i, "vosaline", kt, tsn(:,:,:,jp_sal), jpi*jpj*jpk, idex )    ! now salinity
-      CALL histwrite( id_i, "sossheig", kt, sshn             , jpi*jpj    , idex )    ! sea surface height
-      CALL histwrite( id_i, "vozocrtx", kt, un               , jpi*jpj*jpk, idex )    ! now i-velocity
-      CALL histwrite( id_i, "vomecrty", kt, vn               , jpi*jpj*jpk, idex )    ! now j-velocity
-      CALL histwrite( id_i, "vovecrtz", kt, wn               , jpi*jpj*jpk, idex )    ! now k-velocity
-      !
+      CALL iom_rstput( 0, 0, inum, 'votemper', tsn(:,:,:,jp_tem) )    ! now temperature
+      CALL iom_rstput( 0, 0, inum, 'vosaline', tsn(:,:,:,jp_sal) )    ! now salinity
+      CALL iom_rstput( 0, 0, inum, 'sossheig', sshn              )    ! sea surface height
+      CALL iom_rstput( 0, 0, inum, 'vozocrtx', un                )    ! now i-velocity
+      CALL iom_rstput( 0, 0, inum, 'vomecrty', vn                )    ! now j-velocity
+      CALL iom_rstput( 0, 0, inum, 'vovecrtz', wn                )    ! now k-velocity
       IF( ALLOCATED(ahtu) ) THEN
-         CALL histwrite( id_i, "ahtu"    , kt, ahtu             , jpi*jpj*jpk, idex )    ! aht at u-point
-         CALL histwrite( id_i, "ahtv"    , kt, ahtv             , jpi*jpj*jpk, idex )    !  -  at v-point
+         CALL iom_rstput( 0, 0, inum,  'ahtu', ahtu              )    ! aht at u-point
+         CALL iom_rstput( 0, 0, inum,  'ahtv', ahtv              )    ! aht at v-point
       ENDIF
       IF( ALLOCATED(ahmt) ) THEN
-         CALL histwrite( id_i, "ahmt"    , kt, ahmt             , jpi*jpj*jpk, idex )    ! ahm at t-point
-         CALL histwrite( id_i, "ahmf"    , kt, ahmf             , jpi*jpj*jpk, idex )    !  -  at f-point
+         CALL iom_rstput( 0, 0, inum,  'ahmt', ahmt              )    ! ahmt at u-point
+         CALL iom_rstput( 0, 0, inum,  'ahmf', ahmf              )    ! ahmf at v-point
       ENDIF
-      !
-      CALL histwrite( id_i, "sowaflup", kt, emp - rnf        , jpi*jpj    , idex )    ! freshwater budget
-      CALL histwrite( id_i, "sohefldo", kt, qsr + qns        , jpi*jpj    , idex )    ! total heat flux
-      CALL histwrite( id_i, "soshfldo", kt, qsr              , jpi*jpj    , idex )    ! solar heat flux
-      CALL histwrite( id_i, "soicecov", kt, fr_i             , jpi*jpj    , idex )    ! ice fraction
-      CALL histwrite( id_i, "sozotaux", kt, utau             , jpi*jpj    , idex )    ! i-wind stress
-      CALL histwrite( id_i, "sometauy", kt, vtau             , jpi*jpj    , idex )    ! j-wind stress
-
+      CALL iom_rstput( 0, 0, inum, 'sowaflup', emp - rnf         )    ! freshwater budget
+      CALL iom_rstput( 0, 0, inum, 'sohefldo', qsr + qns         )    ! total heat flux
+      CALL iom_rstput( 0, 0, inum, 'soshfldo', qsr               )    ! solar heat flux
+      CALL iom_rstput( 0, 0, inum, 'soicecov', fr_i              )    ! ice fraction
+      CALL iom_rstput( 0, 0, inum, 'sozotaux', utau              )    ! i-wind stress
+      CALL iom_rstput( 0, 0, inum, 'sometauy', vtau              )    ! j-wind stress
       IF(  .NOT.ln_linssh  ) THEN             
-         CALL histwrite( id_i, "vovvldep", kt, gdept_n(:,:,:), jpi*jpj*jpk, idex )!  T-cell depth 
-         CALL histwrite( id_i, "vovvle3t", kt, e3t_n (:,:,:) , jpi*jpj*jpk, idex )!  T-cell thickness  
-      END IF 
- 
+         CALL iom_rstput( 0, 0, inum, 'vovvldep', gdept_n        )    !  T-cell depth 
+         CALL iom_rstput( 0, 0, inum, 'vovvle3t', e3t_n          )    !  T-cell thickness  
+      END IF
       IF( ln_wave .AND. ln_sdw ) THEN
-         CALL histwrite( id_i, "sdzocrtx", kt, usd           , jpi*jpj*jpk, idex)     ! now StokesDrift i-velocity
-         CALL histwrite( id_i, "sdmecrty", kt, vsd           , jpi*jpj*jpk, idex)     ! now StokesDrift j-velocity
-         CALL histwrite( id_i, "sdvecrtz", kt, wsd           , jpi*jpj*jpk, idex)     ! now StokesDrift k-velocity
+         CALL iom_rstput( 0, 0, inum, 'sdzocrtx', usd            )    ! now StokesDrift i-velocity
+         CALL iom_rstput( 0, 0, inum, 'sdmecrty', vsd            )    ! now StokesDrift j-velocity
+         CALL iom_rstput( 0, 0, inum, 'sdvecrtz', wsd            )    ! now StokesDrift k-velocity
       ENDIF
-
-      ! 3. Close the file
-      ! -----------------
-      CALL histclo( id_i )
-#if ! defined key_iomput
-      IF( ninist /= 1  ) THEN
-         CALL histclo( nid_T )
-         CALL histclo( nid_U )
-         CALL histclo( nid_V )
-         CALL histclo( nid_W )
+ 
+#if defined key_si3
+      IF( nn_ice == 2 ) THEN   ! condition needed in case agrif + ice-model but no-ice in child grid
+         CALL ice_wri_state( inum )
       ENDIF
 #endif
+      !
+      CALL iom_close( inum )
       ! 
    END SUBROUTINE dia_wri_state
 

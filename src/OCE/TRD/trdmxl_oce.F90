@@ -126,8 +126,8 @@ CONTAINS
         &      smltrd_csum_ln(jpi,jpj,jpltrd), smltrd_csum_ub(jpi,jpj,jpltrd), STAT=ierr(5) )
       !
       trdmxl_oce_alloc = MAXVAL( ierr )
-      IF( lk_mpp                )   CALL mpp_sum ( trdmxl_oce_alloc )
-      IF( trdmxl_oce_alloc /= 0 )   CALL ctl_warn('trdmxl_oce_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'trdmxl_oce', trdmxl_oce_alloc )
+      IF( trdmxl_oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trdmxl_oce_alloc: failed to allocate arrays' )
       !
    END FUNCTION trdmxl_oce_alloc
 

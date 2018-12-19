@@ -111,8 +111,8 @@ CONTAINS
       !
       dyn_spg_ts_alloc = MAXVAL( ierr(:) )
       !
-      IF( lk_mpp                )   CALL mpp_sum( dyn_spg_ts_alloc )
-      IF( dyn_spg_ts_alloc /= 0 )   CALL ctl_warn('dyn_spg_ts_alloc: failed to allocate arrays')
+      CALL mpp_sum( 'dynspg_ts', dyn_spg_ts_alloc )
+      IF( dyn_spg_ts_alloc /= 0 )   CALL ctl_stop( 'STOP', 'dyn_spg_ts_alloc: failed to allocate arrays' )
       !
    END FUNCTION dyn_spg_ts_alloc
 
@@ -261,7 +261,7 @@ CONTAINS
                   END DO
                END DO
             END SELECT
-            CALL lbc_lnk( zwz, 'F', 1._wp )
+            CALL lbc_lnk( 'dynspg_ts', zwz, 'F', 1._wp )
             !
             ftne(1,:) = 0._wp ; ftnw(1,:) = 0._wp ; ftse(1,:) = 0._wp ; ftsw(1,:) = 0._wp
             DO jj = 2, jpj
@@ -329,7 +329,7 @@ CONTAINS
                   zhf(:,jj) = zhf(:,jj) + e3f_n(:,jj,jk) * umask(:,jj,jk) * umask(:,jj+1,jk)
                END DO
             END DO
-            CALL lbc_lnk( zhf, 'F', 1._wp )
+            CALL lbc_lnk( 'dynspg_ts', zhf, 'F', 1._wp )
             ! JC: TBC. hf should be greater than 0 
             DO jj = 1, jpj
                DO ji = 1, jpi
@@ -710,6 +710,9 @@ CONTAINS
       !                                             ! ==================== !
       DO jn = 1, icycle                             !  sub-time-step loop  !
          !                                          ! ==================== !
+         !
+         l_full_nf_update = jn == icycle   ! false: disable full North fold update (performances) for jn = 1 to icycle-1
+         !                                                !  ------------------
          !                                                !* Update the forcing (BDY and tides)
          !                                                !  ------------------
          ! Update only tidal forcing at open boundaries
@@ -776,7 +779,7 @@ CONTAINS
                      &              +   e1e2t(ji,jj+1) * zsshp2_e(ji,jj+1) )
                END DO
             END DO
-            CALL lbc_lnk_multi( zwx, 'U', 1._wp, zwy, 'V', 1._wp )
+            CALL lbc_lnk_multi( 'dynspg_ts', zwx, 'U', 1._wp, zwy, 'V', 1._wp )
             !
             zhup2_e(:,:) = hu_0(:,:) + zwx(:,:)                ! Ocean depth at U- and V-points
             zhvp2_e(:,:) = hv_0(:,:) + zwy(:,:)
@@ -871,7 +874,7 @@ CONTAINS
          END DO
          ssha_e(:,:) = (  sshn_e(:,:) - rdtbt * ( zssh_frc(:,:) + zhdiv(:,:) )  ) * ssmask(:,:)
          
-         CALL lbc_lnk( ssha_e, 'T',  1._wp )
+         CALL lbc_lnk( 'dynspg_ts', ssha_e, 'T',  1._wp )
 
          ! Duplicate sea level across open boundaries (this is only cosmetic if linssh=T)
          IF( ln_bdy )   CALL bdy_ssh( ssha_e )
@@ -891,7 +894,7 @@ CONTAINS
                      &              +   e1e2t(ji  ,jj+1)  * ssha_e(ji  ,jj+1) )
                END DO
             END DO
-            CALL lbc_lnk_multi( zsshu_a, 'U', 1._wp, zsshv_a, 'V', 1._wp )
+            CALL lbc_lnk_multi( 'dynspg_ts', zsshu_a, 'U', 1._wp, zsshv_a, 'V', 1._wp )
          ENDIF   
          !                                 
          ! Half-step back interpolation of SSH for surface pressure computation:
@@ -1159,7 +1162,7 @@ CONTAINS
             !
          ENDIF
          !                                             !* domain lateral boundary
-         CALL lbc_lnk_multi( ua_e, 'U', -1._wp, va_e , 'V', -1._wp )
+         CALL lbc_lnk_multi( 'dynspg_ts', ua_e, 'U', -1._wp, va_e , 'V', -1._wp )
          !
          !                                                 ! open boundaries
          IF( ln_bdy )   CALL bdy_dyn2d( jn, ua_e, va_e, un_e, vn_e, hur_e, hvr_e, ssha_e )
@@ -1245,7 +1248,7 @@ CONTAINS
                   &              +   e1e2t(ji,jj+1) * ssha(ji,jj+1) )
             END DO
          END DO
-         CALL lbc_lnk_multi( zsshu_a, 'U', 1._wp, zsshv_a, 'V', 1._wp ) ! Boundary conditions
+         CALL lbc_lnk_multi( 'dynspg_ts', zsshu_a, 'U', 1._wp, zsshv_a, 'V', 1._wp ) ! Boundary conditions
          !
          DO jk=1,jpkm1
             ua(:,:,jk) = ua(:,:,jk) + r1_hu_n(:,:) * ( ua_b(:,:) - ub_b(:,:) * hu_b(:,:) ) * r1_2dt_b
@@ -1480,7 +1483,7 @@ CONTAINS
       END DO
       !
       zcmax = MAXVAL( zcu(:,:) )
-      IF( lk_mpp )   CALL mpp_max( zcmax )
+      CALL mpp_max( 'dynspg_ts', zcmax )
 
       ! Estimate number of iterations to satisfy a max courant number= rn_bt_cmax
       IF( ln_bt_auto )   nn_baro = CEILING( rdt / rn_bt_cmax * zcmax)

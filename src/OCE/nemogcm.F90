@@ -101,6 +101,10 @@ MODULE nemogcm
 
    CHARACTER(lc) ::   cform_aaa="( /, 'AAAAAAAA', / ) "     ! flag for output listing
 
+#if defined key_mpp_mpi
+   INCLUDE 'mpif.h'
+#endif
+
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
    !! $Id$
@@ -143,7 +147,7 @@ CONTAINS
 #endif
       ! check that all process are still there... If some process have an error,
       ! they will never enter in step and other processes will wait until the end of the cpu time!
-      IF( lk_mpp )   CALL mpp_max( nstop )
+      CALL mpp_max( 'nemogcm', nstop )
 
       IF(lwp) WRITE(numout,cform_aaa)   ! Flag AAAAAAA
 
@@ -183,6 +187,11 @@ CONTAINS
       IF( .NOT.ln_diurnal_only ) THEN                 !==  Standard time-stepping  ==!
          !
          DO WHILE( istp <= nitend .AND. nstop == 0 )
+#if defined key_mpp_mpi
+            ncom_stp = istp
+            IF ( istp == ( nit000 + 1 ) ) elapsed_time = MPI_Wtime()
+            IF ( istp ==         nitend ) elapsed_time = MPI_Wtime() - elapsed_time
+#endif
             CALL stp        ( istp ) 
             istp = istp + 1
          END DO
@@ -224,9 +233,13 @@ CONTAINS
       IF( lk_oasis     )            CALL cpl_finalize   ! end coupling and mpp communications with OASIS
 #else
       IF    ( lk_oasis ) THEN   ;   CALL cpl_finalize   ! end coupling and mpp communications with OASIS
-      ELSEIF( lk_mpp   ) THEN   ;   CALL mppstop        ! end mpp communications
+      ELSEIF( lk_mpp   ) THEN   ;   CALL mppstop( ldfinal = .TRUE. )   ! end mpp communications
       ENDIF
 #endif
+      !
+      IF( nstop == 0 ) THEN   ;   STOP 0
+      ELSE                    ;   STOP 999
+      ENDIF
       !
    END SUBROUTINE nemo_gcm
 
@@ -339,17 +352,20 @@ CONTAINS
          WRITE(numout,*)
          WRITE(numout,*)
          DO ji = 1, SIZE(cltxt)
-            IF( TRIM(cltxt (ji)) /= '' )   WRITE(numout,*) cltxt(ji)    ! control print of mynode
+            IF( TRIM(cltxt (ji)) /= '' )   WRITE(numout,*) TRIM(cltxt(ji))    ! control print of mynode
          END DO
          WRITE(numout,*)
          WRITE(numout,*)
          DO ji = 1, SIZE(cltxt2)
-            IF( TRIM(cltxt2(ji)) /= '' )   WRITE(numout,*) cltxt2(ji)   ! control print of domain size
+            IF( TRIM(cltxt2(ji)) /= '' )   WRITE(numout,*) TRIM(cltxt2(ji))   ! control print of domain size
          END DO
          !
          WRITE(numout,cform_aaa)                                        ! Flag AAAAAAA
          !
       ENDIF
+      ! open /dev/null file to be able to supress output write easily
+      CALL ctl_opn( numnul, '/dev/null', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, 6, .FALSE. )
+      !
       !                                      ! Domain decomposition
       CALL mpp_init                          ! MPP
 
@@ -542,7 +558,8 @@ CONTAINS
       ENDIF
       !
       IF( 1._wp /= SIGN(1._wp,-0._wp)  )   CALL ctl_stop( 'nemo_ctl: The intrinsec SIGN function follows f2003 standard.',  &
-         &                                                'Compile with key_nosignedzero enabled' )
+         &                                                'Compile with key_nosignedzero enabled:',   &
+         &                                                '--> add -Dkey_nosignedzero to the definition of %CPP in your arch file' )
       !
 #if defined key_agrif
       IF( ln_timing )   CALL ctl_stop( 'AGRIF not implemented with ln_timing = true')
@@ -611,7 +628,7 @@ CONTAINS
       ierr = ierr + diadct_alloc ()    ! 
 #endif 
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'nemogcm', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'nemo_alloc: unable to allocate standard ocean arrays' )
       !
    END SUBROUTINE nemo_alloc

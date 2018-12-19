@@ -168,7 +168,7 @@ CONTAINS
                   pssh(ji,jj) = pssh(ji,jj-1) - ff_t(ji,jj) / grav * pu(ji,jj,1) * e2t(ji,jj)
                END DO
             END DO
-            CALL lbc_lnk( pssh, 'T',  1. )
+            CALL lbc_lnk( 'usrdef_istate', pssh, 'T',  1. )
          END DO
          
          ! temperature:
@@ -292,10 +292,10 @@ CONTAINS
          CALL RANDOM_NUMBER(zrandom)
          pssh(:,:) = pssh(:,:) + ( 0.1  * zrandom(:,:) - 0.05 )
       END IF
-      CALL lbc_lnk( pssh, 'T',  1. )
-      CALL lbc_lnk(  pts, 'T',  1. )
-      CALL lbc_lnk(   pu, 'U', -1. )
-      CALL lbc_lnk(   pv, 'V', -1. )
+      CALL lbc_lnk( 'usrdef_istate', pssh, 'T',  1. )
+      CALL lbc_lnk(  'usrdef_istate', pts, 'T',  1. )
+      CALL lbc_lnk(   'usrdef_istate', pu, 'U', -1. )
+      CALL lbc_lnk(   'usrdef_istate', pv, 'V', -1. )
 
    END SUBROUTINE usr_def_istate
 

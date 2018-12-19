@@ -13,10 +13,12 @@
 #   define PTR_TYPE              TYPE(PTR_4D)
 #   define PTR_ptab              pt4d
 #endif
-   SUBROUTINE ROUTINE_MULTI( pt1, cdna1, psgn1, pt2, cdna2, psgn2, pt3, cdna3, psgn3   &
+   SUBROUTINE ROUTINE_MULTI( cdname                                                    &
+      &                    , pt1, cdna1, psgn1, pt2, cdna2, psgn2, pt3, cdna3, psgn3   &
       &                    , pt4, cdna4, psgn4, pt5, cdna5, psgn5, pt6, cdna6, psgn6   &
       &                    , pt7, cdna7, psgn7, pt8, cdna8, psgn8, pt9, cdna9, psgn9, cd_mpp, pval)
       !!---------------------------------------------------------------------
+      CHARACTER(len=*)   ,                   INTENT(in   ) ::   cdname  ! name of the calling subroutine
       ARRAY_TYPE(:,:,:,:)          , TARGET, INTENT(inout) ::   pt1     ! arrays on which the lbc is applied
       ARRAY_TYPE(:,:,:,:), OPTIONAL, TARGET, INTENT(inout) ::   pt2  ,  pt3  , pt4  , pt5  , pt6  , pt7  , pt8  , pt9
       CHARACTER(len=1)                     , INTENT(in   ) ::   cdna1   ! nature of pt2D. array grid-points
@@ -47,7 +49,7 @@
       IF( PRESENT(psgn8) )   CALL ROUTINE_LOAD( pt8, cdna8, psgn8, ptab_ptr, cdna_ptr, psgn_ptr, kfld )
       IF( PRESENT(psgn9) )   CALL ROUTINE_LOAD( pt9, cdna9, psgn9, ptab_ptr, cdna_ptr, psgn_ptr, kfld )
       !
-      CALL lbc_lnk_ptr( ptab_ptr, cdna_ptr, psgn_ptr, kfld, cd_mpp, pval )
+      CALL lbc_lnk_ptr( cdname, ptab_ptr, cdna_ptr, psgn_ptr, kfld, cd_mpp, pval )
       !
    END SUBROUTINE ROUTINE_MULTI
 

@@ -38,8 +38,8 @@ CONTAINS
       !!-------------------------------------------------------------------
       ALLOCATE( iperproc(jpnij), STAT=flo_rst_alloc )
       !  
-      IF( lk_mpp             )   CALL mpp_sum ( flo_rst_alloc )
-      IF( flo_rst_alloc /= 0 )   CALL ctl_warn('flo_rst_alloc: failed to allocate arrays.')
+      CALL mpp_sum ( 'florst', flo_rst_alloc )
+      IF( flo_rst_alloc /= 0 )   CALL ctl_stop( 'STOP', 'flo_rst_alloc: failed to allocate arrays.' )
    END FUNCTION flo_rst_alloc
 
 
@@ -108,7 +108,7 @@ CONTAINS
                   iperproc(narea) = iperproc(narea)+1
                ENDIF
             END DO
-            CALL mpp_sum( iperproc, jpnij )
+            CALL mpp_sum( 'florst', iperproc, jpnij )
             !
             IF(lwp) THEN
                WRITE(numout,*) 'DATE',adatrj

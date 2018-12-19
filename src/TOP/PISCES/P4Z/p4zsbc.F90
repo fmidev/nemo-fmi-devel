@@ -367,7 +367,7 @@ CONTAINS
                CALL iom_close( numriv )
                ztimes_riv = 1._wp / REAL(ntimes_riv, wp) 
                DO jm = 1, ntimes_riv
-                  rivinput(ifpr) = rivinput(ifpr) + glob_sum( zriver(:,:,jm) * tmask(:,:,1) * ztimes_riv ) 
+                  rivinput(ifpr) = rivinput(ifpr) + glob_sum( 'p4zsbc', zriver(:,:,jm) * tmask(:,:,1) * ztimes_riv ) 
                END DO
                DEALLOCATE( zriver)
             END DO
@@ -448,7 +448,7 @@ CONTAINS
             END DO
          END DO
          !
-         CALL lbc_lnk( zcmask , 'T', 1. )      ! lateral boundary conditions on cmask   (sign unchanged)
+         CALL lbc_lnk( 'p4zsbc', zcmask , 'T', 1. )      ! lateral boundary conditions on cmask   (sign unchanged)
          !
          DO jk = 1, jpk
             DO jj = 1, jpj

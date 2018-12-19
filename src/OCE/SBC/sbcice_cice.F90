@@ -99,7 +99,7 @@ CONTAINS
       !!                ***  FUNCTION sbc_ice_cice_alloc  ***
       !!----------------------------------------------------------------------
       ALLOCATE( png(jpi,jpj,jpnij), STAT=sbc_ice_cice_alloc )
-      IF( lk_mpp                 )   CALL mpp_sum ( sbc_ice_cice_alloc )
+      CALL mpp_sum ( 'sbcice_cice', sbc_ice_cice_alloc )
       IF( sbc_ice_cice_alloc > 0 )   CALL ctl_warn('sbc_ice_cice_alloc: allocation of arrays failed.')
    END FUNCTION sbc_ice_cice_alloc
 
@@ -216,7 +216,7 @@ CONTAINS
          ENDDO
       ENDDO
 
-      CALL lbc_lnk_multi( fr_iu , 'U', 1.,  fr_iv , 'V', 1. )
+      CALL lbc_lnk_multi( 'sbcice_cice', fr_iu , 'U', 1.,  fr_iv , 'V', 1. )
 
       ! set the snow+ice mass
       CALL cice2nemo(vsno(:,:,:),ztmp1,'T', 1. )
@@ -512,7 +512,7 @@ CONTAINS
             ss_iou(ji,jj) = 0.5 * ( ztmp1(ji,jj-1) + ztmp1(ji,jj) ) * umask(ji,jj,1)
          ENDDO
       ENDDO
-      CALL lbc_lnk( ss_iou , 'U', -1. )
+      CALL lbc_lnk( 'sbcice_cice', ss_iou , 'U', -1. )
 
 ! y comp of ocean-ice stress 
       CALL cice2nemo(strocny,ztmp1,'F', -1. )
@@ -524,7 +524,7 @@ CONTAINS
             ss_iov(ji,jj) = 0.5 * ( ztmp1(ji-1,jj) + ztmp1(ji,jj) ) * vmask(ji,jj,1)
          ENDDO
       ENDDO
-      CALL lbc_lnk( ss_iov , 'V', -1. )
+      CALL lbc_lnk( 'sbcice_cice', ss_iov , 'V', -1. )
 
 ! x and y comps of surface stress
 ! Combine wind stress and ocean-ice stress
@@ -577,7 +577,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
       emp(:,:)=emp(:,:)-ztmp1(:,:)
       fmmflx(:,:) = ztmp1(:,:) !!Joakim edit
       
-      CALL lbc_lnk_multi( emp , 'T', 1., sfx , 'T', 1. )
+      CALL lbc_lnk_multi( 'sbcice_cice', emp , 'T', 1., sfx , 'T', 1. )
 
 ! Solar penetrative radiation and non solar surface heat flux
 
@@ -603,7 +603,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
       CALL cice2nemo(fswthru_ai,ztmp1,'T', 1. )
 #endif
       qsr(:,:)=qsr(:,:)+ztmp1(:,:)
-      CALL lbc_lnk( qsr , 'T', 1. )
+      CALL lbc_lnk( 'sbcice_cice', qsr , 'T', 1. )
 
       DO jj=1,jpj
          DO ji=1,jpi
@@ -618,7 +618,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
 #endif
       qns(:,:)=qns(:,:)+nfrzmlt(:,:)+ztmp1(:,:)
 
-      CALL lbc_lnk( qns , 'T', 1. )
+      CALL lbc_lnk( 'sbcice_cice', qns , 'T', 1. )
 
 ! Prepare for the following CICE time-step
 
@@ -638,7 +638,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
          ENDDO
       ENDDO
 
-      CALL lbc_lnk_multi( fr_iu , 'U', 1., fr_iv , 'V', 1. )
+      CALL lbc_lnk_multi( 'sbcice_cice', fr_iu , 'U', 1., fr_iv , 'V', 1. )
 
       ! set the snow+ice mass
       CALL cice2nemo(vsno(:,:,:),ztmp1,'T', 1. )
@@ -862,7 +862,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
 
 !     A. Ensure all haloes are filled in NEMO field (pn)
 
-      CALL lbc_lnk( pn , cd_type, psgn )
+      CALL lbc_lnk( 'sbcice_cice', pn , cd_type, psgn )
 
 #if defined key_nemocice_decomp
 
@@ -1039,7 +1039,7 @@ taum(:,:)=(1.0-fr_i(:,:))*taum(:,:)+fr_i(:,:)*SQRT(ztmp1*ztmp1 + ztmp2*ztmp2)
 
 !     D. Ensure all haloes are filled in pn
 
-      CALL lbc_lnk( pn , cd_type, psgn )
+      CALL lbc_lnk( 'sbcice_cice', pn , cd_type, psgn )
 
    END SUBROUTINE cice2nemo
 

@@ -113,8 +113,8 @@ CONTAINS
             src_calving     (ji,jj) = nicbpack * mjg(jj) + mig(ji)
          END DO
       END DO
-      CALL lbc_lnk( src_calving_hflx, 'T', 1._wp )
-      CALL lbc_lnk( src_calving     , 'T', 1._wp )
+      CALL lbc_lnk( 'icbini', src_calving_hflx, 'T', 1._wp )
+      CALL lbc_lnk( 'icbini', src_calving     , 'T', 1._wp )
 
       ! work out interior of processor from exchange array
       ! first entry with narea for this processor is left hand interior index
@@ -334,7 +334,7 @@ CONTAINS
       END DO
       !
       ibergs = icb_utl_count()
-      IF( lk_mpp ) CALL mpp_sum(ibergs)
+      CALL mpp_sum('icbini', ibergs)
       WRITE(numicb,'(a,i6,a)') 'diamonds, icb_ini_gen: ',ibergs,' were generated'
       !
    END SUBROUTINE icb_ini_gen

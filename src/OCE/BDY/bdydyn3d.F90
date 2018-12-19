@@ -96,8 +96,8 @@ CONTAINS
             va(ii,ij,jk) = dta%v3d(jb,jk) * vmask(ii,ij,jk)
          END DO
       END DO
-      CALL lbc_bdy_lnk( ua, 'U', -1., ib_bdy )   ! Boundary points should be updated  
-      CALL lbc_bdy_lnk( va, 'V', -1., ib_bdy )   
+      CALL lbc_bdy_lnk( 'bdydyn3d', ua, 'U', -1., ib_bdy )   ! Boundary points should be updated  
+      CALL lbc_bdy_lnk( 'bdydyn3d', va, 'V', -1., ib_bdy )   
       !
       IF( kt == nit000 )   CLOSE( unit = 102 )
       !
@@ -143,8 +143,8 @@ CONTAINS
                         &+ va(ii-fv,ij,jk) * vmask(ii-fv,ij,jk) ) * vmask(ii,ij,jk) * REAL( fv )
          END DO
       END DO
-      CALL lbc_bdy_lnk( ua, 'U', -1., ib_bdy )   ! Boundary points should be updated  
-      CALL lbc_bdy_lnk( va, 'V', -1., ib_bdy )   
+      CALL lbc_bdy_lnk( 'bdydyn3d', ua, 'U', -1., ib_bdy )   ! Boundary points should be updated  
+      CALL lbc_bdy_lnk( 'bdydyn3d', va, 'V', -1., ib_bdy )   
       !
       IF( kt == nit000 )   CLOSE( unit = 102 )
       !
@@ -186,7 +186,7 @@ CONTAINS
          END DO
       END DO
       !
-      CALL lbc_bdy_lnk( ua, 'U', -1., ib_bdy )   ;   CALL lbc_bdy_lnk( va, 'V', -1.,ib_bdy )   ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn3d', ua, 'U', -1., ib_bdy )   ;   CALL lbc_bdy_lnk( 'bdydyn3d', va, 'V', -1.,ib_bdy )   ! Boundary points should be updated
       !
       IF( kt == nit000 )   CLOSE( unit = 102 )
       !
@@ -233,8 +233,8 @@ CONTAINS
             va(ii,ij,jk) = ( va(ii,ij,jk) + zwgt * ( dta%v3d(jb,jk) - va(ii,ij,jk) ) ) * vmask(ii,ij,jk)
          END DO
       END DO 
-      CALL lbc_bdy_lnk( ua, 'U', -1., ib_bdy )    ! Boundary points should be updated
-      CALL lbc_bdy_lnk( va, 'V', -1., ib_bdy )   
+      CALL lbc_bdy_lnk( 'bdydyn3d', ua, 'U', -1., ib_bdy )    ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn3d', va, 'V', -1., ib_bdy )   
       !
       IF( kt == nit000 )   CLOSE( unit = 102 )
       !
@@ -269,8 +269,8 @@ CONTAINS
       !  
       CALL bdy_orlanski_3d( idx, igrd, vb, va, dta%v3d, ll_npo )
       !
-      CALL lbc_bdy_lnk( ua, 'U', -1., ib_bdy )    ! Boundary points should be updated
-      CALL lbc_bdy_lnk( va, 'V', -1., ib_bdy )   
+      CALL lbc_bdy_lnk( 'bdydyn3d', ua, 'U', -1., ib_bdy )    ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn3d', va, 'V', -1., ib_bdy )   
       !
    END SUBROUTINE bdy_dyn3d_orlanski
 
@@ -318,7 +318,7 @@ CONTAINS
          ENDIF
       END DO
       !
-      CALL lbc_lnk_multi( ua, 'U', -1.,  va, 'V', -1. )   ! Boundary points should be updated
+      CALL lbc_lnk_multi( 'bdydyn3d', ua, 'U', -1.,  va, 'V', -1. )   ! Boundary points should be updated
       !
       IF( ln_timing )   CALL timing_stop('bdy_dyn3d_dmp')
       !
@@ -350,8 +350,8 @@ CONTAINS
       !  
       CALL bdy_nmn( idx, igrd, va )
       !
-      CALL lbc_bdy_lnk( ua, 'U', -1., ib_bdy )    ! Boundary points should be updated
-      CALL lbc_bdy_lnk( va, 'V', -1., ib_bdy )
+      CALL lbc_bdy_lnk( 'bdydyn3d', ua, 'U', -1., ib_bdy )    ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn3d', va, 'V', -1., ib_bdy )
       !
    END SUBROUTINE bdy_dyn3d_nmn
 

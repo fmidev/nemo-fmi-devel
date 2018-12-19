@@ -108,8 +108,8 @@ CONTAINS
          zwgt = idx%nbw(jb,igrd)
          pva2d(ii,ij) = ( pva2d(ii,ij) + zwgt * ( dta%v2d(jb) - pva2d(ii,ij) ) ) * vmask(ii,ij,1)
       END DO 
-      CALL lbc_bdy_lnk( pua2d, 'U', -1., ib_bdy ) 
-      CALL lbc_bdy_lnk( pva2d, 'V', -1., ib_bdy)   ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn2d', pua2d, 'U', -1., ib_bdy ) 
+      CALL lbc_bdy_lnk( 'bdydyn2d', pva2d, 'V', -1., ib_bdy)   ! Boundary points should be updated
       !
    END SUBROUTINE bdy_dyn2d_frs
 
@@ -168,7 +168,7 @@ CONTAINS
          ENDIF
       END DO
 
-      CALL lbc_bdy_lnk( spgu(:,:), 'T', 1., ib_bdy )
+      CALL lbc_bdy_lnk( 'bdydyn2d', spgu(:,:), 'T', 1., ib_bdy )
       !
       igrd = 2      ! Flather bc on u-velocity; 
       !             ! remember that flagu=-1 if normal velocity direction is outward
@@ -206,8 +206,8 @@ CONTAINS
          zforc  = dta%v2d(jb) * (1._wp - z1_2*zflag) + z1_2 * zflag * pva2d(ii,ijm1)
          pva2d(ii,ij) = zforc + (1._wp - z1_2*zflag) * zcorr * vmask(ii,ij,1)
       END DO
-      CALL lbc_bdy_lnk( pua2d, 'U', -1., ib_bdy )   ! Boundary points should be updated
-      CALL lbc_bdy_lnk( pva2d, 'V', -1., ib_bdy )   !
+      CALL lbc_bdy_lnk( 'bdydyn2d', pua2d, 'U', -1., ib_bdy )   ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn2d', pva2d, 'V', -1., ib_bdy )   !
       !
    END SUBROUTINE bdy_dyn2d_fla
 
@@ -242,8 +242,8 @@ CONTAINS
       !  
       CALL bdy_orlanski_2d( idx, igrd, pvb2d, pva2d, dta%v2d, ll_npo )
       !
-      CALL lbc_bdy_lnk( pua2d, 'U', -1., ib_bdy )   ! Boundary points should be updated
-      CALL lbc_bdy_lnk( pva2d, 'V', -1., ib_bdy )   !
+      CALL lbc_bdy_lnk( 'bdydyn2d', pua2d, 'U', -1., ib_bdy )   ! Boundary points should be updated
+      CALL lbc_bdy_lnk( 'bdydyn2d', pva2d, 'V', -1., ib_bdy )   !
       !
    END SUBROUTINE bdy_dyn2d_orlanski
 
@@ -290,7 +290,7 @@ CONTAINS
          END DO
 
          ! Boundary points should be updated
-         CALL lbc_bdy_lnk( zssh(:,:), 'T', 1., ib_bdy )
+         CALL lbc_bdy_lnk( 'bdydyn2d', zssh(:,:), 'T', 1., ib_bdy )
       END DO
 
    END SUBROUTINE bdy_ssh

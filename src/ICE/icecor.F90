@@ -118,7 +118,7 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk_multi( u_ice, 'U', -1., v_ice, 'V', -1. )            ! lateral boundary conditions
+         CALL lbc_lnk_multi( 'icecor', u_ice, 'U', -1., v_ice, 'V', -1. )            ! lateral boundary conditions
       ENDIF
 
 !!gm I guess the trends are only out on demand 

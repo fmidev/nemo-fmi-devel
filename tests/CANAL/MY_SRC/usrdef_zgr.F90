@@ -197,13 +197,13 @@ CONTAINS
          z2d(:,:) = REAL( jpkm1 , wp )          ! flat bottom
       CASE(1)
          zmaxlam = MAXVAL(glamt)
-         IF( lk_mpp )   CALL mpp_max( zmaxlam )                 ! max over the global domain
+         CALL mpp_max( 'usrdef_zgr', zmaxlam )                 ! max over the global domain
          zscl = rpi / zmaxlam
          z2d(:,:) = 0.5 * ( 1. - COS( glamt(:,:) * zscl ) )
          z2d(:,:) = REAL(jpkm1 - NINT( 0.75 * REAL(jpkm1,wp) * z2d(:,:) ), wp)
       END SELECT
       !
-      CALL lbc_lnk( z2d, 'T', 1. )           ! set surrounding land to zero (here jperio=0 ==>> closed)
+      CALL lbc_lnk( 'usrdef_zgr', z2d, 'T', 1. )           ! set surrounding land to zero (here jperio=0 ==>> closed)
       !
       k_bot(:,:) = INT( z2d(:,:) )           ! =jpkm1 over the ocean point, =0 elsewhere
       !

@@ -188,7 +188,7 @@ CONTAINS
             END DO 
          END DO 
          ! 
-         CALL lbc_lnk_multi( zvrel, 'T', 1., ht_i_new, 'T', 1.  )
+         CALL lbc_lnk_multi( 'icethd_do', zvrel, 'T', 1., ht_i_new, 'T', 1.  )
 
       ENDIF
 

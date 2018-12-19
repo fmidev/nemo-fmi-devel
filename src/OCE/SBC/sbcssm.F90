@@ -17,6 +17,7 @@ MODULE sbcssm
    USE sbc_oce        ! surface boundary condition: ocean fields
    USE sbcapr         ! surface boundary condition: atmospheric pressure
    USE eosbn2         ! equation of state and related derivatives
+   USE traqsr, ONLY: ln_traqsr
    !
    USE in_out_manager ! I/O manager
    USE prtctl         ! Print control
@@ -251,6 +252,8 @@ CONTAINS
          frq_m(:,:) = 1._wp
          !
       ENDIF
+      !
+      IF( .NOT. ln_traqsr )   fraqsr_1lev(:,:) = 1._wp   ! default definition: qsr 100% in the fisrt level 
       !
       IF( lwxios.AND.nn_fsbc > 1 ) THEN
          CALL iom_set_rstw_var_active('nn_fsbc')

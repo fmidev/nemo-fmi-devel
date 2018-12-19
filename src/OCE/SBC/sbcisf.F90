@@ -156,7 +156,7 @@ CONTAINS
          risf_tsc(:,:,jp_sal) = 0.0_wp
 
          ! lbclnk
-         CALL lbc_lnk_multi( risf_tsc(:,:,jp_tem), 'T', 1., risf_tsc(:,:,jp_sal), 'T', 1., fwfisf,'T', 1., qisf, 'T', 1.)
+         CALL lbc_lnk_multi( 'sbcisf', risf_tsc(:,:,jp_tem), 'T', 1., risf_tsc(:,:,jp_sal), 'T', 1., fwfisf,'T', 1., qisf, 'T', 1.)
          ! output
          IF( iom_use('iceshelf_cea') )   CALL iom_put( 'iceshelf_cea', -fwfisf(:,:)                      )   ! isf mass flux
          IF( iom_use('hflx_isf_cea') )   CALL iom_put( 'hflx_isf_cea', risf_tsc(:,:,jp_tem) * rau0 * rcp )   ! isf sensible+latent heat (W/m2)
@@ -243,8 +243,8 @@ CONTAINS
                &    ralpha(jpi,jpj)       , misfkt(jpi,jpj)     , misfkb(jpi,jpj)     , &
                &    STAT= sbc_isf_alloc )
          !
-         IF( lk_mpp             )   CALL mpp_sum ( sbc_isf_alloc )
-         IF( sbc_isf_alloc /= 0 )   CALL ctl_warn('sbc_isf_alloc: failed to allocate arrays.')
+         CALL mpp_sum ( 'sbcisf', sbc_isf_alloc )
+         IF( sbc_isf_alloc /= 0 )   CALL ctl_stop( 'STOP', 'sbc_isf_alloc: failed to allocate arrays.' )
          !
       ENDIF
    END FUNCTION
@@ -720,7 +720,7 @@ CONTAINS
                END IF
             END DO
          END DO
-         CALL lbc_lnk_multi( pgt, 'T', 1., pgs, 'T', 1.)
+         CALL lbc_lnk_multi( 'sbcisf', pgt, 'T', 1., pgs, 'T', 1.)
       END SELECT
       !
    END SUBROUTINE sbc_isf_gammats
@@ -777,7 +777,7 @@ CONTAINS
                pvarout(ji,jj) = 0.5_wp * (pvarout(ji,jj) + pvarout(ji-1,jj))
             END DO
          END DO
-         CALL lbc_lnk(pvarout,'T',-1.)
+         CALL lbc_lnk('sbcisf', pvarout,'T',-1.)
       
       CASE ( 'V' ) ! compute V in the top boundary layer at T- point 
          DO jj = 1,jpj
@@ -809,7 +809,7 @@ CONTAINS
                pvarout(ji,jj) = 0.5_wp * (pvarout(ji,jj) + pvarout(ji,jj-1))
             END DO
          END DO
-         CALL lbc_lnk(pvarout,'T',-1.)
+         CALL lbc_lnk('sbcisf', pvarout,'T',-1.)
 
       CASE ( 'T' ) ! compute T in the top boundary layer at T- point 
          DO jj = 1,jpj

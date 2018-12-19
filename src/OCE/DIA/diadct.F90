@@ -114,7 +114,7 @@ CONTAINS
      ALLOCATE(transports_2d(nb_2d_vars,nb_sec_max,nb_point_max)    , STAT=ierr(2) ) 
 
      diadct_alloc = MAXVAL( ierr ) 
-     IF( diadct_alloc /= 0 )   CALL ctl_warn('diadct_alloc: failed to allocate arrays') 
+     IF( diadct_alloc /= 0 )   CALL ctl_stop( 'STOP', 'diadct_alloc: failed to allocate arrays' ) 
  
   END FUNCTION diadct_alloc 
 
@@ -257,7 +257,7 @@ CONTAINS
               ish2    = (/nb_sec_max,nb_type_class,nb_class_max/)
               DO jsec=1,nb_sec ; zsum(jsec,:,:) = secs(jsec)%transport(:,:) ; ENDDO
               zwork(:)= RESHAPE(zsum(:,:,:), ish )
-              CALL mpp_sum(zwork, ish(1))
+              CALL mpp_sum('diadct', zwork, ish(1))
               zsum(:,:,:)= RESHAPE(zwork,ish2)
               DO jsec=1,nb_sec ; secs(jsec)%transport(:,:) = zsum(jsec,:,:) ; ENDDO
            ENDIF

@@ -91,7 +91,7 @@ CONTAINS
               &           / (e3t_n(:,:,jk)*r2dt) ) - ztrds(:,:,jk)
          END DO
 !!gm this should be moved in trdtra.F90 and done on all trends
-         CALL lbc_lnk_multi( ztrdt, 'T', 1. , ztrds, 'T', 1. )
+         CALL lbc_lnk_multi( 'trazdf', ztrdt, 'T', 1. , ztrds, 'T', 1. )
 !!gm
          CALL trd_tra( kt, 'TRA', jp_tem, jptra_zdf, ztrdt )
          CALL trd_tra( kt, 'TRA', jp_sal, jptra_zdf, ztrds )

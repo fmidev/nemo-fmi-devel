@@ -120,7 +120,7 @@ CONTAINS
                              CALL stp_ctl( kstp, indic )
       IF( indic < 0  )  THEN
                              CALL ctl_stop( 'step: indic < 0' )
-                             CALL dia_wri_state( 'output.abort', kstp )
+                             CALL dia_wri_state( 'output.abort' )
       ENDIF
       IF( kstp == nit000   ) CALL iom_close( numror )     ! close input  ocean restart file
       

@@ -126,7 +126,7 @@ CONTAINS
 
      ! Total carbon export per year
      IF( iom_use( "tcexp" ) .OR. ( ln_check_mass .AND. kt == nitend .AND. knt == nrdttrc )  )  &
-        &   t_oce_co2_exp = glob_sum( ( sinking(:,:,ik100) + sinking2(:,:,ik100) ) * e1e2t(:,:) * tmask(:,:,1) )
+        &   t_oce_co2_exp = glob_sum( 'p4zsink', ( sinking(:,:,ik100) + sinking2(:,:,ik100) ) * e1e2t(:,:) * tmask(:,:,1) )
      !
      IF( lk_iomput ) THEN
        IF( knt == nrdttrc ) THEN
@@ -219,7 +219,7 @@ CONTAINS
          &                      sinkingp(jpi,jpj,jpk), sinking2p(jpi,jpj,jpk)   , STAT=ierr(2) )
       !
       p4z_sink_alloc = MAXVAL( ierr )
-      IF( p4z_sink_alloc /= 0 ) CALL ctl_warn('p4z_sink_alloc : failed to allocate arrays.')
+      IF( p4z_sink_alloc /= 0 ) CALL ctl_stop( 'STOP', 'p4z_sink_alloc : failed to allocate arrays.' )
       !
    END FUNCTION p4z_sink_alloc
    

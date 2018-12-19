@@ -360,12 +360,12 @@ CONTAINS
          IF( .NOT. lk_c1d ) THEN      ! ORCA configuration (not 1D) !
             !                                                ! --------------------------- !
             ! set total alkalinity, phosphate, nitrate & silicate
-            zarea          = 1._wp / glob_sum( cvol(:,:,:) ) * 1e6              
+            zarea          = 1._wp / glob_sum( 'p4zsms', cvol(:,:,:) ) * 1e6              
 
-            zalksumn = glob_sum( trn(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
-            zpo4sumn = glob_sum( trn(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
-            zno3sumn = glob_sum( trn(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
-            zsilsumn = glob_sum( trn(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
+            zalksumn = glob_sum( 'p4zsms', trn(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
+            zpo4sumn = glob_sum( 'p4zsms', trn(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
+            zno3sumn = glob_sum( 'p4zsms', trn(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
+            zsilsumn = glob_sum( 'p4zsms', trn(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
  
             IF(lwp) WRITE(numout,*) '       TALKN mean : ', zalksumn
             trn(:,:,:,jptal) = trn(:,:,:,jptal) * alkmean / zalksumn
@@ -381,10 +381,10 @@ CONTAINS
             !
             !
             IF( .NOT. ln_top_euler ) THEN
-               zalksumb = glob_sum( trb(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
-               zpo4sumb = glob_sum( trb(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
-               zno3sumb = glob_sum( trb(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
-               zsilsumb = glob_sum( trb(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
+               zalksumb = glob_sum( 'p4zsms', trb(:,:,:,jptal) * cvol(:,:,:)  ) * zarea
+               zpo4sumb = glob_sum( 'p4zsms', trb(:,:,:,jppo4) * cvol(:,:,:)  ) * zarea * po4r
+               zno3sumb = glob_sum( 'p4zsms', trb(:,:,:,jpno3) * cvol(:,:,:)  ) * zarea * rno3
+               zsilsumb = glob_sum( 'p4zsms', trb(:,:,:,jpsil) * cvol(:,:,:)  ) * zarea
  
                IF(lwp) WRITE(numout,*) ' '
                IF(lwp) WRITE(numout,*) '       TALKB mean : ', zalksumb
@@ -448,7 +448,7 @@ CONTAINS
                &          + ( trn(:,:,:,jpzoo) + trn(:,:,:,jpmes) ) * no3rat3 
         ENDIF
         !
-        no3budget = glob_sum( zwork(:,:,:) * cvol(:,:,:)  )  
+        no3budget = glob_sum( 'p4zsms', zwork(:,:,:) * cvol(:,:,:)  )  
         no3budget = no3budget / areatot
         CALL iom_put( "pno3tot", no3budget )
       ENDIF
@@ -466,7 +466,7 @@ CONTAINS
                &          + ( trn(:,:,:,jpzoo) + trn(:,:,:,jpmes) ) * po4rat3 
         ENDIF
         !
-        po4budget = glob_sum( zwork(:,:,:) * cvol(:,:,:)  )  
+        po4budget = glob_sum( 'p4zsms', zwork(:,:,:) * cvol(:,:,:)  )  
         po4budget = po4budget / areatot
         CALL iom_put( "ppo4tot", po4budget )
       ENDIF
@@ -474,7 +474,7 @@ CONTAINS
       IF( iom_use( "psiltot" ) .OR. ( ln_check_mass .AND. kt == nitend )  ) THEN
          zwork(:,:,:) =  trn(:,:,:,jpsil) + trn(:,:,:,jpgsi) + trn(:,:,:,jpdsi) 
          !
-         silbudget = glob_sum( zwork(:,:,:) * cvol(:,:,:)  )  
+         silbudget = glob_sum( 'p4zsms', zwork(:,:,:) * cvol(:,:,:)  )  
          silbudget = silbudget / areatot
          CALL iom_put( "psiltot", silbudget )
       ENDIF
@@ -482,7 +482,7 @@ CONTAINS
       IF( iom_use( "palktot" ) .OR. ( ln_check_mass .AND. kt == nitend )  ) THEN
          zwork(:,:,:) =  trn(:,:,:,jpno3) * rno3 + trn(:,:,:,jptal) + trn(:,:,:,jpcal) * 2.              
          !
-         alkbudget = glob_sum( zwork(:,:,:) * cvol(:,:,:)  )         !
+         alkbudget = glob_sum( 'p4zsms', zwork(:,:,:) * cvol(:,:,:)  )         !
          alkbudget = alkbudget / areatot
          CALL iom_put( "palktot", alkbudget )
       ENDIF
@@ -492,7 +492,7 @@ CONTAINS
             &         +   trn(:,:,:,jpbfe) + trn(:,:,:,jpsfe)                      &
             &         + ( trn(:,:,:,jpzoo) + trn(:,:,:,jpmes) )  * ferat3    
          !
-         ferbudget = glob_sum( zwork(:,:,:) * cvol(:,:,:)  )  
+         ferbudget = glob_sum( 'p4zsms', zwork(:,:,:) * cvol(:,:,:)  )  
          ferbudget = ferbudget / areatot
          CALL iom_put( "pfertot", ferbudget )
       ENDIF
@@ -501,18 +501,18 @@ CONTAINS
       !                          nitrogen fixation by the diazotrophs
       ! --------------------------------------------------------------------------------
       IF( iom_use( "tnfix" ) .OR.  ( ln_check_mass .AND. kt == nitend )  ) THEN
-         znitrpottot  = glob_sum ( nitrpot(:,:,:) * nitrfix * cvol(:,:,:) )
+         znitrpottot  = glob_sum ( 'p4zsms', nitrpot(:,:,:) * nitrfix * cvol(:,:,:) )
          CALL iom_put( "tnfix"  , znitrpottot * xfact3 )  ! Global  nitrogen fixation molC/l  to molN/m3 
       ENDIF
       !
       IF( iom_use( "tdenit" ) .OR.  ( ln_check_mass .AND. kt == nitend )  ) THEN
-         zrdenittot = glob_sum ( denitr(:,:,:) * rdenit * xnegtr(:,:,:) * cvol(:,:,:) )
-         zsdenittot = glob_sum ( sdenit(:,:) * e1e2t(:,:) * tmask(:,:,1) )
+         zrdenittot = glob_sum ( 'p4zsms', denitr(:,:,:) * rdenit * xnegtr(:,:,:) * cvol(:,:,:) )
+         zsdenittot = glob_sum ( 'p4zsms', sdenit(:,:) * e1e2t(:,:) * tmask(:,:,1) )
          CALL iom_put( "tdenit" , ( zrdenittot + zsdenittot ) * xfact3 )  ! Total denitrification molC/l to molN/m3 
       ENDIF
       !
       IF( ln_check_mass .AND. kt == nitend ) THEN   ! Compute the budget of NO3, ALK, Si, Fer
-         t_atm_co2_flx  = t_atm_co2_flx / glob_sum( e1e2t(:,:) )
+         t_atm_co2_flx  = t_atm_co2_flx / glob_sum( 'p4zsms', e1e2t(:,:) )
          t_oce_co2_flx  = t_oce_co2_flx         * xfact1 * (-1 )
          tpp            = tpp           * 1000. * xfact1
          t_oce_co2_exp  = t_oce_co2_exp * 1000. * xfact1

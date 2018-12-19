@@ -100,7 +100,7 @@ CONTAINS
       ! --- If ice drift field is too fast, use an appropriate time step for advection (CFL test for stability) --- !        
       zcfl  =            MAXVAL( ABS( pu_ice(:,:) ) * rdt_ice * r1_e1u(:,:) )
       zcfl  = MAX( zcfl, MAXVAL( ABS( pv_ice(:,:) ) * rdt_ice * r1_e2v(:,:) ) )
-      IF( lk_mpp )   CALL mpp_max( zcfl )
+      CALL mpp_max( 'icedyn_adv_pra', zcfl )
       
       IF( zcfl > 0.5 ) THEN   ;   initad = 2   ;   zusnit = 0.5_wp
       ELSE                    ;   initad = 1   ;   zusnit = 1.0_wp
@@ -424,7 +424,7 @@ CONTAINS
       END DO
 
       !-- Lateral boundary conditions
-      CALL lbc_lnk_multi( psm , 'T',  1., ps0 , 'T',  1.   &
+      CALL lbc_lnk_multi( 'icedyn_adv_pra', psm , 'T',  1., ps0 , 'T',  1.   &
          &              , psx , 'T', -1., psy , 'T', -1.   &   ! caution gradient ==> the sign changes
          &              , psxx, 'T',  1., psyy, 'T',  1.   &
          &              , psxy, 'T',  1. )
@@ -598,7 +598,7 @@ CONTAINS
       END DO
 
       !-- Lateral boundary conditions
-      CALL lbc_lnk_multi( psm , 'T',  1.,  ps0 , 'T',  1.   &
+      CALL lbc_lnk_multi( 'icedyn_adv_pra', psm , 'T',  1.,  ps0 , 'T',  1.   &
          &              , psx , 'T', -1.,  psy , 'T', -1.   &   ! caution gradient ==> the sign changes
          &              , psxx, 'T',  1.,  psyy, 'T',  1.   &
          &              , psxy, 'T',  1. )
@@ -639,7 +639,7 @@ CONTAINS
          &      syye (jpi,jpj,nlay_i,jpl) , sxye (jpi,jpj,nlay_i,jpl)                             , &
          &      STAT = ierr )
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'icedyn_adv_pra', ierr )
       IF( ierr /= 0 )   CALL ctl_stop('STOP', 'adv_pra_init : unable to allocate ice arrays for Prather advection scheme')
       !
       CALL adv_pra_rst( 'READ' )    !* read or initialize all required files

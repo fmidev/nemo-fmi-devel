@@ -340,8 +340,8 @@ CONTAINS
       END DO
       !
       IF( lk_iomput ) THEN
-         CALL lbc_lnk( zw2d(:,:,:),'T', 1. )
-         CALL lbc_lnk_multi( zw3d(:,:,:,1),'T', 1., zw3d(:,:,:,2),'T', 1., zw3d(:,:,:,3),'T', 1. )
+         CALL lbc_lnk( 'p2zbio', zw2d(:,:,:),'T', 1. )
+         CALL lbc_lnk_multi( 'p2zbio', zw3d(:,:,:,1),'T', 1., zw3d(:,:,:,2),'T', 1., zw3d(:,:,:,3),'T', 1. )
          ! Save diagnostics
          CALL iom_put( "TNO3PHY", zw2d(:,:,1) )
          CALL iom_put( "TNH4PHY", zw2d(:,:,2) )

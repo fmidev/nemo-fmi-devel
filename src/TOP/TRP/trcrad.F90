@@ -18,6 +18,7 @@ MODULE trcrad
    USE trd_oce
    USE trdtra
    USE prtctl_trc          ! Print control for debbuging
+   USE lib_fortran
 
    IMPLICIT NONE
    PRIVATE
@@ -26,6 +27,7 @@ MODULE trcrad
    PUBLIC trc_rad_ini  
 
    LOGICAL , PUBLIC ::   ln_trcrad           !: flag to artificially correct negative concentrations
+   REAL(wp), DIMENSION(:,:), ALLOCATABLE::   gainmass
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -104,6 +106,9 @@ CONTAINS
          ENDIF
       ENDIF
       !
+      ALLOCATE( gainmass(jptra,2) )
+      gainmass(:,:) = 0.
+      !
    END SUBROUTINE trc_rad_ini
 
 
@@ -128,94 +133,150 @@ CONTAINS
       REAL(wp), DIMENSION (jpi,jpj,jpk,jptra), INTENT(inout) ::   ptrb    , ptrn     ! before and now traceur concentration
       CHARACTER( len = 1), OPTIONAL          , INTENT(in   ) ::   cpreserv           ! flag to preserve content or not
       !
-      INTEGER ::   ji, jj, jk, jn     ! dummy loop indices
-      LOGICAL ::   lldebug = .FALSE.           ! local logical
-      REAL(wp)::   ztrcorb, ztrmasb, zs2rdt    ! temporary scalars
-      REAL(wp)::   zcoef  , ztrcorn, ztrmasn   !    -         -
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) ::   ztrtrdb, ztrtrdn   ! workspace arrays
+      INTEGER ::   ji, ji2, jj, jj2, jk, jn     ! dummy loop indices
+      INTEGER ::   icnt
+      LOGICAL ::   lldebug = .FALSE.            ! local logical
+      REAL(wp)::   zcoef, zs2rdt, ztotmass
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) ::   ztrneg, ztrpos
+      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) ::   ztrtrd   ! workspace arrays
       !!----------------------------------------------------------------------
       !
-      IF( l_trdtrc )   ALLOCATE( ztrtrdb(jpi,jpj,jpk), ztrtrdn(jpi,jpj,jpk) )
+      IF( l_trdtrc )   ALLOCATE( ztrtrd(jpi,jpj,jpk) )
+      zs2rdt = 1. / ( 2. * rdt * REAL( nn_dttrc, wp ) )
       !
       IF( PRESENT( cpreserv )  ) THEN     !==  total tracer concentration is preserved  ==!
          !
+         ALLOCATE( ztrneg(1:jpi,1:jpj,jp_sms0:jp_sms1), ztrpos(1:jpi,1:jpj,jp_sms0:jp_sms1) )
+
+         DO jn = jp_sms0, jp_sms1
+            ztrneg(:,:,jn) = SUM( MIN( 0., ptrb(:,:,:,jn) ) * cvol(:,:,:), dim = 3 )   ! sum of the negative values
+            ztrpos(:,:,jn) = SUM( MAX( 0., ptrb(:,:,:,jn) ) * cvol(:,:,:), dim = 3 )   ! sum of the positive values
+         END DO
+         CALL sum3x3( ztrneg )
+         CALL sum3x3( ztrpos )
+         
          DO jn = jp_sms0, jp_sms1
             !
-            ztrcorb = 0._wp   ;   ztrmasb = 0._wp
-            ztrcorn = 0._wp   ;   ztrmasn = 0._wp
-            !
-            IF( l_trdtrc ) THEN
-               ztrtrdb(:,:,:) = ptrb(:,:,:,jn)                        ! save input trb for trend computation
-               ztrtrdn(:,:,:) = ptrn(:,:,:,jn)                        ! save input trn for trend computation
-            ENDIF
-            !                                                         ! sum over the global domain 
-            ztrcorb = glob_sum( MIN( 0., ptrb(:,:,:,jn) ) * cvol(:,:,:) )
-            ztrcorn = glob_sum( MIN( 0., ptrn(:,:,:,jn) ) * cvol(:,:,:) )
-            !
-            ztrmasb = glob_sum( MAX( 0., ptrb(:,:,:,jn) ) * cvol(:,:,:) )
-            ztrmasn = glob_sum( MAX( 0., ptrn(:,:,:,jn) ) * cvol(:,:,:) )
-            !
-            IF( ztrcorb /= 0 ) THEN
-               zcoef = 1. + ztrcorb / ztrmasb
-               DO jk = 1, jpkm1
-                  ptrb(:,:,jk,jn) = MAX( 0., ptrb(:,:,jk,jn) )
-                  ptrb(:,:,jk,jn) = ptrb(:,:,jk,jn) * zcoef * tmask(:,:,jk)
-               END DO
-            ENDIF
-            !
-            IF( ztrcorn /= 0 ) THEN
-               zcoef = 1. + ztrcorn / ztrmasn
-               DO jk = 1, jpkm1
-                  ptrn(:,:,jk,jn) = MAX( 0., ptrn(:,:,jk,jn) )
-                  ptrn(:,:,jk,jn) = ptrn(:,:,jk,jn) * zcoef * tmask(:,:,jk)
-               END DO
-            ENDIF
-            !
-            IF( l_trdtrc ) THEN
-               !
-               zs2rdt = 1. / ( 2. * rdt )
-               ztrtrdb(:,:,:) = ( ptrb(:,:,:,jn) - ztrtrdb(:,:,:) ) * zs2rdt
-               ztrtrdn(:,:,:) = ( ptrn(:,:,:,jn) - ztrtrdn(:,:,:) ) * zs2rdt 
-               CALL trd_tra( kt, 'TRC', jn, jptra_radb, ztrtrdb )       ! Asselin-like trend handling
-               CALL trd_tra( kt, 'TRC', jn, jptra_radn, ztrtrdn )       ! standard     trend handling
-              !
-            ENDIF
-            !
-         END DO
-         !
-      ELSE                                !==  total CFC content is NOT strictly preserved  ==!
-         !
-         DO jn = jp_sms0, jp_sms1  
-            !
-            IF( l_trdtrc ) THEN
-               ztrtrdb(:,:,:) = ptrb(:,:,:,jn)                        ! save input trb for trend computation
-               ztrtrdn(:,:,:) = ptrn(:,:,:,jn)                        ! save input trn for trend computation
-            ENDIF
+            IF( l_trdtrc )   ztrtrd(:,:,:) = ptrb(:,:,:,jn)                            ! save input trb for trend computation           
             !
             DO jk = 1, jpkm1
                DO jj = 1, jpj
                   DO ji = 1, jpi
-                     ptrn(ji,jj,jk,jn) = MAX( 0. , ptrn(ji,jj,jk,jn) )
-                     ptrb(ji,jj,jk,jn) = MAX( 0. , ptrb(ji,jj,jk,jn) )
+                     IF( ztrneg(ji,jj,jn) /= 0. ) THEN                                 ! if negative values over the 3x3 box
+                        !
+                        ptrb(ji,jj,jk,jn) = ptrb(ji,jj,jk,jn) * tmask(ji,jj,jk)   ! really needed?
+                        IF( ptrb(ji,jj,jk,jn) < 0. ) ptrb(ji,jj,jk,jn) = 0.       ! supress negative values
+                        IF( ptrb(ji,jj,jk,jn) > 0. ) THEN                         ! use positive values to compensate mass gain
+                           zcoef = 1. + ztrneg(ji,jj,jn) / ztrpos(ji,jj,jn)       ! ztrpos > 0 as ptrb > 0
+                           ptrb(ji,jj,jk,jn) = ptrb(ji,jj,jk,jn) * zcoef
+                           IF( zcoef < 0. ) THEN                                  ! if the compensation exceed the positive value
+                              gainmass(jn,1) = gainmass(jn,1) - ptrb(ji,jj,jk,jn) * cvol(ji,jj,jk)   ! we are adding mass...
+                              ptrb(ji,jj,jk,jn) = 0.                              ! limit the compensation to keep positive value
+                           ENDIF
+                        ENDIF
+                        !
+                     ENDIF
                   END DO
                END DO
             END DO
             !
             IF( l_trdtrc ) THEN
-               !
-               zs2rdt = 1. / ( 2. * rdt * REAL( nn_dttrc, wp ) )
-               ztrtrdb(:,:,:) = ( ptrb(:,:,:,jn) - ztrtrdb(:,:,:) ) * zs2rdt
-               ztrtrdn(:,:,:) = ( ptrn(:,:,:,jn) - ztrtrdn(:,:,:) ) * zs2rdt 
-               CALL trd_tra( kt, 'TRC', jn, jptra_radb, ztrtrdb )       ! Asselin-like trend handling
-               CALL trd_tra( kt, 'TRC', jn, jptra_radn, ztrtrdn )       ! standard     trend handling
-              !
+               ztrtrd(:,:,:) = ( ptrb(:,:,:,jn) - ztrtrd(:,:,:) ) * zs2rdt
+               CALL trd_tra( kt, 'TRC', jn, jptra_radb, ztrtrd )       ! Asselin-like trend handling
+            ENDIF
+            !
+         END DO
+ 
+         IF( kt == nitend ) THEN
+            CALL mpp_sum( 'trcrad', gainmass(:,1) )
+            DO jn = jp_sms0, jp_sms1
+               IF( gainmass(jn,1) > 0. ) THEN
+                  ztotmass = glob_sum( 'trcrad', ptrb(:,:,:,jn) * cvol(:,:,:) )
+                  IF(lwp) WRITE(numout, '(a, i2, a, D23.16, a, D23.16)') 'trcrad ptrb, traceur ', jn  &
+                     &        , ' total mass : ', ztotmass, ', mass gain : ',  gainmass(jn,1)
+               END IF
+            END DO
+         ENDIF
+
+         DO jn = jp_sms0, jp_sms1
+            ztrneg(:,:,jn) = SUM( MIN( 0., ptrn(:,:,:,jn) ) * cvol(:,:,:), dim = 3 )   ! sum of the negative values
+            ztrpos(:,:,jn) = SUM( MAX( 0., ptrn(:,:,:,jn) ) * cvol(:,:,:), dim = 3 )   ! sum of the positive values
+         END DO
+         CALL sum3x3( ztrneg )
+         CALL sum3x3( ztrpos )
+         
+         DO jn = jp_sms0, jp_sms1
+            !
+            IF( l_trdtrc )   ztrtrd(:,:,:) = ptrn(:,:,:,jn)                            ! save input trb for trend computation
+            !
+            DO jk = 1, jpkm1
+               DO jj = 1, jpj
+                  DO ji = 1, jpi
+                     IF( ztrneg(ji,jj,jn) /= 0. ) THEN                                 ! if negative values over the 3x3 box
+                        !
+                        ptrn(ji,jj,jk,jn) = ptrn(ji,jj,jk,jn) * tmask(ji,jj,jk)   ! really needed?
+                        IF( ptrn(ji,jj,jk,jn) < 0. ) ptrn(ji,jj,jk,jn) = 0.       ! supress negative values
+                        IF( ptrn(ji,jj,jk,jn) > 0. ) THEN                         ! use positive values to compensate mass gain
+                           zcoef = 1. + ztrneg(ji,jj,jn) / ztrpos(ji,jj,jn)       ! ztrpos > 0 as ptrb > 0
+                           ptrn(ji,jj,jk,jn) = ptrn(ji,jj,jk,jn) * zcoef
+                           IF( zcoef < 0. ) THEN                                  ! if the compensation exceed the positive value
+                              gainmass(jn,2) = gainmass(jn,2) - ptrn(ji,jj,jk,jn) * cvol(ji,jj,jk)   ! we are adding mass...
+                              ptrn(ji,jj,jk,jn) = 0.                              ! limit the compensation to keep positive value
+                           ENDIF
+                        ENDIF
+                        !
+                     ENDIF
+                  END DO
+               END DO
+            END DO
+            !
+            IF( l_trdtrc ) THEN
+               ztrtrd(:,:,:) = ( ptrn(:,:,:,jn) - ztrtrd(:,:,:) ) * zs2rdt
+               CALL trd_tra( kt, 'TRC', jn, jptra_radn, ztrtrd )       ! standard     trend handling
+            ENDIF
+            !
+         END DO
+ 
+         IF( kt == nitend ) THEN
+            CALL mpp_sum( 'trcrad', gainmass(:,2) )
+            DO jn = jp_sms0, jp_sms1
+               IF( gainmass(jn,2) > 0. ) THEN
+                  ztotmass = glob_sum( 'trcrad', ptrn(:,:,:,jn) * cvol(:,:,:) )
+                  WRITE(numout, '(a, i2, a, D23.16, a, D23.16)') 'trcrad ptrn, traceur ', jn  &
+                     &        , ' total mass : ', ztotmass, ', mass gain : ',  gainmass(jn,1)
+               END IF
+            END DO
+         ENDIF
+
+         DEALLOCATE( ztrneg, ztrpos )
+         !
+      ELSE                                !==  total CFC content is NOT strictly preserved  ==!
+         !
+         DO jn = jp_sms0, jp_sms1  
+            !
+            IF( l_trdtrc )   ztrtrd(:,:,:) = ptrb(:,:,:,jn)                        ! save input trb for trend computation
+            !
+            WHERE( ptrb(:,:,:,jn) < 0. )   ptrb(:,:,:,jn) = 0.
+            !
+            IF( l_trdtrc ) THEN
+               ztrtrd(:,:,:) = ( ptrb(:,:,:,jn) - ztrtrd(:,:,:) ) * zs2rdt
+               CALL trd_tra( kt, 'TRC', jn, jptra_radb, ztrtrd )       ! Asselin-like trend handling
+            ENDIF
+            !
+            IF( l_trdtrc )   ztrtrd(:,:,:) = ptrn(:,:,:,jn)                        ! save input trn for trend computation
+            !
+            WHERE( ptrn(:,:,:,jn) < 0. )   ptrn(:,:,:,jn) = 0.
+            !
+            IF( l_trdtrc ) THEN
+               ztrtrd(:,:,:) = ( ptrn(:,:,:,jn) - ztrtrd(:,:,:) ) * zs2rdt
+               CALL trd_tra( kt, 'TRC', jn, jptra_radn, ztrtrd )       ! standard     trend handling
             ENDIF
             !
          END DO
          !
       ENDIF
       !
-      IF( l_trdtrc )  DEALLOCATE( ztrtrdb, ztrtrdn )
+      IF( l_trdtrc )  DEALLOCATE( ztrtrd )
       !
    END SUBROUTINE trc_rad_sms
 

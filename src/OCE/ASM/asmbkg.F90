@@ -84,7 +84,7 @@ CONTAINS
             IF(lwp) WRITE(numout,*) ' Setting up assimilation background file '// TRIM( c_asmbkg )
             !
             !                                      ! Define the output file        
-            CALL iom_open( c_asmbkg, inum, ldwrt = .TRUE., kiolib = jprstlib)
+            CALL iom_open( c_asmbkg, inum, ldwrt = .TRUE. )
             !
             IF( nitbkg_r == nit000 - 1 ) THEN      ! Treat special case when nitbkg = 0
                zdate = REAL( ndastp )
@@ -122,7 +122,7 @@ CONTAINS
             IF(lwp) WRITE(numout,*) ' Setting up assimilation background file '// TRIM( c_asmdin )
             !
             !                                      ! Define the output file        
-            CALL iom_open( c_asmdin, inum, ldwrt = .TRUE., kiolib = jprstlib)
+            CALL iom_open( c_asmdin, inum, ldwrt = .TRUE. )
             !
             IF( nitdin_r == nit000 - 1 ) THEN      ! Treat special case when nitbkg = 0
 

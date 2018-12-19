@@ -135,7 +135,7 @@ CONTAINS
             END DO
          END DO
          ! Lateral boundary conditions on the slopes
-         CALL lbc_lnk_multi( uslp , 'U', -1., vslp , 'V', -1., wslpi, 'W', -1., wslpj, 'W', -1. )
+         CALL lbc_lnk_multi( 'dynldf_iso', uslp , 'U', -1., vslp , 'V', -1., wslpi, 'W', -1., wslpj, 'W', -1. )
          !
        ENDIF
          

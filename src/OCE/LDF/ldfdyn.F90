@@ -398,7 +398,7 @@ CONTAINS
             END DO
          ENDIF
          !
-         CALL lbc_lnk_multi( ahmt, 'T', 1.,  ahmf, 'F', 1. )
+         CALL lbc_lnk_multi( 'ldfdyn', ahmt, 'T', 1.,  ahmf, 'F', 1. )
          !
          !
       CASE(  32  )       !==  time varying 3D field  ==!   = F( local deformation rate and gridscale ) (Smagorinsky)
@@ -476,7 +476,7 @@ CONTAINS
             !
          ENDIF
          !
-         CALL lbc_lnk_multi( ahmt, 'T', 1. , ahmf, 'F', 1. )
+         CALL lbc_lnk_multi( 'ldfdyn', ahmt, 'T', 1. , ahmf, 'F', 1. )
          !
       END SELECT
       !

@@ -54,8 +54,8 @@ CONTAINS
       !
       IF( .NOT.ll_grid_crs )   CALL dom_grid_crs   ! Save the parent grid information  & Switch to coarse grid domain
       !
-      IF( PRESENT( cd_mpp ) ) THEN   ;   CALL lbc_lnk( pt3d1, cd_type1, psgn, cd_mpp, pval=zval  )
-      ELSE                           ;   CALL lbc_lnk( pt3d1, cd_type1, psgn        , pval=zval  )
+      IF( PRESENT( cd_mpp ) ) THEN   ;   CALL lbc_lnk( 'crslbclnk', pt3d1, cd_type1, psgn, cd_mpp, pval=zval  )
+      ELSE                           ;   CALL lbc_lnk( 'crslbclnk', pt3d1, cd_type1, psgn        , pval=zval  )
       ENDIF
       !
       IF( .NOT.ll_grid_crs )   CALL dom_grid_glo   ! Return to parent grid domain
@@ -91,8 +91,8 @@ CONTAINS
       !
       IF( .NOT.ll_grid_crs )   CALL dom_grid_crs   ! Save the parent grid information  & Switch to coarse grid domain
       !
-      IF( PRESENT( cd_mpp ) ) THEN   ;   CALL lbc_lnk( pt2d, cd_type, psgn, cd_mpp, pval=zval  )
-      ELSE                           ;   CALL lbc_lnk( pt2d, cd_type, psgn        , pval=zval  )
+      IF( PRESENT( cd_mpp ) ) THEN   ;   CALL lbc_lnk( 'crslbclnk', pt2d, cd_type, psgn, cd_mpp, pval=zval  )
+      ELSE                           ;   CALL lbc_lnk( 'crslbclnk', pt2d, cd_type, psgn        , pval=zval  )
       ENDIF
       !
       IF( .NOT.ll_grid_crs )   CALL dom_grid_glo   ! Return to parent grid domain

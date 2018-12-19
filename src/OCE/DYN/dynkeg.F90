@@ -157,7 +157,7 @@ CONTAINS
                END DO  
             END DO
          END DO
-         CALL lbc_lnk( zhke, 'T', 1. )
+         CALL lbc_lnk( 'dynkeg', zhke, 'T', 1. )
          !
       END SELECT
 

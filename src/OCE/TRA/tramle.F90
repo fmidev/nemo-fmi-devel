@@ -320,7 +320,7 @@ CONTAINS
                   rfv(ji,jj) = SQRT(  zfv * zfv + z1_t2 )
                END DO
             END DO
-            CALL lbc_lnk_multi( rfu, 'U', 1. , rfv, 'V', 1. )
+            CALL lbc_lnk_multi( 'tramle', rfu, 'U', 1. , rfv, 'V', 1. )
             !
          ELSEIF( nn_mle == 1 ) THEN           ! MLE array allocation & initialisation
             rc_f = rn_ce / (  5.e3_wp * 2._wp * omega * SIN( rad * rn_lat )  )

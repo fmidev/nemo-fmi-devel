@@ -178,48 +178,52 @@ CONTAINS
    !!   to maintain the same interface with regards to the mpp case
    !!----------------------------------------------------------------------
    
-   SUBROUTINE lbc_bdy_lnk_4d( pt4d, cd_type, psgn, ib_bdy )
+   SUBROUTINE lbc_bdy_lnk_4d( cdname, pt4d, cd_type, psgn, ib_bdy )
       !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(:,:,:,:), INTENT(inout) ::   pt4d      ! 4D array on which the lbc is applied
-      CHARACTER(len=1)            , INTENT(in   ) ::   cd_type   ! nature of pt4d grid-points
-      REAL(wp)                    , INTENT(in   ) ::   psgn      ! sign used across north fold 
-      INTEGER                     , INTENT(in   ) ::   ib_bdy    ! BDY boundary set
+      CHARACTER(len=*)          , INTENT(in   ) ::   cdname      ! name of the calling subroutine
+      REAL(wp), DIMENSION(:,:,:,:), INTENT(inout) ::   pt4d      ! 3D array on which the lbc is applied
+      CHARACTER(len=1)          , INTENT(in   ) ::   cd_type   ! nature of pt3d grid-points
+      REAL(wp)                  , INTENT(in   ) ::   psgn      ! sign used across north fold 
+      INTEGER                   , INTENT(in   ) ::   ib_bdy    ! BDY boundary set
       !!----------------------------------------------------------------------
-      CALL lbc_lnk_4d( pt4d, cd_type, psgn)
+      CALL lbc_lnk_4d( cdname, pt4d, cd_type, psgn)
    END SUBROUTINE lbc_bdy_lnk_4d
 
-   SUBROUTINE lbc_bdy_lnk_3d( pt3d, cd_type, psgn, ib_bdy )
+   SUBROUTINE lbc_bdy_lnk_3d( cdname, pt3d, cd_type, psgn, ib_bdy )
       !!----------------------------------------------------------------------
+      CHARACTER(len=*)          , INTENT(in   ) ::   cdname      ! name of the calling subroutine
       REAL(wp), DIMENSION(:,:,:), INTENT(inout) ::   pt3d      ! 3D array on which the lbc is applied
       CHARACTER(len=1)          , INTENT(in   ) ::   cd_type   ! nature of pt3d grid-points
       REAL(wp)                  , INTENT(in   ) ::   psgn      ! sign used across north fold 
       INTEGER                   , INTENT(in   ) ::   ib_bdy    ! BDY boundary set
       !!----------------------------------------------------------------------
-      CALL lbc_lnk_3d( pt3d, cd_type, psgn)
+      CALL lbc_lnk_3d( cdname, pt3d, cd_type, psgn)
    END SUBROUTINE lbc_bdy_lnk_3d
 
 
-   SUBROUTINE lbc_bdy_lnk_2d( pt2d, cd_type, psgn, ib_bdy )
+   SUBROUTINE lbc_bdy_lnk_2d( cdname, pt2d, cd_type, psgn, ib_bdy )
       !!----------------------------------------------------------------------
+      CHARACTER(len=*)        , INTENT(in   ) ::   cdname      ! name of the calling subroutine
       REAL(wp), DIMENSION(:,:), INTENT(inout) ::   pt2d      ! 3D array on which the lbc is applied
       CHARACTER(len=1)        , INTENT(in   ) ::   cd_type   ! nature of pt3d grid-points
       REAL(wp)                , INTENT(in   ) ::   psgn      ! sign used across north fold 
       INTEGER                 , INTENT(in   ) ::   ib_bdy    ! BDY boundary set
       !!----------------------------------------------------------------------
-      CALL lbc_lnk_2d( pt2d, cd_type, psgn)
+      CALL lbc_lnk_2d( cdname, pt2d, cd_type, psgn)
    END SUBROUTINE lbc_bdy_lnk_2d
 
 
 !!gm  This routine should be removed with an optional halos size added in argument of generic routines
 
-   SUBROUTINE lbc_lnk_2d_icb( pt2d, cd_type, psgn, ki, kj )
+   SUBROUTINE lbc_lnk_2d_icb( cdname, pt2d, cd_type, psgn, ki, kj )
       !!----------------------------------------------------------------------
+      CHARACTER(len=*)        , INTENT(in   ) ::   cdname      ! name of the calling subroutine
       REAL(wp), DIMENSION(:,:), INTENT(inout) ::   pt2d      ! 2D array on which the lbc is applied
       CHARACTER(len=1)        , INTENT(in   ) ::   cd_type   ! nature of pt3d grid-points
       REAL(wp)                , INTENT(in   ) ::   psgn      ! sign used across north fold 
       INTEGER                 , INTENT(in   ) ::   ki, kj    ! sizes of extra halo (not needed in non-mpp)
       !!----------------------------------------------------------------------
-      CALL lbc_lnk_2d( pt2d, cd_type, psgn )
+      CALL lbc_lnk_2d( cdname, pt2d, cd_type, psgn )
    END SUBROUTINE lbc_lnk_2d_icb
 !!gm end
 

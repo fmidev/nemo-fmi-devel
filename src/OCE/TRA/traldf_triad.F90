@@ -97,7 +97,7 @@ CONTAINS
       !
       IF( .NOT.ALLOCATED(zdkt3d) )  THEN
          ALLOCATE( zdkt3d(jpi,jpj,0:1) , STAT=ierr )
-         IF( lk_mpp   )   CALL mpp_sum ( ierr )
+         CALL mpp_sum ( 'traldf_triad', ierr )
          IF( ierr > 0 )   CALL ctl_stop('STOP', 'tra_ldf_triad: unable to allocate arrays')
       ENDIF
      !

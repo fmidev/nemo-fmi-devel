@@ -240,9 +240,9 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk_multi( zwdlmtu, 'U', 1., zwdlmtv, 'V', 1. )
+         CALL lbc_lnk_multi( 'wet_dry', zwdlmtu, 'U', 1., zwdlmtv, 'V', 1. )
          !
-         IF( lk_mpp )   CALL mpp_max(jflag)   !max over the global domain
+         CALL mpp_max('wet_dry', jflag)   !max over the global domain
          !
          IF( jflag == 0 )   EXIT
          !
@@ -256,8 +256,8 @@ CONTAINS
       vn_b(:,:) = vn_b(:,:) * zwdlmtv(:, :)
       !
 !!gm TO BE SUPPRESSED ?  these lbc_lnk are useless since zwdlmtu and zwdlmtv are defined everywhere !
-      CALL lbc_lnk_multi( un  , 'U', -1., vn  , 'V', -1. )
-      CALL lbc_lnk_multi( un_b, 'U', -1., vn_b, 'V', -1. )
+      CALL lbc_lnk_multi( 'wet_dry', un  , 'U', -1., vn  , 'V', -1. )
+      CALL lbc_lnk_multi( 'wet_dry', un_b, 'U', -1., vn_b, 'V', -1. )
 !!gm
       !
       IF(jflag == 1 .AND. lwp)   WRITE(numout,*) 'Need more iterations in wad_lmt!!!'
@@ -369,9 +369,9 @@ CONTAINS
             END DO ! ji loop
          END DO  ! jj loop
          !
-         CALL lbc_lnk_multi( zwdlmtu, 'U', 1., zwdlmtv, 'V', 1. )
+         CALL lbc_lnk_multi( 'wet_dry', zwdlmtu, 'U', 1., zwdlmtv, 'V', 1. )
          !
-         IF(lk_mpp) CALL mpp_max(jflag)   !max over the global domain
+         CALL mpp_max('wet_dry', jflag)   !max over the global domain
          !
          IF(jflag == 0)   EXIT
          !
@@ -381,7 +381,7 @@ CONTAINS
       zflxv(:,:) = zflxv(:,:) * zwdlmtv(:, :) 
       !
 !!gm THIS lbc_lnk is useless since it is already done at the end of the jk1-loop
-      CALL lbc_lnk_multi( zflxu, 'U', -1., zflxv, 'V', -1. )
+      CALL lbc_lnk_multi( 'wet_dry', zflxu, 'U', -1., zflxv, 'V', -1. )
 !!gm end
       !
       IF( jflag == 1 .AND. lwp )   WRITE(numout,*) 'Need more iterations in wad_lmt_bt!!!'

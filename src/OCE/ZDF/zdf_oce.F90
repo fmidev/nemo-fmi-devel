@@ -68,7 +68,7 @@ CONTAINS
          &      avt (jpi,jpj,jpk) , avt_k(jpi,jpj,jpk) , en (jpi,jpj,jpk) ,   & 
          &      avmb(jpk)         , avtb(jpk)          , avtb_2d(jpi,jpj) , STAT = zdf_oce_alloc )
          !
-      IF( zdf_oce_alloc /= 0 )   CALL ctl_warn('zdf_oce_alloc: failed to allocate arrays')
+      IF( zdf_oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'zdf_oce_alloc: failed to allocate arrays' )
       !
    END FUNCTION zdf_oce_alloc
 

@@ -71,7 +71,7 @@ CONTAINS
       !                                  ! ============================
       !                                  !  create 'mesh_mask.nc' file
       !                                  ! ============================
-      CALL iom_open( TRIM(clnam), inum, ldwrt = .TRUE., kiolib = jprstlib )
+      CALL iom_open( TRIM(clnam), inum, ldwrt = .TRUE. )
       !
       !                                                         ! global domain size
       CALL iom_rstput( 0, 0, inum, 'jpiglo', REAL( jpiglo, wp), ktype = jp_i4 )
@@ -209,7 +209,7 @@ CONTAINS
       ztstref(:,:) = RESHAPE( (/ (zshift + REAL(ji,wp), ji = 1, jpi*jpj) /), (/ jpi, jpj /) )
       !
       puniq(:,:) = ztstref(:,:)                   ! default definition
-      CALL lbc_lnk( puniq, cdgrd, 1. )            ! apply boundary conditions
+      CALL lbc_lnk( 'domwri', puniq, cdgrd, 1. )            ! apply boundary conditions
       lldbl(:,:,1) = puniq(:,:) == ztstref(:,:)   ! check which values have been changed 
       !
       puniq(:,:) = 1.                             ! default definition
@@ -270,13 +270,13 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk( zx1, 'T', 1. )
+      CALL lbc_lnk( 'domwri', zx1, 'T', 1. )
       !
       IF( PRESENT( px1 ) )    px1 = zx1
       !
       zrxmax = MAXVAL( zx1 )
       !
-      IF( lk_mpp )   CALL mpp_max( zrxmax ) ! max over the global domain
+      CALL mpp_max( 'domwri', zrxmax ) ! max over the global domain
       !
       IF(lwp) THEN
          WRITE(numout,*)

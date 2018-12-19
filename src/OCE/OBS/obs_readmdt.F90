@@ -219,9 +219,9 @@ CONTAINS
         END DO      
       END DO
 
-      IF( lk_mpp)   CALL mpp_sum( zeta1 )
-      IF( lk_mpp)   CALL mpp_sum( zeta2 )
-      IF( lk_mpp)   CALL mpp_sum( zarea )
+      CALL mpp_sum( 'obs_readmdt', zeta1 )
+      CALL mpp_sum( 'obs_readmdt', zeta2 )
+      CALL mpp_sum( 'obs_readmdt', zarea )
       
       zcorr_mdt    = zeta1 / zarea
       zcorr_bcketa = zeta2 / zarea

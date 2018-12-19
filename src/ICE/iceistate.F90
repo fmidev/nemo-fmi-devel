@@ -413,6 +413,8 @@ CONTAINS
       ! --- set ice velocities --- !
       u_ice (:,:) = 0._wp
       v_ice (:,:) = 0._wp
+      ! fields needed for ice_dyn_adv_umx
+      l_split_advumx(1) = .FALSE.
       !
       !----------------------------------------------
       ! 5) Snow-ice mass (case ice is fully embedded)
@@ -482,7 +484,7 @@ CONTAINS
 
 !!clem: output of initial state should be written here but it is impossible because
 !!      the ocean and ice are in the same file
-!!      CALL dia_wri_state( 'output.init', nit000 )
+!!      CALL dia_wri_state( 'output.init' )
       !
    END SUBROUTINE ice_istate
 

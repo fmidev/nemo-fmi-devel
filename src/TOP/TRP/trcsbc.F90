@@ -112,17 +112,19 @@ CONTAINS
       ENDIF
 
       ! 0. initialization
-      DO jn = 1, jptra
+      IF( nn_ice_tr == -1 ) THEN    ! No tracers in sea ice (null concentration in sea ice)
          !
-         IF( l_trdtrc )   ztrtrd(:,:,:) = tra(:,:,:,jn)  ! save trends
-         !
-         IF( nn_ice_tr == -1 ) THEN    ! No tracers in sea ice (null concentration in sea ice)
+         DO jn = 1, jptra
             DO jj = 2, jpj
                DO ji = fs_2, fs_jpim1   ! vector opt.
                   sbc_trc(ji,jj,jn) = zsfx(ji,jj) * r1_rau0 * trn(ji,jj,1,jn)
                END DO
             END DO
-         ELSE
+         END DO
+         !
+       ELSE
+         !
+         DO jn = 1, jptra
             DO jj = 2, jpj
                DO ji = fs_2, fs_jpim1   ! vector opt.
                   zse3t = 1. / e3t_n(ji,jj,1)
@@ -142,10 +144,15 @@ CONTAINS
                   sbc_trc(ji,jj,jn) =  zdtra 
                END DO
             END DO
-         ENDIF
+         END DO
+      ENDIF
+      !
+      CALL lbc_lnk( 'trcsbc', sbc_trc(:,:,:), 'T', 1. )
+      !                                       Concentration dilution effect on tracers due to evaporation & precipitation 
+      DO jn = 1, jptra
          !
-         CALL lbc_lnk( sbc_trc(:,:,jn), 'T', 1. )
-         !                                       Concentration dilution effect on tracers due to evaporation & precipitation 
+         IF( l_trdtrc )   ztrtrd(:,:,:) = tra(:,:,:,jn)  ! save trends
+         !
          DO jj = 2, jpj
             DO ji = fs_2, fs_jpim1   ! vector opt.
                zse3t = zfact / e3t_n(ji,jj,1)

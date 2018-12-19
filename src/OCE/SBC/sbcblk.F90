@@ -146,8 +146,8 @@ CONTAINS
       ALLOCATE( Cd_atm (jpi,jpj), Ch_atm (jpi,jpj), Ce_atm (jpi,jpj), t_zu(jpi,jpj), q_zu(jpi,jpj), &
          &      cdn_oce(jpi,jpj), chn_oce(jpi,jpj), cen_oce(jpi,jpj), STAT=sbc_blk_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( sbc_blk_alloc )
-      IF( sbc_blk_alloc /= 0 )   CALL ctl_warn('sbc_blk_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'sbcblk', sbc_blk_alloc )
+      IF( sbc_blk_alloc /= 0 )   CALL ctl_stop( 'STOP', 'sbc_blk_alloc: failed to allocate arrays' )
    END FUNCTION sbc_blk_alloc
 
 
@@ -235,7 +235,7 @@ CONTAINS
       IF ( ln_wave ) THEN
       !Activated wave module but neither drag nor stokes drift activated
          IF ( .NOT.(ln_cdgw .OR. ln_sdw .OR. ln_tauwoc .OR. ln_stcor ) )   THEN
-            CALL ctl_warn( 'Ask for wave coupling but ln_cdgw=F, ln_sdw=F, ln_tauwoc=F, ln_stcor=F')
+            CALL ctl_stop( 'STOP',  'Ask for wave coupling but ln_cdgw=F, ln_sdw=F, ln_tauwoc=F, ln_stcor=F' )
       !drag coefficient read from wave model definable only with mfs bulk formulae and core 
          ELSEIF (ln_cdgw .AND. .NOT. ln_NCAR )       THEN       
              CALL ctl_stop( 'drag coefficient read from wave model definable only with NCAR and CORE bulk formulae')
@@ -406,7 +406,7 @@ CONTAINS
             zwnd_j(ji,jj) = (  sf(jp_wndj)%fnow(ji,jj,1) - rn_vfac * 0.5 * ( pv(ji  ,jj-1) + pv(ji,jj) )  )
          END DO
       END DO
-      CALL lbc_lnk_multi( zwnd_i, 'T', -1., zwnd_j, 'T', -1. )
+      CALL lbc_lnk_multi( 'sbcblk', zwnd_i, 'T', -1., zwnd_j, 'T', -1. )
       ! ... scalar wind ( = | U10m - U_oce | ) at T-point (masked)
       wndm(:,:) = SQRT(  zwnd_i(:,:) * zwnd_i(:,:)   &
          &             + zwnd_j(:,:) * zwnd_j(:,:)  ) * tmask(:,:,1)
@@ -484,7 +484,7 @@ CONTAINS
                &          * MAX(tmask(ji,jj,1),tmask(ji,jj+1,1))
          END DO
       END DO
-      CALL lbc_lnk_multi( utau, 'U', -1., vtau, 'V', -1. )
+      CALL lbc_lnk_multi( 'sbcblk', utau, 'U', -1., vtau, 'V', -1. )
 
       !  Turbulent fluxes over ocean
       ! -----------------------------
@@ -726,7 +726,7 @@ CONTAINS
             wndm_ice(ji,jj) = SQRT( zwndi_t * zwndi_t + zwndj_t * zwndj_t ) * tmask(ji,jj,1)
          END DO
       END DO
-      CALL lbc_lnk( wndm_ice, 'T',  1. )
+      CALL lbc_lnk( 'sbcblk', wndm_ice, 'T',  1. )
       !
       ! Make ice-atm. drag dependent on ice concentration
       IF    ( ln_Cd_L12 ) THEN   ! calculate new drag from Lupkes(2012) equations
@@ -760,7 +760,7 @@ CONTAINS
                &          * ( 0.5 * (sf(jp_wndj)%fnow(ji,jj+1,1) + sf(jp_wndj)%fnow(ji,jj,1) ) - rn_vfac * v_ice(ji,jj) )
          END DO
       END DO
-      CALL lbc_lnk_multi( utau_ice, 'U', -1., vtau_ice, 'V', -1. )
+      CALL lbc_lnk_multi( 'sbcblk', utau_ice, 'U', -1., vtau_ice, 'V', -1. )
       !
       !
       IF(ln_ctl) THEN
@@ -1185,7 +1185,7 @@ CONTAINS
             !
          END DO
       END DO
-      CALL lbc_lnk_multi( Cd, 'T',  1., Ch, 'T', 1. )
+      CALL lbc_lnk_multi( 'sbcblk', Cd, 'T',  1., Ch, 'T', 1. )
       !
    END SUBROUTINE Cdn10_Lupkes2015
 

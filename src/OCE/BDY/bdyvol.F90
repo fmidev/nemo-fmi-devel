@@ -84,9 +84,9 @@ CONTAINS
       ! -----------------------------------------------------------------------
 !!gm replace these lines :
       z_cflxemp = SUM ( ( emp(:,:) - rnf(:,:) + fwfisf(:,:) ) * bdytmask(:,:) * e1e2t(:,:) ) / rau0
-      IF( lk_mpp )   CALL mpp_sum( z_cflxemp )     ! sum over the global domain
+      CALL mpp_sum( 'bdyvol', z_cflxemp )     ! sum over the global domain
 !!gm   by :
-!!gm      z_cflxemp = glob_sum(  ( emp(:,:)-rnf(:,:)+fwfisf(:,:) ) * bdytmask(:,:) * e1e2t(:,:)  ) / rau0
+!!gm      z_cflxemp = glob_sum(  'bdyvol', ( emp(:,:)-rnf(:,:)+fwfisf(:,:) ) * bdytmask(:,:) * e1e2t(:,:)  ) / rau0
 !!gm
 
       ! Transport through the unstructured open boundary
@@ -113,7 +113,7 @@ CONTAINS
          END DO
          !
       END DO
-      IF( lk_mpp )   CALL mpp_sum( zubtpecor )   ! sum over the global domain
+      CALL mpp_sum( 'bdyvol', zubtpecor )   ! sum over the global domain
 
       ! The normal velocity correction
       ! ------------------------------
@@ -147,7 +147,7 @@ CONTAINS
          END DO
          !
       END DO
-      IF( lk_mpp )   CALL mpp_sum( ztranst )   ! sum over the global domain
+      CALL mpp_sum( 'bdyvol', ztranst )   ! sum over the global domain
  
       ! Check the cumulated transport through unstructured OBC once barotropic velocities corrected
       ! ------------------------------------------------------

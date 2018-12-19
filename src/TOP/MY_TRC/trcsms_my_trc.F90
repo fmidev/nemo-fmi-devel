@@ -80,7 +80,7 @@ CONTAINS
       ! ALLOCATE( tab(...) , STAT=trc_sms_my_trc_alloc )
       trc_sms_my_trc_alloc = 0      ! set to zero if no array to be allocated
       !
-      IF( trc_sms_my_trc_alloc /= 0 ) CALL ctl_warn('trc_sms_my_trc_alloc : failed to allocate arrays')
+      IF( trc_sms_my_trc_alloc /= 0 ) CALL ctl_stop( 'STOP', 'trc_sms_my_trc_alloc : failed to allocate arrays' )
       !
    END FUNCTION trc_sms_my_trc_alloc
 

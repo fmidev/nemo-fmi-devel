@@ -72,8 +72,8 @@ CONTAINS
          &      vor_avrres(jpi,jpj) , vortrd  (jpi,jpj,jpltot_vor) ,              &
          &      ndexvor1  (jpi*jpj)                                ,   STAT= trd_vor_alloc )
          !
-      IF( lk_mpp             )   CALL mpp_sum ( trd_vor_alloc )
-      IF( trd_vor_alloc /= 0 )   CALL ctl_warn('trd_vor_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'trdvor', trd_vor_alloc )
+      IF( trd_vor_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trd_vor_alloc: failed to allocate arrays' )
    END FUNCTION trd_vor_alloc
 
 
@@ -160,7 +160,7 @@ CONTAINS
       !
 
       zudpvor(:,:) = 0._wp                 ;   zvdpvor(:,:) = 0._wp                    ! Initialisation
-      CALL lbc_lnk_multi( putrdvor, 'U', -1. , pvtrdvor, 'V', -1. )      ! lateral boundary condition
+      CALL lbc_lnk_multi( 'trdvor', putrdvor, 'U', -1. , pvtrdvor, 'V', -1. )      ! lateral boundary condition
       
 
       !  =====================================
@@ -249,7 +249,7 @@ CONTAINS
       zudpvor(:,:) = 0._wp
       zvdpvor(:,:) = 0._wp
       !                            ! lateral boundary condition on input momentum trends
-      CALL lbc_lnk_multi( putrdvor, 'U', -1. , pvtrdvor, 'V', -1. )
+      CALL lbc_lnk_multi( 'trdvor', putrdvor, 'U', -1. , pvtrdvor, 'V', -1. )
 
       !  =====================================
       !  I vertical integration of 3D trends
@@ -394,7 +394,7 @@ CONTAINS
          vor_avrres(:,:) = vor_avrtot(:,:) - rotot(:,:) / zmean
 
          ! Boundary conditions
-         CALL lbc_lnk_multi( vor_avrtot, 'F', 1. , vor_avrres, 'F', 1. )
+         CALL lbc_lnk_multi( 'trdvor', vor_avrtot, 'F', 1. , vor_avrres, 'F', 1. )
 
 
          ! III.3 time evolution array swap

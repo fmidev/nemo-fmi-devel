@@ -106,7 +106,7 @@ CONTAINS
       CALL Agrif_tra                     ! AGRIF zoom boundaries
 #endif
       !                                              ! local domain boundaries  (T-point, unchanged sign)
-      CALL lbc_lnk_multi( tsa(:,:,:,jp_tem), 'T', 1., tsa(:,:,:,jp_sal), 'T', 1. )
+      CALL lbc_lnk_multi( 'tranxt', tsa(:,:,:,jp_tem), 'T', 1., tsa(:,:,:,jp_sal), 'T', 1. )
       !
       IF( ln_bdy )   CALL bdy_tra( kt )  ! BDY open boundaries
  
@@ -162,7 +162,7 @@ CONTAINS
            &                                                                sbc_tsc, sbc_tsc_b, jpts )  ! non-linear free surface
          ENDIF
          !
-         CALL lbc_lnk_multi( tsb(:,:,:,jp_tem), 'T', 1., tsb(:,:,:,jp_sal), 'T', 1., &
+         CALL lbc_lnk_multi( 'tranxt', tsb(:,:,:,jp_tem), 'T', 1., tsb(:,:,:,jp_sal), 'T', 1., &
                   &          tsn(:,:,:,jp_tem), 'T', 1., tsn(:,:,:,jp_sal), 'T', 1., &
                   &          tsa(:,:,:,jp_tem), 'T', 1., tsa(:,:,:,jp_sal), 'T', 1.  )
          !

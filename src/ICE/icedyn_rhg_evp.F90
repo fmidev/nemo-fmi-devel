@@ -145,7 +145,7 @@ CONTAINS
       !
       REAL(wp), DIMENSION(jpi,jpj) ::   zds                             ! shear
       REAL(wp), DIMENSION(jpi,jpj) ::   zs1, zs2, zs12                  ! stress tensor components
-      REAL(wp), DIMENSION(jpi,jpj) ::   zu_ice, zv_ice, zresr           ! check convergence
+!!$      REAL(wp), DIMENSION(jpi,jpj) ::   zu_ice, zv_ice, zresr           ! check convergence
       REAL(wp), DIMENSION(jpi,jpj) ::   zsshdyn                         ! array used for the calculation of ice surface slope:
       !                                                                 !    ocean surface (ssh_m) if ice is not embedded
       !                                                                 !    ice bottom surface if ice is embedded   
@@ -192,7 +192,7 @@ CONTAINS
             zfmask(ji,jj) = tmask(ji,jj,1) * tmask(ji+1,jj,1) * tmask(ji,jj+1,1) * tmask(ji+1,jj+1,1)
          END DO
       END DO
-      CALL lbc_lnk( zfmask, 'F', 1._wp )
+      CALL lbc_lnk( 'icedyn_rhg_evp', zfmask, 'F', 1._wp )
 
       ! Lateral boundary conditions on velocity (modify zfmask)
       zwf(:,:) = zfmask(:,:)
@@ -219,7 +219,7 @@ CONTAINS
             zfmask(ji,jpj) = rn_ishlat * MIN( 1._wp , MAX( zwf(ji+1,jpj), zwf(ji-1,jpj), zwf(ji,jpjm1) ) )
          ENDIF
       END DO
-      CALL lbc_lnk( zfmask, 'F', 1._wp )
+      CALL lbc_lnk( 'icedyn_rhg_evp', zfmask, 'F', 1._wp )
 
       !------------------------------------------------------------------------------!
       ! 1) define some variables and initialize arrays
@@ -321,7 +321,7 @@ CONTAINS
 
          END DO
       END DO
-      CALL lbc_lnk_multi( zmf, 'T', 1., zdt_m, 'T', 1. )
+      CALL lbc_lnk_multi( 'icedyn_rhg_evp', zmf, 'T', 1., zdt_m, 'T', 1. )
       !
       !                                  !== Landfast ice parameterization ==!
       !
@@ -342,7 +342,7 @@ CONTAINS
                tau_icebfr(ji,jj) = rn_icebfr * MAX( 0._wp, vt_i(ji,jj) - zvCr ) * EXP( -rn_crhg * ( 1._wp - at_i(ji,jj) ) )
             END DO
          END DO
-         CALL lbc_lnk( tau_icebfr(:,:), 'T', 1. )
+         CALL lbc_lnk( 'icedyn_rhg_evp', tau_icebfr(:,:), 'T', 1. )
          !
       ELSEIF( ln_landfast_home ) THEN          !-- Home made
          DO jj = 2, jpjm1
@@ -369,12 +369,14 @@ CONTAINS
       !                                               !----------------------!
       DO jter = 1 , nn_nevp                           !    loop over jter    !
          !                                            !----------------------!        
-         IF(ln_ctl) THEN   ! Convergence test
-            DO jj = 1, jpjm1
-               zu_ice(:,jj) = u_ice(:,jj) ! velocity at previous time step
-               zv_ice(:,jj) = v_ice(:,jj)
-            END DO
-         ENDIF
+         l_full_nf_update = jter == nn_nevp   ! false: disable full North fold update (performances) for iter = 1 to nn_nevp-1
+         !
+!!$         IF(ln_ctl) THEN   ! Convergence test
+!!$            DO jj = 1, jpjm1
+!!$               zu_ice(:,jj) = u_ice(:,jj) ! velocity at previous time step
+!!$               zv_ice(:,jj) = v_ice(:,jj)
+!!$            END DO
+!!$         ENDIF
 
          ! --- divergence, tension & shear (Appendix B of Hunke & Dukowicz, 2002) --- !
          DO jj = 1, jpjm1         ! loops start at 1 since there is no boundary condition (lbc_lnk) at i=1 and j=1 for F points
@@ -387,7 +389,7 @@ CONTAINS
 
             END DO
          END DO
-         CALL lbc_lnk( zds, 'F', 1. )
+         CALL lbc_lnk( 'icedyn_rhg_evp', zds, 'F', 1. )
 
          DO jj = 2, jpj    ! loop to jpi,jpj to avoid making a communication for zs1,zs2,zs12
             DO ji = 2, jpi ! no vector loop
@@ -431,7 +433,7 @@ CONTAINS
              
             END DO
          END DO
-         CALL lbc_lnk( zp_delt, 'T', 1. )
+         CALL lbc_lnk( 'icedyn_rhg_evp', zp_delt, 'T', 1. )
 
          DO jj = 1, jpjm1
             DO ji = 1, jpim1
@@ -526,7 +528,7 @@ CONTAINS
                   ENDIF
                END DO
             END DO
-            CALL lbc_lnk( v_ice, 'V', -1. )
+            CALL lbc_lnk( 'icedyn_rhg_evp', v_ice, 'V', -1. )
             !
 #if defined key_agrif
 !!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
@@ -574,7 +576,7 @@ CONTAINS
                   ENDIF
                END DO
             END DO
-            CALL lbc_lnk( u_ice, 'U', -1. )
+            CALL lbc_lnk( 'icedyn_rhg_evp', u_ice, 'U', -1. )
             !
 #if defined key_agrif
 !!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
@@ -624,7 +626,7 @@ CONTAINS
                   ENDIF
                END DO
             END DO
-            CALL lbc_lnk( u_ice, 'U', -1. )
+            CALL lbc_lnk( 'icedyn_rhg_evp', u_ice, 'U', -1. )
             !
 #if defined key_agrif
 !!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
@@ -672,7 +674,7 @@ CONTAINS
                   ENDIF
                END DO
             END DO
-            CALL lbc_lnk( v_ice, 'V', -1. )
+            CALL lbc_lnk( 'icedyn_rhg_evp', v_ice, 'V', -1. )
             !
 #if defined key_agrif
 !!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
@@ -681,14 +683,14 @@ CONTAINS
             IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
             !
          ENDIF
-         
-         IF(ln_ctl) THEN   ! Convergence test
-            DO jj = 2 , jpjm1
-               zresr(:,jj) = MAX( ABS( u_ice(:,jj) - zu_ice(:,jj) ), ABS( v_ice(:,jj) - zv_ice(:,jj) ) )
-            END DO
-            zresm = MAXVAL( zresr( 1:jpi, 2:jpjm1 ) )
-            IF( lk_mpp )   CALL mpp_max( zresm )   ! max over the global domain
-         ENDIF
+
+!!$         IF(ln_ctl) THEN   ! Convergence test
+!!$            DO jj = 2 , jpjm1
+!!$               zresr(:,jj) = MAX( ABS( u_ice(:,jj) - zu_ice(:,jj) ), ABS( v_ice(:,jj) - zv_ice(:,jj) ) )
+!!$            END DO
+!!$            zresm = MAXVAL( zresr( 1:jpi, 2:jpjm1 ) )
+!!$            CALL mpp_max( 'icedyn_rhg_evp', zresm )   ! max over the global domain
+!!$         ENDIF
          !
          !                                                ! ==================== !
       END DO                                              !  end loop over jter  !
@@ -737,10 +739,10 @@ CONTAINS
 
          END DO
       END DO
-      CALL lbc_lnk_multi( pshear_i, 'T', 1., pdivu_i, 'T', 1., pdelta_i, 'T', 1. )
+      CALL lbc_lnk_multi( 'icedyn_rhg_evp', pshear_i, 'T', 1., pdivu_i, 'T', 1., pdelta_i, 'T', 1. )
       
       ! --- Store the stress tensor for the next time step --- !
-      CALL lbc_lnk_multi( zs1, 'T', 1., zs2, 'T', 1., zs12, 'F', 1. )
+      CALL lbc_lnk_multi( 'icedyn_rhg_evp', zs1, 'T', 1., zs2, 'T', 1., zs12, 'F', 1. )
       pstress1_i (:,:) = zs1 (:,:)
       pstress2_i (:,:) = zs2 (:,:)
       pstress12_i(:,:) = zs12(:,:)
@@ -784,7 +786,7 @@ CONTAINS
                zsig3(ji,jj) = zdum2**2 * ( ( pstress1_i(ji,jj) + strength(ji,jj) )**2 + ( rn_ecc * zshear )**2 )
             END DO
          END DO
-         CALL lbc_lnk_multi( zsig1, 'T', 1., zsig2, 'T', 1., zsig3, 'T', 1. )
+         CALL lbc_lnk_multi( 'icedyn_rhg_evp', zsig1, 'T', 1., zsig2, 'T', 1., zsig3, 'T', 1. )
          !
          IF( iom_use('isig1') )   CALL iom_put( "isig1" , zsig1 )
          IF( iom_use('isig2') )   CALL iom_put( "isig2" , zsig2 )
@@ -841,12 +843,12 @@ CONTAINS
             END DO
          END DO
          
-         CALL lbc_lnk_multi( zdiag_sig1   , 'T',  1., zdiag_sig2   , 'T',  1.,   &
+         CALL lbc_lnk_multi( 'icedyn_rhg_evp', zdiag_sig1   , 'T',  1., zdiag_sig2   , 'T',  1.,   &
             &                zdiag_dssh_dx, 'U', -1., zdiag_dssh_dy, 'V', -1.,   &
             &                zdiag_corstrx, 'U', -1., zdiag_corstry, 'V', -1.,   & 
             &                zdiag_intstrx, 'U', -1., zdiag_intstry, 'V', -1.    )
                   
-         CALL lbc_lnk_multi( zdiag_utau_oi  , 'U', -1., zdiag_vtau_oi  , 'V', -1.,   &
+         CALL lbc_lnk_multi( 'icedyn_rhg_evp', zdiag_utau_oi  , 'U', -1., zdiag_vtau_oi  , 'V', -1.,   &
             &                zdiag_xmtrp_ice, 'U', -1., zdiag_xmtrp_snw, 'U', -1.,   &
             &                zdiag_xatrp    , 'U', -1., zdiag_ymtrp_ice, 'V', -1.,   &
             &                zdiag_ymtrp_snw, 'V', -1., zdiag_yatrp    , 'V', -1.    )

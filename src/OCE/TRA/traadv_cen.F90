@@ -122,7 +122,7 @@ CONTAINS
                   END DO
                END DO
             END DO
-            CALL lbc_lnk_multi( ztu, 'U', -1. , ztv, 'V', -1. )   ! Lateral boundary cond.
+            CALL lbc_lnk_multi( 'traadv_cen', ztu, 'U', -1. , ztv, 'V', -1. )   ! Lateral boundary cond.
             !
             DO jk = 1, jpkm1                       ! Horizontal advective fluxes
                DO jj = 2, jpjm1

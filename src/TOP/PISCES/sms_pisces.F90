@@ -130,7 +130,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!        *** ROUTINE sms_pisces_alloc ***
       !!----------------------------------------------------------------------
-      USE lib_mpp , ONLY: ctl_warn
+      USE lib_mpp , ONLY: ctl_stop
       INTEGER ::   ierr(10)        ! Local variables
       !!----------------------------------------------------------------------
       ierr(:) = 0
@@ -185,7 +185,7 @@ CONTAINS
       !
       sms_pisces_alloc = MAXVAL( ierr )
       !
-      IF( sms_pisces_alloc /= 0 )   CALL ctl_warn('sms_pisces_alloc: failed to allocate arrays') 
+      IF( sms_pisces_alloc /= 0 )   CALL ctl_stop( 'STOP', 'sms_pisces_alloc: failed to allocate arrays' ) 
       !
    END FUNCTION sms_pisces_alloc
 

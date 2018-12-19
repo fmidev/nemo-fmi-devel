@@ -71,7 +71,7 @@ CONTAINS
       CALL trc_ini_trp   ! passive tracers transport
       CALL trc_ice_ini   ! Tracers in sea ice
       !
-      IF(lwp) CALL ctl_opn( numstr, 'tracer.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp , narea )
+      IF(lwm) CALL ctl_opn( numstr, 'tracer.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp , narea )
       !
       CALL trc_ini_state  !  passive tracers initialisation : from a restart or from clim
       IF( nn_dttrc /= 1 ) &
@@ -118,11 +118,11 @@ CONTAINS
          cvol(:,:,jk) = e1e2t(:,:) * e3t_n(:,:,jk) * tmask(:,:,jk)
       END DO
       !                          ! total volume of the ocean 
-      areatot = glob_sum( cvol(:,:,:) )
+      areatot = glob_sum( 'trcini', cvol(:,:,:) )
       !
       trai(:) = 0._wp            ! initial content of all tracers
       DO jn = 1, jptra
-         trai(jn) = trai(jn) + glob_sum( trn(:,:,:,jn) * cvol(:,:,:)   )
+         trai(jn) = trai(jn) + glob_sum( 'trcini', trn(:,:,:,jn) * cvol(:,:,:)   )
       END DO
 
       IF(lwp) THEN               ! control print
@@ -291,7 +291,7 @@ CONTAINS
       ierr = ierr + trd_mxl_trc_alloc()
 #endif
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'trcini', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'top_alloc : unable to allocate standard ocean arrays' )
       !
    END SUBROUTINE top_alloc

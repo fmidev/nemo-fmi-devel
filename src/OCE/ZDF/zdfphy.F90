@@ -299,15 +299,15 @@ CONTAINS
 
       !                                         !* Lateral boundary conditions (sign unchanged)
       IF( l_zdfsh2 ) THEN
-         CALL lbc_lnk_multi( avm_k, 'W', 1. , avt_k, 'W', 1.,   &
+         CALL lbc_lnk_multi( 'zdfphy', avm_k, 'W', 1. , avt_k, 'W', 1.,   &
             &                avm  , 'W', 1. , avt  , 'W', 1. , avs , 'W', 1. )
       ELSE
-         CALL lbc_lnk_multi( avm  , 'W', 1. , avt  , 'W', 1. , avs , 'W', 1. )
+         CALL lbc_lnk_multi( 'zdfphy', avm  , 'W', 1. , avt  , 'W', 1. , avs , 'W', 1. )
       ENDIF
       !
       IF( l_zdfdrg ) THEN     ! drag  have been updated (non-linear cases)
-         IF( ln_isfcav ) THEN   ;  CALL lbc_lnk_multi( rCdU_top, 'T', 1. , rCdU_bot, 'T', 1. )   ! top & bot drag
-         ELSE                   ;  CALL lbc_lnk      ( rCdU_bot, 'T', 1. )                       ! bottom drag only
+         IF( ln_isfcav ) THEN   ;  CALL lbc_lnk_multi( 'zdfphy', rCdU_top, 'T', 1. , rCdU_bot, 'T', 1. )   ! top & bot drag
+         ELSE                   ;  CALL lbc_lnk      ( 'zdfphy', rCdU_bot, 'T', 1. )                       ! bottom drag only
          ENDIF
       ENDIF
       !
@@ -330,7 +330,7 @@ CONTAINS
      ! Allocate wi array (declared in oce.F90) for use with the adaptive-implicit vertical velocity option
      ALLOCATE(     wi(jpi,jpj,jpk), Cu_adv(jpi,jpj,jpk),  STAT= zdf_phy_alloc )
      IF( zdf_phy_alloc /= 0 )   CALL ctl_warn('zdf_phy_alloc: failed to allocate ln_zad_Aimp=T required arrays')
-     IF( lk_mpp             )   CALL mpp_sum ( zdf_phy_alloc )
+     CALL mpp_sum ( 'zdfphy', zdf_phy_alloc )
    END FUNCTION zdf_phy_alloc
 
    !!======================================================================

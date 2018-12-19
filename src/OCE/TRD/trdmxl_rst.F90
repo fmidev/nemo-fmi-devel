@@ -60,15 +60,13 @@ CONTAINS
          IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
          IF(lwp) THEN
             WRITE(numout,*)
-            SELECT CASE ( jprstlib )
-            CASE DEFAULT         ;   WRITE(numout,*) '             open ocean restart_mxl NetCDF file: '//clname
-            END SELECT
+            WRITE(numout,*) '             open ocean restart_mxl NetCDF file: '//clname
             IF( kt == nitrst - 1 ) THEN   ;   WRITE(numout,*) '             kt = nitrst - 1 = ', kt,' date= ', ndastp
             ELSE                          ;   WRITE(numout,*) '             kt = '             , kt,' date= ', ndastp
             ENDIF
          ENDIF
 
-         CALL iom_open( TRIM(clpath)//TRIM(clname), nummxlw, ldwrt = .TRUE., kiolib = jprstlib )
+         CALL iom_open( TRIM(clpath)//TRIM(clname), nummxlw, ldwrt = .TRUE. )
       ENDIF
 
       IF( kt == nitrst .AND. lwp ) THEN
@@ -132,7 +130,6 @@ CONTAINS
       !
       CHARACTER (len=35) :: charout
       INTEGER ::   jk         ! loop indice
-      INTEGER ::   jlibalt = jprstlib
       LOGICAL ::   llok
       CHARACTER(LEN=256)  ::   clpath   ! full path to restart file
       !!-----------------------------------------------------------------------------
@@ -145,7 +142,7 @@ CONTAINS
 
       clpath = TRIM(cn_ocerst_indir)
       IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
-      CALL iom_open( TRIM(clpath)//TRIM(cn_trdrst_in), inum, kiolib = jlibalt ) 
+      CALL iom_open( TRIM(clpath)//TRIM(cn_trdrst_in), inum ) 
 
       IF( ln_trdmxl_instant ) THEN 
          !-- Temperature

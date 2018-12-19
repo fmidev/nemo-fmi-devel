@@ -134,9 +134,9 @@ CONTAINS
 
          ENDDO
       ENDDO
-      CALL lbc_bdy_lnk( a_i(:,:,:), 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( h_i(:,:,:), 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( h_s(:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', a_i(:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', h_i(:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', h_s(:,:,:), 'T', 1., jbdy )
 
       DO jl = 1, jpl
          DO i_bdy = 1, idx%nblenrim(jgrd)
@@ -243,21 +243,21 @@ CONTAINS
          !
       END DO ! jl
 
-      CALL lbc_bdy_lnk( a_i (:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( h_i (:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( h_s (:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( oa_i(:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( a_ip(:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( v_ip(:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( s_i (:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( t_su(:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( v_i (:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( v_s (:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( sv_i(:,:,:)  , 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( t_s (:,:,:,:), 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( e_s (:,:,:,:), 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( t_i (:,:,:,:), 'T', 1., jbdy )
-      CALL lbc_bdy_lnk( e_i (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', a_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', h_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', h_s (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', oa_i(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', a_ip(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', v_ip(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', s_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', t_su(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', v_i (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', v_s (:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', sv_i(:,:,:)  , 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', t_s (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', e_s (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', t_i (:,:,:,:), 'T', 1., jbdy )
+      CALL lbc_bdy_lnk( 'bdyice', e_i (:,:,:,:), 'T', 1., jbdy )
       !      
    END SUBROUTINE bdy_ice_frs
 
@@ -316,7 +316,7 @@ CONTAINS
                   ENDIF
                   !
                END DO
-               CALL lbc_bdy_lnk( u_ice(:,:), 'U', -1., jbdy )
+               CALL lbc_bdy_lnk( 'bdyice', u_ice(:,:), 'U', -1., jbdy )
                !
             CASE ( 'V' )
                jgrd = 3      ! v velocity
@@ -339,7 +339,7 @@ CONTAINS
                   ENDIF
                   !
                END DO
-               CALL lbc_bdy_lnk( v_ice(:,:), 'V', -1., jbdy )
+               CALL lbc_bdy_lnk( 'bdyice', v_ice(:,:), 'V', -1., jbdy )
                !
             END SELECT
             !

@@ -532,7 +532,7 @@ CONTAINS
             END DO
          END DO
          !
-         CALL lbc_lnk( prd, 'T', 1. )                    ! Lateral boundary conditions
+         CALL lbc_lnk( 'eosbn2', prd, 'T', 1. )                    ! Lateral boundary conditions
          !
       CASE( np_seos )                !==  simplified EOS  ==!
          !
@@ -552,7 +552,7 @@ CONTAINS
             END DO
          END DO
          !
-         CALL lbc_lnk( prd, 'T', 1. )                    ! Lateral boundary conditions
+         CALL lbc_lnk( 'eosbn2', prd, 'T', 1. )                    ! Lateral boundary conditions
          !
       END SELECT
       !
@@ -663,9 +663,8 @@ CONTAINS
          END DO
          !
       CASE DEFAULT
-         IF(lwp) WRITE(numout,cform_err)
-         IF(lwp) WRITE(numout,*) '          bad flag value for neos = ', neos
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '          bad flag value for neos = ', neos
+         CALL ctl_stop( 'rab_3d:', ctmp1 )
          !
       END SELECT
       !
@@ -755,7 +754,7 @@ CONTAINS
             END DO
          END DO
          !                            ! Lateral boundary conditions
-         CALL lbc_lnk_multi( pab(:,:,jp_tem), 'T', 1. , pab(:,:,jp_sal), 'T', 1. )                    
+         CALL lbc_lnk_multi( 'eosbn2', pab(:,:,jp_tem), 'T', 1. , pab(:,:,jp_sal), 'T', 1. )                    
          !
       CASE( np_seos )                  !==  simplified EOS  ==!
          !
@@ -775,12 +774,11 @@ CONTAINS
             END DO
          END DO
          !                            ! Lateral boundary conditions
-         CALL lbc_lnk_multi( pab(:,:,jp_tem), 'T', 1. , pab(:,:,jp_sal), 'T', 1. )                    
+         CALL lbc_lnk_multi( 'eosbn2', pab(:,:,jp_tem), 'T', 1. , pab(:,:,jp_sal), 'T', 1. )                    
          !
       CASE DEFAULT
-         IF(lwp) WRITE(numout,cform_err)
-         IF(lwp) WRITE(numout,*) '          bad flag value for neos = ', neos
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '          bad flag value for neos = ', neos
+         CALL ctl_stop( 'rab_2d:', ctmp1 )
          !
       END SELECT
       !
@@ -878,9 +876,8 @@ CONTAINS
          pab(jp_sal) = zn * r1_rau0   ! beta
          !
       CASE DEFAULT
-         IF(lwp) WRITE(numout,cform_err)
-         IF(lwp) WRITE(numout,*) '          bad flag value for neos = ', neos
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '          bad flag value for neos = ', neos
+         CALL ctl_stop( 'rab_0d:', ctmp1 )
          !
       END SELECT
       !
@@ -1039,9 +1036,8 @@ CONTAINS
          IF( PRESENT( pdep ) )   ptf(:,:) = ptf(:,:) - 7.53e-4 * pdep(:,:)
          !
       CASE DEFAULT
-         IF(lwp) WRITE(numout,cform_err)
-         IF(lwp) WRITE(numout,*) '          bad flag value for neos = ', neos
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '          bad flag value for neos = ', neos
+         CALL ctl_stop( 'eos_fzp_2d:', ctmp1 )
          !
       END SELECT      
       !
@@ -1086,9 +1082,8 @@ CONTAINS
          IF( PRESENT( pdep ) )   ptf = ptf - 7.53e-4 * pdep
          !
       CASE DEFAULT
-         IF(lwp) WRITE(numout,cform_err)
-         IF(lwp) WRITE(numout,*) '          bad flag value for neos = ', neos
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '          bad flag value for neos = ', neos
+         CALL ctl_stop( 'eos_fzp_0d:', ctmp1 )
          !
       END SELECT
       !
@@ -1212,9 +1207,8 @@ CONTAINS
          END DO
          !
       CASE DEFAULT
-         IF(lwp) WRITE(numout,cform_err)
-         IF(lwp) WRITE(numout,*) '          bad flag value for neos = ', neos
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '          bad flag value for neos = ', neos
+         CALL ctl_stop( 'eos_pen:', ctmp1 )
          !
       END SELECT
       !

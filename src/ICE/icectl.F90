@@ -76,69 +76,76 @@ CONTAINS
       !
       IF( icount == 0 ) THEN
          !                          ! water flux
-         pdiag_fv = glob_sum( -( wfx_bog(:,:) + wfx_bom(:,:) + wfx_sum(:,:) + wfx_sni(:,:) +                  &
+         pdiag_fv = glob_sum( 'icectl',                                                                       &
+            &                 -( wfx_bog(:,:) + wfx_bom(:,:) + wfx_sum(:,:) + wfx_sni(:,:) +                  &
             &                    wfx_opw(:,:) + wfx_res(:,:) + wfx_dyn(:,:) + wfx_lam(:,:) + wfx_pnd(:,:)  +  &
             &                    wfx_snw_sni(:,:) + wfx_snw_sum(:,:) + wfx_snw_dyn(:,:) + wfx_snw_sub(:,:) +  &
             &                    wfx_ice_sub(:,:) + wfx_spr(:,:)  &
             &                  ) * e1e2t(:,:) ) * zconv
          !
          !                          ! salt flux
-         pdiag_fs = glob_sum(  ( sfx_bri(:,:) + sfx_bog(:,:) + sfx_bom(:,:) + sfx_sum(:,:) + sfx_sni(:,:) +  &
+         pdiag_fs = glob_sum( 'icectl',                                                                     &
+            &                  ( sfx_bri(:,:) + sfx_bog(:,:) + sfx_bom(:,:) + sfx_sum(:,:) + sfx_sni(:,:) +  &
             &                    sfx_opw(:,:) + sfx_res(:,:) + sfx_dyn(:,:) + sfx_sub(:,:) + sfx_lam(:,:)    &
             &                  ) *  e1e2t(:,:) ) * zconv 
          !
          !                          ! heat flux
-         pdiag_ft = glob_sum(  ( hfx_sum(:,:) + hfx_bom(:,:) + hfx_bog(:,:) + hfx_dif(:,:) + hfx_opw(:,:) + hfx_snw(:,:)  & 
+         pdiag_ft = glob_sum( 'icectl',                                                                    &
+            &                  ( hfx_sum(:,:) + hfx_bom(:,:) + hfx_bog(:,:) + hfx_dif(:,:) + hfx_opw(:,:) + hfx_snw(:,:)  & 
             &                  - hfx_thd(:,:) - hfx_dyn(:,:) - hfx_res(:,:) - hfx_sub(:,:) - hfx_spr(:,:)   &
             &                  ) *  e1e2t(:,:) ) * zconv
 
-         pdiag_v = glob_sum( SUM( v_i * rhoi + v_s * rhos, dim=3 ) * e1e2t * zconv )
+         pdiag_v = glob_sum( 'icectl', SUM( v_i * rhoi + v_s * rhos, dim=3 ) * e1e2t * zconv )
 
-         pdiag_s = glob_sum( SUM( sv_i * rhoi            , dim=3 ) * e1e2t * zconv )
+         pdiag_s = glob_sum( 'icectl', SUM( sv_i * rhoi            , dim=3 ) * e1e2t * zconv )
 
-         pdiag_t = glob_sum( (  SUM( SUM( e_i(:,:,1:nlay_i,:), dim=4 ), dim=3 )     &
+         pdiag_t = glob_sum( 'icectl', (  SUM( SUM( e_i(:,:,1:nlay_i,:), dim=4 ), dim=3 )     &
             &                 + SUM( SUM( e_s(:,:,1:nlay_s,:), dim=4 ), dim=3 ) ) * e1e2t ) * zconv
 
       ELSEIF( icount == 1 ) THEN
 
          ! water flux
-         zfv  = glob_sum( -( wfx_bog(:,:) + wfx_bom(:,:) + wfx_sum(:,:) + wfx_sni(:,:) +                  &
+         zfv = glob_sum( 'icectl',                                                                        &
+            &             -( wfx_bog(:,:) + wfx_bom(:,:) + wfx_sum(:,:) + wfx_sni(:,:) +                  &
             &                wfx_opw(:,:) + wfx_res(:,:) + wfx_dyn(:,:) + wfx_lam(:,:) + wfx_pnd(:,:)  +  &
             &                wfx_snw_sni(:,:) + wfx_snw_sum(:,:) + wfx_snw_dyn(:,:) + wfx_snw_sub(:,:) +  &
             &                wfx_ice_sub(:,:) + wfx_spr(:,:)  &
             &              ) * e1e2t(:,:) ) * zconv - pdiag_fv
 
          ! salt flux
-         zfs  = glob_sum(  ( sfx_bri(:,:) + sfx_bog(:,:) + sfx_bom(:,:) + sfx_sum(:,:) + sfx_sni(:,:) +  &
+         zfs = glob_sum( 'icectl',                                                                       &
+            &              ( sfx_bri(:,:) + sfx_bog(:,:) + sfx_bom(:,:) + sfx_sum(:,:) + sfx_sni(:,:) +  &
             &                sfx_opw(:,:) + sfx_res(:,:) + sfx_dyn(:,:) + sfx_sub(:,:) + sfx_lam(:,:)    & 
             &              ) * e1e2t(:,:) ) * zconv - pdiag_fs
 
          ! heat flux
-         zft  = glob_sum(  ( hfx_sum(:,:) + hfx_bom(:,:) + hfx_bog(:,:) + hfx_dif(:,:) + hfx_opw(:,:) + hfx_snw(:,:)  & 
+         zft = glob_sum( 'icectl',                                                                      &
+            &              ( hfx_sum(:,:) + hfx_bom(:,:) + hfx_bog(:,:) + hfx_dif(:,:) + hfx_opw(:,:) + hfx_snw(:,:)  & 
             &              - hfx_thd(:,:) - hfx_dyn(:,:) - hfx_res(:,:) - hfx_sub(:,:) - hfx_spr(:,:)   &
             &              ) * e1e2t(:,:) ) * zconv - pdiag_ft
  
          ! outputs
-         zv = ( ( glob_sum( SUM( v_i * rhoi + v_s * rhos, dim=3 ) * e1e2t ) * zconv  &
+         zv = ( ( glob_sum( 'icectl', SUM( v_i * rhoi + v_s * rhos, dim=3 ) * e1e2t ) * zconv  &
             &     - pdiag_v ) * r1_rdtice - zfv ) * rday
 
-         zs = ( ( glob_sum( SUM( sv_i * rhoi            , dim=3 ) * e1e2t ) * zconv  &
+         zs = ( ( glob_sum( 'icectl', SUM( sv_i * rhoi            , dim=3 ) * e1e2t ) * zconv  &
             &     - pdiag_s ) * r1_rdtice + zfs ) * rday
 
-         zt = ( glob_sum( (  SUM( SUM( e_i(:,:,1:nlay_i,:), dim=4 ), dim=3 )   &
+         zt = ( glob_sum( 'icectl',                                                                &
+            &             (  SUM( SUM( e_i(:,:,1:nlay_i,:), dim=4 ), dim=3 )                       &
             &              + SUM( SUM( e_s(:,:,1:nlay_s,:), dim=4 ), dim=3 ) ) * e1e2t ) * zconv   &
             &   - pdiag_t ) * r1_rdtice + zft
 
          ! zvtrp and zetrp must be close to 0 if the advection scheme is conservative
-         zvtrp = glob_sum( ( diag_trp_vi * rhoi + diag_trp_vs * rhos ) * e1e2t  ) * zconv * rday 
-         zetrp = glob_sum( ( diag_trp_ei        + diag_trp_es        ) * e1e2t  ) * zconv
+         zvtrp = glob_sum( 'icectl', ( diag_trp_vi * rhoi + diag_trp_vs * rhos ) * e1e2t  ) * zconv * rday 
+         zetrp = glob_sum( 'icectl', ( diag_trp_ei        + diag_trp_es        ) * e1e2t  ) * zconv
 
-         zvmin = glob_min( v_i )
-         zamax = glob_max( SUM( a_i, dim=3 ) )
-         zamin = glob_min( a_i )
+         zvmin = glob_min( 'icectl', v_i )
+         zamax = glob_max( 'icectl', SUM( a_i, dim=3 ) )
+         zamin = glob_min( 'icectl', a_i )
 
          ! set threshold values and calculate the ice area (+epsi10 to set a threshold > 0 when there is no ice) 
-         zarea   = glob_sum( SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2
+         zarea   = glob_sum( 'icectl', SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2
          zv_sill = zarea * 2.5e-5
          zs_sill = zarea * 25.e-5
          zt_sill = zarea * 10.e-5
@@ -183,16 +190,16 @@ CONTAINS
       !!-------------------------------------------------------------------
 
       ! water flux
-      zvfx  = glob_sum( ( wfx_ice + wfx_snw + wfx_spr + wfx_sub + diag_vice + diag_vsnw ) * e1e2t ) * zconv * rday
+      zvfx  = glob_sum( 'icectl', ( wfx_ice + wfx_snw + wfx_spr + wfx_sub + diag_vice + diag_vsnw ) * e1e2t ) * zconv * rday
 
       ! salt flux
-      zsfx  = glob_sum( ( sfx + diag_sice ) * e1e2t ) * zconv * rday
+      zsfx  = glob_sum( 'icectl', ( sfx + diag_sice ) * e1e2t ) * zconv * rday
 
       ! heat flux
-      zhfx  = glob_sum( ( qt_atm_oi - qt_oce_ai - diag_heat ) * e1e2t ) * zconv
+      zhfx  = glob_sum( 'icectl', ( qt_atm_oi - qt_oce_ai - diag_heat ) * e1e2t ) * zconv
 
       ! set threshold values and calculate the ice area (+epsi10 to set a threshold > 0 when there is no ice) 
-      zarea   = glob_sum( SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2
+      zarea   = glob_sum( 'icectl', SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2
       zv_sill = zarea * 2.5e-5
       zs_sill = zarea * 25.e-5
       zt_sill = zarea * 10.e-5
@@ -399,7 +406,7 @@ CONTAINS
       ! sum of the alerts on all processors
       IF( lk_mpp ) THEN
          DO ialert_id = 1, inb_altests
-            CALL mpp_sum(inb_alp(ialert_id))
+            CALL mpp_sum('icectl', inb_alp(ialert_id))
          END DO
       ENDIF
 

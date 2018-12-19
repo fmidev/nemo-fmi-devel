@@ -156,7 +156,7 @@ CONTAINS
             END DO
          END DO
          taum(:,:) = taum(:,:) * tmask(:,:,1) ; wndm(:,:) = wndm(:,:) * tmask(:,:,1)
-         CALL lbc_lnk( taum(:,:), 'T', 1. )   ;   CALL lbc_lnk( wndm(:,:), 'T', 1. )
+         CALL lbc_lnk( 'sbcflx', taum(:,:), 'T', 1. )   ;   CALL lbc_lnk( 'sbcflx', wndm(:,:), 'T', 1. )
 
          IF( nitend-nit000 <= 100 .AND. lwp ) THEN                ! control print (if less than 100 time-step asked)
             WRITE(numout,*) 

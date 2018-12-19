@@ -140,8 +140,8 @@ CONTAINS
          WRITE(numout,'(2(a,i5))') 'icebergs, read_restart_bergs: # bergs =',jn,' on PE',narea-1
       IF( lk_mpp ) THEN
          ! Only mpp_sum ibergs_in_file if we are reading from multiple restart files. 
-         IF( INDEX(iom_file(ncid)%name,'icebergs.nc' ) .EQ. 0 ) CALL mpp_sum(ibergs_in_file)
-         CALL mpp_sum(jn)
+         IF( INDEX(iom_file(ncid)%name,'icebergs.nc' ) .EQ. 0 ) CALL mpp_sum('icbrst', ibergs_in_file)
+         CALL mpp_sum('icbrst', jn)
       ENDIF
       IF( lwp )   WRITE(numout,'(a,i5,a,i5,a)') 'icebergs, icb_rst_read: there were',ibergs_in_file,   &
          &                                    ' bergs in the restart file and', jn,' bergs have been read'
@@ -163,14 +163,14 @@ CONTAINS
          ibase_err = 1
       ENDIF
       IF( lk_mpp ) THEN
-         CALL mpp_sum(ibase_err)
+         CALL mpp_sum('icbrst', ibase_err)
       ENDIF
       IF( ibase_err > 0 ) THEN
          ! 
          ! A new base is needed. The only secure solution is to set bases such that
          ! all future icebergs numbers will be greater than the current global maximum
          IF( lk_mpp ) THEN
-            CALL mpp_max(imax_icb)
+            CALL mpp_max('icbrst', imax_icb)
          ENDIF
          num_bergs(1) = imax_icb - jpnij + narea
       ENDIF
@@ -403,7 +403,7 @@ CONTAINS
          IF ( lwp .AND. nn_verbose_level >= 0)   &
             WRITE(numout,'(2(a,i5))') 'icebergs, icb_rst_write: # bergs =',jn,' on PE',narea-1
          IF( lk_mpp ) THEN
-            CALL mpp_sum(jn)
+            CALL mpp_sum('icbrst', jn)
          ENDIF
          IF(lwp)   WRITE(numout,'(a,i5,a,i5,a)') 'icebergs, icb_rst_write: ', jn,   &
             &                                    ' bergs in total have been written at timestep ', kt

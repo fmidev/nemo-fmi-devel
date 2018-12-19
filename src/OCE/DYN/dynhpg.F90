@@ -489,7 +489,7 @@ CONTAINS
              END IF
            END DO
         END DO
-        CALL lbc_lnk_multi( zcpx, 'U', 1., zcpy, 'V', 1. )
+        CALL lbc_lnk_multi( 'dynhpg', zcpx, 'U', 1., zcpy, 'V', 1. )
       END IF
 
       ! Surface value
@@ -722,7 +722,7 @@ CONTAINS
              END IF
            END DO
         END DO
-        CALL lbc_lnk_multi( zcpx, 'U', 1., zcpy, 'V', 1. )
+        CALL lbc_lnk_multi( 'dynhpg', zcpx, 'U', 1., zcpy, 'V', 1. )
       END IF
 
       IF( kt == nit000 ) THEN
@@ -882,7 +882,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( rho_k, 'W', 1., rho_i, 'U', 1., rho_j, 'V', 1. )
+      CALL lbc_lnk_multi( 'dynhpg', rho_k, 'W', 1., rho_i, 'U', 1., rho_j, 'V', 1. )
 
       ! ---------------
       !  Surface value
@@ -1015,7 +1015,7 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         CALL lbc_lnk_multi( zcpx, 'U', 1., zcpy, 'V', 1. )
+         CALL lbc_lnk_multi( 'dynhpg', zcpx, 'U', 1., zcpy, 'V', 1. )
       ENDIF
 
       ! Clean 3-D work arrays
@@ -1101,7 +1101,7 @@ CONTAINS
         END DO
       END DO
 
-      CALL lbc_lnk_multi (zsshu_n, 'U', 1., zsshv_n, 'V', 1. )
+      CALL lbc_lnk_multi ('dynhpg', zsshu_n, 'U', 1., zsshv_n, 'V', 1. )
 
       DO jj = 2, jpjm1
         DO ji = 2, jpim1

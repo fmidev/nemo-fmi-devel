@@ -279,7 +279,7 @@ SUBROUTINE Agrif_InitValues_cont
          ! check if tmask and vertical scale factors agree with parent over first two coarse grid points:
          CALL Agrif_Bc_variable(e3t_id,calledweight=1.,procname=interpe3t)
          !
-         IF (lk_mpp) CALL mpp_sum( kindic_agr )
+         CALL mpp_sum( 'agrif_user', kindic_agr )
          IF( kindic_agr /= 0 ) THEN
             CALL ctl_stop('Child Bathymetry is not correct near boundaries.')
          ELSE

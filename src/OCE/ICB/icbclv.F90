@@ -173,9 +173,9 @@ CONTAINS
       END DO
       !
       DO jn = 1, nclasses
-         CALL lbc_lnk( berg_grid%stored_ice(:,:,jn), 'T', 1._wp )
+         CALL lbc_lnk( 'icbclv', berg_grid%stored_ice(:,:,jn), 'T', 1._wp )
       END DO
-      CALL lbc_lnk( berg_grid%stored_heat, 'T', 1._wp )
+      CALL lbc_lnk( 'icbclv', berg_grid%stored_heat, 'T', 1._wp )
       !
       IF( nn_verbose_level > 0 .AND. icntmax > 1 )   WRITE(numicb,*) 'icb_clv: icnt=', icnt,' on', narea
       !

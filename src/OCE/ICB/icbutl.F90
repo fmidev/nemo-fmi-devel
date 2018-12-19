@@ -77,13 +77,13 @@ CONTAINS
       ua_e(:,:) = 0._wp   ;   ua_e(1:jpi,1:jpj) = utau (:,:) * umask(:,:,1) ! maybe mask useless because mask applied in sbcblk
       va_e(:,:) = 0._wp   ;   va_e(1:jpi,1:jpj) = vtau (:,:) * vmask(:,:,1) ! maybe mask useless because mask applied in sbcblk
       !
-      CALL lbc_lnk_icb( uo_e, 'U', -1._wp, 1, 1 )
-      CALL lbc_lnk_icb( vo_e, 'V', -1._wp, 1, 1 )
-      CALL lbc_lnk_icb( ff_e, 'F', +1._wp, 1, 1 )
-      CALL lbc_lnk_icb( ua_e, 'U', -1._wp, 1, 1 )
-      CALL lbc_lnk_icb( va_e, 'V', -1._wp, 1, 1 )
-      CALL lbc_lnk_icb( fr_e, 'T', +1._wp, 1, 1 )
-      CALL lbc_lnk_icb( tt_e, 'T', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', uo_e, 'U', -1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', vo_e, 'V', -1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', ff_e, 'F', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', ua_e, 'U', -1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', va_e, 'V', -1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', fr_e, 'T', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', tt_e, 'T', +1._wp, 1, 1 )
 #if defined key_si3
       hicth(:,:) = 0._wp ;  hicth(1:jpi,1:jpj) = hm_i (:,:)  
       ui_e(:,:) = 0._wp ;   ui_e(1:jpi, 1:jpj) = u_ice(:,:)
@@ -93,9 +93,9 @@ CONTAINS
       zssh_lead_m(:,:) = ice_var_sshdyn(ssh_m, snwice_mass, snwice_mass_b)
       ssh_e(:,:) = 0._wp ;  ssh_e(1:jpi, 1:jpj) = zssh_lead_m(:,:) * tmask(:,:,1)
       !
-      CALL lbc_lnk_icb( hicth, 'T', +1._wp, 1, 1 )
-      CALL lbc_lnk_icb( ui_e , 'U', -1._wp, 1, 1 )
-      CALL lbc_lnk_icb( vi_e , 'V', -1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', hicth, 'T', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', ui_e , 'U', -1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', vi_e , 'V', -1._wp, 1, 1 )
 #else
       ssh_e(:,:) = 0._wp ;  ssh_e(1:jpi, 1:jpj) = ssh_m(:,:) * tmask(:,:,1)
 #endif
@@ -110,7 +110,7 @@ CONTAINS
       ssh_e(jpi+1,0)     = ssh_e(jpi,1)
       ssh_e(0,jpj+1)     = ssh_e(1,jpj)
       ssh_e(jpi+1,jpj+1) = ssh_e(jpi,jpj)
-      CALL lbc_lnk_icb( ssh_e, 'T', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbutl', ssh_e, 'T', +1._wp, 1, 1 )
       !
    END SUBROUTINE icb_utl_copy
 
@@ -660,7 +660,7 @@ CONTAINS
       END DO
       ibergs = icb_utl_count()
       inbergs = ibergs
-      IF( lk_mpp )   CALL mpp_sum(inbergs)
+      CALL mpp_sum('icbutl', inbergs)
       IF( ibergs > 0 )   WRITE(numicb,'(a," there are",i5," bergs out of",i6," on PE ",i4)')   &
          &                                  cd_label, ibergs, inbergs, narea
       !

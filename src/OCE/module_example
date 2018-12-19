@@ -62,8 +62,8 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( array(jpi,jpj,jpk) , STAT= exa_mpl_alloc )   ! Module array                                                                
       !
-      IF( lk_mpp             )   CALL mpp_sum ( exa_mpl_alloc )
-      IF( exa_mpl_alloc /= 0 )   CALL ctl_warn('exa_mpl_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'module_example', exa_mpl_alloc )
+      IF( exa_mpl_alloc /= 0 )   CALL ctl_stop( 'STOP', 'exa_mpl_alloc: failed to allocate arrays' )
       !
    END FUNCTION exa_mpl_alloc
    
@@ -126,7 +126,7 @@ CONTAINS
          !
       END SELECT
       !
-      CALL lbc_lnk( avm, 'T', 1. )              ! Lateral boundary conditions (unchanged sign)
+      CALL lbc_lnk( 'module_example', avm, 'T', 1. )              ! Lateral boundary conditions (unchanged sign)
       !
    END SUBROUTINE exa_mpl
 
@@ -175,7 +175,7 @@ CONTAINS
       IF( exa_mpl_alloc() /= 0 )   CALL ctl_stop( 'STOP', 'exa_mpl_init : unable to allocate arrays' )
       !                              ! Parameter control
       IF( ln_opt      )   CALL ctl_stop( 'exa_mpl_init: this work and option xxx are incompatible'   )
-      IF( nn_opt == 2 )   CALL ctl_warn( 'exa_mpl_init: this work and option yyy may cause problems' )
+      IF( nn_opt == 2 )   CALL ctl_stop( 'STOP',  'exa_mpl_init: this work and option yyy may cause problems'  )
       !
    END SUBROUTINE exa_mpl_init
 

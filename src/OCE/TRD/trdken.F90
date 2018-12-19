@@ -53,8 +53,8 @@ CONTAINS
       !!---------------------------------------------------------------------
       ALLOCATE( bu(jpi,jpj,jpk) , bv(jpi,jpj,jpk) , r1_bt(jpi,jpj,jpk) , STAT= trd_ken_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( trd_ken_alloc )
-      IF( trd_ken_alloc /= 0 )   CALL ctl_warn('trd_ken_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'trdken', trd_ken_alloc )
+      IF( trd_ken_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trd_ken_alloc: failed to allocate arrays' )
    END FUNCTION trd_ken_alloc
 
 
@@ -87,7 +87,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj,jpk)      ::   zke                 ! 3D workspace 
       !!----------------------------------------------------------------------
       !
-      CALL lbc_lnk_multi( putrd, 'U', -1. , pvtrd, 'V', -1. )      ! lateral boundary conditions
+      CALL lbc_lnk_multi( 'trdken', putrd, 'U', -1. , pvtrd, 'V', -1. )      ! lateral boundary conditions
       !
       nkstp = kt
       DO jk = 1, jpkm1

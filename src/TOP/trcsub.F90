@@ -307,7 +307,7 @@ CONTAINS
       IF(lwp) WRITE(numout,*) '~~~~~~~'
 
       ierr =  trc_sub_alloc    ()
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'trcsub', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'top_sub_alloc : unable to allocate standard ocean arrays' )
 
       un_tm   (:,:,:)        = un   (:,:,:)        * e3u_n(:,:,:) 
@@ -509,7 +509,7 @@ CONTAINS
 #endif
          IF( ln_bdy ) THEN
             ssha(:,:) = ssha(:,:) * bdytmask(:,:)
-            CALL lbc_lnk( ssha, 'T', 1. ) 
+            CALL lbc_lnk( 'trcsub', ssha, 'T', 1. ) 
          ENDIF
       ENDIF
       !
@@ -534,7 +534,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       !!                    *** ROUTINE trc_sub_alloc ***
       !!-------------------------------------------------------------------
-      USE lib_mpp, ONLY: ctl_warn
+      USE lib_mpp, ONLY: ctl_stop
       INTEGER ::  ierr(3)
       !!-------------------------------------------------------------------
       !
@@ -576,7 +576,7 @@ CONTAINS
       !
       trc_sub_alloc = MAXVAL( ierr )
       !
-      IF( trc_sub_alloc /= 0 )   CALL ctl_warn('trc_sub_alloc: failed to allocate arrays')
+      IF( trc_sub_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trc_sub_alloc: failed to allocate arrays' )
       !
    END FUNCTION trc_sub_alloc
 

@@ -201,7 +201,7 @@ CONTAINS
       !
       z2d(:,:) = REAL( jpkm1 , wp )          ! flat bottom
       !
-      CALL lbc_lnk( z2d, 'T', 1. )           ! set surrounding land to zero (here jperio=0 ==>> closed)
+      CALL lbc_lnk( 'usrdef_zgr', z2d, 'T', 1. )           ! set surrounding land to zero (here jperio=0 ==>> closed)
       !
       k_bot(:,:) = NINT( z2d(:,:) )           ! =jpkm1 over the ocean point, =0 elsewhere
       !

@@ -163,7 +163,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( z3d, 'T', 1. )
+         CALL lbc_lnk( 'crsfld', z3d, 'T', 1. )
          !
          CALL crs_dom_ope( z3d, 'VOL', 'T', tmask, zt_crs, p_e12=e1e2t, p_e3=ze3t, psgn=1.0 )
          CALL iom_put( "eken", zt_crs )

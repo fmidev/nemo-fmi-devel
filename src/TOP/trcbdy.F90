@@ -70,7 +70,7 @@ CONTAINS
             CASE DEFAULT           ;   CALL ctl_stop( 'trc_bdy : unrecognised option for open boundaries for passive tracers' )
             END SELECT
             ! Boundary points should be updated
-            CALL lbc_bdy_lnk( tra(:,:,:,jn), 'T', 1., ib_bdy )
+            CALL lbc_bdy_lnk( 'trcbdy', tra(:,:,:,jn), 'T', 1., ib_bdy )
             !
          END DO
       END DO

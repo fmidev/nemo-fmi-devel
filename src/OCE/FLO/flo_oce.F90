@@ -63,8 +63,8 @@ CONTAINS
          &      flxx(jpnfl)     , flyy(jpnfl)   , flzz(jpnfl)    ,                 & 
          &      tpifl(jpnfl)    , tpjfl(jpnfl)  , tpkfl(jpnfl)   , STAT=flo_oce_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( flo_oce_alloc )
-      IF( flo_oce_alloc /= 0 )   CALL ctl_warn('flo_oce_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'flo_oce', flo_oce_alloc )
+      IF( flo_oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'flo_oce_alloc: failed to allocate arrays' )
    END FUNCTION flo_oce_alloc
 
 #else

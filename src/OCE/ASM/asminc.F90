@@ -420,7 +420,7 @@ CONTAINS
                         &            - e1v(ji,jj-1) * e3v_n(ji,jj-1,jk) * v_bkginc(ji,jj-1,jk)  ) / e3t_n(ji,jj,jk)
                   END DO
                END DO
-               CALL lbc_lnk( zhdiv, 'T', 1. )   ! lateral boundary cond. (no sign change)
+               CALL lbc_lnk( 'asminc', zhdiv, 'T', 1. )   ! lateral boundary cond. (no sign change)
                !
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1   ! vector opt.

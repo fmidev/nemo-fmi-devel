@@ -240,7 +240,7 @@ CONTAINS
       ierr = ierr + sbc_ice_alloc    ()      ! surface forcing 
       ierr = ierr + ice1D_alloc      ()      ! thermodynamics
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'icestp', ierr )
       IF( ierr /= 0 )   CALL ctl_stop('STOP', 'ice_init : unable to allocate ice arrays')
       !
       CALL ice_itd_init                ! ice thickness distribution initialization

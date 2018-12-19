@@ -1132,7 +1132,7 @@ CONTAINS
             bdyvmask(ii,ij) = bdytmask(ii,ij) * bdytmask(ii  ,ij+1)  
          END DO
       END DO
-      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
+      CALL lbc_lnk_multi( 'bdyini', bdyumask, 'U', 1. , bdyvmask, 'V', 1. )   ! Lateral boundary cond. 
 
       ! bdy masks are now set to zero on boundary points:
       !
@@ -1168,8 +1168,8 @@ CONTAINS
       END DO
 
       ! Lateral boundary conditions
-      CALL lbc_lnk( zfmask, 'F', 1. ) 
-      CALL lbc_lnk_multi( bdyumask, 'U', 1. , bdyvmask, 'V', 1., bdytmask, 'T', 1. )
+      CALL lbc_lnk( 'bdyini', zfmask, 'F', 1. ) 
+      CALL lbc_lnk_multi( 'bdyini', bdyumask, 'U', 1. , bdyvmask, 'V', 1., bdytmask, 'T', 1. )
       DO ib_bdy = 1, nb_bdy       ! Indices and directions of rim velocity components
 
          idx_bdy(ib_bdy)%flagu(:,:) = 0._wp
@@ -1202,12 +1202,10 @@ CONTAINS
                ENDIF
             END DO
             IF( icount /= 0 ) THEN
-               IF(lwp) WRITE(numout,*)
-               IF(lwp) WRITE(numout,*) ' E R R O R : Some ',cgrid(igrd),' grid points,',   &
+               WRITE(ctmp1,*) ' E R R O R : Some ',cgrid(igrd),' grid points,',   &
                   ' are not boundary points (flagu calculation). Check nbi, nbj, indices for boundary set ',ib_bdy
-               IF(lwp) WRITE(numout,*) ' ========== '
-               IF(lwp) WRITE(numout,*)
-               nstop = nstop + 1
+               WRITE(ctmp2,*) ' ========== '
+               CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
             ENDIF 
          END DO
 
@@ -1237,12 +1235,10 @@ CONTAINS
                END IF
             END DO
             IF( icount /= 0 ) THEN
-               IF(lwp) WRITE(numout,*)
-               IF(lwp) WRITE(numout,*) ' E R R O R : Some ',cgrid(igrd),' grid points,',   &
+               WRITE(ctmp1,*) ' E R R O R : Some ',cgrid(igrd),' grid points,',   &
                   ' are not boundary points (flagv calculation). Check nbi, nbj, indices for boundary set ',ib_bdy
-               IF(lwp) WRITE(numout,*) ' ========== '
-               IF(lwp) WRITE(numout,*)
-               nstop = nstop + 1
+               WRITE(ctmp2,*) ' ========== '
+               CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
             ENDIF 
          END DO
          !
@@ -1279,7 +1275,7 @@ CONTAINS
             END DO
          END DO
          !
-         IF( lk_mpp )   CALL mpp_sum( bdysurftot )      ! sum over the global domain
+         CALL mpp_sum( 'bdyini', bdysurftot )      ! sum over the global domain
       END IF   
       !
       ! Tidy up
@@ -1375,21 +1371,17 @@ CONTAINS
                      icornw(ib1,1) = npckgs(ib2)
                      icorns(ib2,1) = npckgw(ib1)
                   ELSEIF ((jpisft(ib2)==jpiwob(ib1)).AND.(jpjwft(ib1)==jpjsob(ib2))) THEN
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
-                     &                                     jpisft(ib2), jpjwft(ib1)
-                     IF(lwp) WRITE(numout,*) ' ==========  Not allowed yet'
-                     IF(lwp) WRITE(numout,*) '             Crossing problem with West segment: ',npckgw(ib1), & 
-                     &                                                    ' and South segment: ',npckgs(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     WRITE(ctmp1,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
+                        &                                     jpisft(ib2), jpjwft(ib1)
+                     WRITE(ctmp2,*) ' ==========  Not allowed yet'
+                     WRITE(ctmp3,*) '             Crossing problem with West segment: ',npckgw(ib1), & 
+                        &                                        ' and South segment: ',npckgs(ib2)
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ctmp3, ' ' )
                   ELSE
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Check South and West Open boundary indices'
-                     IF(lwp) WRITE(numout,*) ' ==========  Crossing problem with West segment: ',npckgw(ib1) , &
-                     &                                                    ' and South segment: ',npckgs(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop+1
+                     WRITE(ctmp1,*) ' E R R O R : Check South and West Open boundary indices'
+                     WRITE(ctmp2,*) ' ==========  Crossing problem with West segment: ',npckgw(ib1) , &
+                        &                                         ' and South segment: ',npckgs(ib2)
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
                   END IF
                END IF
             END DO
@@ -1411,21 +1403,17 @@ CONTAINS
                      icorne(ib1,1) = npckgs(ib2)
                      icorns(ib2,2) = npckge(ib1)
                   ELSEIF ((jpjeft(ib1)==jpjsob(ib2)).AND.(jpisdt(ib2)==jpieob(ib1)+1)) THEN
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
-                     &                                     jpisdt(ib2), jpjeft(ib1)
-                     IF(lwp) WRITE(numout,*) ' ==========  Not allowed yet'
-                     IF(lwp) WRITE(numout,*) '             Crossing problem with East segment: ',npckge(ib1), &
-                     &                                                    ' and South segment: ',npckgs(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     WRITE(ctmp1,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
+                        &                                     jpisdt(ib2), jpjeft(ib1)
+                     WRITE(ctmp2,*) ' ==========  Not allowed yet'
+                     WRITE(ctmp3,*) '             Crossing problem with East segment: ',npckge(ib1), &
+                        &                                        ' and South segment: ',npckgs(ib2)
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ctmp3, ' ' )
                   ELSE
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Check South and East Open boundary indices'
-                     IF(lwp) WRITE(numout,*) ' ==========  Crossing problem with East segment: ',npckge(ib1), &
-                     &                                                    ' and South segment: ',npckgs(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     WRITE(ctmp1,*) ' E R R O R : Check South and East Open boundary indices'
+                     WRITE(ctmp2,*) ' ==========  Crossing problem with East segment: ',npckge(ib1), &
+                     &                                           ' and South segment: ',npckgs(ib2)
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
                   END IF
                END IF
             END DO
@@ -1447,21 +1435,17 @@ CONTAINS
                      icornw(ib1,2) = npckgn(ib2)
                      icornn(ib2,1) = npckgw(ib1)
                   ELSEIF ((jpjwdt(ib1)==jpjnob(ib2)+1).AND.(jpinft(ib2)==jpiwob(ib1))) THEN
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
+                     WRITE(ctmp1,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
                      &                                     jpinft(ib2), jpjwdt(ib1)
-                     IF(lwp) WRITE(numout,*) ' ==========  Not allowed yet'
-                     IF(lwp) WRITE(numout,*) '             Crossing problem with West segment: ',npckgw(ib1), &
+                     WRITE(ctmp2,*) ' ==========  Not allowed yet'
+                     WRITE(ctmp3,*) '             Crossing problem with West segment: ',npckgw(ib1), &
                      &                                                    ' and North segment: ',npckgn(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ctmp3, ' ' )
                   ELSE
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Check North and West Open boundary indices'
-                     IF(lwp) WRITE(numout,*) ' ==========  Crossing problem with West segment: ',npckgw(ib1), &
+                     WRITE(ctmp1,*) ' E R R O R : Check North and West Open boundary indices'
+                     WRITE(ctmp2,*) ' ==========  Crossing problem with West segment: ',npckgw(ib1), &
                      &                                                    ' and North segment: ',npckgn(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
                   END IF
                END IF
             END DO
@@ -1483,21 +1467,17 @@ CONTAINS
                      icorne(ib1,2) = npckgn(ib2)
                      icornn(ib2,2) = npckge(ib1)
                   ELSEIF ((jpjedt(ib1)==jpjnob(ib2)+1).AND.(jpindt(ib2)==jpieob(ib1)+1)) THEN
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
+                     WRITE(ctmp1,*) ' E R R O R : Found an acute open boundary corner at point (i,j)= ', &
                      &                                     jpindt(ib2), jpjedt(ib1)
-                     IF(lwp) WRITE(numout,*) ' ==========  Not allowed yet'
-                     IF(lwp) WRITE(numout,*) '             Crossing problem with East segment: ',npckge(ib1), &
-                     &                                                    ' and North segment: ',npckgn(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     WRITE(ctmp2,*) ' ==========  Not allowed yet'
+                     WRITE(ctmp3,*) '             Crossing problem with East segment: ',npckge(ib1), &
+                     &                                           ' and North segment: ',npckgn(ib2)
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ctmp3, ' ' )
                   ELSE
-                     IF(lwp) WRITE(numout,*)
-                     IF(lwp) WRITE(numout,*) ' E R R O R : Check North and East Open boundary indices'
-                     IF(lwp) WRITE(numout,*) ' ==========  Crossing problem with East segment: ',npckge(ib1), &
-                     &                                                    ' and North segment: ',npckgn(ib2)
-                     IF(lwp) WRITE(numout,*)
-                     nstop = nstop + 1
+                     WRITE(ctmp1,*) ' E R R O R : Check North and East Open boundary indices'
+                     WRITE(ctmp2,*) ' ==========  Crossing problem with East segment: ',npckge(ib1), &
+                     &                                           ' and North segment: ',npckgn(ib2)
+                     CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
                   END IF
                END IF
             END DO
@@ -1519,15 +1499,13 @@ CONTAINS
                &  ((jj + njmpp - 1) == jpjwft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF (ztestmask(1)==1) THEN 
             IF (icornw(ib,1)==0) THEN
-               IF(lwp) WRITE(numout,*)
-               IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckgw(ib)
-               IF(lwp) WRITE(numout,*) ' ==========  does not start on land or on a corner'                                                  
-               IF(lwp) WRITE(numout,*)
-               nstop = nstop + 1
+               WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckgw(ib)
+               WRITE(ctmp2,*) ' ==========  does not start on land or on a corner'                                                  
+               CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
             ELSE
                ! This is a corner
                IF(lwp) WRITE(numout,*) 'Found a South-West corner at (i,j): ', jpiwob(ib), jpjwdt(ib)
@@ -1537,11 +1515,9 @@ CONTAINS
          ENDIF
          IF (ztestmask(2)==1) THEN
             IF (icornw(ib,2)==0) THEN
-               IF(lwp) WRITE(numout,*)
-               IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckgw(ib)
-               IF(lwp) WRITE(numout,*) ' ==========  does not end on land or on a corner'                                                  
-               IF(lwp) WRITE(numout,*)
-               nstop = nstop + 1
+               WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckgw(ib)
+               WRITE(ctmp2,*) ' ==========  does not end on land or on a corner'                                                  
+               CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
             ELSE
                ! This is a corner
                IF(lwp) WRITE(numout,*) 'Found a North-West corner at (i,j): ', jpiwob(ib), jpjwft(ib)
@@ -1563,15 +1539,13 @@ CONTAINS
                &  ((jj + njmpp - 1) == jpjeft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF (ztestmask(1)==1) THEN
             IF (icorne(ib,1)==0) THEN
-               IF(lwp) WRITE(numout,*)
-               IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckge(ib)
-               IF(lwp) WRITE(numout,*) ' ==========  does not start on land or on a corner'                                                  
-               IF(lwp) WRITE(numout,*)
-               nstop = nstop + 1 
+               WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckge(ib)
+               WRITE(ctmp2,*) ' ==========  does not start on land or on a corner'                                                  
+               CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
             ELSE
                ! This is a corner
                IF(lwp) WRITE(numout,*) 'Found a South-East corner at (i,j): ', jpieob(ib)+1, jpjedt(ib)
@@ -1581,11 +1555,9 @@ CONTAINS
          ENDIF
          IF (ztestmask(2)==1) THEN
             IF (icorne(ib,2)==0) THEN
-               IF(lwp) WRITE(numout,*)
-               IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckge(ib)
-               IF(lwp) WRITE(numout,*) ' ==========  does not end on land or on a corner'                                                  
-               IF(lwp) WRITE(numout,*)
-               nstop = nstop + 1
+               WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckge(ib)
+               WRITE(ctmp2,*) ' ==========  does not end on land or on a corner'                                                  
+               CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
             ELSE
                ! This is a corner
                IF(lwp) WRITE(numout,*) 'Found a North-East corner at (i,j): ', jpieob(ib)+1, jpjeft(ib)
@@ -1607,21 +1579,17 @@ CONTAINS
                &  ((ji + nimpp - 1) == jpisft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF ((ztestmask(1)==1).AND.(icorns(ib,1)==0)) THEN
-            IF(lwp) WRITE(numout,*)
-            IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckgs(ib)
-            IF(lwp) WRITE(numout,*) ' ==========  does not start on land or on a corner'                                                  
-            IF(lwp) WRITE(numout,*)
-            nstop = nstop + 1
+            WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckgs(ib)
+            WRITE(ctmp2,*) ' ==========  does not start on land or on a corner'                                                  
+            CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
          ENDIF
          IF ((ztestmask(2)==1).AND.(icorns(ib,2)==0)) THEN
-            IF(lwp) WRITE(numout,*)
-            IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckgs(ib)
-            IF(lwp) WRITE(numout,*) ' ==========  does not end on land or on a corner'                                                  
-            IF(lwp) WRITE(numout,*)
-            nstop = nstop + 1
+            WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckgs(ib)
+            WRITE(ctmp2,*) ' ==========  does not end on land or on a corner'                                                  
+            CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
          ENDIF
       END DO
       !
@@ -1637,21 +1605,17 @@ CONTAINS
                &  ((ji + nimpp - 1) == jpinft(ib))) ztestmask(2)=tmask(ji,jj,1)  
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( ztestmask, 2 )   ! sum over the global domain
+         CALL mpp_sum( 'bdyini', ztestmask, 2 )   ! sum over the global domain
 
          IF ((ztestmask(1)==1).AND.(icornn(ib,1)==0)) THEN
-            IF(lwp) WRITE(numout,*)
-            IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckgn(ib)
-            IF(lwp) WRITE(numout,*) ' ==========  does not start on land'                                                  
-            IF(lwp) WRITE(numout,*)
-            nstop = nstop + 1
+            WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckgn(ib)
+            WRITE(ctmp2,*) ' ==========  does not start on land'                                                  
+            CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
          ENDIF
          IF ((ztestmask(2)==1).AND.(icornn(ib,2)==0)) THEN
-            IF(lwp) WRITE(numout,*)
-            IF(lwp) WRITE(numout,*) ' E R R O R : Open boundary segment ', npckgn(ib)
-            IF(lwp) WRITE(numout,*) ' ==========  does not end on land'                                                  
-            IF(lwp) WRITE(numout,*)
-            nstop = nstop + 1
+            WRITE(ctmp1,*) ' E R R O R : Open boundary segment ', npckgn(ib)
+            WRITE(ctmp2,*) ' ==========  does not end on land'                                                  
+            CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
          ENDIF
       END DO
       !
@@ -1690,10 +1654,9 @@ CONTAINS
       IF( nn_rimwidth(ib1) /= nn_rimwidth(ib2) )   itest = itest + 1   
       !
       IF( itest>0 ) THEN
-         IF(lwp) WRITE(numout,*) ' E R R O R : Segments ', ib1, 'and ', ib2
-         IF(lwp) WRITE(numout,*) ' ==========  have different open bdy schemes'                                                  
-         IF(lwp) WRITE(numout,*)
-         nstop = nstop + 1
+         WRITE(ctmp1,*) ' E R R O R : Segments ', ib1, 'and ', ib2
+         WRITE(ctmp2,*) ' ==========  have different open bdy schemes'                                                  
+         CALL ctl_stop( ' ', ctmp1, ctmp2, ' ' )
       ENDIF
       !
    END SUBROUTINE bdy_ctl_corn

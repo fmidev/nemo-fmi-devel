@@ -43,8 +43,8 @@ CONTAINS
          ALLOCATE( raa (jpi,jpj) , rbb  (jpi,jpj) , rcc  (jpi,jpj) , rab  (jpi,jpj) ,     &
             &      rtmd(jpi,jpj) , rdawn(jpi,jpj) , rdusk(jpi,jpj) , rscal(jpi,jpj) , STAT=sbc_dcy_alloc )
             !
-         IF( lk_mpp             )   CALL mpp_sum ( sbc_dcy_alloc )
-         IF( sbc_dcy_alloc /= 0 )   CALL ctl_warn('sbc_dcy_alloc: failed to allocate arrays')
+         CALL mpp_sum ( 'sbcdcy', sbc_dcy_alloc )
+         IF( sbc_dcy_alloc /= 0 )   CALL ctl_stop( 'STOP', 'sbc_dcy_alloc: failed to allocate arrays' )
       END FUNCTION sbc_dcy_alloc
 
 

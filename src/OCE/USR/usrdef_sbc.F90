@@ -131,8 +131,8 @@ CONTAINS
          END DO
       END DO
 
-      zsumemp = GLOB_SUM( emp  (:,:)   ) 
-      zsurf   = GLOB_SUM( tmask(:,:,1) ) 
+      zsumemp = GLOB_SUM( 'usrdef_sbc', emp  (:,:)   ) 
+      zsurf   = GLOB_SUM( 'usrdef_sbc', tmask(:,:,1) ) 
       zsumemp = zsumemp / zsurf         ! Default GYRE configuration
 
       ! freshwater (mass flux) and update of qns with heat content of emp
@@ -185,7 +185,7 @@ CONTAINS
             wndm(ji,jj) = SQRT( zmod * zcoef )
          END DO
       END DO
-      CALL lbc_lnk_multi( taum(:,:), 'T', 1. , wndm(:,:), 'T', 1. )
+      CALL lbc_lnk_multi( 'usrdef_sbc', taum(:,:), 'T', 1. , wndm(:,:), 'T', 1. )
 
       ! ---------------------------------- !
       !  control print at first time-step  !

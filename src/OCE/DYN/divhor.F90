@@ -103,7 +103,7 @@ CONTAINS
       !
       IF( ln_iscpl .AND. ln_hsb )   CALL iscpl_div( hdivn ) !==  ice sheet  ==!   (update hdivn field)
       !
-      CALL lbc_lnk( hdivn, 'T', 1. )   !   (no sign change)
+      CALL lbc_lnk( 'divhor', hdivn, 'T', 1. )   !   (no sign change)
       !
       IF( ln_timing )   CALL timing_stop('div_hor')
       !

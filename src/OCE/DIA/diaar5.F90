@@ -55,8 +55,8 @@ CONTAINS
       !
       ALLOCATE( area(jpi,jpj), thick0(jpi,jpj) , sn0(jpi,jpj,jpk) , STAT=dia_ar5_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( dia_ar5_alloc )
-      IF( dia_ar5_alloc /= 0 )   CALL ctl_warn('dia_ar5_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'diaar5', dia_ar5_alloc )
+      IF( dia_ar5_alloc /= 0 )   CALL ctl_stop( 'STOP', 'dia_ar5_alloc: failed to allocate arrays' )
       !
    END FUNCTION dia_ar5_alloc
 
@@ -94,7 +94,7 @@ CONTAINS
       IF( iom_use( 'voltot' ) .OR. iom_use( 'sshtot' )  .OR. iom_use( 'sshdyn' )  ) THEN    
          !                                         ! total volume of liquid seawater
          zvolssh = SUM( zarea_ssh(:,:) ) 
-         IF( lk_mpp )   CALL mpp_sum( zvolssh )
+         CALL mpp_sum( 'diaar5', zvolssh )
          zvol = vol0 + zvolssh
       
          CALL iom_put( 'voltot', zvol               )
@@ -129,7 +129,7 @@ CONTAINS
          END IF
          !                                         
          zarho = SUM( area(:,:) * zbotpres(:,:) ) 
-         IF( lk_mpp )   CALL mpp_sum( zarho )
+         CALL mpp_sum( 'diaar5', zarho )
          zssh_steric = - zarho / area_tot
          CALL iom_put( 'sshthster', zssh_steric )
       
@@ -155,7 +155,7 @@ CONTAINS
          END IF
          !    
          zarho = SUM( area(:,:) * zbotpres(:,:) ) 
-         IF( lk_mpp )   CALL mpp_sum( zarho )
+         CALL mpp_sum( 'diaar5', zarho )
          zssh_steric = - zarho / area_tot
          CALL iom_put( 'sshsteric', zssh_steric )
       
@@ -193,8 +193,8 @@ CONTAINS
             END IF
          ENDIF
          IF( lk_mpp ) THEN  
-            CALL mpp_sum( ztemp )
-            CALL mpp_sum( zsal  )
+            CALL mpp_sum( 'diaar5', ztemp )
+            CALL mpp_sum( 'diaar5', zsal  )
          END IF
          !
          zmass = rau0 * ( zarho + zvol )                 ! total mass of liquid seawater
@@ -244,7 +244,7 @@ CONTAINS
             END DO
          ENDIF
 !!gm useless lbc_lnk since the computation above is performed over 1:jpi & 1:jpj
-!!gm           CALL lbc_lnk( zpe, 'T', 1._wp)         
+!!gm           CALL lbc_lnk( 'diaar5', zpe, 'T', 1._wp)         
           CALL iom_put( 'tnpeo', zpe )
           DEALLOCATE( zpe )
       ENDIF
@@ -284,7 +284,7 @@ CONTAINS
             END DO
          END DO
        END DO
-       CALL lbc_lnk( z2d, 'U', -1. )
+       CALL lbc_lnk( 'diaar5', z2d, 'U', -1. )
        IF( cptr == 'adv' ) THEN
           IF( ktra == jp_tem ) CALL iom_put( "uadv_heattr" , rau0_rcp * z2d )  ! advective heat transport in i-direction
           IF( ktra == jp_sal ) CALL iom_put( "uadv_salttr" , rau0     * z2d )  ! advective salt transport in i-direction
@@ -302,7 +302,7 @@ CONTAINS
              END DO
           END DO
        END DO
-       CALL lbc_lnk( z2d, 'V', -1. )
+       CALL lbc_lnk( 'diaar5', z2d, 'V', -1. )
        IF( cptr == 'adv' ) THEN
           IF( ktra == jp_tem ) CALL iom_put( "vadv_heattr" , rau0_rcp * z2d )  ! advective heat transport in j-direction
           IF( ktra == jp_sal ) CALL iom_put( "vadv_salttr" , rau0     * z2d )  ! advective salt transport in j-direction
@@ -341,7 +341,7 @@ CONTAINS
 
          area(:,:) = e1e2t(:,:) * tmask_i(:,:)
 
-         area_tot = SUM( area(:,:) )   ;   IF( lk_mpp )   CALL mpp_sum( area_tot )
+         area_tot = SUM( area(:,:) )   ;   CALL mpp_sum( 'diaar5', area_tot )
 
          vol0        = 0._wp
          thick0(:,:) = 0._wp
@@ -349,7 +349,7 @@ CONTAINS
             vol0        = vol0        + SUM( area (:,:) * tmask(:,:,jk) * e3t_0(:,:,jk) )
             thick0(:,:) = thick0(:,:) +    tmask_i(:,:) * tmask(:,:,jk) * e3t_0(:,:,jk)
          END DO
-         IF( lk_mpp )   CALL mpp_sum( vol0 )
+         CALL mpp_sum( 'diaar5', vol0 )
 
          IF( iom_use( 'sshthster' ) ) THEN
             ALLOCATE( zsaldta(jpi,jpj,jpj,jpts) )

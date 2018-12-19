@@ -53,7 +53,7 @@ CONTAINS
          clpath = TRIM(cn_trcrst_outdir)
          IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
          IF(lwp) WRITE(numout,*) '             open ocean restart_mld_trc NetCDF  'TRIM(clpath)//TRIM(clname)
-         CALL iom_open( TRIM(clpath)//TRIM(clname), nummldw_trc, ldwrt = .TRUE., kiolib = jprstlib )
+         CALL iom_open( TRIM(clpath)//TRIM(clname), nummldw_trc, ldwrt = .TRUE. )
       ENDIF
 
       IF( kt == nitend .AND. lk_trdmxl_trc ) THEN
@@ -126,7 +126,6 @@ CONTAINS
       !
       CHARACTER (len=35) :: charout
       INTEGER ::  jk, jn, jl     ! loop indice
-      INTEGER ::  jlibalt = jprstlib
       LOGICAL ::  llok
       CHARACTER(LEN=256)  ::   clpath   ! full path to restart file
       !!-----------------------------------------------------------------------------
@@ -139,7 +138,7 @@ CONTAINS
       
       clpath = TRIM(cn_trcrst_indir)
       IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
-      CALL iom_open( TRIM(clpath)//TRIM(cn_trdrst_trc_in), inum, kiolib = jlibalt ) 
+      CALL iom_open( TRIM(clpath)//TRIM(cn_trdrst_trc_in), inum ) 
       
       IF( ln_trdmxl_trc_instant ) THEN 
          

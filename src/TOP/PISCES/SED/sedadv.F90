@@ -435,7 +435,7 @@ CONTAINS
       ALLOCATE( dvolsp(jpksed), dvolsm(jpksed), c2por(jpksed),         &
       &         ckpor(jpksed) ,           STAT = sed_adv_alloc )
       !
-      IF( sed_adv_alloc /= 0 ) CALL ctl_warn('sed_adv_alloc : failed to allocate arrays.')
+      IF( sed_adv_alloc /= 0 ) CALL ctl_stop( 'STOP', 'sed_adv_alloc : failed to allocate arrays.' )
       !
    END FUNCTION sed_adv_alloc
 

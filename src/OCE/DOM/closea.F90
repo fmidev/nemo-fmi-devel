@@ -117,7 +117,7 @@ CONTAINS
             closea_mask(:,:) = NINT(zdata_in(:,:)) * tmask(:,:,1)
             ! number of closed seas = global maximum value in closea_mask field
             jncs = maxval(closea_mask(:,:))
-            IF( lk_mpp ) CALL mpp_max(jncs)
+            CALL mpp_max('closea', jncs)
             IF( jncs > 0 ) THEN
                IF( lwp ) WRITE(numout,*) 'Number of closed seas : ',jncs
             ELSE
@@ -145,7 +145,7 @@ CONTAINS
                closea_mask_rnf(:,:) = NINT(zdata_in(:,:)) * tmask(:,:,1)
                ! number of closed seas rnf mappings = global maximum in closea_mask_rnf field
                jncsr = maxval(closea_mask_rnf(:,:))
-               IF( lk_mpp ) CALL mpp_max(jncsr)
+               CALL mpp_max('closea', jncsr)
                IF( jncsr > 0 ) THEN
                   IF( lwp ) WRITE(numout,*) 'Number of closed seas rnf mappings : ',jncsr
                ELSE
@@ -165,7 +165,7 @@ CONTAINS
                closea_mask_empmr(:,:) = NINT(zdata_in(:,:)) * tmask(:,:,1)
                ! number of closed seas empmr mappings = global maximum value in closea_mask_empmr field
                jncse = maxval(closea_mask_empmr(:,:))
-               IF( lk_mpp ) CALL mpp_max(jncse)
+               CALL mpp_max('closea', jncse)
                IF( jncse > 0 ) THEN 
                   IF( lwp ) WRITE(numout,*) 'Number of closed seas empmr mappings : ',jncse
                ELSE
@@ -236,13 +236,13 @@ CONTAINS
          IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'sbc_clo: failed to allocate surfe array')
          surfe(:) = 0.e0_wp
          !
-         surf(jncs+1) = glob_sum( e1e2t(:,:) )   ! surface of the global ocean
+         surf(jncs+1) = glob_sum( 'closea', e1e2t(:,:) )   ! surface of the global ocean
          !
          !                                        ! surface areas of closed seas 
          DO jc = 1, jncs
             ztmp2d(:,:) = 0.e0_wp
             WHERE( closea_mask(:,:) == jc ) ztmp2d(:,:) = e1e2t(:,:) * tmask_i(:,:)
-            surf(jc) = glob_sum( ztmp2d(:,:) )
+            surf(jc) = glob_sum( 'closea', ztmp2d(:,:) )
          END DO
          !
          ! jncs+1 : surface area of global ocean, closed seas excluded
@@ -253,7 +253,7 @@ CONTAINS
             DO jcr = 1, jncsr
                ztmp2d(:,:) = 0.e0_wp
                WHERE( closea_mask_rnf(:,:) == jcr .and. closea_mask(:,:) == 0 ) ztmp2d(:,:) = e1e2t(:,:) * tmask_i(:,:)
-               surfr(jcr) = glob_sum( ztmp2d(:,:) )
+               surfr(jcr) = glob_sum( 'closea', ztmp2d(:,:) )
             END DO
          ENDIF
          !
@@ -262,7 +262,7 @@ CONTAINS
             DO jce = 1, jncse
                ztmp2d(:,:) = 0.e0_wp
                WHERE( closea_mask_empmr(:,:) == jce .and. closea_mask(:,:) == 0 ) ztmp2d(:,:) = e1e2t(:,:) * tmask_i(:,:)
-               surfe(jce) = glob_sum( ztmp2d(:,:) )
+               surfe(jce) = glob_sum( 'closea', ztmp2d(:,:) )
             END DO
          ENDIF
          !
@@ -300,7 +300,7 @@ CONTAINS
       DO jc = 1, jncs
          ztmp2d(:,:) = 0.e0_wp
          WHERE( closea_mask(:,:) == jc ) ztmp2d(:,:) = e1e2t(:,:) * ( emp(:,:)-rnf(:,:) ) * tmask_i(:,:)
-         zfwf(jc) = glob_sum( ztmp2d(:,:) )
+         zfwf(jc) = glob_sum( 'closea', ztmp2d(:,:) )
       END DO
       zfwf_total = SUM(zfwf)
 
@@ -315,7 +315,7 @@ CONTAINS
             !
             ztmp2d(:,:) = 0.e0_wp
             WHERE( closea_mask_rnf(:,:) == jcr .and. closea_mask(:,:) > 0 ) ztmp2d(:,:) = e1e2t(:,:) * ( emp(:,:)-rnf(:,:) ) * tmask_i(:,:)
-            zfwfr(jcr) = glob_sum( ztmp2d(:,:) )
+            zfwfr(jcr) = glob_sum( 'closea', ztmp2d(:,:) )
             !
             ! The following if avoids the redistribution of the round off
             IF ( ABS(zfwfr(jcr) / surf(jncs+1) ) > rsmall) THEN
@@ -344,7 +344,7 @@ CONTAINS
             !
             ztmp2d(:,:) = 0.e0_wp
             WHERE( closea_mask_empmr(:,:) == jce .and. closea_mask(:,:) > 0 ) ztmp2d(:,:) = e1e2t(:,:) * ( emp(:,:)-rnf(:,:) ) * tmask_i(:,:)
-            zfwfe(jce) = glob_sum( ztmp2d(:,:) )
+            zfwfe(jce) = glob_sum( 'closea', ztmp2d(:,:) )
             !
             ! The following if avoids the redistribution of the round off
             IF ( ABS( zfwfe(jce) / surf(jncs+1) ) > rsmall ) THEN
@@ -395,7 +395,7 @@ CONTAINS
       !
       emp (:,:) = emp (:,:) * tmask(:,:,1)
       !
-      CALL lbc_lnk( emp , 'T', 1._wp )
+      CALL lbc_lnk( 'closea', emp , 'T', 1._wp )
       !
    END SUBROUTINE sbc_clo
 

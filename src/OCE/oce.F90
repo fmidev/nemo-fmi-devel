@@ -114,7 +114,7 @@ CONTAINS
 #endif
          !
       oce_alloc = MAXVAL( ierr )
-      IF( oce_alloc /= 0 )   CALL ctl_warn('oce_alloc: failed to allocate arrays')
+      IF( oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'oce_alloc: failed to allocate arrays' )
       !
    END FUNCTION oce_alloc
 

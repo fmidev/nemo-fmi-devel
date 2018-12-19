@@ -22,6 +22,9 @@ MODULE trcnam
    USE trd_oce     !       
    USE trdtrc_oce  !
    USE iom         ! I/O manager
+#if defined key_mpp_mpi
+   USE lib_mpp, ONLY: ncom_dttrc
+#endif
 
    IMPLICIT NONE
    PRIVATE 
@@ -75,7 +78,7 @@ CONTAINS
          ENDIF
       ENDIF
       !
-      rdttrc = rdt * FLOAT( nn_dttrc )          ! passive tracer time-step
+      rdttrc = rdt * FLOAT( nn_dttrc )          ! passive tracer time-step      
       ! 
       IF(lwp) THEN                              ! control print
         WRITE(numout,*) 
@@ -127,7 +130,11 @@ CONTAINS
          WRITE(numout,*) '      Use euler integration for TRC (y/n)          ln_top_euler  = ', ln_top_euler
       ENDIF
       !
-    END SUBROUTINE trc_nam_run
+#if defined key_mpp_mpi
+      ncom_dttrc = nn_dttrc    ! make nn_fsbc available for lib_mpp
+#endif
+      !
+   END SUBROUTINE trc_nam_run
 
 
    SUBROUTINE trc_nam_trc

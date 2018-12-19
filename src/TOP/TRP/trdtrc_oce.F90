@@ -116,7 +116,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!         *** ROUTINE trd_trc_oce_alloc ***
       !!----------------------------------------------------------------------
-      USE lib_mpp, ONLY: ctl_warn
+      USE lib_mpp, ONLY: ctl_stop
       INTEGER :: ierr(2)
       !!----------------------------------------------------------------------
       ierr(:) = 0
@@ -145,7 +145,7 @@ CONTAINS
       !
       trd_trc_oce_alloc = MAXVAL(ierr)
       !
-      IF( trd_trc_oce_alloc /= 0 )   CALL ctl_warn('trd_trc_oce_alloc: failed to allocate arrays')
+      IF( trd_trc_oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'trd_trc_oce_alloc: failed to allocate arrays' )
       !
 # if defined key_trdmxl_trc
       jpktrd_trc = jpk      ! Initialise what used to be a parameter - max level for mixed-layer trends diag.

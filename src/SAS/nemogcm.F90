@@ -93,7 +93,7 @@ CONTAINS
 #endif
       ! check that all process are still there... If some process have an error,
       ! they will never enter in step and other processes will wait until the end of the cpu time!
-      IF( lk_mpp )   CALL mpp_max( nstop )
+      CALL mpp_max( 'nemogcm', nstop )
 
       IF(lwp) WRITE(numout,cform_aaa)   ! Flag AAAAAAA
 
@@ -485,7 +485,7 @@ CONTAINS
       ierr = ierr + oce_alloc    ()          ! (tsn...) needed for agrif and/or SI3 and bdy
       ierr = ierr + bdy_oce_alloc()          ! bdy masks (incl. initialization)
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'nemogcm', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'nemo_alloc: unable to allocate standard ocean arrays' )
       !
    END SUBROUTINE nemo_alloc

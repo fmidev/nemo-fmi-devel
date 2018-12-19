@@ -95,24 +95,24 @@ CONTAINS
       CALL iom_put( "AtmCO2", co2sbc )  !     global atmospheric CO2 [ppm]
     
       IF( iom_use("AtmC14") ) THEN
-         zarea = glob_sum( e1e2t(:,:) )           ! global ocean surface
-         ztemp = glob_sum( c14sbc(:,:) * e1e2t(:,:) )
+         zarea = glob_sum( 'trcwri_c14', e1e2t(:,:) )           ! global ocean surface
+         ztemp = glob_sum( 'trcwri_c14', c14sbc(:,:) * e1e2t(:,:) )
          ztemp = ( ztemp / zarea - 1._wp ) * 1000._wp
          CALL iom_put( "AtmC14" , ztemp )   ! Global atmospheric DeltaC14 [permil]
       ENDIF
       IF( iom_use("K_C14") ) THEN
-         ztemp = glob_sum ( exch_c14(:,:) * e1e2t(:,:) )
+         ztemp = glob_sum ( 'trcwri_c14', exch_c14(:,:) * e1e2t(:,:) )
          ztemp = rsiyea * ztemp / zarea
          CALL iom_put( "K_C14" , ztemp )   ! global mean exchange velocity for C14/C ratio [m/yr]
       ENDIF
       IF( iom_use("K_CO2") ) THEN
-         zarea = glob_sum( e1e2t(:,:) )           ! global ocean surface
-         ztemp = glob_sum ( exch_co2(:,:) * e1e2t(:,:) )
+         zarea = glob_sum( 'trcwri_c14', e1e2t(:,:) )           ! global ocean surface
+         ztemp = glob_sum ( 'trcwri_c14', exch_co2(:,:) * e1e2t(:,:) )
          ztemp = 360000._wp * ztemp / zarea       ! cm/h units: directly comparable with literature
          CALL iom_put( "K_CO2", ztemp )  !  global mean CO2 piston velocity [cm/hr]
       ENDIF
       IF( iom_use("C14Inv") ) THEN
-         ztemp = glob_sum( trn(:,:,:,jp_c14) * cvol(:,:,:) )
+         ztemp = glob_sum( 'trcwri_c14', trn(:,:,:,jp_c14) * cvol(:,:,:) )
          ztemp = atomc14 * xdicsur * ztemp
          CALL iom_put( "C14Inv", ztemp )  !  Radiocarbon ocean inventory [10^26 atoms]
       END IF

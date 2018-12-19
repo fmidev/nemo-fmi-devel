@@ -455,7 +455,9 @@ CONTAINS
          ENDIF
          !--- Fill the overlap areas and extra hallows (mpp)
          !--- check periodicity conditions (all cases)
-         IF( .not. llfisrt )   CALL lbc_lnk( pdata(:,:,jc), srcv(kid)%clgrid, srcv(kid)%nsgn )   
+         IF( .not. llfisrt ) THEN
+            CALL lbc_lnk( 'cpl_oasis3', pdata(:,:,jc), srcv(kid)%clgrid, srcv(kid)%nsgn )   
+         ENDIF
  
       ENDDO
       !

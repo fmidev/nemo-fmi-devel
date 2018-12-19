@@ -58,8 +58,8 @@ CONTAINS
       !!-------------------------------------------------------------------
       ALLOCATE( utau_oce(jpi,jpj), vtau_oce(jpi,jpj), tmod_io(jpi,jpj), STAT=ice_update_alloc )
       !
-      IF( lk_mpp                )   CALL mpp_sum( ice_update_alloc )
-      IF( ice_update_alloc /= 0 )   CALL ctl_warn('ice_update_alloc: failed to allocate arrays')
+      CALL mpp_sum( 'iceupdate', ice_update_alloc )
+      IF( ice_update_alloc /= 0 )   CALL ctl_stop( 'STOP', 'ice_update_alloc: failed to allocate arrays' )
       !
    END FUNCTION ice_update_alloc
 
@@ -349,7 +349,7 @@ CONTAINS
                tmod_io(ji,jj) = zrhoco * SQRT( zmodt )          ! rhoco * |U_ice-U_oce| at T-point
             END DO
          END DO
-         CALL lbc_lnk_multi( taum, 'T', 1., tmod_io, 'T', 1. )
+         CALL lbc_lnk_multi( 'iceupdate', taum, 'T', 1., tmod_io, 'T', 1. )
          !
          utau_oce(:,:) = utau(:,:)                    !* save the air-ocean stresses at ice time-step
          vtau_oce(:,:) = vtau(:,:)
@@ -373,7 +373,7 @@ CONTAINS
             vtau(ji,jj) = ( 1._wp - zat_v ) * vtau_oce(ji,jj) + zat_v * zvtau_ice
          END DO
       END DO
-      CALL lbc_lnk_multi( utau, 'U', -1., vtau, 'V', -1. )   ! lateral boundary condition
+      CALL lbc_lnk_multi( 'iceupdate', utau, 'U', -1., vtau, 'V', -1. )   ! lateral boundary condition
       !
       IF( ln_timing )   CALL timing_stop('ice_update_tau')
       !  

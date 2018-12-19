@@ -31,9 +31,9 @@ MODULE lbcnfd
    !
    INTERFACE lbc_nfd_nogather
 !                        ! Currently only 4d array version is needed
-!     MODULE PROCEDURE   lbc_nfd_nogather_2d    , lbc_nfd_nogather_3d
-      MODULE PROCEDURE   lbc_nfd_nogather_4d
-!     MODULE PROCEDURE   lbc_nfd_nogather_2d_ptr, lbc_nfd_nogather_3d_ptr
+     MODULE PROCEDURE   lbc_nfd_nogather_2d    , lbc_nfd_nogather_3d
+     MODULE PROCEDURE   lbc_nfd_nogather_4d
+     MODULE PROCEDURE   lbc_nfd_nogather_2d_ptr, lbc_nfd_nogather_3d_ptr
 !     MODULE PROCEDURE   lbc_nfd_nogather_4d_ptr
    END INTERFACE
 
@@ -124,29 +124,29 @@ CONTAINS
    !
    !                       !==  2D array and array of 2D pointer  ==!
    !
-!#  define DIM_2d
-!#     define ROUTINE_NFD           lbc_nfd_nogather_2d
-!#     include "lbc_nfd_nogather_generic.h90"
-!#     undef ROUTINE_NFD
-!#     define MULTI
-!#     define ROUTINE_NFD           lbc_nfd_nogather_2d_ptr
-!#     include "lbc_nfd_nogather_generic.h90"
-!#     undef ROUTINE_NFD
-!#     undef MULTI
-!#  undef DIM_2d
+#  define DIM_2d
+#     define ROUTINE_NFD           lbc_nfd_nogather_2d
+#     include "lbc_nfd_nogather_generic.h90"
+#     undef ROUTINE_NFD
+#     define MULTI
+#     define ROUTINE_NFD           lbc_nfd_nogather_2d_ptr
+#     include "lbc_nfd_nogather_generic.h90"
+#     undef ROUTINE_NFD
+#     undef MULTI
+#  undef DIM_2d
    !
    !                       !==  3D array and array of 3D pointer  ==!
    !
-!#  define DIM_3d
-!#     define ROUTINE_NFD           lbc_nfd_nogather_3d
-!#     include "lbc_nfd_nogather_generic.h90"
-!#     undef ROUTINE_NFD
-!#     define MULTI
-!#     define ROUTINE_NFD           lbc_nfd_nogather_3d_ptr
-!#     include "lbc_nfd_nogather_generic.h90"
-!#     undef ROUTINE_NFD
-!#     undef MULTI
-!#  undef DIM_3d
+#  define DIM_3d
+#     define ROUTINE_NFD           lbc_nfd_nogather_3d
+#     include "lbc_nfd_nogather_generic.h90"
+#     undef ROUTINE_NFD
+#     define MULTI
+#     define ROUTINE_NFD           lbc_nfd_nogather_3d_ptr
+#     include "lbc_nfd_nogather_generic.h90"
+#     undef ROUTINE_NFD
+#     undef MULTI
+#  undef DIM_3d
    !
    !                       !==  4D array and array of 4D pointer  ==!
    !

@@ -111,7 +111,7 @@ CONTAINS
       !
       IF ( .NOT.ln_dynspg_ts ) THEN
          IF( ln_bdy ) THEN
-            CALL lbc_lnk( ssha, 'T', 1. )    ! Not sure that's necessary
+            CALL lbc_lnk( 'sshwzv', ssha, 'T', 1. )    ! Not sure that's necessary
             CALL bdy_ssh( ssha )             ! Duplicate sea level across open boundaries
          ENDIF
       ENDIF
@@ -175,7 +175,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk(zhdiv, 'T', 1.)  ! - ML - Perhaps not necessary: not used for horizontal "connexions"
+         CALL lbc_lnk('sshwzv', zhdiv, 'T', 1.)  ! - ML - Perhaps not necessary: not used for horizontal "connexions"
          !                             ! Is it problematic to have a wrong vertical velocity in boundary cells?
          !                             ! Same question holds for hdivn. Perhaps just for security
          DO jk = jpkm1, 1, -1                       ! integrate from the bottom the hor. divergence

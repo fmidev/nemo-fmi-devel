@@ -125,7 +125,7 @@ CONTAINS
             END DO
          END DO
       ENDIF
-      CALL lbc_lnk( zfric, 'T',  1. )
+      CALL lbc_lnk( 'icethd', zfric, 'T',  1. )
       !
       !--------------------------------------------------------------------!
       ! Partial computation of forcing for the thermodynamic sea ice model
@@ -211,8 +211,6 @@ CONTAINS
             END DO
          END DO
 
-         IF( lk_mpp )         CALL mpp_ini_ice( npti , numout )
-
          IF( npti > 0 ) THEN  ! If there is no ice, do nothing.
             !                                                                
                               CALL ice_thd_1d2d( jl, 1 )            ! --- Move to 1D arrays --- !
@@ -249,7 +247,6 @@ CONTAINS
                               CALL ice_thd_1d2d( jl, 2 )            ! --- Change units of e_i, e_s from J/m3 to J/m2 --- !
             !                                                       ! --- & Move to 2D arrays --- !
             !
-            IF( lk_mpp )      CALL mpp_comm_free( ncomm_ice ) !RB necessary ??
          ENDIF
          !
       END DO

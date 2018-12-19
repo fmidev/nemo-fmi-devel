@@ -822,7 +822,7 @@ CONTAINS
       !* Variable for chemistry of the CO2 cycle
       p4z_che_alloc = MAXVAL( ierr )
       !
-      IF( p4z_che_alloc /= 0 )   CALL ctl_warn('p4z_che_alloc : failed to allocate arrays.')
+      IF( p4z_che_alloc /= 0 )   CALL ctl_stop( 'STOP', 'p4z_che_alloc : failed to allocate arrays.' )
       !
    END FUNCTION p4z_che_alloc
 

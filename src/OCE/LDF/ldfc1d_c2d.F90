@@ -86,7 +86,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( pah2, 'F', 1. )   ! Lateral boundary conditions
+         CALL lbc_lnk( 'ldfc1d_c2d', pah2, 'F', 1. )   ! Lateral boundary conditions
          !
       CASE( 'TRA' )                     ! U- and V-points (zdep1 & 2 are an approximation in zps-coord.)
          DO jk = jpkm1, 1, -1
@@ -100,7 +100,7 @@ CONTAINS
             END DO
          END DO
          ! Lateral boundary conditions
-         CALL lbc_lnk_multi( pah1, 'U', 1. , pah2, 'V', 1. )   
+         CALL lbc_lnk_multi( 'ldfc1d_c2d', pah1, 'U', 1. , pah2, 'V', 1. )   
          !
       CASE DEFAULT                        ! error
          CALL ctl_stop( 'ldf_c1d: ', cd_type, ' Unknown, i.e. /= DYN or TRA' )

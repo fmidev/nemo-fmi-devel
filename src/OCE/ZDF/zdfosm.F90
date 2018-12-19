@@ -117,7 +117,7 @@ CONTAINS
           &      hbl(jpi,jpj)    ,  hbli(jpi,jpj)    , dstokes(jpi, jpj) ,                     &
           &   etmean(jpi,jpj,jpk),  STAT= zdf_osm_alloc )
      IF( zdf_osm_alloc /= 0 )   CALL ctl_warn('zdf_osm_alloc: failed to allocate zdf_osm arrays')
-     IF( lk_mpp             )   CALL mpp_sum ( zdf_osm_alloc )
+     CALL mpp_sum ( 'zdfosm', zdf_osm_alloc )
    END FUNCTION zdf_osm_alloc
 
 
@@ -1286,7 +1286,7 @@ CONTAINS
        END IF ! ln_convmix = .true.
 
        ! Lateral boundary conditions on zvicos (sign unchanged), needed to caclulate viscosities on u and v grids
-       CALL lbc_lnk( zviscos(:,:,:), 'W', 1. )
+       CALL lbc_lnk( 'zdfosm', zviscos(:,:,:), 'W', 1. )
 
        ! GN 25/8: need to change tmask --> wmask
 
@@ -1299,7 +1299,7 @@ CONTAINS
          END DO
      END DO
       ! Lateral boundary conditions on ghamu and ghamv, currently on W-grid  (sign unchanged), needed to caclulate gham[uv] on u and v grids
-     CALL lbc_lnk_multi( p_avt, 'W', 1. , p_avm, 'W', 1.,   &
+     CALL lbc_lnk_multi( 'zdfosm', p_avt, 'W', 1. , p_avm, 'W', 1.,   &
       &                  ghamu, 'W', 1. , ghamv, 'W', 1. )
        DO jk = 2, jpkm1
            DO jj = 2, jpjm1
@@ -1317,7 +1317,7 @@ CONTAINS
         END DO
         ! Lateral boundary conditions on final outputs for gham[ts],  on W-grid  (sign unchanged)
         ! Lateral boundary conditions on final outputs for gham[uv],  on [UV]-grid  (sign unchanged)
-        CALL lbc_lnk_multi( ghamt, 'W', 1. , ghams, 'W', 1.,   &
+        CALL lbc_lnk_multi( 'zdfosm', ghamt, 'W', 1. , ghams, 'W', 1.,   &
          &                  ghamu, 'U', 1. , ghamv, 'V', 1. )
 
        IF(ln_dia_osm) THEN
@@ -1358,7 +1358,7 @@ CONTAINS
          IF ( iom_use("zt_ml") ) CALL iom_put( "zt_ml", tmask(:,:,1)*zt_ml )               ! average T in ML
       END IF
       ! Lateral boundary conditions on p_avt  (sign unchanged)
-      CALL lbc_lnk( p_avt(:,:,:), 'W', 1. )
+      CALL lbc_lnk( 'zdfosm', p_avt(:,:,:), 'W', 1. )
       !
    END SUBROUTINE zdf_osm
 

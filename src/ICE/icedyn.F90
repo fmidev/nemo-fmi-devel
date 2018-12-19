@@ -115,7 +115,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( zhi_max(:,:,:), 'T', 1., zhs_max(:,:,:), 'T', 1., zhip_max(:,:,:), 'T', 1. )
+      CALL lbc_lnk_multi( 'icedyn', zhi_max(:,:,:), 'T', 1., zhs_max(:,:,:), 'T', 1., zhip_max(:,:,:), 'T', 1. )
       !
       !
       SELECT CASE( nice_dyn )           !-- Set which dynamics is running
@@ -154,7 +154,7 @@ CONTAINS
                   &             + e1v(ji,jj) * v_ice(ji,jj) - e1v(ji,jj-1) * v_ice(ji,jj-1) ) * r1_e1e2t(ji,jj)
             END DO
          END DO
-         CALL lbc_lnk( zdivu_i, 'T', 1. )
+         CALL lbc_lnk( 'icedyn', zdivu_i, 'T', 1. )
          IF( iom_use('icediv') )   CALL iom_put( "icediv" , zdivu_i(:,:) )
 
          DEALLOCATE( zdivu_i )
@@ -175,7 +175,7 @@ CONTAINS
                   &             + e1v(ji,jj) * v_ice(ji,jj) - e1v(ji,jj-1) * v_ice(ji,jj-1) ) * r1_e1e2t(ji,jj)
             END DO
          END DO
-         CALL lbc_lnk( zdivu_i, 'T', 1. )
+         CALL lbc_lnk( 'icedyn', zdivu_i, 'T', 1. )
          IF( iom_use('icediv') )   CALL iom_put( "icediv" , zdivu_i(:,:) )
 
          DEALLOCATE( zdivu_i )

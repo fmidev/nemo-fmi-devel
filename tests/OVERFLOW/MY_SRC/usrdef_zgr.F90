@@ -92,7 +92,7 @@ CONTAINS
       DO ji = 1, jpim1
          zhu(ji,:) = 0.5_wp * ( zht(ji,:) + zht(ji+1,:) )
       END DO
-      CALL lbc_lnk( zhu, 'U', 1. )     ! boundary condition: this mask the surrouding grid-points
+      CALL lbc_lnk( 'usrdef_zgr', zhu, 'U', 1. )     ! boundary condition: this mask the surrouding grid-points
       !                                ! ==>>>  set by hand non-zero value on first/last columns & rows 
       DO ji = mi0(1), mi1(1)              ! first row of global domain only
          zhu(ji,2) = zht(1,2)
@@ -111,7 +111,7 @@ CONTAINS
       ! no ocean cavities : top ocean level is ONE, except over land
       ! the ocean basin surrounded by land (1 grid-point) set through lbc_lnk call as jperio=0 
       z2d(:,:) = 1._wp                    ! surface ocean is the 1st level
-      CALL lbc_lnk( z2d, 'T', 1. )        ! closed basin since jperio = 0 (see userdef_nam.F90)
+      CALL lbc_lnk( 'usrdef_zgr', z2d, 'T', 1. )        ! closed basin since jperio = 0 (see userdef_nam.F90)
       k_top(:,:) = NINT( z2d(:,:) )
       !
       !                              

@@ -534,7 +534,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!                     ***  ROUTINE p5z_lim_alloc  ***
       !!----------------------------------------------------------------------
-      USE lib_mpp , ONLY: ctl_warn
+      USE lib_mpp , ONLY: ctl_stop
       INTEGER ::   ierr(2)        ! Local variables
       !!----------------------------------------------------------------------
       ierr(:) = 0
@@ -558,7 +558,7 @@ CONTAINS
          !
       p5z_lim_alloc = MAXVAL( ierr )
       !
-      IF( p5z_lim_alloc /= 0 ) CALL ctl_warn('p5z_lim_alloc : failed to allocate arrays.')
+      IF( p5z_lim_alloc /= 0 ) CALL ctl_stop( 'STOP', 'p5z_lim_alloc : failed to allocate arrays.' )
       !
    END FUNCTION p5z_lim_alloc
    !!======================================================================

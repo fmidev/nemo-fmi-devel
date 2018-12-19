@@ -82,7 +82,7 @@ CONTAINS
                vtau_ice(ji,jj) = vtau_ice(ji,jj) * xcplmask(ji,jj,0) + zvtau_ice(ji,jj) * ( 1. - xcplmask(ji,jj,0) )
             END DO
          END DO
-         CALL lbc_lnk_multi( utau_ice, 'U', -1., vtau_ice, 'V', -1. )
+         CALL lbc_lnk_multi( 'iceforcing', utau_ice, 'U', -1., vtau_ice, 'V', -1. )
       ENDIF
       !
       IF( ln_timing )   CALL timing_stop('ice_forcing')

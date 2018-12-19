@@ -192,8 +192,8 @@ CONTAINS
       !Test if each float is in one and only one proc
       !----------------------------------------------
       IF( lk_mpp )   THEN 
-         CALL mpp_sum(ihtest,jpnfl)
-         CALL mpp_sum(ivtest,jpnfl)
+         CALL mpp_sum('flodom', ihtest,jpnfl)
+         CALL mpp_sum('flodom', ivtest,jpnfl)
       ENDIF
       DO jfl = kfl_start,kfl_end
 
@@ -251,8 +251,8 @@ CONTAINS
                   
       ! The sum of all the arrays zgifl, zgjfl, zgkfl give 3 arrays with the positions of all the floats.
       IF( lk_mpp )   THEN 
-         CALL mpp_sum( zgjfl, ifl )   ! sums over the global domain
-         CALL mpp_sum( zgkfl, ifl )
+         CALL mpp_sum( 'flodom', zgjfl, ifl )   ! sums over the global domain
+         CALL mpp_sum( 'flodom', zgkfl, ifl )
       ENDIF
             
       DO jfl = kfl_start,kfl_end
@@ -450,8 +450,8 @@ CONTAINS
                 idomfl(jpnfl), ivtest(jpnfl), ihtest(jpnfl),                 &
                 zgifl(jpnfl) , zgjfl(jpnfl) , zgkfl(jpnfl)   , STAT=flo_dom_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( flo_dom_alloc )
-      IF( flo_dom_alloc /= 0 )   CALL ctl_warn('flo_dom_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'flodom', flo_dom_alloc )
+      IF( flo_dom_alloc /= 0 )   CALL ctl_stop( 'STOP', 'flo_dom_alloc: failed to allocate arrays' )
    END FUNCTION flo_dom_alloc
 
 

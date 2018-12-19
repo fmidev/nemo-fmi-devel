@@ -206,6 +206,8 @@ MODULE ice
    REAL(wp), PUBLIC, PARAMETER ::   epsi10 = 1.e-10_wp  !: small number 
    REAL(wp), PUBLIC, PARAMETER ::   epsi20 = 1.e-20_wp  !: small number 
 
+   !                                     !!** some other parameters for advection using the ULTIMATE-MACHO scheme
+   LOGICAL, PUBLIC, DIMENSION(2) :: l_split_advumx = .FALSE.    ! force one iteration at the first time-step
 
    !                                     !!** define arrays
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::   u_oce,v_oce !: surface ocean velocity used in ice dynamics
@@ -462,7 +464,7 @@ CONTAINS
       ALLOCATE( t_si(jpi,jpj,jpl) , tm_si(jpi,jpj) , qcn_ice_bot(jpi,jpj,jpl) , qcn_ice_top(jpi,jpj,jpl) , STAT = ierr(ii) )
 
       ice_alloc = MAXVAL( ierr(:) )
-      IF( ice_alloc /= 0 )   CALL ctl_warn('ice_alloc: failed to allocate arrays.')
+      IF( ice_alloc /= 0 )   CALL ctl_stop( 'STOP', 'ice_alloc: failed to allocate arrays.' )
       !
    END FUNCTION ice_alloc
 

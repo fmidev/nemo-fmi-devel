@@ -231,7 +231,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( zwz, 'U', -1.,  zww, 'V', -1. )      ! lateral boundary conditions
+      CALL lbc_lnk_multi( 'ldfslp', zwz, 'U', -1.,  zww, 'V', -1. )      ! lateral boundary conditions
       !
       !                                            !* horizontal Shapiro filter
       DO jk = 2, jpkm1
@@ -313,7 +313,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( zwz, 'T', -1.,  zww, 'T', -1. )      ! lateral boundary conditions
+      CALL lbc_lnk_multi( 'ldfslp', zwz, 'T', -1.,  zww, 'T', -1. )      ! lateral boundary conditions
       !
       !                                           !* horizontal Shapiro filter
       DO jk = 2, jpkm1
@@ -362,7 +362,7 @@ CONTAINS
 
       ! IV. Lateral boundary conditions
       ! ===============================
-      CALL lbc_lnk_multi( uslp , 'U', -1. , vslp , 'V', -1. , wslpi, 'W', -1., wslpj, 'W', -1. )
+      CALL lbc_lnk_multi( 'ldfslp', uslp , 'U', -1. , vslp , 'V', -1. , wslpi, 'W', -1., wslpj, 'W', -1. )
 
       IF(ln_ctl) THEN
          CALL prt_ctl(tab3d_1=uslp , clinfo1=' slp  - u : ', tab3d_2=vslp,  clinfo2=' v : ', kdim=jpk)
@@ -610,7 +610,7 @@ CONTAINS
       !
       wslp2(:,:,1) = 0._wp                ! force the surface wslp to zero
 
-      CALL lbc_lnk( wslp2, 'W', 1. )      ! lateral boundary confition on wslp2 only   ==>>> gm : necessary ? to be checked
+      CALL lbc_lnk( 'ldfslp', wslp2, 'W', 1. )      ! lateral boundary confition on wslp2 only   ==>>> gm : necessary ? to be checked
       !
       IF( ln_timing )   CALL timing_stop('ldf_slp_triad')
       !
@@ -724,7 +724,7 @@ CONTAINS
          END DO
       END DO
       !!gm this lbc_lnk should be useless....
-      CALL lbc_lnk_multi( uslpml , 'U', -1. , vslpml , 'V', -1. , wslpiml, 'W', -1. , wslpjml, 'W', -1. ) 
+      CALL lbc_lnk_multi( 'ldfslp', uslpml , 'U', -1. , vslpml , 'V', -1. , wslpiml, 'W', -1. , wslpjml, 'W', -1. ) 
       !
    END SUBROUTINE ldf_slp_mxl
 
@@ -792,7 +792,7 @@ CONTAINS
 !                  END DO
 !               END DO
 !            END DO
-!            CALL lbc_lnk_multi( uslp , 'U', -1. ; CALL lbc_lnk( vslp , 'V', -1.,  wslpi, 'W', -1.,  wslpj, 'W', -1. )
+!            CALL lbc_lnk_multi( 'ldfslp', uslp , 'U', -1. ; CALL lbc_lnk( 'ldfslp', vslp , 'V', -1.,  wslpi, 'W', -1.,  wslpj, 'W', -1. )
 !!gm         ENDIF
       ENDIF
       !

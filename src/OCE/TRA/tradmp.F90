@@ -65,7 +65,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( resto(jpi,jpj,jpk), STAT= tra_dmp_alloc )
       !
-      IF( lk_mpp            )   CALL mpp_sum ( tra_dmp_alloc )
+      CALL mpp_sum ( 'tradmp', tra_dmp_alloc )
       IF( tra_dmp_alloc > 0 )   CALL ctl_warn('tra_dmp_alloc: allocation of arrays failed')
       !
    END FUNCTION tra_dmp_alloc

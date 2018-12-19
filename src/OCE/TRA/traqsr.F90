@@ -274,7 +274,7 @@ CONTAINS
             ENDIF
          END DO
       END DO
-      CALL lbc_lnk( fraqsr_1lev(:,:), 'T', 1._wp )
+      CALL lbc_lnk( 'traqsr', fraqsr_1lev(:,:), 'T', 1._wp )
       !
       IF( iom_use('qsr3d') ) THEN      ! output the shortwave Radiation distribution
          ALLOCATE( zetot(jpi,jpj,jpk) )

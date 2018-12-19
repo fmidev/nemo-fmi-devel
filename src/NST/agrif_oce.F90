@@ -21,7 +21,7 @@ MODULE agrif_oce
 #endif   
    !                                              !!* Namelist namagrif: AGRIF parameters
    LOGICAL , PUBLIC ::   ln_spc_dyn    = .FALSE.   !:
-   INTEGER , PUBLIC, PARAMETER ::   nn_sponge_len = 1  !: Sponge width (in number of parent grid points)
+   INTEGER , PUBLIC, PARAMETER ::   nn_sponge_len = 2  !: Sponge width (in number of parent grid points)
    REAL(wp), PUBLIC ::   rn_sponge_tra = 2800.     !: sponge coeff. for tracers
    REAL(wp), PUBLIC ::   rn_sponge_dyn = 2800.     !: sponge coeff. for dynamics
    LOGICAL , PUBLIC ::   ln_chk_bathy  = .FALSE.   !: check of parent bathymetry 

@@ -80,7 +80,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( ndextrd1(jpi*jpj) , STAT=trd_mxl_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( trd_mxl_alloc )
+      CALL mpp_sum ( 'trdmxl', trd_mxl_alloc )
       IF( trd_mxl_alloc /= 0 )   CALL ctl_warn('trd_mxl_alloc: failed to allocate array ndextrd1')
    END FUNCTION trd_mxl_alloc
 
@@ -151,7 +151,7 @@ CONTAINS
  
 !!gm to be put juste before the output !
 !      ! Lateral boundary conditions
-!      CALL lbc_lnk_multi( tmltrd(:,:,jl), 'T', 1. , smltrd(:,:,jl), 'T', 1. )
+!      CALL lbc_lnk_multi( 'trdmxl', tmltrd(:,:,jl), 'T', 1. , smltrd(:,:,jl), 'T', 1. )
 !!gm end
 
 
@@ -469,7 +469,7 @@ CONTAINS
          
          !-- Lateral boundary conditions
          !         ... temperature ...                    ... salinity ...
-         CALL lbc_lnk_multi( ztmltot , 'T', 1., zsmltot , 'T', 1., &
+         CALL lbc_lnk_multi( 'trdmxl', ztmltot , 'T', 1., zsmltot , 'T', 1., &
                   &          ztmlres , 'T', 1., zsmlres , 'T', 1., &
                   &          ztmlatf , 'T', 1., zsmlatf , 'T', 1. )
 
@@ -520,10 +520,10 @@ CONTAINS
 
          !-- Lateral boundary conditions
          !         ... temperature ...                    ... salinity ...
-         CALL lbc_lnk_multi( ztmltot2, 'T', 1., zsmltot2, 'T', 1., &
+         CALL lbc_lnk_multi( 'trdmxl', ztmltot2, 'T', 1., zsmltot2, 'T', 1., &
                   &          ztmlres2, 'T', 1., zsmlres2, 'T', 1. )
          !
-         CALL lbc_lnk_multi( ztmltrd2(:,:,:), 'T', 1., zsmltrd2(:,:,:), 'T', 1. ) ! /  in the NetCDF trends file
+         CALL lbc_lnk_multi( 'trdmxl', ztmltrd2(:,:,:), 'T', 1., zsmltrd2(:,:,:), 'T', 1. ) ! /  in the NetCDF trends file
          
          ! III.3 Time evolution array swap
          ! -------------------------------

@@ -149,7 +149,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk_multi( zfc(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1. )   ! Lateral boundary conditions 
+         CALL lbc_lnk_multi( 'traadv_qck', zfc(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1. )   ! Lateral boundary conditions 
          
          !
          ! Horizontal advective fluxes
@@ -175,7 +175,7 @@ CONTAINS
             END DO
          END DO 
          !--- Lateral boundary conditions 
-         CALL lbc_lnk_multi( zfu(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1., zfc(:,:,:), 'T', 1.,  zwx(:,:,:), 'T', 1. )
+         CALL lbc_lnk_multi( 'traadv_qck', zfu(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1., zfc(:,:,:), 'T', 1.,  zwx(:,:,:), 'T', 1. )
 
          !--- QUICKEST scheme
          CALL quickest( zfu, zfd, zfc, zwx )
@@ -188,7 +188,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( zfu(:,:,:), 'T', 1. )      ! Lateral boundary conditions 
+         CALL lbc_lnk( 'traadv_qck', zfu(:,:,:), 'T', 1. )      ! Lateral boundary conditions 
 
          !
          ! Tracer flux on the x-direction
@@ -206,7 +206,7 @@ CONTAINS
             END DO
          END DO
          !
-         CALL lbc_lnk( zwx(:,:,:), 'T', 1. ) ! Lateral boundary conditions
+         CALL lbc_lnk( 'traadv_qck', zwx(:,:,:), 'T', 1. ) ! Lateral boundary conditions
          !
          ! Computation of the trend
          DO jk = 1, jpkm1  
@@ -264,7 +264,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk_multi( zfc(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1. )   ! Lateral boundary conditions 
+         CALL lbc_lnk_multi( 'traadv_qck', zfc(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1. )   ! Lateral boundary conditions 
 
          
          !
@@ -293,7 +293,7 @@ CONTAINS
          END DO
 
          !--- Lateral boundary conditions 
-         CALL lbc_lnk_multi( zfu(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1., zfc(:,:,:), 'T', 1., zwy(:,:,:), 'T', 1. )
+         CALL lbc_lnk_multi( 'traadv_qck', zfu(:,:,:), 'T', 1. , zfd(:,:,:), 'T', 1., zfc(:,:,:), 'T', 1., zwy(:,:,:), 'T', 1. )
 
          !--- QUICKEST scheme
          CALL quickest( zfu, zfd, zfc, zwy )
@@ -306,7 +306,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( zfu(:,:,:), 'T', 1. )    !--- Lateral boundary conditions 
+         CALL lbc_lnk( 'traadv_qck', zfu(:,:,:), 'T', 1. )    !--- Lateral boundary conditions 
          !
          ! Tracer flux on the x-direction
          DO jk = 1, jpkm1  
@@ -323,7 +323,7 @@ CONTAINS
             END DO
          END DO
          !
-         CALL lbc_lnk( zwy(:,:,:), 'T', 1. ) ! Lateral boundary conditions
+         CALL lbc_lnk( 'traadv_qck', zwy(:,:,:), 'T', 1. ) ! Lateral boundary conditions
          !
          ! Computation of the trend
          DO jk = 1, jpkm1  

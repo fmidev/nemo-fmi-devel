@@ -49,8 +49,8 @@ CONTAINS
       !!---------------------------------------------------------------------
       ALLOCATE( rab_pe(jpi,jpj,jpk,jpts) , STAT= trd_pen_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( trd_pen_alloc )
-      IF( trd_pen_alloc /= 0 )   CALL ctl_warn( 'trd_pen_alloc: failed to allocate arrays' )
+      CALL mpp_sum ( 'trdpen', trd_pen_alloc )
+      IF( trd_pen_alloc /= 0 )   CALL ctl_stop( 'STOP',  'trd_pen_alloc: failed to allocate arrays'  )
    END FUNCTION trd_pen_alloc
 
 

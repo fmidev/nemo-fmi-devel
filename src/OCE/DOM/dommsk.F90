@@ -144,7 +144,7 @@ CONTAINS
       END DO  
 !SF  add here lbc_lnk: bug not still understood : cause now domain configuration is read !
 !!gm I don't understand why...  
-      CALL lbc_lnk( tmask  , 'T', 1._wp )      ! Lateral boundary conditions
+      CALL lbc_lnk( 'dommsk', tmask  , 'T', 1._wp )      ! Lateral boundary conditions
 
      ! Mask corrections for bdy (read in mppini2)
       REWIND( numnam_ref )              ! Namelist nambdy in reference namelist :Unstructured open boundaries
@@ -182,7 +182,7 @@ CONTAINS
             END DO
          END DO
       END DO
-      CALL lbc_lnk_multi( umask, 'U', 1., vmask, 'V', 1., fmask, 'F', 1. )      ! Lateral boundary conditions
+      CALL lbc_lnk_multi( 'dommsk', umask, 'U', 1., vmask, 'V', 1., fmask, 'F', 1. )      ! Lateral boundary conditions
  
       ! Ocean/land mask at wu-, wv- and w points    (computed from tmask)
       !-----------------------------------------
@@ -282,7 +282,7 @@ CONTAINS
          !
          DEALLOCATE( zwf )
          !
-         CALL lbc_lnk( fmask, 'F', 1._wp )      ! Lateral boundary conditions on fmask
+         CALL lbc_lnk( 'dommsk', fmask, 'F', 1._wp )      ! Lateral boundary conditions on fmask
          !
          ! CAUTION : The fmask may be further modified in dyn_vor_init ( dynvor.F90 ) depending on ln_vorlat
          !

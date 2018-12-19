@@ -24,12 +24,12 @@ CONTAINS
       !!-------------------------------------------------------------------
       !!                    *** ROUTINE sed_alloc ***
       !!-------------------------------------------------------------------
-      USE lib_mpp, ONLY: ctl_warn
+      USE lib_mpp, ONLY: ctl_stop
       !!-------------------------------------------------------------------
       !
       ALLOCATE( profsed(jpksed) , profsedw(jpksed) , STAT=sed_oce_alloc )
 
-      IF( sed_oce_alloc /= 0 )   CALL ctl_warn('sed_oce_alloc: failed to allocate arrays')
+      IF( sed_oce_alloc /= 0 )   CALL ctl_stop( 'STOP', 'sed_oce_alloc: failed to allocate arrays' )
       !
    END FUNCTION sed_oce_alloc
 

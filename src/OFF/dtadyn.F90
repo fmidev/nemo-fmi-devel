@@ -403,8 +403,8 @@ CONTAINS
       nkrnf_max = MAXVAL( nk_rnf(:,:) )
       hrnf_max = MAXVAL( h_rnf(:,:) )
       IF( lk_mpp )  THEN
-         CALL mpp_max( nkrnf_max )                 ! max over the  global domain
-         CALL mpp_max( hrnf_max )                 ! max over the  global domain
+         CALL mpp_max( 'dtadyn', nkrnf_max )                 ! max over the  global domain
+         CALL mpp_max( 'dtadyn', hrnf_max )                 ! max over the  global domain
       ENDIF
       IF(lwp) WRITE(numout,*) ' '
       IF(lwp) WRITE(numout,*) ' max depht of runoff : ', hrnf_max,'    max level  : ', nkrnf_max

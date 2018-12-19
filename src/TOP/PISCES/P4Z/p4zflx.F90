@@ -171,9 +171,11 @@ CONTAINS
          END DO
       END DO
 
-      t_oce_co2_flx     = glob_sum( oce_co2(:,:) )                    !  Total Flux of Carbon
+      IF( iom_use("tcflx") .OR. iom_use("tcflxcum") .OR. kt == nitrst   &
+         &                 .OR. (ln_check_mass .AND. kt == nitend) )    &
+         t_oce_co2_flx  = glob_sum( 'p4zflx', oce_co2(:,:) )                    !  Total Flux of Carbon
       t_oce_co2_flx_cum = t_oce_co2_flx_cum + t_oce_co2_flx       !  Cumulative Total Flux of Carbon
-!      t_atm_co2_flx     = glob_sum( satmco2(:,:) * e1e2t(:,:) )       ! Total atmospheric pCO2
+!      t_atm_co2_flx     = glob_sum( 'p4zflx', satmco2(:,:) * e1e2t(:,:) )       ! Total atmospheric pCO2
       t_atm_co2_flx     =  atcco2      ! Total atmospheric pCO2
  
       IF(ln_ctl)   THEN  ! print mean trends (used for debugging)
@@ -204,8 +206,8 @@ CONTAINS
            zw2d(:,:) = ( atcox * patm(:,:) - atcox * trb(:,:,1,jpoxy) / ( chemo2(:,:,1) + rtrn ) ) * tmask(:,:,1)
            CALL iom_put( "Dpo2"  , zw2d )
          ENDIF
-         IF( iom_use( "tcflx" ) )  CALL iom_put( "tcflx"    , t_oce_co2_flx * rfact2r )   ! molC/s
-         CALL iom_put( "tcflxcum" , t_oce_co2_flx_cum )      ! molC
+         CALL iom_put( "tcflx"    , t_oce_co2_flx * rfact2r )   ! molC/s
+         CALL iom_put( "tcflxcum" , t_oce_co2_flx_cum       )   ! molC
          !
          DEALLOCATE( zw2d )
       ENDIF
@@ -375,7 +377,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( satmco2(jpi,jpj), patm(jpi,jpj), STAT=p4z_flx_alloc )
       !
-      IF( p4z_flx_alloc /= 0 )   CALL ctl_warn('p4z_flx_alloc : failed to allocate arrays')
+      IF( p4z_flx_alloc /= 0 )   CALL ctl_stop( 'STOP', 'p4z_flx_alloc : failed to allocate arrays' )
       !
    END FUNCTION p4z_flx_alloc
 

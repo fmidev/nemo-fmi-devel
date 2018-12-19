@@ -56,7 +56,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( utrdmp(jpi,jpj,jpk), vtrdmp(jpi,jpj,jpk), resto_uv(jpi,jpj,jpk), STAT= dyn_dmp_alloc )
       !
-      IF( lk_mpp            )   CALL mpp_sum ( dyn_dmp_alloc )
+      CALL mpp_sum ( 'dyndmp', dyn_dmp_alloc )
       IF( dyn_dmp_alloc > 0 )   CALL ctl_warn('dyn_dmp_alloc: allocation of arrays failed')
       !
    END FUNCTION dyn_dmp_alloc

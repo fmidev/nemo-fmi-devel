@@ -117,7 +117,7 @@ CONTAINS
       ENDIF
       ierr = ierr +  p4z_rem_alloc()
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'trcini_pisces', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'pisces_alloc: unable to allocate PISCES arrays' )
       !
       ryyss    = nyear_len(1) * rday    ! number of seconds per year
@@ -310,7 +310,7 @@ CONTAINS
       ierr =        sms_pisces_alloc()          
       ierr = ierr + p2z_exp_alloc()
       !
-      IF( lk_mpp    )   CALL mpp_sum( ierr )
+      CALL mpp_sum( 'trcini_pisces', ierr )
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'p2z_ini: unable to allocate LOBSTER arrays' )
 
       DO jn = 1, jptra

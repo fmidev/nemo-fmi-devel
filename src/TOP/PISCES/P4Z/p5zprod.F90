@@ -461,7 +461,7 @@ CONTAINS
 
     ! Total primary production per year
     IF( iom_use( "tintpp" ) .OR. ( ln_check_mass .AND. kt == nitend .AND. knt == nrdttrc )  )  &
-      & tpp = glob_sum( ( zprorcan(:,:,:) + zprorcad(:,:,:) + zprorcap(:,:,:) ) * cvol(:,:,:) )
+      & tpp = glob_sum( 'p5zprod', ( zprorcan(:,:,:) + zprorcad(:,:,:) + zprorcap(:,:,:) ) * cvol(:,:,:) )
 
     IF( lk_iomput ) THEN
        IF( knt == nrdttrc ) THEN
@@ -623,7 +623,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       ALLOCATE( zdaylen(jpi,jpj), STAT = p5z_prod_alloc )
       !
-      IF( p5z_prod_alloc /= 0 ) CALL ctl_warn('p5z_prod_alloc : failed to allocate arrays.')
+      IF( p5z_prod_alloc /= 0 ) CALL ctl_stop( 'STOP', 'p5z_prod_alloc : failed to allocate arrays.' )
       !
    END FUNCTION p5z_prod_alloc
    !!======================================================================

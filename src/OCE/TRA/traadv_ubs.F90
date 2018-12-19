@@ -140,7 +140,7 @@ CONTAINS
             END DO
             !                                    
          END DO         
-         CALL lbc_lnk( zltu, 'T', 1. )   ;    CALL lbc_lnk( zltv, 'T', 1. )   ! Lateral boundary cond. (unchanged sgn)
+         CALL lbc_lnk( 'traadv_ubs', zltu, 'T', 1. )   ;    CALL lbc_lnk( 'traadv_ubs', zltv, 'T', 1. )   ! Lateral boundary cond. (unchanged sgn)
          !    
          DO jk = 1, jpkm1        !==  Horizontal advective fluxes  ==!     (UBS)
             DO jj = 1, jpjm1
@@ -225,7 +225,7 @@ CONTAINS
                   END DO
                END DO
             END DO
-            CALL lbc_lnk( zti, 'T', 1. )      ! Lateral boundary conditions on zti, zsi   (unchanged sign)
+            CALL lbc_lnk( 'traadv_ubs', zti, 'T', 1. )      ! Lateral boundary conditions on zti, zsi   (unchanged sign)
             !
             !                          !*  anti-diffusive flux : high order minus low order
             DO jk = 2, jpkm1        ! Interior value  (w-masked)

@@ -49,8 +49,8 @@ CONTAINS
       IF( .NOT. ALLOCATED( nmln ) ) THEN
          ALLOCATE( nmln(jpi,jpj), hmld(jpi,jpj), hmlp(jpi,jpj), hmlpt(jpi,jpj), STAT= zdf_mxl_alloc )
          !
-         IF( lk_mpp             )   CALL mpp_sum ( zdf_mxl_alloc )
-         IF( zdf_mxl_alloc /= 0 )   CALL ctl_warn('zdf_mxl_alloc: failed to allocate arrays.')
+         CALL mpp_sum ( 'zdfmxl', zdf_mxl_alloc )
+         IF( zdf_mxl_alloc /= 0 )   CALL ctl_stop( 'STOP', 'zdf_mxl_alloc: failed to allocate arrays.' )
          !
       ENDIF
    END FUNCTION zdf_mxl_alloc

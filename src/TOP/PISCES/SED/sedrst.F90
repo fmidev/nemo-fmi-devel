@@ -77,7 +77,7 @@ CONTAINS
          IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
          IF(lwp) WRITE(numsed,*) &
              '             open sed restart.output NetCDF file: ',TRIM(clpath)//clname
-         CALL iom_open( TRIM(clpath)//TRIM(clname), numrsw, ldwrt = .TRUE., kiolib = jprstlib, kdlev = jpksed )
+         CALL iom_open( TRIM(clpath)//TRIM(clname), numrsw, ldwrt = .TRUE., kdlev = jpksed )
          lrst_sed = .TRUE.
       ENDIF
       !
@@ -104,7 +104,6 @@ CONTAINS
       REAL(wp) :: zkt
       CHARACTER(len = 20) ::   cltra
       CHARACTER(LEN=20)   ::   name1
-      INTEGER             ::   jlibalt = jprstlib
       LOGICAL             ::   llok
       !--------------------------------------------------------------------
 
@@ -337,7 +336,6 @@ CONTAINS
       INTEGER         , INTENT(in) ::   kt         ! ocean time-step
       CHARACTER(len=*), INTENT(in) ::   cdrw       ! "READ"/"WRITE" flag
       !
-      INTEGER  ::  jlibalt = jprstlib
       LOGICAL  ::  llok
       REAL(wp) ::  zkt, zrdttrc1
       REAL(wp) ::  zndastp
@@ -352,7 +350,7 @@ CONTAINS
          IF(lwp) WRITE(numsed,*) '~~~~~~~~~~~~'
 
          IF( ln_rst_sed ) THEN
-            CALL iom_open( TRIM(cn_sedrst_indir)//'/'//cn_sedrst_in, numrsr, kiolib = jlibalt )
+            CALL iom_open( TRIM(cn_sedrst_indir)//'/'//cn_sedrst_in, numrsr )
             CALL iom_get ( numrsr, 'kt', zkt )   ! last time-step of previous run
 
             IF(lwp) THEN

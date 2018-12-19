@@ -139,7 +139,7 @@ CONTAINS
            END DO
          END DO
          ! lateral boundary conditions   (changed sign)
-         CALL lbc_lnk_multi( zwx, 'U', -1. , zwy, 'V', -1. )
+         CALL lbc_lnk_multi( 'traadv_mus', zwx, 'U', -1. , zwy, 'V', -1. )
          !                                !-- Slopes of tracer
          zslpx(:,:,jpk) = 0._wp                 ! bottom values
          zslpy(:,:,jpk) = 0._wp
@@ -187,7 +187,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk_multi( zwx, 'U', -1. , zwy, 'V', -1. )   ! lateral boundary conditions   (changed sign)
+         CALL lbc_lnk_multi( 'traadv_mus', zwx, 'U', -1. , zwy, 'V', -1. )   ! lateral boundary conditions   (changed sign)
          !
          DO jk = 1, jpkm1                 !-- Tracer advective trend
             DO jj = 2, jpjm1      

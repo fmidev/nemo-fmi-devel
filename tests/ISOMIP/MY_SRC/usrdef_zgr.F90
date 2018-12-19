@@ -88,7 +88,7 @@ CONTAINS
       !
       ! the ocean basin surrounded by land (1 grid-point) set through lbc_lnk call as jperio=0 
       z2d(:,:) = 1._wp                    ! surface ocean is the 1st level
-      CALL lbc_lnk( z2d, 'T', 1. )        ! closed basin since jperio = 0 (see userdef_nam.F90)
+      CALL lbc_lnk( 'usrdef_zgr', z2d, 'T', 1. )        ! closed basin since jperio = 0 (see userdef_nam.F90)
       zmsk(:,:) = NINT( z2d(:,:) )
       !
       !
@@ -176,8 +176,8 @@ CONTAINS
                END DO
             END DO
          END DO
-         CALL lbc_lnk( pe3v , 'V', 1._wp )   ;   CALL lbc_lnk( pe3vw, 'V', 1._wp )
-         CALL lbc_lnk( pe3f , 'F', 1._wp )
+         CALL lbc_lnk( 'usrdef_zgr', pe3v , 'V', 1._wp )   ;   CALL lbc_lnk( 'usrdef_zgr', pe3vw, 'V', 1._wp )
+         CALL lbc_lnk( 'usrdef_zgr', pe3f , 'F', 1._wp )
          DO jk = 1, jpk
             ! set to z-scale factor if zero (i.e. along closed boundaries) because of lbclnk
             WHERE( pe3u (:,:,jk) == 0._wp )   pe3u (:,:,jk) = pe3t_1d(jk)

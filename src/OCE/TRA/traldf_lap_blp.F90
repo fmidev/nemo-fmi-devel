@@ -212,7 +212,7 @@ CONTAINS
          CALL tra_ldf_triad( kt, kit000, cdtype, pahu, pahv, pgu, pgv, pgui, pgvi, ptb, ptb, zlap, kjpt, 1 )
       END SELECT
       !
-      CALL lbc_lnk( zlap(:,:,:,:) , 'T', 1. )     ! Lateral boundary conditions (unchanged sign)
+      CALL lbc_lnk( 'traldf_lap_blp', zlap(:,:,:,:) , 'T', 1. )     ! Lateral boundary conditions (unchanged sign)
       !                                               ! Partial top/bottom cell: GRADh( zlap )  
       IF( ln_isfcav .AND. ln_zps ) THEN   ;   CALL zps_hde_isf( kt, kjpt, zlap, zglu, zglv, zgui, zgvi )  ! both top & bottom
       ELSEIF(             ln_zps ) THEN   ;   CALL zps_hde    ( kt, kjpt, zlap, zglu, zglv )              ! only bottom 

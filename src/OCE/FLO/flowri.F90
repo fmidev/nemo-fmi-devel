@@ -50,8 +50,8 @@ CONTAINS
       ALLOCATE( ztem(jpnfl) , zsal(jpnfl) , zrho(jpnfl) , &
                 zlon(jpnfl) , zlat(jpnfl) , zdep(jpnfl) , STAT=flo_wri_alloc)
       !  
-      IF( lk_mpp             )   CALL mpp_sum ( flo_wri_alloc )
-      IF( flo_wri_alloc /= 0 )   CALL ctl_warn('flo_wri_alloc: failed to allocate arrays.')
+      CALL mpp_sum ( 'flowri', flo_wri_alloc )
+      IF( flo_wri_alloc /= 0 )   CALL ctl_stop( 'STOP', 'flo_wri_alloc: failed to allocate arrays.' )
    END FUNCTION flo_wri_alloc
 
    SUBROUTINE flo_wri( kt )
@@ -152,12 +152,12 @@ CONTAINS
 
       !Only proc 0 writes all positions : SUM of positions on all procs
       IF( lk_mpp ) THEN
-         CALL mpp_sum( zlon, jpnfl )   ! sums over the global domain
-         CALL mpp_sum( zlat, jpnfl )   ! sums over the global domain
-         CALL mpp_sum( zdep, jpnfl )   ! sums over the global domain
-         CALL mpp_sum( ztem, jpnfl )   ! sums over the global domain
-         CALL mpp_sum( zsal, jpnfl )   ! sums over the global domain
-         CALL mpp_sum( zrho, jpnfl )   ! sums over the global domain
+         CALL mpp_sum( 'flowri', zlon, jpnfl )   ! sums over the global domain
+         CALL mpp_sum( 'flowri', zlat, jpnfl )   ! sums over the global domain
+         CALL mpp_sum( 'flowri', zdep, jpnfl )   ! sums over the global domain
+         CALL mpp_sum( 'flowri', ztem, jpnfl )   ! sums over the global domain
+         CALL mpp_sum( 'flowri', zsal, jpnfl )   ! sums over the global domain
+         CALL mpp_sum( 'flowri', zrho, jpnfl )   ! sums over the global domain
       ENDIF
 
 

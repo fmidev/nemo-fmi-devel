@@ -63,12 +63,12 @@ MODULE lib_mpp
    PRIVATE
 
    INTERFACE mpp_nfd
-      MODULE PROCEDURE   mpp_nfd_2d      , mpp_nfd_3d      , mpp_nfd_4d
+      MODULE PROCEDURE   mpp_nfd_2d    , mpp_nfd_3d    , mpp_nfd_4d
       MODULE PROCEDURE   mpp_nfd_2d_ptr, mpp_nfd_3d_ptr, mpp_nfd_4d_ptr
    END INTERFACE
 
    ! Interface associated to the mpp_lnk_... routines is defined in lbclnk
-   PUBLIC   mpp_lnk_2d      , mpp_lnk_3d      , mpp_lnk_4d
+   PUBLIC   mpp_lnk_2d    , mpp_lnk_3d    , mpp_lnk_4d
    PUBLIC   mpp_lnk_2d_ptr, mpp_lnk_3d_ptr, mpp_lnk_4d_ptr
    !
 !!gm  this should be useless
@@ -82,13 +82,11 @@ MODULE lib_mpp
    PUBLIC   mpp_lnk_2d_icb
    PUBLIC   mpp_lbc_north_icb
    PUBLIC   mpp_min, mpp_max, mpp_sum, mpp_minloc, mpp_maxloc
-   PUBLIC   mpp_max_multiple
+   PUBLIC   mpp_delay_max, mpp_delay_sum, mpp_delay_rcv
    PUBLIC   mppscatter, mppgather
-   PUBLIC   mpp_ini_ice, mpp_ini_znl
-   PUBLIC   mppsize
+   PUBLIC   mpp_ini_znl
    PUBLIC   mppsend, mpprecv                          ! needed by TAM and ICB routines
    PUBLIC   mpp_lnk_bdy_2d, mpp_lnk_bdy_3d, mpp_lnk_bdy_4d
-   PUBLIC   mpprank
    
    !! * Interfaces
    !! define generic interface for these routine as they are called sometimes
@@ -110,9 +108,6 @@ MODULE lib_mpp
    INTERFACE mpp_maxloc
       MODULE PROCEDURE mpp_maxloc2d ,mpp_maxloc3d
    END INTERFACE
-   INTERFACE mpp_max_multiple
-      MODULE PROCEDURE mppmax_real_multiple
-   END INTERFACE
 
    !! ========================= !!
    !!  MPI  variable definition !!
@@ -125,21 +120,13 @@ MODULE lib_mpp
 
    INTEGER, PARAMETER         ::   nprocmax = 2**10   ! maximun dimension (required to be a power of 2)
 
-   INTEGER ::   mppsize        ! number of process
-   INTEGER ::   mpprank        ! process number  [ 0 - size-1 ]
+   INTEGER, PUBLIC ::   mppsize        ! number of process
+   INTEGER, PUBLIC ::   mpprank        ! process number  [ 0 - size-1 ]
 !$AGRIF_DO_NOT_TREAT
    INTEGER, PUBLIC ::   mpi_comm_oce   ! opa local communicator
 !$AGRIF_END_DO_NOT_TREAT
 
    INTEGER :: MPI_SUMDD
-
-   ! variables used in case of sea-ice
-   INTEGER, PUBLIC ::   ncomm_ice       !: communicator made by the processors with sea-ice (public so that it can be freed in icethd)
-   INTEGER         ::   ngrp_iworld     !  group ID for the world processors (for rheology)
-   INTEGER         ::   ngrp_ice        !  group ID for the ice processors (for rheology)
-   INTEGER         ::   ndim_rank_ice   !  number of 'ice' processors
-   INTEGER         ::   n_ice_root      !  number (in the comm_ice) of proc 0 in the ice comm
-   INTEGER, DIMENSION(:), ALLOCATABLE, SAVE ::   nrank_ice     ! dimension ndim_rank_ice
 
    ! variables used for zonal integration
    INTEGER, PUBLIC ::   ncomm_znl       !: communicator made by the processors on the same zonal average
@@ -163,6 +150,35 @@ MODULE lib_mpp
    LOGICAL         , PUBLIC ::   l_isend = .FALSE.  !: isend use indicator (T if cn_mpi_send='I')
    INTEGER         , PUBLIC ::   nn_buffer          !: size of the buffer in case of mpi_bsend
 
+   ! Communications summary report
+   CHARACTER(len=128), DIMENSION(:), ALLOCATABLE ::   crname_lbc                   !: names of lbc_lnk calling routines
+   CHARACTER(len=128), DIMENSION(:), ALLOCATABLE ::   crname_glb                   !: names of global comm  calling routines
+   INTEGER, PUBLIC                               ::   ncom_stp = 0                 !: copy of time step # istp
+   INTEGER, PUBLIC                               ::   ncom_fsbc = 1                !: copy of sbc time step # nn_fsbc
+   INTEGER, PUBLIC                               ::   ncom_dttrc = 1               !: copy of top time step # nn_dttrc
+   INTEGER, PUBLIC                               ::   ncom_freq                    !: frequency of comm diagnostic
+   INTEGER, PUBLIC , DIMENSION(:,:), ALLOCATABLE ::   ncomm_sequence               !: size of communicated arrays (halos)
+   INTEGER, PARAMETER, PUBLIC                    ::   ncom_rec_max = 2000          !: max number of communication record
+   INTEGER, PUBLIC                               ::   n_sequence_lbc = 0           !: # of communicated arraysvia lbc
+   INTEGER, PUBLIC                               ::   n_sequence_glb = 0           !: # of global communications
+   INTEGER, PUBLIC                               ::   numcom = -1                  !: logical unit for communicaton report
+   LOGICAL, PUBLIC                               ::   l_full_nf_update = .TRUE.    !: logical for a full (2lines) update of bc at North fold report
+   INTEGER,                    PARAMETER, PUBLIC ::   nbdelay = 2       !: number of delayed operations
+   !: name (used as id) of allreduce-delayed operations
+   CHARACTER(len=32), DIMENSION(nbdelay), PUBLIC ::   c_delaylist = (/ 'cflice', 'fwb' /)
+   !: component name where the allreduce-delayed operation is performed
+   CHARACTER(len=3),  DIMENSION(nbdelay), PUBLIC ::   c_delaycpnt = (/ 'ICE'   , 'OCE' /)
+   TYPE, PUBLIC ::   DELAYARR
+      REAL(   wp), POINTER, DIMENSION(:) ::  z1d => NULL()
+      COMPLEX(wp), POINTER, DIMENSION(:) ::  y1d => NULL()
+   END TYPE DELAYARR
+   TYPE( DELAYARR ), DIMENSION(nbdelay), PUBLIC  ::   todelay              
+   INTEGER,          DIMENSION(nbdelay), PUBLIC  ::   ndelayid = -1     !: mpi request id of the delayed operations
+
+   ! timing summary report
+   REAL(wp), DIMENSION(2), PUBLIC ::  waiting_time = 0._wp
+   REAL(wp)              , PUBLIC ::  compute_time = 0._wp, elapsed_time = 0._wp
+   
    REAL(wp), DIMENSION(:), ALLOCATABLE, SAVE ::   tampon   ! buffer in case of bsend
 
    LOGICAL, PUBLIC ::   ln_nnogather                !: namelist control of northfold comms
@@ -213,24 +229,11 @@ CONTAINS
       WRITE(ldtxt(ii),*) '      mpi send type          cn_mpi_send = ', cn_mpi_send       ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      size exported buffer   nn_buffer   = ', nn_buffer,' bytes';   ii = ii + 1
       !
-#if defined key_agrif
-      IF( .NOT. Agrif_Root() ) THEN
-         jpni  = Agrif_Parent(jpni )
-         jpnj  = Agrif_Parent(jpnj )
-         jpnij = Agrif_Parent(jpnij)
-      ENDIF
-#endif
-      !
-      IF( jpnij < 1 ) THEN         ! If jpnij is not specified in namelist then we calculate it
-         jpnij = jpni * jpnj       ! this means there will be no land cutting out.
-      ENDIF
-
       IF( jpni < 1 .OR. jpnj < 1  ) THEN
          WRITE(ldtxt(ii),*) '      jpni, jpnj and jpnij will be calculated automatically' ;   ii = ii + 1
       ELSE
          WRITE(ldtxt(ii),*) '      processor grid extent in i         jpni = ',jpni       ;   ii = ii + 1
          WRITE(ldtxt(ii),*) '      processor grid extent in j         jpnj = ',jpnj       ;   ii = ii + 1
-         WRITE(ldtxt(ii),*) '      number of local domains           jpnij = ',jpnij      ;   ii = ii + 1
       ENDIF
 
       WRITE(ldtxt(ii),*) '      avoid use of mpi_allgather at the north fold  ln_nnogather = ', ln_nnogather  ; ii = ii + 1
@@ -263,6 +266,7 @@ CONTAINS
          END SELECT
          !
       ELSEIF ( PRESENT(localComm) .AND. .NOT. mpi_was_called ) THEN
+         WRITE(ldtxt(ii),cform_err)                                                    ;   ii = ii + 1
          WRITE(ldtxt(ii),*) ' lib_mpp: You cannot provide a local communicator '          ;   ii = ii + 1
          WRITE(ldtxt(ii),*) '          without calling MPI_Init before ! '                ;   ii = ii + 1
          kstop = kstop + 1
@@ -573,125 +577,210 @@ CONTAINS
       !
    END SUBROUTINE mppscatter
 
+   
+   SUBROUTINE mpp_delay_sum( cdname, cdelay, y_in, pout, ldlast, kcom )
+     !!----------------------------------------------------------------------
+      !!                   ***  routine mpp_delay_sum  ***
+      !!
+      !! ** Purpose :   performed delayed mpp_sum, the result is received on next call
+      !!
+      !!----------------------------------------------------------------------
+      CHARACTER(len=*), INTENT(in   )               ::   cdname  ! name of the calling subroutine
+      CHARACTER(len=*), INTENT(in   )               ::   cdelay  ! name (used as id) of the delayed operation
+      COMPLEX(wp),      INTENT(in   ), DIMENSION(:) ::   y_in
+      REAL(wp),         INTENT(  out), DIMENSION(:) ::   pout
+      LOGICAL,          INTENT(in   )               ::   ldlast  ! true if this is the last time we call this routine
+      INTEGER,          INTENT(in   ), OPTIONAL     ::   kcom
+      !!
+      INTEGER ::   ji, isz
+      INTEGER ::   idvar
+      INTEGER ::   ierr, ilocalcomm
+      COMPLEX(wp), ALLOCATABLE, DIMENSION(:) ::   ytmp
+      !!----------------------------------------------------------------------
+      ilocalcomm = mpi_comm_oce
+      IF( PRESENT(kcom) )   ilocalcomm = kcom
+
+      isz = SIZE(y_in)
+      
+      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ld_glb = .TRUE. )
+
+      idvar = -1
+      DO ji = 1, nbdelay
+         IF( TRIM(cdelay) == TRIM(c_delaylist(ji)) ) idvar = ji
+      END DO
+      IF ( idvar == -1 )   CALL ctl_stop( 'STOP',' mpp_delay_sum : please add a new delayed exchange for '//TRIM(cdname) )
+
+      IF ( ndelayid(idvar) == 0 ) THEN         ! first call    with restart: %z1d defined in iom_delay_rst
+         !                                       --------------------------
+         IF ( SIZE(todelay(idvar)%z1d) /= isz ) THEN                  ! Check dimension coherence
+            IF(lwp) WRITE(numout,*) ' WARNING: the nb of delayed variables in restart file is not the model one'
+            DEALLOCATE(todelay(idvar)%z1d)
+            ndelayid(idvar) = -1                                      ! do as if we had no restart
+         ELSE
+            ALLOCATE(todelay(idvar)%y1d(isz))
+            todelay(idvar)%y1d(:) = CMPLX(todelay(idvar)%z1d(:), 0., wp)   ! create %y1d, complex variable needed by mpi_sumdd
+         END IF
+      ENDIF
+      
+      IF( ndelayid(idvar) == -1 ) THEN         ! first call without restart: define %y1d and %z1d from y_in with blocking allreduce
+         !                                       --------------------------
+         ALLOCATE(todelay(idvar)%z1d(isz), todelay(idvar)%y1d(isz))   ! allocate also %z1d as used for the restart
+         CALL mpi_allreduce( y_in(:), todelay(idvar)%y1d(:), isz, MPI_DOUBLE_COMPLEX, mpi_sumdd, ilocalcomm, ierr )   ! get %y1d
+         todelay(idvar)%z1d(:) = REAL(todelay(idvar)%y1d(:), wp)      ! define %z1d from %y1d
+      ENDIF
+
+      IF( ndelayid(idvar) > 0 )   CALL mpp_delay_rcv( idvar )         ! make sure %z1d is received
+
+      ! send back pout from todelay(idvar)%z1d defined at previous call
+      pout(:) = todelay(idvar)%z1d(:)
+
+      ! send y_in into todelay(idvar)%y1d with a non-blocking communication
+      CALL mpi_iallreduce( y_in(:), todelay(idvar)%y1d(:), isz, MPI_DOUBLE_COMPLEX, mpi_sumdd, ilocalcomm, ndelayid(idvar), ierr )
+
+   END SUBROUTINE mpp_delay_sum
+
+   
+   SUBROUTINE mpp_delay_max( cdname, cdelay, p_in, pout, ldlast, kcom )
+      !!----------------------------------------------------------------------
+      !!                   ***  routine mpp_delay_max  ***
+      !!
+      !! ** Purpose :   performed delayed mpp_max, the result is received on next call
+      !!
+      !!----------------------------------------------------------------------
+      CHARACTER(len=*), INTENT(in   )                 ::   cdname  ! name of the calling subroutine
+      CHARACTER(len=*), INTENT(in   )                 ::   cdelay  ! name (used as id) of the delayed operation
+      REAL(wp),         INTENT(in   ), DIMENSION(:)   ::   p_in    ! 
+      REAL(wp),         INTENT(  out), DIMENSION(:)   ::   pout    ! 
+      LOGICAL,          INTENT(in   )                 ::   ldlast  ! true if this is the last time we call this routine
+      INTEGER,          INTENT(in   ), OPTIONAL       ::   kcom
+      !!
+      INTEGER ::   ji, isz
+      INTEGER ::   idvar
+      INTEGER ::   ierr, ilocalcomm
+      !!----------------------------------------------------------------------
+      ilocalcomm = mpi_comm_oce
+      IF( PRESENT(kcom) )   ilocalcomm = kcom
+
+      isz = SIZE(p_in)
+
+      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ld_glb = .TRUE. )
+
+      idvar = -1
+      DO ji = 1, nbdelay
+         IF( TRIM(cdelay) == TRIM(c_delaylist(ji)) ) idvar = ji
+      END DO
+      IF ( idvar == -1 )   CALL ctl_stop( 'STOP',' mpp_delay_max : please add a new delayed exchange for '//TRIM(cdname) )
+
+      IF ( ndelayid(idvar) == 0 ) THEN         ! first call    with restart: %z1d defined in iom_delay_rst
+         !                                       --------------------------
+         IF ( SIZE(todelay(idvar)%z1d) /= isz ) THEN                  ! Check dimension coherence
+            IF(lwp) WRITE(numout,*) ' WARNING: the nb of delayed variables in restart file is not the model one'
+            DEALLOCATE(todelay(idvar)%z1d)
+            ndelayid(idvar) = -1                                      ! do as if we had no restart
+         END IF
+      ENDIF
+
+      IF( ndelayid(idvar) == -1 ) THEN         ! first call without restart: define %z1d from p_in with a blocking allreduce
+         !                                       --------------------------
+         ALLOCATE(todelay(idvar)%z1d(isz))
+         CALL mpi_allreduce( p_in(:), todelay(idvar)%z1d(:), isz, MPI_DOUBLE_PRECISION, mpi_max, ilocalcomm, ierr )   ! get %z1d
+      ENDIF
+
+      IF( ndelayid(idvar) > 0 )   CALL mpp_delay_rcv( idvar )         ! make sure %z1d is received
+
+      ! send back pout from todelay(idvar)%z1d defined at previous call
+      pout(:) = todelay(idvar)%z1d(:)
+
+      ! send p_in into todelay(idvar)%z1d with a non-blocking communication
+      CALL mpi_iallreduce( p_in(:), todelay(idvar)%z1d(:), isz, MPI_DOUBLE_PRECISION, mpi_max, ilocalcomm, ndelayid(idvar), ierr )
+
+   END SUBROUTINE mpp_delay_max
+
+   
+   SUBROUTINE mpp_delay_rcv( kid )
+      !!----------------------------------------------------------------------
+      !!                   ***  routine mpp_delay_rcv  ***
+      !!
+      !! ** Purpose :  force barrier for delayed mpp (needed for restart) 
+      !!
+      !!----------------------------------------------------------------------
+      INTEGER,INTENT(in   )      ::  kid 
+      INTEGER ::   ierr
+      !!----------------------------------------------------------------------
+      IF( ndelayid(kid) /= -2 ) THEN  
+         IF( ln_timing ) CALL tic_tac( .TRUE., ld_global = .TRUE.)
+         CALL mpi_wait( ndelayid(kid), MPI_STATUS_IGNORE, ierr )                        ! make sure todelay(kid) is received
+         IF( ln_timing ) CALL tic_tac(.FALSE., ld_global = .TRUE.)
+         IF( ASSOCIATED(todelay(kid)%y1d) )   todelay(kid)%z1d(:) = REAL(todelay(kid)%y1d(:), wp)  ! define %z1d from %y1d
+         ndelayid(kid) = -2   ! add flag to know that mpi_wait was already called on kid
+      ENDIF
+   END SUBROUTINE mpp_delay_rcv
+
+   
    !!----------------------------------------------------------------------
    !!    ***  mppmax_a_int, mppmax_int, mppmax_a_real, mppmax_real  ***
    !!   
    !!----------------------------------------------------------------------
    !!
-   SUBROUTINE mppmax_a_int( ktab, kdim, kcom )
-      !!----------------------------------------------------------------------
-      INTEGER , INTENT(in   )                  ::   kdim   ! size of array
-      INTEGER , INTENT(inout), DIMENSION(kdim) ::   ktab   ! input array
-      INTEGER , INTENT(in   ), OPTIONAL        ::   kcom   !
-      INTEGER :: ierror, ilocalcomm   ! temporary integer
-      INTEGER, DIMENSION(kdim) ::   iwork
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ktab, iwork, kdim, mpi_integer, mpi_max, ilocalcomm, ierror )
-      ktab(:) = iwork(:)
-   END SUBROUTINE mppmax_a_int
-   !!
-   SUBROUTINE mppmax_int( ktab, kcom )
-      !!----------------------------------------------------------------------
-      INTEGER, INTENT(inout)           ::   ktab   ! ???
-      INTEGER, INTENT(in   ), OPTIONAL ::   kcom   ! ???
-      INTEGER ::   ierror, iwork, ilocalcomm   ! temporary integer
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ktab, iwork, 1, mpi_integer, mpi_max, ilocalcomm, ierror )
-      ktab = iwork
-   END SUBROUTINE mppmax_int
-   !!
-   SUBROUTINE mppmax_a_real( ptab, kdim, kcom )
-      !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(kdim), INTENT(inout) ::   ptab
-      INTEGER                  , INTENT(in   ) ::   kdim
-      INTEGER , OPTIONAL       , INTENT(in   ) ::   kcom
-      INTEGER :: ierror, ilocalcomm
-      REAL(wp), DIMENSION(kdim) ::  zwork
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ptab, zwork, kdim, mpi_double_precision, mpi_max, ilocalcomm, ierror )
-      ptab(:) = zwork(:)
-   END SUBROUTINE mppmax_a_real
-   !!
-   SUBROUTINE mppmax_real( ptab, kcom )
-      !!----------------------------------------------------------------------
-      REAL(wp), INTENT(inout)           ::   ptab   ! ???
-      INTEGER , INTENT(in   ), OPTIONAL ::   kcom   ! ???
-      INTEGER  ::   ierror, ilocalcomm
-      REAL(wp) ::   zwork
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom!
-      CALL mpi_allreduce( ptab, zwork, 1, mpi_double_precision, mpi_max, ilocalcomm, ierror )
-      ptab = zwork
-   END SUBROUTINE mppmax_real
-
-
+#  define OPERATION_MAX
+#  define INTEGER_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmax_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmax_a_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef INTEGER_TYPE
+!
+#  define REAL_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmax_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmax_a_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef REAL_TYPE
+#  undef OPERATION_MAX
    !!----------------------------------------------------------------------
    !!    ***  mppmin_a_int, mppmin_int, mppmin_a_real, mppmin_real  ***
    !!   
    !!----------------------------------------------------------------------
    !!
-   SUBROUTINE mppmin_a_int( ktab, kdim, kcom )
-      !!----------------------------------------------------------------------
-      INTEGER , INTENT( in  )                  ::   kdim   ! size of array
-      INTEGER , INTENT(inout), DIMENSION(kdim) ::   ktab   ! input array
-      INTEGER , INTENT( in  ), OPTIONAL        ::   kcom   ! input array
-      !!
-      INTEGER ::   ierror, ilocalcomm   ! temporary integer
-      INTEGER, DIMENSION(kdim) ::   iwork
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ktab, iwork, kdim, mpi_integer, mpi_min, ilocalcomm, ierror )
-      ktab(:) = iwork(:)
-   END SUBROUTINE mppmin_a_int
-   !!
-   SUBROUTINE mppmin_int( ktab, kcom )
-      !!----------------------------------------------------------------------
-      INTEGER, INTENT(inout) ::   ktab      ! ???
-      INTEGER , INTENT( in  ), OPTIONAL        ::   kcom        ! input array
-      !!
-      INTEGER ::  ierror, iwork, ilocalcomm
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ktab, iwork, 1, mpi_integer, mpi_min, ilocalcomm, ierror )
-      ktab = iwork
-   END SUBROUTINE mppmin_int
-   !!
-   SUBROUTINE mppmin_a_real( ptab, kdim, kcom )
-      !!----------------------------------------------------------------------
-      INTEGER , INTENT(in   )                  ::   kdim
-      REAL(wp), INTENT(inout), DIMENSION(kdim) ::   ptab
-      INTEGER , INTENT(in   ), OPTIONAL        ::   kcom
-      INTEGER :: ierror, ilocalcomm
-      REAL(wp), DIMENSION(kdim) ::   zwork
-      !!-----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ptab, zwork, kdim, mpi_double_precision, mpi_min, ilocalcomm, ierror )
-      ptab(:) = zwork(:)
-   END SUBROUTINE mppmin_a_real
-   !!
-   SUBROUTINE mppmin_real( ptab, kcom )
-      !!-----------------------------------------------------------------------
-      REAL(wp), INTENT(inout)           ::   ptab        !
-      INTEGER , INTENT(in   ), OPTIONAL :: kcom
-      INTEGER  ::   ierror, ilocalcomm
-      REAL(wp) ::   zwork
-      !!-----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ptab, zwork, 1, mpi_double_precision, mpi_min, ilocalcomm, ierror )
-      ptab = zwork
-   END SUBROUTINE mppmin_real
-
+#  define OPERATION_MIN
+#  define INTEGER_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmin_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmin_a_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef INTEGER_TYPE
+!
+#  define REAL_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmin_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmin_a_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef REAL_TYPE
+#  undef OPERATION_MIN
 
    !!----------------------------------------------------------------------
    !!    ***  mppsum_a_int, mppsum_int, mppsum_a_real, mppsum_real  ***
@@ -699,263 +788,79 @@ CONTAINS
    !!   Global sum of 1D array or a variable (integer, real or complex)
    !!----------------------------------------------------------------------
    !!
-   SUBROUTINE mppsum_a_int( ktab, kdim )
-      !!----------------------------------------------------------------------
-      INTEGER, INTENT(in   )                   ::   kdim   ! ???
-      INTEGER, INTENT(inout), DIMENSION (kdim) ::   ktab   ! ???
-      INTEGER :: ierror
-      INTEGER, DIMENSION (kdim) ::  iwork
-      !!----------------------------------------------------------------------
-      CALL mpi_allreduce( ktab, iwork, kdim, mpi_integer, mpi_sum, mpi_comm_oce, ierror )
-      ktab(:) = iwork(:)
-   END SUBROUTINE mppsum_a_int
+#  define OPERATION_SUM
+#  define INTEGER_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppsum_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppsum_a_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef INTEGER_TYPE
+!
+#  define REAL_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppsum_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppsum_a_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef REAL_TYPE
+#  undef OPERATION_SUM
+
+#  define OPERATION_SUM_DD
+#  define COMPLEX_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppsum_realdd
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppsum_a_realdd
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef COMPLEX_TYPE
+#  undef OPERATION_SUM_DD
+
+   !!----------------------------------------------------------------------
+   !!    ***  mpp_minloc2d, mpp_minloc3d, mpp_maxloc2d, mpp_maxloc3d
+   !!   
+   !!----------------------------------------------------------------------
    !!
-   SUBROUTINE mppsum_int( ktab )
-      !!----------------------------------------------------------------------
-      INTEGER, INTENT(inout) ::   ktab
-      INTEGER :: ierror, iwork
-      !!----------------------------------------------------------------------
-      CALL mpi_allreduce( ktab, iwork, 1, mpi_integer, mpi_sum, mpi_comm_oce, ierror )
-      ktab = iwork
-   END SUBROUTINE mppsum_int
-   !!
-   SUBROUTINE mppsum_a_real( ptab, kdim, kcom )
-      !!-----------------------------------------------------------------------
-      INTEGER                  , INTENT(in   ) ::   kdim   ! size of ptab
-      REAL(wp), DIMENSION(kdim), INTENT(inout) ::   ptab   ! input array
-      INTEGER , OPTIONAL       , INTENT(in   ) ::   kcom   ! specific communicator
-      INTEGER  ::   ierror, ilocalcomm    ! local integer
-      REAL(wp) ::   zwork(kdim)           ! local workspace
-      !!-----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ptab, zwork, kdim, mpi_double_precision, mpi_sum, ilocalcomm, ierror )
-      ptab(:) = zwork(:)
-   END SUBROUTINE mppsum_a_real
-   !!
-   SUBROUTINE mppsum_real( ptab, kcom )
-      !!-----------------------------------------------------------------------
-      REAL(wp)          , INTENT(inout)           ::   ptab   ! input scalar
-      INTEGER , OPTIONAL, INTENT(in   ) ::   kcom
-      INTEGER  ::   ierror, ilocalcomm
-      REAL(wp) ::   zwork
-      !!-----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL mpi_allreduce( ptab, zwork, 1, mpi_double_precision, mpi_sum, ilocalcomm, ierror )
-      ptab = zwork
-   END SUBROUTINE mppsum_real
-   !!
-   SUBROUTINE mppsum_realdd( ytab, kcom )
-      !!-----------------------------------------------------------------------
-      COMPLEX(wp)          , INTENT(inout) ::   ytab    ! input scalar
-      INTEGER    , OPTIONAL, INTENT(in   ) ::   kcom
-      INTEGER     ::   ierror, ilocalcomm
-      COMPLEX(wp) ::   zwork
-      !!-----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL MPI_ALLREDUCE( ytab, zwork, 1, MPI_DOUBLE_COMPLEX, MPI_SUMDD, ilocalcomm, ierror )
-      ytab = zwork
-   END SUBROUTINE mppsum_realdd
-   !!
-   SUBROUTINE mppsum_a_realdd( ytab, kdim, kcom )
-      !!----------------------------------------------------------------------
-      INTEGER                     , INTENT(in   ) ::   kdim   ! size of ytab
-      COMPLEX(wp), DIMENSION(kdim), INTENT(inout) ::   ytab   ! input array
-      INTEGER    , OPTIONAL       , INTENT(in   ) ::   kcom
-      INTEGER:: ierror, ilocalcomm    ! local integer
-      COMPLEX(wp), DIMENSION(kdim) :: zwork     ! temporary workspace
-      !!-----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      CALL MPI_ALLREDUCE( ytab, zwork, kdim, MPI_DOUBLE_COMPLEX, MPI_SUMDD, ilocalcomm, ierror )
-      ytab(:) = zwork(:)
-   END SUBROUTINE mppsum_a_realdd
-   
+#  define OPERATION_MINLOC
+#  define DIM_2d
+#     define ROUTINE_LOC           mpp_minloc2d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_2d
+#  define DIM_3d
+#     define ROUTINE_LOC           mpp_minloc3d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_3d
+#  undef OPERATION_MINLOC
 
-   SUBROUTINE mppmax_real_multiple( pt1d, kdim, kcom  )
-      !!----------------------------------------------------------------------
-      !!                  ***  routine mppmax_real  ***
-      !!
-      !! ** Purpose :   Maximum across processor of each element of a 1D arrays
-      !!
-      !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(kdim), INTENT(inout) ::   pt1d   ! 1D arrays
-      INTEGER                  , INTENT(in   ) ::   kdim
-      INTEGER , OPTIONAL       , INTENT(in   ) ::   kcom   ! local communicator
-      !!
-      INTEGER  ::   ierror, ilocalcomm
-      REAL(wp), DIMENSION(kdim) ::  zwork
-      !!----------------------------------------------------------------------
-      ilocalcomm = mpi_comm_oce
-      IF( PRESENT(kcom) )   ilocalcomm = kcom
-      !
-      CALL mpi_allreduce( pt1d, zwork, kdim, mpi_double_precision, mpi_max, ilocalcomm, ierror )
-      pt1d(:) = zwork(:)
-      !
-   END SUBROUTINE mppmax_real_multiple
-
-
-   SUBROUTINE mpp_minloc2d( ptab, pmask, pmin, ki,kj )
-      !!------------------------------------------------------------------------
-      !!             ***  routine mpp_minloc  ***
-      !!
-      !! ** Purpose :   Compute the global minimum of an array ptab
-      !!              and also give its global position
-      !!
-      !! ** Method  :   Use MPI_ALLREDUCE with MPI_MINLOC
-      !!
-      !!--------------------------------------------------------------------------
-      REAL(wp), DIMENSION (jpi,jpj), INTENT(in   ) ::   ptab    ! Local 2D array
-      REAL(wp), DIMENSION (jpi,jpj), INTENT(in   ) ::   pmask   ! Local mask
-      REAL(wp)                     , INTENT(  out) ::   pmin    ! Global minimum of ptab
-      INTEGER                      , INTENT(  out) ::   ki, kj  ! index of minimum in global frame
-      !
-      INTEGER :: ierror
-      INTEGER , DIMENSION(2)   ::   ilocs
-      REAL(wp) ::   zmin   ! local minimum
-      REAL(wp), DIMENSION(2,1) ::   zain, zaout
-      !!-----------------------------------------------------------------------
-      !
-      zmin  = MINVAL( ptab(:,:) , mask= pmask == 1._wp )
-      ilocs = MINLOC( ptab(:,:) , mask= pmask == 1._wp )
-      !
-      ki = ilocs(1) + nimpp - 1
-      kj = ilocs(2) + njmpp - 1
-      !
-      zain(1,:)=zmin
-      zain(2,:)=ki+10000.*kj
-      !
-      CALL MPI_ALLREDUCE( zain,zaout, 1, MPI_2DOUBLE_PRECISION,MPI_MINLOC,MPI_COMM_OCE,ierror)
-      !
-      pmin = zaout(1,1)
-      kj = INT(zaout(2,1)/10000.)
-      ki = INT(zaout(2,1) - 10000.*kj )
-      !
-   END SUBROUTINE mpp_minloc2d
-
-
-   SUBROUTINE mpp_minloc3d( ptab, pmask, pmin, ki, kj ,kk)
-      !!------------------------------------------------------------------------
-      !!             ***  routine mpp_minloc  ***
-      !!
-      !! ** Purpose :   Compute the global minimum of an array ptab
-      !!              and also give its global position
-      !!
-      !! ** Method  :   Use MPI_ALLREDUCE with MPI_MINLOC
-      !!
-      !!--------------------------------------------------------------------------
-      REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   ptab         ! Local 2D array
-      REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   pmask        ! Local mask
-      REAL(wp)                  , INTENT(  out) ::   pmin         ! Global minimum of ptab
-      INTEGER                   , INTENT(  out) ::   ki, kj, kk   ! index of minimum in global frame
-      !
-      INTEGER  ::   ierror
-      REAL(wp) ::   zmin     ! local minimum
-      INTEGER , DIMENSION(3)   ::   ilocs
-      REAL(wp), DIMENSION(2,1) ::   zain, zaout
-      !!-----------------------------------------------------------------------
-      !
-      zmin  = MINVAL( ptab(:,:,:) , mask= pmask == 1._wp )
-      ilocs = MINLOC( ptab(:,:,:) , mask= pmask == 1._wp )
-      !
-      ki = ilocs(1) + nimpp - 1
-      kj = ilocs(2) + njmpp - 1
-      kk = ilocs(3)
-      !
-      zain(1,:) = zmin
-      zain(2,:) = ki + 10000.*kj + 100000000.*kk
-      !
-      CALL MPI_ALLREDUCE( zain,zaout, 1, MPI_2DOUBLE_PRECISION,MPI_MINLOC,MPI_COMM_OCE,ierror)
-      !
-      pmin = zaout(1,1)
-      kk   = INT( zaout(2,1) / 100000000. )
-      kj   = INT( zaout(2,1) - kk * 100000000. ) / 10000
-      ki   = INT( zaout(2,1) - kk * 100000000. -kj * 10000. )
-      !
-   END SUBROUTINE mpp_minloc3d
-
-
-   SUBROUTINE mpp_maxloc2d( ptab, pmask, pmax, ki, kj )
-      !!------------------------------------------------------------------------
-      !!             ***  routine mpp_maxloc  ***
-      !!
-      !! ** Purpose :   Compute the global maximum of an array ptab
-      !!              and also give its global position
-      !!
-      !! ** Method  :   Use MPI_ALLREDUCE with MPI_MINLOC
-      !!
-      !!--------------------------------------------------------------------------
-      REAL(wp), DIMENSION (jpi,jpj), INTENT(in   ) ::   ptab     ! Local 2D array
-      REAL(wp), DIMENSION (jpi,jpj), INTENT(in   ) ::   pmask    ! Local mask
-      REAL(wp)                     , INTENT(  out) ::   pmax     ! Global maximum of ptab
-      INTEGER                      , INTENT(  out) ::   ki, kj   ! index of maximum in global frame
-      !!
-      INTEGER  :: ierror
-      INTEGER, DIMENSION (2)   ::   ilocs
-      REAL(wp) :: zmax   ! local maximum
-      REAL(wp), DIMENSION(2,1) ::   zain, zaout
-      !!-----------------------------------------------------------------------
-      !
-      zmax  = MAXVAL( ptab(:,:) , mask= pmask == 1._wp )
-      ilocs = MAXLOC( ptab(:,:) , mask= pmask == 1._wp )
-      !
-      ki = ilocs(1) + nimpp - 1
-      kj = ilocs(2) + njmpp - 1
-      !
-      zain(1,:) = zmax
-      zain(2,:) = ki + 10000. * kj
-      !
-      CALL MPI_ALLREDUCE( zain,zaout, 1, MPI_2DOUBLE_PRECISION,MPI_MAXLOC,MPI_COMM_OCE,ierror)
-      !
-      pmax = zaout(1,1)
-      kj   = INT( zaout(2,1) / 10000.     )
-      ki   = INT( zaout(2,1) - 10000.* kj )
-      !
-   END SUBROUTINE mpp_maxloc2d
-
-
-   SUBROUTINE mpp_maxloc3d( ptab, pmask, pmax, ki, kj, kk )
-      !!------------------------------------------------------------------------
-      !!             ***  routine mpp_maxloc  ***
-      !!
-      !! ** Purpose :  Compute the global maximum of an array ptab
-      !!              and also give its global position
-      !!
-      !! ** Method : Use MPI_ALLREDUCE with MPI_MINLOC
-      !!
-      !!--------------------------------------------------------------------------
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   ptab         ! Local 2D array
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   pmask        ! Local mask
-      REAL(wp)                   , INTENT(  out) ::   pmax         ! Global maximum of ptab
-      INTEGER                    , INTENT(  out) ::   ki, kj, kk   ! index of maximum in global frame
-      !
-      INTEGER  ::   ierror   ! local integer
-      REAL(wp) ::   zmax     ! local maximum
-      REAL(wp), DIMENSION(2,1) ::   zain, zaout
-      INTEGER , DIMENSION(3)   ::   ilocs
-      !!-----------------------------------------------------------------------
-      !
-      zmax  = MAXVAL( ptab(:,:,:) , mask= pmask == 1._wp )
-      ilocs = MAXLOC( ptab(:,:,:) , mask= pmask == 1._wp )
-      !
-      ki = ilocs(1) + nimpp - 1
-      kj = ilocs(2) + njmpp - 1
-      kk = ilocs(3)
-      !
-      zain(1,:) = zmax
-      zain(2,:) = ki + 10000.*kj + 100000000.*kk
-      !
-      CALL MPI_ALLREDUCE( zain,zaout, 1, MPI_2DOUBLE_PRECISION,MPI_MAXLOC,MPI_COMM_OCE,ierror)
-      !
-      pmax = zaout(1,1)
-      kk   = INT( zaout(2,1) / 100000000. )
-      kj   = INT( zaout(2,1) - kk * 100000000. ) / 10000
-      ki   = INT( zaout(2,1) - kk * 100000000. -kj * 10000. )
-      !
-   END SUBROUTINE mpp_maxloc3d
-
+#  define OPERATION_MAXLOC
+#  define DIM_2d
+#     define ROUTINE_LOC           mpp_maxloc2d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_2d
+#  define DIM_3d
+#     define ROUTINE_LOC           mpp_maxloc3d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_3d
+#  undef OPERATION_MAXLOC
 
    SUBROUTINE mppsync()
       !!----------------------------------------------------------------------
@@ -972,18 +877,30 @@ CONTAINS
    END SUBROUTINE mppsync
 
 
-   SUBROUTINE mppstop
+   SUBROUTINE mppstop( ldfinal, ld_force_abort ) 
       !!----------------------------------------------------------------------
       !!                  ***  routine mppstop  ***
       !!
       !! ** purpose :   Stop massively parallel processors method
       !!
       !!----------------------------------------------------------------------
+      LOGICAL, OPTIONAL, INTENT(in) :: ldfinal    ! source process number
+      LOGICAL, OPTIONAL, INTENT(in) :: ld_force_abort    ! source process number
+      LOGICAL ::   llfinal, ll_force_abort
       INTEGER ::   info
       !!----------------------------------------------------------------------
+      llfinal = .FALSE.
+      IF( PRESENT(ldfinal) ) llfinal = ldfinal
+      ll_force_abort = .FALSE.
+      IF( PRESENT(ld_force_abort) ) ll_force_abort = ld_force_abort
       !
-      CALL mppsync
-      CALL mpi_finalize( info )
+      IF(ll_force_abort) THEN
+         CALL mpi_abort( MPI_COMM_WORLD )
+      ELSE
+         CALL mppsync
+         CALL mpi_finalize( info )
+      ENDIF
+      IF( .NOT. llfinal ) STOP 123456
       !
    END SUBROUTINE mppstop
 
@@ -998,89 +915,6 @@ CONTAINS
       CALL MPI_COMM_FREE(kcom, ierr)
       !
    END SUBROUTINE mpp_comm_free
-
-
-   SUBROUTINE mpp_ini_ice( pindic, kumout )
-      !!----------------------------------------------------------------------
-      !!               ***  routine mpp_ini_ice  ***
-      !!
-      !! ** Purpose :   Initialize special communicator for ice areas
-      !!      condition together with global variables needed in the ddmpp folding
-      !!
-      !! ** Method  : - Look for ice processors in ice routines
-      !!              - Put their number in nrank_ice
-      !!              - Create groups for the world processors and the ice processors
-      !!              - Create a communicator for ice processors
-      !!
-      !! ** output
-      !!      njmppmax = njmpp for northern procs
-      !!      ndim_rank_ice = number of processors with ice
-      !!      nrank_ice (ndim_rank_ice) = ice processors
-      !!      ngrp_iworld = group ID for the world processors
-      !!      ngrp_ice = group ID for the ice processors
-      !!      ncomm_ice = communicator for the ice procs.
-      !!      n_ice_root = number (in the world) of proc 0 in the ice comm.
-      !!
-      !!----------------------------------------------------------------------
-      INTEGER, INTENT(in) ::   pindic
-      INTEGER, INTENT(in) ::   kumout   ! ocean.output logical unit
-      !!
-      INTEGER :: jjproc
-      INTEGER :: ii, ierr
-      INTEGER, ALLOCATABLE, DIMENSION(:) ::   kice
-      INTEGER, ALLOCATABLE, DIMENSION(:) ::   zwork
-      !!----------------------------------------------------------------------
-      !
-      ALLOCATE( kice(jpnij), zwork(jpnij), STAT=ierr )
-      IF( ierr /= 0 ) THEN
-         WRITE(kumout, cform_err)
-         WRITE(kumout,*) 'mpp_ini_ice : failed to allocate 2, 1D arrays (jpnij in length)'
-         CALL mppstop
-      ENDIF
-
-      ! Look for how many procs with sea-ice
-      !
-      kice = 0
-      DO jjproc = 1, jpnij
-         IF( jjproc == narea .AND. pindic .GT. 0 )   kice(jjproc) = 1
-      END DO
-      !
-      zwork = 0
-      CALL MPI_ALLREDUCE( kice, zwork, jpnij, mpi_integer, mpi_sum, mpi_comm_oce, ierr )
-      ndim_rank_ice = SUM( zwork )
-
-      ! Allocate the right size to nrank_north
-      IF( ALLOCATED ( nrank_ice ) )   DEALLOCATE( nrank_ice )
-      ALLOCATE( nrank_ice(ndim_rank_ice) )
-      !
-      ii = 0
-      nrank_ice = 0
-      DO jjproc = 1, jpnij
-         IF( zwork(jjproc) == 1) THEN
-            ii = ii + 1
-            nrank_ice(ii) = jjproc -1
-         ENDIF
-      END DO
-
-      ! Create the world group
-      CALL MPI_COMM_GROUP( mpi_comm_oce, ngrp_iworld, ierr )
-
-      ! Create the ice group from the world group
-      CALL MPI_GROUP_INCL( ngrp_iworld, ndim_rank_ice, nrank_ice, ngrp_ice, ierr )
-
-      ! Create the ice communicator , ie the pool of procs with sea-ice
-      CALL MPI_COMM_CREATE( mpi_comm_oce, ngrp_ice, ncomm_ice, ierr )
-
-      ! Find proc number in the world of proc 0 in the north
-      ! The following line seems to be useless, we just comment & keep it as reminder
-      ! CALL MPI_GROUP_TRANSLATE_RANKS(ngrp_ice,1,0,ngrp_iworld,n_ice_root,ierr)
-      !
-      CALL MPI_GROUP_FREE(ngrp_ice, ierr)
-      CALL MPI_GROUP_FREE(ngrp_iworld, ierr)
-
-      DEALLOCATE(kice, zwork)
-      !
-   END SUBROUTINE mpp_ini_ice
 
 
    SUBROUTINE mpp_ini_znl( kumout )
@@ -1174,7 +1008,7 @@ CONTAINS
       ELSE
          l_znl_root = .FALSE.
          kwork (1) = nimpp
-         CALL mpp_min ( kwork(1), kcom = ncomm_znl)
+         CALL mpp_min ( 'lib_mpp', kwork(1), kcom = ncomm_znl)
          IF ( nimpp == kwork(1)) l_znl_root = .TRUE.
       END IF
 
@@ -1383,9 +1217,13 @@ CONTAINS
       END DO
       !
       itaille = jpimax * ( ipj + 2*kextj )
+      !
+      IF( ln_timing ) CALL tic_tac(.TRUE.)
       CALL MPI_ALLGATHER( znorthloc_e(1,1-kextj)    , itaille, MPI_DOUBLE_PRECISION,    &
          &                znorthgloio_e(1,1-kextj,1), itaille, MPI_DOUBLE_PRECISION,    &
          &                ncomm_north, ierr )
+      !
+      IF( ln_timing ) CALL tic_tac(.FALSE.)
       !
       DO jr = 1, ndim_rank_north            ! recover the global north array
          iproc = nrank_north(jr) + 1
@@ -1417,7 +1255,7 @@ CONTAINS
    END SUBROUTINE mpp_lbc_north_icb
 
 
-   SUBROUTINE mpp_lnk_2d_icb( pt2d, cd_type, psgn, kexti, kextj )
+   SUBROUTINE mpp_lnk_2d_icb( cdname, pt2d, cd_type, psgn, kexti, kextj )
       !!----------------------------------------------------------------------
       !!                  ***  routine mpp_lnk_2d_icb  ***
       !!
@@ -1439,6 +1277,7 @@ CONTAINS
       !!                    noso   : number for local neighboring processors
       !!                    nono   : number for local neighboring processors
       !!----------------------------------------------------------------------
+      CHARACTER(len=*)                                        , INTENT(in   ) ::   cdname      ! name of the calling subroutine
       REAL(wp), DIMENSION(1-kexti:jpi+kexti,1-kextj:jpj+kextj), INTENT(inout) ::   pt2d     ! 2D array with extra halo
       CHARACTER(len=1)                                        , INTENT(in   ) ::   cd_type  ! nature of ptab array grid-points
       REAL(wp)                                                , INTENT(in   ) ::   psgn     ! sign used across the north fold
@@ -1458,6 +1297,7 @@ CONTAINS
       ipreci = nn_hls + kexti      ! take into account outer extra 2D overlap area
       iprecj = nn_hls + kextj
 
+      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, 1, 1, 1, ld_lbc = .TRUE. )
 
       ! 1. standard boundary treatment
       ! ------------------------------
@@ -1510,6 +1350,8 @@ CONTAINS
       !                           ! Migrations
       imigr = ipreci * ( jpj + 2*kextj )
       !
+      IF( ln_timing ) CALL tic_tac(.TRUE.)
+      !
       SELECT CASE ( nbondi )
       CASE ( -1 )
          CALL mppsend( 2, r2dwe(1-kextj,1,1), imigr, noea, ml_req1 )
@@ -1527,6 +1369,8 @@ CONTAINS
          CALL mpprecv( 2, r2dwe(1-kextj,1,2), imigr, nowe )
          IF(l_isend) CALL mpi_wait(ml_req1,ml_stat,ml_err)
       END SELECT
+      !
+      IF( ln_timing ) CALL tic_tac(.FALSE.)
       !
       !                           ! Write Dirichlet lateral conditions
       iihom = jpi - nn_hls
@@ -1563,6 +1407,8 @@ CONTAINS
       !                           ! Migrations
       imigr = iprecj * ( jpi + 2*kexti )
       !
+      IF( ln_timing ) CALL tic_tac(.TRUE.)
+      !
       SELECT CASE ( nbondj )
       CASE ( -1 )
          CALL mppsend( 4, r2dsn(1-kexti,1,1), imigr, nono, ml_req1 )
@@ -1580,6 +1426,8 @@ CONTAINS
          CALL mpprecv( 4, r2dsn(1-kexti,1,2), imigr, noso )
          IF(l_isend) CALL mpi_wait(ml_req1,ml_stat,ml_err)
       END SELECT
+      !
+      IF( ln_timing ) CALL tic_tac(.FALSE.)
       !
       !                           ! Write Dirichlet lateral conditions
       ijhom = jpj - nn_hls
@@ -1601,6 +1449,128 @@ CONTAINS
       END SELECT
       !
    END SUBROUTINE mpp_lnk_2d_icb
+
+
+   SUBROUTINE mpp_report( cdname, kpk, kpl, kpf, ld_lbc, ld_glb )
+      !!----------------------------------------------------------------------
+      !!                  ***  routine mpp_report  ***
+      !!
+      !! ** Purpose :   report use of mpp routines per time-setp
+      !!
+      !!----------------------------------------------------------------------
+      CHARACTER(len=*),           INTENT(in   ) ::   cdname      ! name of the calling subroutine
+      INTEGER         , OPTIONAL, INTENT(in   ) ::   kpk, kpl, kpf
+      LOGICAL         , OPTIONAL, INTENT(in   ) ::   ld_lbc, ld_glb
+      !!
+      LOGICAL ::   ll_lbc, ll_glb
+      INTEGER ::    ji,  jj,  jk,  jh, jf   ! dummy loop indices
+      !!----------------------------------------------------------------------
+      !
+      ll_lbc = .FALSE.
+      IF( PRESENT(ld_lbc) ) ll_lbc = ld_lbc
+      ll_glb = .FALSE.
+      IF( PRESENT(ld_glb) ) ll_glb = ld_glb
+      !
+      ! find the smallest common frequency: default = frequency product, if multiple, choose the larger of the 2 frequency
+      IF( ncom_dttrc /= 1 )   CALL ctl_stop( 'STOP', 'mpp_report, ncom_dttrc /= 1 not coded...' ) 
+      ncom_freq = ncom_fsbc
+      !
+      IF ( ncom_stp == nit000+ncom_freq ) THEN   ! avoid to count extra communications in potential initializations at nit000
+         IF( ll_lbc ) THEN
+            IF( .NOT. ALLOCATED(ncomm_sequence) ) ALLOCATE( ncomm_sequence(ncom_rec_max,2) )
+            IF( .NOT. ALLOCATED(    crname_lbc) ) ALLOCATE(     crname_lbc(ncom_rec_max  ) )
+            n_sequence_lbc = n_sequence_lbc + 1
+            IF( n_sequence_lbc > ncom_rec_max ) CALL ctl_stop( 'STOP', 'lib_mpp, increase ncom_rec_max' )   ! deadlock
+            crname_lbc(n_sequence_lbc) = cdname     ! keep the name of the calling routine
+            ncomm_sequence(n_sequence_lbc,1) = kpk*kpl   ! size of 3rd and 4th dimensions
+            ncomm_sequence(n_sequence_lbc,2) = kpf       ! number of arrays to be treated (multi)
+         ENDIF
+         IF( ll_glb ) THEN
+            IF( .NOT. ALLOCATED(crname_glb) ) ALLOCATE( crname_glb(ncom_rec_max) )
+            n_sequence_glb = n_sequence_glb + 1
+            IF( n_sequence_glb > ncom_rec_max ) CALL ctl_stop( 'STOP', 'lib_mpp, increase ncom_rec_max' )   ! deadlock
+            crname_glb(n_sequence_glb) = cdname     ! keep the name of the calling routine
+         ENDIF
+      ELSE IF ( ncom_stp == nit000+2*ncom_freq ) THEN
+         CALL ctl_opn( numcom, 'communication_report.txt', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, .FALSE., narea )
+         WRITE(numcom,*) ' '
+         WRITE(numcom,*) ' ------------------------------------------------------------'
+         WRITE(numcom,*) ' Communication pattern report (second oce+sbc+top time step):'
+         WRITE(numcom,*) ' ------------------------------------------------------------'
+         WRITE(numcom,*) ' '
+         WRITE(numcom,'(A,I4)') ' Exchanged halos : ', n_sequence_lbc
+         jj = 0; jk = 0; jf = 0; jh = 0
+         DO ji = 1, n_sequence_lbc
+            IF ( ncomm_sequence(ji,1) .GT. 1 ) jk = jk + 1
+            IF ( ncomm_sequence(ji,2) .GT. 1 ) jf = jf + 1
+            IF ( ncomm_sequence(ji,1) .GT. 1 .AND. ncomm_sequence(ji,2) .GT. 1 ) jj = jj + 1
+            jh = MAX (jh, ncomm_sequence(ji,1)*ncomm_sequence(ji,2))
+         END DO
+         WRITE(numcom,'(A,I3)') ' 3D Exchanged halos : ', jk
+         WRITE(numcom,'(A,I3)') ' Multi arrays exchanged halos : ', jf
+         WRITE(numcom,'(A,I3)') '   from which 3D : ', jj
+         WRITE(numcom,'(A,I10)') ' Array max size : ', jh*jpi*jpj
+         WRITE(numcom,*) ' '
+         WRITE(numcom,*) ' lbc_lnk called'
+         jj = 1
+         DO ji = 2, n_sequence_lbc
+            IF( crname_lbc(ji-1) /= crname_lbc(ji) ) THEN
+               WRITE(numcom,'(A, I4, A, A)') ' - ', jj,' times by subroutine ', TRIM(crname_lbc(ji-1))
+               jj = 0
+            END IF
+            jj = jj + 1 
+         END DO
+         WRITE(numcom,'(A, I4, A, A)') ' - ', jj,' times by subroutine ', TRIM(crname_lbc(n_sequence_lbc))
+         WRITE(numcom,*) ' '
+         IF ( n_sequence_glb > 0 ) THEN
+            WRITE(numcom,'(A,I4)') ' Global communications : ', n_sequence_glb
+            jj = 1
+            DO ji = 2, n_sequence_glb
+               IF( crname_glb(ji-1) /= crname_glb(ji) ) THEN
+                  WRITE(numcom,'(A, I4, A, A)') ' - ', jj,' times by subroutine ', TRIM(crname_glb(ji-1))
+                  jj = 0
+               END IF
+               jj = jj + 1 
+            END DO
+            WRITE(numcom,'(A, I4, A, A)') ' - ', jj,' times by subroutine ', TRIM(crname_glb(n_sequence_glb))
+            DEALLOCATE(crname_glb)
+         ELSE
+            WRITE(numcom,*) ' No MPI global communication '
+         ENDIF
+         WRITE(numcom,*) ' '
+         WRITE(numcom,*) ' -----------------------------------------------'
+         WRITE(numcom,*) ' '
+         DEALLOCATE(ncomm_sequence)
+         DEALLOCATE(crname_lbc)
+      ENDIF
+   END SUBROUTINE mpp_report
+
+   
+   SUBROUTINE tic_tac (ld_tic, ld_global)
+
+    LOGICAL,           INTENT(IN) :: ld_tic
+    LOGICAL, OPTIONAL, INTENT(IN) :: ld_global
+    REAL(wp), DIMENSION(2), SAVE :: tic_wt
+    REAL(wp),               SAVE :: tic_ct = 0._wp
+    INTEGER :: ii
+
+    IF( ncom_stp <= nit000 ) RETURN
+    IF( ncom_stp == nitend ) RETURN
+    ii = 1
+    IF( PRESENT( ld_global ) ) THEN
+       IF( ld_global ) ii = 2
+    END IF
+    
+    IF ( ld_tic ) THEN
+       tic_wt(ii) = MPI_Wtime()                                                    ! start count tic->tac (waiting time)
+       IF ( tic_ct > 0.0_wp ) compute_time = compute_time + MPI_Wtime() - tic_ct   ! cumulate count tac->tic
+    ELSE
+       waiting_time(ii) = waiting_time(ii) + MPI_Wtime() - tic_wt(ii)              ! cumulate count tic->tac
+       tic_ct = MPI_Wtime()                                                        ! start count tac->tic (waiting time)
+    ENDIF
+    
+   END SUBROUTINE tic_tac
+
    
 #else
    !!----------------------------------------------------------------------
@@ -1609,7 +1579,7 @@ CONTAINS
    USE in_out_manager
 
    INTERFACE mpp_sum
-      MODULE PROCEDURE mpp_sum_a2s, mpp_sum_as, mpp_sum_ai, mpp_sum_s, mpp_sum_i, mppsum_realdd, mppsum_a_realdd
+      MODULE PROCEDURE mppsum_int, mppsum_a_int, mppsum_real, mppsum_a_real, mppsum_realdd, mppsum_a_realdd
    END INTERFACE
    INTERFACE mpp_max
       MODULE PROCEDURE mppmax_a_int, mppmax_int, mppmax_a_real, mppmax_real
@@ -1623,14 +1593,20 @@ CONTAINS
    INTERFACE mpp_maxloc
       MODULE PROCEDURE mpp_maxloc2d ,mpp_maxloc3d
    END INTERFACE
-   INTERFACE mpp_max_multiple
-      MODULE PROCEDURE mppmax_real_multiple
-   END INTERFACE
 
    LOGICAL, PUBLIC, PARAMETER ::   lk_mpp = .FALSE.      !: mpp flag
    LOGICAL, PUBLIC            ::   ln_nnogather          !: namelist control of northfold comms (needed here in case "key_mpp_mpi" is not used)
-   INTEGER :: ncomm_ice
    INTEGER, PUBLIC            ::   mpi_comm_oce          ! opa local communicator
+
+   INTEGER, PARAMETER, PUBLIC               ::   nbdelay = 0   ! make sure we don't enter loops: DO ji = 1, nbdelay
+   CHARACTER(len=32), DIMENSION(1), PUBLIC  ::   c_delaylist = 'empty'
+   CHARACTER(len=32), DIMENSION(1), PUBLIC  ::   c_delaycpnt = 'empty'
+   TYPE ::   DELAYARR
+      REAL(   wp), POINTER, DIMENSION(:) ::  z1d => NULL()
+      COMPLEX(wp), POINTER, DIMENSION(:) ::  y1d => NULL()
+   END TYPE DELAYARR
+   TYPE( DELAYARR ), DIMENSION(1), PUBLIC  ::   todelay              
+   INTEGER,  PUBLIC, DIMENSION(1)           ::   ndelayid = -1
    !!----------------------------------------------------------------------
 CONTAINS
 
@@ -1653,140 +1629,183 @@ CONTAINS
    SUBROUTINE mppsync                       ! Dummy routine
    END SUBROUTINE mppsync
 
-   SUBROUTINE mpp_sum_as( parr, kdim, kcom )      ! Dummy routine
-      REAL   , DIMENSION(:) :: parr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mpp_sum_as: You should not have seen this print! error?', kdim, parr(1), kcom
-   END SUBROUTINE mpp_sum_as
+   !!----------------------------------------------------------------------
+   !!    ***  mppmax_a_int, mppmax_int, mppmax_a_real, mppmax_real  ***
+   !!   
+   !!----------------------------------------------------------------------
+   !!
+#  define OPERATION_MAX
+#  define INTEGER_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmax_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmax_a_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef INTEGER_TYPE
+!
+#  define REAL_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmax_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmax_a_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef REAL_TYPE
+#  undef OPERATION_MAX
+   !!----------------------------------------------------------------------
+   !!    ***  mppmin_a_int, mppmin_int, mppmin_a_real, mppmin_real  ***
+   !!   
+   !!----------------------------------------------------------------------
+   !!
+#  define OPERATION_MIN
+#  define INTEGER_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmin_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmin_a_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef INTEGER_TYPE
+!
+#  define REAL_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppmin_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppmin_a_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef REAL_TYPE
+#  undef OPERATION_MIN
 
-   SUBROUTINE mpp_sum_a2s( parr, kdim, kcom )      ! Dummy routine
-      REAL   , DIMENSION(:,:) :: parr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mpp_sum_a2s: You should not have seen this print! error?', kdim, parr(1,1), kcom
-   END SUBROUTINE mpp_sum_a2s
+   !!----------------------------------------------------------------------
+   !!    ***  mppsum_a_int, mppsum_int, mppsum_a_real, mppsum_real  ***
+   !!   
+   !!   Global sum of 1D array or a variable (integer, real or complex)
+   !!----------------------------------------------------------------------
+   !!
+#  define OPERATION_SUM
+#  define INTEGER_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppsum_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppsum_a_int
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef INTEGER_TYPE
+!
+#  define REAL_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppsum_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppsum_a_real
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef REAL_TYPE
+#  undef OPERATION_SUM
 
-   SUBROUTINE mpp_sum_ai( karr, kdim, kcom )      ! Dummy routine
-      INTEGER, DIMENSION(:) :: karr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mpp_sum_ai: You should not have seen this print! error?', kdim, karr(1), kcom
-   END SUBROUTINE mpp_sum_ai
+#  define OPERATION_SUM_DD
+#  define COMPLEX_TYPE
+#  define DIM_0d
+#     define ROUTINE_ALLREDUCE           mppsum_realdd
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_0d
+#  define DIM_1d
+#     define ROUTINE_ALLREDUCE           mppsum_a_realdd
+#     include "mpp_allreduce_generic.h90"
+#     undef ROUTINE_ALLREDUCE
+#  undef DIM_1d
+#  undef COMPLEX_TYPE
+#  undef OPERATION_SUM_DD
 
-   SUBROUTINE mpp_sum_s( psca, kcom )            ! Dummy routine
-      REAL                  :: psca
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mpp_sum_s: You should not have seen this print! error?', psca, kcom
-   END SUBROUTINE mpp_sum_s
+   !!----------------------------------------------------------------------
+   !!    ***  mpp_minloc2d, mpp_minloc3d, mpp_maxloc2d, mpp_maxloc3d
+   !!   
+   !!----------------------------------------------------------------------
+   !!
+#  define OPERATION_MINLOC
+#  define DIM_2d
+#     define ROUTINE_LOC           mpp_minloc2d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_2d
+#  define DIM_3d
+#     define ROUTINE_LOC           mpp_minloc3d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_3d
+#  undef OPERATION_MINLOC
 
-   SUBROUTINE mpp_sum_i( kint, kcom )            ! Dummy routine
-      integer               :: kint
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mpp_sum_i: You should not have seen this print! error?', kint, kcom
-   END SUBROUTINE mpp_sum_i
+#  define OPERATION_MAXLOC
+#  define DIM_2d
+#     define ROUTINE_LOC           mpp_maxloc2d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_2d
+#  define DIM_3d
+#     define ROUTINE_LOC           mpp_maxloc3d
+#     include "mpp_loc_generic.h90"
+#     undef ROUTINE_LOC
+#  undef DIM_3d
+#  undef OPERATION_MAXLOC
 
-   SUBROUTINE mppsum_realdd( ytab, kcom )
-      COMPLEX(wp), INTENT(inout)         :: ytab    ! input scalar
-      INTEGER , INTENT( in  ), OPTIONAL :: kcom
-      WRITE(*,*) 'mppsum_realdd: You should not have seen this print! error?', ytab
-   END SUBROUTINE mppsum_realdd
+   SUBROUTINE mpp_delay_sum( cdname, cdelay, y_in, pout, ldlast, kcom )
+      CHARACTER(len=*), INTENT(in   )               ::   cdname  ! name of the calling subroutine
+      CHARACTER(len=*), INTENT(in   )               ::   cdelay  ! name (used as id) of the delayed operation
+      COMPLEX(wp),      INTENT(in   ), DIMENSION(:) ::   y_in
+      REAL(wp),         INTENT(  out), DIMENSION(:) ::   pout
+      LOGICAL,          INTENT(in   )               ::   ldlast  ! true if this is the last time we call this routine
+      INTEGER,          INTENT(in   ), OPTIONAL     ::   kcom
+      !
+      pout(:) = REAL(y_in(:), wp)
+   END SUBROUTINE mpp_delay_sum
 
-   SUBROUTINE mppsum_a_realdd( ytab, kdim, kcom )
-      INTEGER , INTENT( in )                        ::   kdim      ! size of ytab
-      COMPLEX(wp), DIMENSION(kdim), INTENT( inout ) ::   ytab      ! input array
-      INTEGER , INTENT( in  ), OPTIONAL :: kcom
-      WRITE(*,*) 'mppsum_a_realdd: You should not have seen this print! error?', kdim, ytab(1), kcom
-   END SUBROUTINE mppsum_a_realdd
+   SUBROUTINE mpp_delay_max( cdname, cdelay, p_in, pout, ldlast, kcom )
+      CHARACTER(len=*), INTENT(in   )               ::   cdname  ! name of the calling subroutine
+      CHARACTER(len=*), INTENT(in   )               ::   cdelay  ! name (used as id) of the delayed operation
+      REAL(wp),         INTENT(in   ), DIMENSION(:) ::   p_in
+      REAL(wp),         INTENT(  out), DIMENSION(:) ::   pout
+      LOGICAL,          INTENT(in   )               ::   ldlast  ! true if this is the last time we call this routine
+      INTEGER,          INTENT(in   ), OPTIONAL     ::   kcom
+      !
+      pout(:) = p_in(:)
+   END SUBROUTINE mpp_delay_max
 
-   SUBROUTINE mppmax_a_real( parr, kdim, kcom )
-      REAL   , DIMENSION(:) :: parr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmax_a_real: You should not have seen this print! error?', kdim, parr(1), kcom
-   END SUBROUTINE mppmax_a_real
-
-   SUBROUTINE mppmax_real( psca, kcom )
-      REAL                  :: psca
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmax_real: You should not have seen this print! error?', psca, kcom
-   END SUBROUTINE mppmax_real
-
-   SUBROUTINE mppmin_a_real( parr, kdim, kcom )
-      REAL   , DIMENSION(:) :: parr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmin_a_real: You should not have seen this print! error?', kdim, parr(1), kcom
-   END SUBROUTINE mppmin_a_real
-
-   SUBROUTINE mppmin_real( psca, kcom )
-      REAL                  :: psca
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmin_real: You should not have seen this print! error?', psca, kcom
-   END SUBROUTINE mppmin_real
-
-   SUBROUTINE mppmax_a_int( karr, kdim ,kcom)
-      INTEGER, DIMENSION(:) :: karr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmax_a_int: You should not have seen this print! error?', kdim, karr(1), kcom
-   END SUBROUTINE mppmax_a_int
-
-   SUBROUTINE mppmax_int( kint, kcom)
-      INTEGER               :: kint
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmax_int: You should not have seen this print! error?', kint, kcom
-   END SUBROUTINE mppmax_int
-
-   SUBROUTINE mppmin_a_int( karr, kdim, kcom )
-      INTEGER, DIMENSION(:) :: karr
-      INTEGER               :: kdim
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmin_a_int: You should not have seen this print! error?', kdim, karr(1), kcom
-   END SUBROUTINE mppmin_a_int
-
-   SUBROUTINE mppmin_int( kint, kcom )
-      INTEGER               :: kint
-      INTEGER, OPTIONAL     :: kcom
-      WRITE(*,*) 'mppmin_int: You should not have seen this print! error?', kint, kcom
-   END SUBROUTINE mppmin_int
-
-   SUBROUTINE mpp_minloc2d( ptab, pmask, pmin, ki, kj )
-      REAL                   :: pmin
-      REAL , DIMENSION (:,:) :: ptab, pmask
-      INTEGER :: ki, kj
-      WRITE(*,*) 'mpp_minloc2d: You should not have seen this print! error?', pmin, ki, kj, ptab(1,1), pmask(1,1)
-   END SUBROUTINE mpp_minloc2d
-
-   SUBROUTINE mpp_minloc3d( ptab, pmask, pmin, ki, kj, kk )
-      REAL                     :: pmin
-      REAL , DIMENSION (:,:,:) :: ptab, pmask
-      INTEGER :: ki, kj, kk
-      WRITE(*,*) 'mpp_minloc3d: You should not have seen this print! error?', pmin, ki, kj, kk, ptab(1,1,1), pmask(1,1,1)
-   END SUBROUTINE mpp_minloc3d
-
-   SUBROUTINE mpp_maxloc2d( ptab, pmask, pmax, ki, kj )
-      REAL                   :: pmax
-      REAL , DIMENSION (:,:) :: ptab, pmask
-      INTEGER :: ki, kj
-      WRITE(*,*) 'mpp_maxloc2d: You should not have seen this print! error?', pmax, ki, kj, ptab(1,1), pmask(1,1)
-   END SUBROUTINE mpp_maxloc2d
-
-   SUBROUTINE mpp_maxloc3d( ptab, pmask, pmax, ki, kj, kk )
-      REAL                     :: pmax
-      REAL , DIMENSION (:,:,:) :: ptab, pmask
-      INTEGER :: ki, kj, kk
-      WRITE(*,*) 'mpp_maxloc3d: You should not have seen this print! error?', pmax, ki, kj, kk, ptab(1,1,1), pmask(1,1,1)
-   END SUBROUTINE mpp_maxloc3d
-
-   SUBROUTINE mppstop
+   SUBROUTINE mpp_delay_rcv( kid )
+      INTEGER,INTENT(in   )      ::  kid 
+      WRITE(*,*) 'mpp_delay_rcv: You should not have seen this print! error?', kid
+   END SUBROUTINE mpp_delay_rcv
+   
+   SUBROUTINE mppstop( ldfinal, ld_force_abort )
+      LOGICAL, OPTIONAL, INTENT(in) :: ldfinal    ! source process number
+      LOGICAL, OPTIONAL, INTENT(in) :: ld_force_abort    ! source process number
       STOP      ! non MPP case, just stop the run
    END SUBROUTINE mppstop
-
-   SUBROUTINE mpp_ini_ice( kcom, knum )
-      INTEGER :: kcom, knum
-      WRITE(*,*) 'mpp_ini_ice: You should not have seen this print! error?', kcom, knum
-   END SUBROUTINE mpp_ini_ice
 
    SUBROUTINE mpp_ini_znl( knum )
       INTEGER :: knum
@@ -1798,13 +1817,6 @@ CONTAINS
       WRITE(*,*) 'mpp_comm_free: You should not have seen this print! error?', kcom
    END SUBROUTINE mpp_comm_free
    
-   SUBROUTINE mppmax_real_multiple( ptab, kdim , kcom  )
-      REAL, DIMENSION(:) ::   ptab   ! 
-      INTEGER            ::   kdim   ! 
-      INTEGER, OPTIONAL  ::   kcom   ! 
-      WRITE(*,*) 'mppmax_real_multiple: You should not have seen this print! error?', ptab(1), kdim
-   END SUBROUTINE mppmax_real_multiple
-
 #endif
 
    !!----------------------------------------------------------------------
@@ -1824,27 +1836,30 @@ CONTAINS
       !!----------------------------------------------------------------------
       !
       nstop = nstop + 1
-      IF(lwp) THEN
-         WRITE(numout,cform_err)
-         IF( PRESENT(cd1 ) )   WRITE(numout,*) cd1
-         IF( PRESENT(cd2 ) )   WRITE(numout,*) cd2
-         IF( PRESENT(cd3 ) )   WRITE(numout,*) cd3
-         IF( PRESENT(cd4 ) )   WRITE(numout,*) cd4
-         IF( PRESENT(cd5 ) )   WRITE(numout,*) cd5
-         IF( PRESENT(cd6 ) )   WRITE(numout,*) cd6
-         IF( PRESENT(cd7 ) )   WRITE(numout,*) cd7
-         IF( PRESENT(cd8 ) )   WRITE(numout,*) cd8
-         IF( PRESENT(cd9 ) )   WRITE(numout,*) cd9
-         IF( PRESENT(cd10) )   WRITE(numout,*) cd10
-      ENDIF
+
+      ! force to open ocean.output file
+      IF( numout == 6 ) CALL ctl_opn( numout, 'ocean.output', 'APPEND', 'FORMATTED', 'SEQUENTIAL', -1, 6, .FALSE. )
+       
+      WRITE(numout,cform_err)
+      IF( PRESENT(cd1 ) )   WRITE(numout,*) TRIM(cd1)
+      IF( PRESENT(cd2 ) )   WRITE(numout,*) TRIM(cd2)
+      IF( PRESENT(cd3 ) )   WRITE(numout,*) TRIM(cd3)
+      IF( PRESENT(cd4 ) )   WRITE(numout,*) TRIM(cd4)
+      IF( PRESENT(cd5 ) )   WRITE(numout,*) TRIM(cd5)
+      IF( PRESENT(cd6 ) )   WRITE(numout,*) TRIM(cd6)
+      IF( PRESENT(cd7 ) )   WRITE(numout,*) TRIM(cd7)
+      IF( PRESENT(cd8 ) )   WRITE(numout,*) TRIM(cd8)
+      IF( PRESENT(cd9 ) )   WRITE(numout,*) TRIM(cd9)
+      IF( PRESENT(cd10) )   WRITE(numout,*) TRIM(cd10)
+
                                CALL FLUSH(numout    )
       IF( numstp     /= -1 )   CALL FLUSH(numstp    )
       IF( numrun     /= -1 )   CALL FLUSH(numrun    )
       IF( numevo_ice /= -1 )   CALL FLUSH(numevo_ice)
       !
       IF( cd1 == 'STOP' ) THEN
-         IF(lwp) WRITE(numout,*)  'huge E-R-R-O-R : immediate stop'
-         CALL mppstop()
+         WRITE(numout,*)  'huge E-R-R-O-R : immediate stop'
+         CALL mppstop(ld_force_abort = .true.)
       ENDIF
       !
    END SUBROUTINE ctl_stop
@@ -1865,16 +1880,16 @@ CONTAINS
       nwarn = nwarn + 1
       IF(lwp) THEN
          WRITE(numout,cform_war)
-         IF( PRESENT(cd1 ) ) WRITE(numout,*) cd1
-         IF( PRESENT(cd2 ) ) WRITE(numout,*) cd2
-         IF( PRESENT(cd3 ) ) WRITE(numout,*) cd3
-         IF( PRESENT(cd4 ) ) WRITE(numout,*) cd4
-         IF( PRESENT(cd5 ) ) WRITE(numout,*) cd5
-         IF( PRESENT(cd6 ) ) WRITE(numout,*) cd6
-         IF( PRESENT(cd7 ) ) WRITE(numout,*) cd7
-         IF( PRESENT(cd8 ) ) WRITE(numout,*) cd8
-         IF( PRESENT(cd9 ) ) WRITE(numout,*) cd9
-         IF( PRESENT(cd10) ) WRITE(numout,*) cd10
+         IF( PRESENT(cd1 ) ) WRITE(numout,*) TRIM(cd1)
+         IF( PRESENT(cd2 ) ) WRITE(numout,*) TRIM(cd2)
+         IF( PRESENT(cd3 ) ) WRITE(numout,*) TRIM(cd3)
+         IF( PRESENT(cd4 ) ) WRITE(numout,*) TRIM(cd4)
+         IF( PRESENT(cd5 ) ) WRITE(numout,*) TRIM(cd5)
+         IF( PRESENT(cd6 ) ) WRITE(numout,*) TRIM(cd6)
+         IF( PRESENT(cd7 ) ) WRITE(numout,*) TRIM(cd7)
+         IF( PRESENT(cd8 ) ) WRITE(numout,*) TRIM(cd8)
+         IF( PRESENT(cd9 ) ) WRITE(numout,*) TRIM(cd9)
+         IF( PRESENT(cd10) ) WRITE(numout,*) TRIM(cd10)
       ENDIF
       CALL FLUSH(numout)
       !
@@ -1915,16 +1930,21 @@ CONTAINS
 #else
       knum=get_unit()
 #endif
+      IF( TRIM(cdfile) == '/dev/null' )   clfile = TRIM(cdfile)   ! force the use of /dev/null
       !
       iost=0
-      IF( cdacce(1:6) == 'DIRECT' )  THEN
-         OPEN( UNIT=knum, FILE=clfile, FORM=cdform, ACCESS=cdacce, STATUS=cdstat, RECL=klengh, ERR=100, IOSTAT=iost )
+      IF( cdacce(1:6) == 'DIRECT' )  THEN         ! cdacce has always more than 6 characters
+         OPEN( UNIT=knum, FILE=clfile, FORM=cdform, ACCESS=cdacce, STATUS=cdstat, RECL=klengh         , ERR=100, IOSTAT=iost )
+      ELSE IF( TRIM(cdstat) == 'APPEND' )  THEN   ! cdstat can have less than 6 characters
+         OPEN( UNIT=knum, FILE=clfile, FORM=cdform, ACCESS=cdacce, STATUS='UNKNOWN', POSITION='APPEND', ERR=100, IOSTAT=iost )
       ELSE
-         OPEN( UNIT=knum, FILE=clfile, FORM=cdform, ACCESS=cdacce, STATUS=cdstat             , ERR=100, IOSTAT=iost )
+         OPEN( UNIT=knum, FILE=clfile, FORM=cdform, ACCESS=cdacce, STATUS=cdstat                      , ERR=100, IOSTAT=iost )
       ENDIF
+      IF( iost /= 0 .AND. TRIM(clfile) == '/dev/null' ) &   ! for windows
+         &  OPEN(UNIT=knum,FILE='NUL', FORM=cdform, ACCESS=cdacce, STATUS=cdstat                      , ERR=100, IOSTAT=iost )   
       IF( iost == 0 ) THEN
          IF(ldwp) THEN
-            WRITE(kout,*) '     file   : ', clfile,' open ok'
+            WRITE(kout,*) '     file   : ', TRIM(clfile),' open ok'
             WRITE(kout,*) '     unit   = ', knum
             WRITE(kout,*) '     status = ', cdstat
             WRITE(kout,*) '     form   = ', cdform
@@ -1936,7 +1956,7 @@ CONTAINS
       IF( iost /= 0 ) THEN
          IF(ldwp) THEN
             WRITE(kout,*)
-            WRITE(kout,*) ' ===>>>> : bad opening file: ', clfile
+            WRITE(kout,*) ' ===>>>> : bad opening file: ', TRIM(clfile)
             WRITE(kout,*) ' =======   ===  '
             WRITE(kout,*) '           unit   = ', knum
             WRITE(kout,*) '           status = ', cdstat
@@ -1947,7 +1967,7 @@ CONTAINS
             WRITE(kout,*)
          ELSE  !!! Force writing to make sure we get the information - at least once - in this violent STOP!!
             WRITE(*,*)
-            WRITE(*,*) ' ===>>>> : bad opening file: ', clfile
+            WRITE(*,*) ' ===>>>> : bad opening file: ', TRIM(clfile)
             WRITE(*,*) ' =======   ===  '
             WRITE(*,*) '           unit   = ', knum
             WRITE(*,*) '           status = ', cdstat

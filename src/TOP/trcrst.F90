@@ -22,6 +22,7 @@ MODULE trcrst
    USE trc
    USE iom
    USE daymod
+   USE lib_mpp
    
    IMPLICIT NONE
    PRIVATE
@@ -86,7 +87,7 @@ CONTAINS
          IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
          IF(lwp) WRITE(numout,*) &
              '             open trc restart.output NetCDF file: ',TRIM(clpath)//clname
-         CALL iom_open( TRIM(clpath)//TRIM(clname), numrtw, ldwrt = .TRUE., kiolib = jprstlib )
+         CALL iom_open( TRIM(clpath)//TRIM(clname), numrtw, ldwrt = .TRUE. )
          lrst_trc = .TRUE.
       ENDIF
       !
@@ -115,6 +116,8 @@ CONTAINS
          CALL iom_get( numrtr, jpdom_autoglo, 'TRB'//ctrcnm(jn), trb(:,:,:,jn) )
       END DO
       !
+      CALL iom_delay_rst( 'READ', 'TOP', numrtr )   ! read only TOP delayed global communication variables
+      
    END SUBROUTINE trc_rst_read
 
    SUBROUTINE trc_rst_wri( kt )
@@ -126,7 +129,6 @@ CONTAINS
       INTEGER, INTENT( in ) ::   kt    ! ocean time-step index
       !!
       INTEGER  :: jn
-      REAL(wp) :: zarak0
       !!----------------------------------------------------------------------
       !
       CALL iom_rstput( kt, nitrst, numrtw, 'rdttrc1', rdttrc )   ! passive tracer time step
@@ -140,6 +142,8 @@ CONTAINS
          CALL iom_rstput( kt, nitrst, numrtw, 'TRB'//ctrcnm(jn), trb(:,:,:,jn) )
       END DO
       !
+      CALL iom_delay_rst( 'WRITE', 'TOP', numrtw )   ! save only TOP delayed global communication variables
+    
       IF( kt == nitrst ) THEN
           CALL trc_rst_stat            ! statistics
           CALL iom_close( numrtw )     ! close the restart file (only at last time step)
@@ -183,7 +187,6 @@ CONTAINS
       INTEGER         , INTENT(in) ::   kt         ! ocean time-step
       CHARACTER(len=*), INTENT(in) ::   cdrw       ! "READ"/"WRITE" flag
       !
-      INTEGER  ::  jlibalt = jprstlib
       LOGICAL  ::  llok
       REAL(wp) ::  zrdttrc1, zkt, zndastp, zdayfrac, ksecs, ktime
       INTEGER  ::   ihour, iminute
@@ -198,7 +201,7 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~'
 
          IF( ln_rsttr ) THEN
-            CALL iom_open( TRIM(cn_trcrst_indir)//'/'//cn_trcrst_in, numrtr, kiolib = jlibalt )
+            CALL iom_open( TRIM(cn_trcrst_indir)//'/'//cn_trcrst_in, numrtr )
             CALL iom_get ( numrtr, 'kt', zkt )   ! last time-step of previous run
 
             IF(lwp) THEN
@@ -315,12 +318,12 @@ CONTAINS
       END DO
       !
       DO jn = 1, jptra
-         ztraf = glob_sum( trn(:,:,:,jn) * zvol(:,:,:) )
+         ztraf = glob_sum( 'trcrst', trn(:,:,:,jn) * zvol(:,:,:) )
          zmin  = MINVAL( trn(:,:,:,jn), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
          zmax  = MAXVAL( trn(:,:,:,jn), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
          IF( lk_mpp ) THEN
-            CALL mpp_min( zmin )      ! min over the global domain
-            CALL mpp_max( zmax )      ! max over the global domain
+            CALL mpp_min( 'trcrst', zmin )      ! min over the global domain
+            CALL mpp_max( 'trcrst', zmax )      ! max over the global domain
          END IF
          zmean  = ztraf / areatot
          zdrift = ( ( ztraf - trai(jn) ) / ( trai(jn) + 1.e-12 )  ) * 100._wp

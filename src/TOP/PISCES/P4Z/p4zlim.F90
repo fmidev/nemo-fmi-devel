@@ -292,7 +292,7 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!                     ***  ROUTINE p5z_lim_alloc  ***
       !!----------------------------------------------------------------------
-      USE lib_mpp , ONLY: ctl_warn
+      USE lib_mpp , ONLY: ctl_stop
       !!----------------------------------------------------------------------
 
       !*  Biological arrays for phytoplankton growth
@@ -305,7 +305,7 @@ CONTAINS
          &      concnfe (jpi,jpj,jpk), concdfe (jpi,jpj,jpk),       &
          &      xlimsi  (jpi,jpj,jpk), STAT=p4z_lim_alloc )
       !
-      IF( p4z_lim_alloc /= 0 ) CALL ctl_warn('p4z_lim_alloc : failed to allocate arrays.')
+      IF( p4z_lim_alloc /= 0 ) CALL ctl_stop( 'STOP', 'p4z_lim_alloc : failed to allocate arrays.' )
       !
    END FUNCTION p4z_lim_alloc
 

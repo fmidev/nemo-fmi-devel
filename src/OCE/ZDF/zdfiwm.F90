@@ -63,8 +63,8 @@ CONTAINS
       ALLOCATE( ebot_iwm(jpi,jpj),  epyc_iwm(jpi,jpj),  ecri_iwm(jpi,jpj) ,     &
       &         hbot_iwm(jpi,jpj),  hcri_iwm(jpi,jpj)                     , STAT=zdf_iwm_alloc )
       !
-      IF( lk_mpp             )   CALL mpp_sum ( zdf_iwm_alloc )
-      IF( zdf_iwm_alloc /= 0 )   CALL ctl_warn('zdf_iwm_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'zdfiwm', zdf_iwm_alloc )
+      IF( zdf_iwm_alloc /= 0 )   CALL ctl_stop( 'STOP', 'zdf_iwm_alloc: failed to allocate arrays' )
    END FUNCTION zdf_iwm_alloc
 
 
@@ -121,7 +121,7 @@ CONTAINS
       REAL(wp), DIMENSION(:,:,:) , INTENT(inout) ::   p_avt, p_avs   ! tracer   Kz (w-points)
       !
       INTEGER  ::   ji, jj, jk   ! dummy loop indices
-      REAL(wp) ::   zztmp        ! scalar workspace
+      REAL(wp) ::   zztmp, ztmp1, ztmp2        ! scalar workspace
       REAL(wp), DIMENSION(jpi,jpj)     ::   zfact       ! Used for vertical structure
       REAL(wp), DIMENSION(jpi,jpj)     ::   zhdep       ! Ocean depth
       REAL(wp), DIMENSION(jpi,jpj,jpk) ::   zwkb        ! WKB-stretched height above bottom
@@ -156,10 +156,17 @@ CONTAINS
       END DO
 !!gm gde3w ==>>>  check for ssh taken into account.... seem OK gde3w_n=gdept_n - sshn
       DO jk = 2, jpkm1              ! complete with the level-dependent part
-         zemx_iwm(:,:,jk) = zfact(:,:) * (  EXP( ( gde3w_n(:,:,jk  ) - zhdep(:,:) ) / hcri_iwm(:,:) )                      &
-            &                             - EXP( ( gde3w_n(:,:,jk-1) - zhdep(:,:) ) / hcri_iwm(:,:) )  ) * wmask(:,:,jk)   &
-            &                          / ( gde3w_n(:,:,jk) - gde3w_n(:,:,jk-1) )
-
+         DO jj = 1, jpj             
+            DO ji = 1, jpi
+               IF ( zfact(ji,jj) == 0._wp .OR. wmask(ji,jj,jk) == 0._wp ) THEN   ! optimization
+                  zemx_iwm(ji,jj,jk) = 0._wp
+               ELSE
+                  zemx_iwm(ji,jj,jk) = zfact(ji,jj) * (  EXP( ( gde3w_n(ji,jj,jk  ) - zhdep(ji,jj) ) / hcri_iwm(ji,jj) )     &
+                       &                               - EXP( ( gde3w_n(ji,jj,jk-1) - zhdep(ji,jj) ) / hcri_iwm(ji,jj) ) )   &
+                       &                            / ( gde3w_n(ji,jj,jk) - gde3w_n(ji,jj,jk-1) )
+               ENDIF
+            END DO
+         END DO
 !!gm delta(gde3w_n) = e3t_n  !!  Please verify the grid-point position w versus t-point
 !!gm it seems to me that only 1/hcri_iwm  is used ==>  compute it one for all
 
@@ -233,10 +240,17 @@ CONTAINS
       END DO
       zwkb(:,:,1) = zhdep(:,:) * wmask(:,:,1)
       !
-      zweight(:,:,:) = 0._wp
       DO jk = 2, jpkm1
-         zweight(:,:,jk) = MAX( 0._wp, rn2(:,:,jk) ) * hbot_iwm(:,:) * wmask(:,:,jk)                    &
-            &   * (  EXP( -zwkb(:,:,jk) / hbot_iwm(:,:) ) - EXP( -zwkb(:,:,jk-1) / hbot_iwm(:,:) )  )
+         DO jj = 1, jpj
+            DO ji = 1, jpi
+               IF ( rn2(ji,jj,jk) <= 0._wp .OR. wmask(ji,jj,jk) == 0._wp ) THEN   ! optimization
+                  zweight(ji,jj,jk) = 0._wp
+               ELSE
+                  zweight(ji,jj,jk) = rn2(ji,jj,jk) * hbot_iwm(ji,jj)    &
+                     &   * (  EXP( -zwkb(ji,jj,jk) / hbot_iwm(ji,jj) ) - EXP( -zwkb(ji,jj,jk-1) / hbot_iwm(ji,jj) )  )
+               ENDIF
+            END DO
+         END DO
       END DO
       !
       zfact(:,:) = 0._wp
@@ -304,7 +318,7 @@ CONTAINS
                END DO
             END DO
          END DO
-         IF( lk_mpp )   CALL mpp_sum( zztmp )
+         CALL mpp_sum( 'zdfiwm', zztmp )
          zztmp = rau0 * zztmp ! Global integral of rauo * Kz * N^2 = power contributing to mixing 
          !
          IF(lwp) THEN
@@ -321,12 +335,16 @@ CONTAINS
       !                          ! ----------------------- !
       !      
       IF( ln_tsdiff ) THEN          !* Option for differential mixing of salinity and temperature
+         ztmp1 = 0.505_wp + 0.495_wp * TANH( 0.92_wp * ( LOG10( 1.e-20_wp ) - 0.60_wp ) )
          DO jk = 2, jpkm1              ! Calculate S/T diffusivity ratio as a function of Reb
             DO jj = 1, jpj
                DO ji = 1, jpi
-                  zav_ratio(ji,jj,jk) = ( 0.505_wp + 0.495_wp *                                                                  &
-                      &   TANH(    0.92_wp * (   LOG10(  MAX( 1.e-20_wp, zReb(ji,jj,jk) * 5._wp * r1_6 )  ) - 0.60_wp   )    )   &
-                      &                 ) * wmask(ji,jj,jk)
+                  ztmp2 = zReb(ji,jj,jk) * 5._wp * r1_6
+                  IF ( ztmp2 > 1.e-20_wp .AND. wmask(ji,jj,jk) == 1._wp ) THEN
+                     zav_ratio(ji,jj,jk) = 0.505_wp + 0.495_wp * TANH( 0.92_wp * ( LOG10(ztmp2) - 0.60_wp ) )
+                  ELSE
+                     zav_ratio(ji,jj,jk) = ztmp1 * wmask(ji,jj,jk)
+                  ENDIF
                END DO
             END DO
          END DO
@@ -462,9 +480,9 @@ CONTAINS
       epyc_iwm(:,:) = epyc_iwm(:,:) * ssmask(:,:)
       ecri_iwm(:,:) = ecri_iwm(:,:) * ssmask(:,:)
 
-      zbot = glob_sum( e1e2t(:,:) * ebot_iwm(:,:) )
-      zpyc = glob_sum( e1e2t(:,:) * epyc_iwm(:,:) )
-      zcri = glob_sum( e1e2t(:,:) * ecri_iwm(:,:) )
+      zbot = glob_sum( 'zdfiwm', e1e2t(:,:) * ebot_iwm(:,:) )
+      zpyc = glob_sum( 'zdfiwm', e1e2t(:,:) * epyc_iwm(:,:) )
+      zcri = glob_sum( 'zdfiwm', e1e2t(:,:) * ecri_iwm(:,:) )
       IF(lwp) THEN
          WRITE(numout,*) '      High-mode wave-breaking energy:             ', zbot * 1.e-12_wp, 'TW'
          WRITE(numout,*) '      Pycnocline-intensifed wave-breaking energy: ', zpyc * 1.e-12_wp, 'TW'

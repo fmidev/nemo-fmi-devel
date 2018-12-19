@@ -91,7 +91,7 @@ CONTAINS
          END DO
       END DO
       !
-      CALL lbc_lnk( tsa(:,:,:,jp_tem) , 'T', 1. )
+      CALL lbc_lnk( 'trabbc', tsa(:,:,:,jp_tem) , 'T', 1. )
       !
       IF( l_trdtra ) THEN        ! Send the trend for diagnostics
          ztrdt(:,:,:) = tsa(:,:,:,jp_tem) - ztrdt(:,:,:)

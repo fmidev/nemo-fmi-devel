@@ -228,7 +228,7 @@ CONTAINS
          &      STAT=ierr(ii) )
 
       ice1D_alloc = MAXVAL( ierr(:) )
-      IF( ice1D_alloc /= 0 )   CALL ctl_warn( 'ice1D_alloc: failed to allocate arrays.' )
+      IF( ice1D_alloc /= 0 )   CALL ctl_stop( 'STOP',  'ice1D_alloc: failed to allocate arrays.'  )
       !
    END FUNCTION ice1D_alloc
    

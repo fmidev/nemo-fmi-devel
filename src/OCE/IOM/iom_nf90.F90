@@ -29,16 +29,10 @@ MODULE iom_nf90
    PRIVATE
 
    PUBLIC iom_nf90_open  , iom_nf90_close, iom_nf90_varid, iom_nf90_get, iom_nf90_gettime, iom_nf90_rstput
-   PUBLIC iom_nf90_getatt, iom_nf90_putatt
+   PUBLIC iom_nf90_chkatt, iom_nf90_getatt, iom_nf90_putatt
 
    INTERFACE iom_nf90_get
       MODULE PROCEDURE iom_nf90_g0d, iom_nf90_g123d
-   END INTERFACE
-   INTERFACE iom_nf90_getatt
-      MODULE PROCEDURE iom_nf90_giatt, iom_nf90_gratt, iom_nf90_gcatt
-   END INTERFACE
-   INTERFACE iom_nf90_putatt
-      MODULE PROCEDURE iom_nf90_piatt, iom_nf90_pratt, iom_nf90_pcatt
    END INTERFACE
    INTERFACE iom_nf90_rstput
       MODULE PROCEDURE iom_nf90_rp0123d
@@ -128,16 +122,14 @@ CONTAINS
             ELSE
                CALL iom_nf90_check(NF90_CREATE( TRIM(cdname), imode, if90id, chunksize = ichunk ), clinfo)
             ENDIF
-            CALL iom_nf90_check(NF90_SET_FILL( if90id, NF90_NOFILL, idmy                     ), clinfo)
+            CALL iom_nf90_check(NF90_SET_FILL( if90id, NF90_NOFILL,                   idmy ), clinfo)
             ! define dimensions
-            CALL iom_nf90_check(NF90_DEF_DIM( if90id, 'x'      , kdompar(1,1)  , idmy ), clinfo)
-            CALL iom_nf90_check(NF90_DEF_DIM( if90id, 'y'      , kdompar(2,1)  , idmy ), clinfo)
-            IF( PRESENT(kdlev) ) THEN
-               CALL iom_nf90_check(NF90_DEF_DIM( if90id, 'numcat' , ilevels    , idmy ), clinfo)
-            ELSE
-               CALL iom_nf90_check(NF90_DEF_DIM( if90id, 'nav_lev', ilevels    , idmy ), clinfo)
-            ENDIF
+            CALL iom_nf90_check(NF90_DEF_DIM( if90id,            'x',   kdompar(1,1), idmy ), clinfo)
+            CALL iom_nf90_check(NF90_DEF_DIM( if90id,            'y',   kdompar(2,1), idmy ), clinfo)
+            CALL iom_nf90_check(NF90_DEF_DIM( if90id,      'nav_lev',            jpk, idmy ), clinfo)
             CALL iom_nf90_check(NF90_DEF_DIM( if90id, 'time_counter', NF90_UNLIMITED, idmy ), clinfo)
+            IF( PRESENT(kdlev) )   &
+               CALL iom_nf90_check(NF90_DEF_DIM( if90id,    'numcat',          kdlev, idmy ), clinfo)
             ! global attributes
             CALL iom_nf90_check(NF90_PUT_ATT( if90id, NF90_GLOBAL, 'DOMAIN_number_total'   , jpnij              ), clinfo)
             CALL iom_nf90_check(NF90_PUT_ATT( if90id, NF90_GLOBAL, 'DOMAIN_number'         , narea-1            ), clinfo)
@@ -164,7 +156,6 @@ CONTAINS
          ENDDO
          iom_file(kiomid)%name   = TRIM(cdname)
          iom_file(kiomid)%nfid   = if90id
-         iom_file(kiomid)%iolib  = jpnf90
          iom_file(kiomid)%nvars  = 0
          iom_file(kiomid)%irec   = -1   ! useless for NetCDF files, used to know if the file is in define mode 
          iom_file(kiomid)%nlev   = ilevels
@@ -328,23 +319,67 @@ CONTAINS
       !
    END SUBROUTINE iom_nf90_g123d
 
+
+   SUBROUTINE iom_nf90_chkatt( kiomid, cdatt, llok, ksize, cdvar )
+      !!-----------------------------------------------------------------------
+      !!                  ***  ROUTINE  iom_nf90_chkatt  ***
+      !!
+      !! ** Purpose : check existence of attribute with NF90
+      !!              (either a global attribute (default) or a variable
+      !!               attribute if optional variable name is supplied (cdvar))
+      !!-----------------------------------------------------------------------
+      INTEGER         , INTENT(in   ) ::   kiomid   ! Identifier of the file
+      CHARACTER(len=*), INTENT(in   ) ::   cdatt    ! attribute name
+      LOGICAL         , INTENT(  out) ::   llok     ! error code
+      INTEGER         , INTENT(  out), OPTIONAL     &
+                      &               ::   ksize    ! attribute size
+      CHARACTER(len=*), INTENT(in   ), OPTIONAL     &
+                      &               ::   cdvar    ! name of the variable
+      !
+      INTEGER                         ::   if90id   ! temporary integer
+      INTEGER                         ::   isize    ! temporary integer
+      INTEGER                         ::   ivarid   ! NetCDF variable Id
+      !---------------------------------------------------------------------
+      !
+      if90id = iom_file(kiomid)%nfid
+      IF( PRESENT(cdvar) ) THEN
+         ! check the variable exists in the file
+         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr
+         IF( llok ) &
+            ! check the variable has the attribute required
+            llok = NF90_Inquire_attribute(if90id, ivarid, cdatt, len=isize ) == nf90_noerr
+      ELSE
+         llok = NF90_Inquire_attribute(if90id, NF90_GLOBAL, cdatt, len=isize ) == nf90_noerr
+      ENDIF
+      !
+      IF( PRESENT(ksize) ) ksize = isize
+      !
+      IF( .not. llok) &
+         CALL ctl_warn('iom_nf90_chkatt: no attribute '//cdatt//' found')
+      !
+   END SUBROUTINE iom_nf90_chkatt
+
+
    !!----------------------------------------------------------------------
    !!                   INTERFACE iom_nf90_getatt
    !!----------------------------------------------------------------------
 
-   SUBROUTINE iom_nf90_giatt( kiomid, cdatt, pv_i0d, cdvar)
+   SUBROUTINE iom_nf90_getatt( kiomid, cdatt, katt0d, katt1d, patt0d, patt1d, cdatt0d, cdvar)
       !!-----------------------------------------------------------------------
-      !!                  ***  ROUTINE  iom_nf90_giatt  ***
+      !!                  ***  ROUTINE  iom_nf90_getatt  ***
       !!
-      !! ** Purpose : read an integer attribute with NF90
+      !! ** Purpose : read an attribute with NF90
       !!              (either a global attribute (default) or a variable
       !!               attribute if optional variable name is supplied (cdvar))
       !!-----------------------------------------------------------------------
-      INTEGER         , INTENT(in   ) ::   kiomid   ! Identifier of the file
-      CHARACTER(len=*), INTENT(in   ) ::   cdatt    ! attribute name
-      INTEGER         , INTENT(  out) ::   pv_i0d   ! read field
-      CHARACTER(len=*), INTENT(in   ), OPTIONAL     &
-                      &               ::   cdvar    ! name of the variable
+      INTEGER               , INTENT(in   )           ::   kiomid   ! Identifier of the file
+      CHARACTER(len=*)      , INTENT(in   )           ::   cdatt    ! attribute name
+      INTEGER               , INTENT(  out), OPTIONAL ::   katt0d   ! read scalar integer
+      INTEGER, DIMENSION(:) , INTENT(  out), OPTIONAL ::   katt1d   ! read 1d array integer
+      REAL(wp)              , INTENT(  out), OPTIONAL ::   patt0d   ! read scalar  real
+      REAL(wp), DIMENSION(:), INTENT(  out), OPTIONAL ::   patt1d   ! read 1d array real
+      CHARACTER(len=*)      , INTENT(  out), OPTIONAL ::   cdatt0d  ! read character
+      CHARACTER(len=*)      , INTENT(in   ), OPTIONAL ::   cdvar    ! name of the variable
       !
       INTEGER                         ::   if90id   ! temporary integer
       INTEGER                         ::   ivarid   ! NetCDF variable Id
@@ -360,7 +395,7 @@ CONTAINS
             ! check the variable has the attribute required
             llok = NF90_Inquire_attribute(if90id, ivarid, cdatt) == nf90_noerr
          ELSE
-            CALL ctl_warn('iom_nf90_getatt: no variable '//cdvar//' found')
+            CALL ctl_warn('iom_nf90_getatt: no variable '//TRIM(cdvar)//' found')
          ENDIF
       ELSE
          llok = NF90_Inquire_attribute(if90id, NF90_GLOBAL, cdatt) == nf90_noerr
@@ -368,274 +403,93 @@ CONTAINS
       ENDIF
       !
       IF( llok) THEN
-         clinfo = 'iom_nf90_getatt, file: '//TRIM(iom_file(kiomid)%name)//', giatt: '//TRIM(cdatt)
-         CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values=pv_i0d), clinfo)
+         clinfo = 'iom_nf90_getatt, file: '//TRIM(iom_file(kiomid)%name)//', att: '//TRIM(cdatt)
+         IF(PRESENT( katt0d))   CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values =  katt0d), clinfo)
+         IF(PRESENT( katt1d))   CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values =  katt1d), clinfo)
+         IF(PRESENT( patt0d))   CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values =  patt0d), clinfo)
+         IF(PRESENT( patt1d))   CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values =  patt1d), clinfo)
+         IF(PRESENT(cdatt0d))   CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values = cdatt0d), clinfo)
       ELSE
-         CALL ctl_warn('iom_nf90_getatt: no attribute '//cdatt//' found')
-         pv_i0d = -999
+         CALL ctl_warn('iom_nf90_getatt: no attribute '//TRIM(cdatt)//' found')
+         IF(PRESENT( katt0d))    katt0d    = -999
+         IF(PRESENT( katt1d))    katt1d(:) = -999
+         IF(PRESENT( patt0d))    patt0d    = -999._wp
+         IF(PRESENT( patt1d))    patt1d(:) = -999._wp
+         IF(PRESENT(cdatt0d))   cdatt0d    = '!'
       ENDIF
       !
-   END SUBROUTINE iom_nf90_giatt
+   END SUBROUTINE iom_nf90_getatt
 
 
-   SUBROUTINE iom_nf90_gratt( kiomid, cdatt, pv_r0d, cdvar )
+   SUBROUTINE iom_nf90_putatt( kiomid, cdatt, katt0d, katt1d, patt0d, patt1d, cdatt0d, cdvar)
       !!-----------------------------------------------------------------------
-      !!                  ***  ROUTINE  iom_nf90_gratt  ***
+      !!                  ***  ROUTINE  iom_nf90_putatt  ***
       !!
-      !! ** Purpose : read a real attribute with NF90
+      !! ** Purpose : write an attribute with NF90
       !!              (either a global attribute (default) or a variable
       !!               attribute if optional variable name is supplied (cdvar))
       !!-----------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   kiomid   ! Identifier of the file
-      CHARACTER(len=*)          , INTENT(in   ) ::   cdatt    ! attribute name
-      REAL(wp)                  , INTENT(  out) ::   pv_r0d   ! read field
-      CHARACTER(len=*), OPTIONAL, INTENT(in   ) ::   cdvar    ! name of the variable
-      !
-      INTEGER            ::   if90id   ! temporary integer
-      INTEGER            ::   ivarid   ! NetCDF variable Id
-      LOGICAL            ::   llok     ! temporary logical
-      CHARACTER(LEN=100) ::   clinfo   ! info character
-      !---------------------------------------------------------------------
-      !
-      if90id = iom_file(kiomid)%nfid
-      IF( PRESENT(cdvar) ) THEN
-         ! check the variable exists in the file
-         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr
-         IF( llok ) THEN
-            ! check the variable has the attribute required
-            llok = NF90_Inquire_attribute(if90id, ivarid, cdatt) == nf90_noerr
-         ELSE
-            CALL ctl_warn('iom_nf90_getatt: no variable '//cdvar//' found')
-         ENDIF
-      ELSE
-         llok = NF90_Inquire_attribute(if90id, NF90_GLOBAL, cdatt) == nf90_noerr
-         ivarid = NF90_GLOBAL
-      ENDIF
-      !
-      IF( llok) THEN
-         clinfo = 'iom_nf90_getatt, file: '//TRIM(iom_file(kiomid)%name)//', gratt: '//TRIM(cdatt)
-         CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values=pv_r0d), clinfo)
-      ELSE
-         CALL ctl_warn('iom_nf90_getatt: no attribute '//cdatt//' found')
-         pv_r0d = -999._wp
-      ENDIF
-      !
-   END SUBROUTINE iom_nf90_gratt
-
-
-   SUBROUTINE iom_nf90_gcatt( kiomid, cdatt, pv_c0d, cdvar )
-      !!-----------------------------------------------------------------------
-      !!                  ***  ROUTINE  iom_nf90_gcatt  ***
-      !!
-      !! ** Purpose : read a character attribute with NF90
-      !!              (either a global attribute (default) or a variable
-      !!               attribute if optional variable name is supplied (cdvar))
-      !!-----------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   kiomid   ! Identifier of the file
-      CHARACTER(len=*)          , INTENT(in   ) ::   cdatt    ! attribute name
-      CHARACTER(len=*)          , INTENT(  out) ::   pv_c0d   ! read field
-      CHARACTER(len=*), OPTIONAL, INTENT(in   ) ::   cdvar    ! name of the variable
-      !
-      INTEGER            ::   if90id   ! temporary integer
-      INTEGER            ::   ivarid   ! NetCDF variable Id
-      LOGICAL            ::   llok     ! temporary logical
-      CHARACTER(LEN=100) ::   clinfo   ! info character
-      !---------------------------------------------------------------------
-      !
-      if90id = iom_file(kiomid)%nfid
-      IF( PRESENT(cdvar) ) THEN
-         ! check the variable exists in the file
-         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr
-         IF( llok ) THEN
-            ! check the variable has the attribute required
-            llok = NF90_Inquire_attribute(if90id, ivarid, cdatt) == nf90_noerr
-         ELSE
-            CALL ctl_warn('iom_nf90_getatt: no variable '//cdvar//' found')
-         ENDIF
-      ELSE
-         llok = NF90_Inquire_attribute(if90id, NF90_GLOBAL, cdatt) == nf90_noerr
-         ivarid = NF90_GLOBAL
-      ENDIF
-!
-      IF( llok) THEN
-         clinfo = 'iom_nf90_getatt, file: '//TRIM(iom_file(kiomid)%name)//', gcatt: '//TRIM(cdatt)
-         CALL iom_nf90_check(NF90_GET_ATT(if90id, ivarid, cdatt, values=pv_c0d), clinfo)
-      ELSE
-         CALL ctl_warn('iom_nf90_getatt: no attribute '//cdatt//' found')
-         pv_c0d = '!'
-      ENDIF
-      !
-   END SUBROUTINE iom_nf90_gcatt
-
-
-   !!----------------------------------------------------------------------
-   !!                   INTERFACE iom_nf90_putatt
-   !!----------------------------------------------------------------------
-
-   SUBROUTINE iom_nf90_piatt( kiomid, cdatt, pv_i0d, cdvar)
-      !!-----------------------------------------------------------------------
-      !!                  ***  ROUTINE  iom_nf90_piatt  ***
-      !!
-      !! ** Purpose : write an integer attribute with NF90
-      !!              (either a global attribute (default) or a variable
-      !!               attribute if optional variable name is supplied (cdvar))
-      !!-----------------------------------------------------------------------
-      INTEGER         , INTENT(in   ) ::   kiomid   ! Identifier of the file
-      CHARACTER(len=*), INTENT(in   ) ::   cdatt    ! attribute name
-      INTEGER         , INTENT(in   ) ::   pv_i0d   ! write field
-      CHARACTER(len=*), INTENT(in   ), OPTIONAL     &
-                      &               ::   cdvar    ! name of the variable
+      INTEGER               , INTENT(in   )           ::   kiomid   ! Identifier of the file
+      CHARACTER(len=*)      , INTENT(in   )           ::   cdatt    ! attribute name
+      INTEGER               , INTENT(in   ), OPTIONAL ::   katt0d   ! read scalar integer
+      INTEGER, DIMENSION(:) , INTENT(in   ), OPTIONAL ::   katt1d   ! read 1d array integer
+      REAL(wp)              , INTENT(in   ), OPTIONAL ::   patt0d   ! read scalar  real
+      REAL(wp), DIMENSION(:), INTENT(in   ), OPTIONAL ::   patt1d   ! read 1d array real
+      CHARACTER(len=*)      , INTENT(in   ), OPTIONAL ::   cdatt0d  ! read character
+      CHARACTER(len=*)      , INTENT(in   ), OPTIONAL ::   cdvar    ! name of the variable
       !
       INTEGER                         ::   if90id   ! temporary integer
       INTEGER                         ::   ivarid   ! NetCDF variable Id
+      INTEGER                         ::   isize    ! Attribute size
+      INTEGER                         ::   itype    ! Attribute type
       LOGICAL                         ::   llok     ! temporary logical
-      LOGICAL                         ::   lenddef  ! temporary logical
+      LOGICAL                         ::   llatt     ! temporary logical
+      LOGICAL                         ::   lldata   ! temporary logical
       CHARACTER(LEN=100)              ::   clinfo   ! info character
       !---------------------------------------------------------------------
       !
       if90id = iom_file(kiomid)%nfid
-      lenddef = .false.
       IF( PRESENT(cdvar) ) THEN
-         ! check the variable exists in the file
-         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr
+         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr   ! is the variable in the file?
          IF( .NOT. llok ) THEN
-            CALL ctl_warn('iom_nf90_putatt: no variable '//cdvar//' found')
+            CALL ctl_warn('iom_nf90_putatt: no variable '//TRIM(cdvar)//' found'   &
+               &        , '                 no attribute '//cdatt//' written' )
+            RETURN
          ENDIF
       ELSE
-         llok = .true.
          ivarid = NF90_GLOBAL
       ENDIF
+      llatt = NF90_Inquire_attribute(if90id, ivarid, cdatt, len = isize, xtype = itype ) == nf90_noerr
       !
-      IF( llok) THEN
-         clinfo = 'iom_nf90_putatt, file: '//TRIM(iom_file(kiomid)%name)//', piatt: '//TRIM(cdatt)
-         IF( iom_file(kiomid)%irec /= -1 ) THEN   
-            ! trick: irec used to know if the file is in define mode or not
-            ! if it is not then temporarily put it into define mode
-            CALL iom_nf90_check(NF90_REDEF( if90id ), clinfo)
-            lenddef = .true.
-         ENDIF
+      ! trick: irec used to know if the file is in define mode or not
+      lldata = iom_file(kiomid)%irec /= -1   ! default: go back in define mode if in data mode
+      IF( lldata .AND. llatt ) THEN          ! attribute already there. Do we really need to go back in define mode?
+         ! do we have the appropriate type?
+         IF(PRESENT( katt0d) .OR. PRESENT( katt1d))   llok = itype == NF90_INT
+         IF(PRESENT( patt0d) .OR. PRESENT( patt1d))   llok = itype == NF90_DOUBLE
+         IF(PRESENT(cdatt0d)                      )   llok = itype == NF90_CHAR
+         ! and do we have the appropriate size?
+         IF(PRESENT( katt0d))   llok = llok .AND. isize == 1
+         IF(PRESENT( katt1d))   llok = llok .AND. isize == SIZE(katt1d)
+         IF(PRESENT( patt0d))   llok = llok .AND. isize == 1
+         IF(PRESENT( patt1d))   llok = llok .AND. isize == SIZE(patt1d)
+         IF(PRESENT(cdatt0d))   llok = llok .AND. isize == LEN_TRIM(cdatt0d)
          !
-         CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values=pv_i0d), clinfo)
-         !
-         IF( lenddef ) THEN   
-            ! file was in data mode on entry; put it back in that mode
-            CALL iom_nf90_check(NF90_ENDDEF( if90id ), clinfo)
-         ENDIF
-      ELSE
-         CALL ctl_warn('iom_nf90_putatt: no attribute '//cdatt//' written')
+         lldata = .NOT. llok
       ENDIF
       !
-   END SUBROUTINE iom_nf90_piatt
-
-
-   SUBROUTINE iom_nf90_pratt( kiomid, cdatt, pv_r0d, cdvar )
-      !!-----------------------------------------------------------------------
-      !!                  ***  ROUTINE  iom_nf90_pratt  ***
-      !!
-      !! ** Purpose : write a real attribute with NF90
-      !!              (either a global attribute (default) or a variable
-      !!               attribute if optional variable name is supplied (cdvar))
-      !!-----------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   kiomid   ! Identifier of the file
-      CHARACTER(len=*)          , INTENT(in   ) ::   cdatt    ! attribute name
-      REAL(wp)                  , INTENT(in   ) ::   pv_r0d   ! write field
-      CHARACTER(len=*), OPTIONAL, INTENT(in   ) ::   cdvar    ! name of the variable
+      clinfo = 'iom_nf90_putatt, file: '//TRIM(iom_file(kiomid)%name)//', att: '//TRIM(cdatt)
+      IF(lldata)   CALL iom_nf90_check(NF90_REDEF( if90id ), clinfo)   ! leave data mode to define mode
       !
-      INTEGER            ::   if90id   ! temporary integer
-      INTEGER            ::   ivarid   ! NetCDF variable Id
-      LOGICAL            ::   llok     ! temporary logical
-      LOGICAL            ::   lenddef  ! temporary logical
-      CHARACTER(LEN=100) ::   clinfo   ! info character
-      !---------------------------------------------------------------------
+      IF(PRESENT( katt0d))   CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values =       katt0d) , clinfo)
+      IF(PRESENT( katt1d))   CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values =       katt1d) , clinfo)
+      IF(PRESENT( patt0d))   CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values =       patt0d) , clinfo)
+      IF(PRESENT( patt1d))   CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values =       patt1d) , clinfo)
+      IF(PRESENT(cdatt0d))   CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values = trim(cdatt0d)), clinfo)
       !
-      if90id = iom_file(kiomid)%nfid
-      lenddef = .false.
-      IF( PRESENT(cdvar) ) THEN
-         ! check the variable exists in the file
-         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr
-         IF( .NOT. llok ) THEN
-            CALL ctl_warn('iom_nf90_putatt: no variable '//cdvar//' found')
-         ENDIF
-      ELSE
-         llok = .true.
-         ivarid = NF90_GLOBAL
-      ENDIF
+      IF(lldata)   CALL iom_nf90_check(NF90_ENDDEF( if90id ), clinfo)   ! leave define mode to data mode
       !
-      IF( llok) THEN
-         clinfo = 'iom_nf90_putatt, file: '//TRIM(iom_file(kiomid)%name)//', pratt: '//TRIM(cdatt)
-         IF( iom_file(kiomid)%irec /= -1 ) THEN   
-            ! trick: irec used to know if the file is in define mode or not
-            ! if it is not then temporarily put it into define mode
-            CALL iom_nf90_check(NF90_REDEF( if90id ), clinfo)
-            lenddef = .true.
-         ENDIF
-         !
-         CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values=pv_r0d), clinfo)
-         !
-         IF( lenddef ) THEN   
-            ! file was in data mode on entry; put it back in that mode
-            CALL iom_nf90_check(NF90_ENDDEF( if90id ), clinfo)
-         ENDIF
-      ELSE
-         CALL ctl_warn('iom_nf90_putatt: no attribute '//cdatt//' written')
-      ENDIF
-      !
-   END SUBROUTINE iom_nf90_pratt
-
-
-   SUBROUTINE iom_nf90_pcatt( kiomid, cdatt, pv_c0d, cdvar )
-      !!-----------------------------------------------------------------------
-      !!                  ***  ROUTINE  iom_nf90_pcatt  ***
-      !!
-      !! ** Purpose : write a character attribute with NF90
-      !!              (either a global attribute (default) or a variable
-      !!               attribute if optional variable name is supplied (cdvar))
-      !!-----------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   kiomid   ! Identifier of the file
-      CHARACTER(len=*)          , INTENT(in   ) ::   cdatt    ! attribute name
-      CHARACTER(len=*)          , INTENT(in   ) ::   pv_c0d   ! write field
-      CHARACTER(len=*), OPTIONAL, INTENT(in   ) ::   cdvar    ! name of the variable
-      !
-      INTEGER            ::   if90id   ! temporary integer
-      INTEGER            ::   ivarid   ! NetCDF variable Id
-      LOGICAL            ::   llok     ! temporary logical
-      LOGICAL            ::   lenddef  ! temporary logical
-      CHARACTER(LEN=100) ::   clinfo   ! info character
-      !---------------------------------------------------------------------
-      !
-      if90id = iom_file(kiomid)%nfid
-      lenddef = .false.
-      IF( PRESENT(cdvar) ) THEN
-         ! check the variable exists in the file
-         llok = NF90_INQ_VARID( if90id, TRIM(cdvar), ivarid ) == nf90_noerr
-         IF( .NOT. llok ) THEN
-            CALL ctl_warn('iom_nf90_putatt: no variable '//cdvar//' found')
-         ENDIF
-      ELSE
-         llok = .true.
-         ivarid = NF90_GLOBAL
-      ENDIF
-      !
-      IF( llok) THEN
-         clinfo = 'iom_nf90_putatt, file: '//TRIM(iom_file(kiomid)%name)//', pcatt: '//TRIM(cdatt)
-         IF( iom_file(kiomid)%irec /= -1 ) THEN   
-            ! trick: irec used to know if the file is in define mode or not
-            ! if it is not then temporarily put it into define mode
-            CALL iom_nf90_check(NF90_REDEF( if90id ), clinfo)
-            lenddef = .true.
-         ENDIF
-         !
-         CALL iom_nf90_check(NF90_PUT_ATT(if90id, ivarid, cdatt, values=pv_c0d), clinfo)
-         !
-         IF( lenddef ) THEN   
-            ! file was in data mode on entry; put it back in that mode
-            CALL iom_nf90_check(NF90_ENDDEF( if90id ), clinfo)
-         ENDIF
-      ELSE
-         CALL ctl_warn('iom_nf90_putatt: no attribute '//cdatt//' written')
-      ENDIF
-      !
-   END SUBROUTINE iom_nf90_pcatt
+   END SUBROUTINE iom_nf90_putatt
 
 
    SUBROUTINE iom_nf90_gettime( kiomid, kvid, ptime, cdunits, cdcalendar )
@@ -692,7 +546,7 @@ CONTAINS
       INTEGER, DIMENSION(4) :: idimsz               ! dimensions size  
       INTEGER, DIMENSION(4) :: idimid               ! dimensions id
       CHARACTER(LEN=256)    :: clinfo               ! info character
-      CHARACTER(LEN= 12), DIMENSION(4) :: cltmp     ! temporary character
+      CHARACTER(LEN= 12), DIMENSION(5) :: cltmp     ! temporary character
       INTEGER               :: if90id               ! nf90 file identifier
       INTEGER               :: idmy                 ! dummy variable
       INTEGER               :: itype                ! variable type
@@ -703,6 +557,7 @@ CONTAINS
       LOGICAL               :: lchunk               ! logical switch to activate chunking and compression
       !                                             ! when appropriate (currently chunking is applied to 4d fields only)
       INTEGER               :: idlv                 ! local variable
+      INTEGER               :: idim3                ! id of the third dimension
       !---------------------------------------------------------------------
       !
       clinfo = '          iom_nf90_rp0123d, file: '//TRIM(iom_file(kiomid)%name)//', var: '//TRIM(cdvar)
@@ -716,11 +571,7 @@ CONTAINS
             CALL iom_nf90_check(NF90_REDEF( if90id ), clinfo)   ;   iom_file(kiomid)%irec = -1
          ENDIF
          ! define the dimension variables if it is not already done
-         IF(iom_file(kiomid)%nlev == jpk ) THEN
-          cltmp = (/ 'nav_lon     ', 'nav_lat     ', 'nav_lev     ', 'time_counter' /)
-         ELSE
-          cltmp = (/ 'nav_lon     ', 'nav_lat     ', 'numcat      ', 'time_counter' /)
-         ENDIF
+         cltmp = (/ 'nav_lon', 'nav_lat', 'nav_lev', 'time_counter', 'numcat' /)
          CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(1)), NF90_FLOAT , (/ 1, 2 /), iom_file(kiomid)%nvid(1) ), clinfo)
          CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(2)), NF90_FLOAT , (/ 1, 2 /), iom_file(kiomid)%nvid(2) ), clinfo)
          CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(3)), NF90_FLOAT , (/ 3    /), iom_file(kiomid)%nvid(3) ), clinfo)
@@ -728,8 +579,15 @@ CONTAINS
          ! update informations structure related the dimension variable we just added...
          iom_file(kiomid)%nvars       = 4
          iom_file(kiomid)%luld(1:4)   = (/ .FALSE., .FALSE., .FALSE., .TRUE. /)
-         iom_file(kiomid)%cn_var(1:4) = cltmp
-         iom_file(kiomid)%ndims(1:4)  = (/ 2, 2, 1, 1 /)  
+         iom_file(kiomid)%cn_var(1:4) = cltmp(1:4)
+         iom_file(kiomid)%ndims(1:4)  = (/ 2, 2, 1, 1 /)
+         IF( NF90_INQ_DIMID( if90id, 'numcat', idmy ) == nf90_noerr ) THEN   ! add a 5th variable corresponding to the 5th dimension
+            CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(5)), NF90_FLOAT , (/ 5 /), iom_file(kiomid)%nvid(5) ), clinfo)
+            iom_file(kiomid)%nvars     = 5
+            iom_file(kiomid)%luld(5)   = .FALSE.
+            iom_file(kiomid)%cn_var(5) = cltmp(5)
+            iom_file(kiomid)%ndims(5)  = 1
+         ENDIF
          ! trick: defined to 0 to say that dimension variables are defined but not yet written
          iom_file(kiomid)%dimsz(1, 1)  = 0   
          IF(lwp) WRITE(numout,*) TRIM(clinfo)//' define dimension variables done'
@@ -751,17 +609,25 @@ CONTAINS
          ENDIF
          ! variable definition
          IF(     PRESENT(pv_r0d) ) THEN   ;   idims = 0
-         ELSEIF( PRESENT(pv_r1d) ) THEN   ;   idims = 2   ;   idimid(1:idims) = (/    3,4/)
+         ELSEIF( PRESENT(pv_r1d) ) THEN
+            IF( SIZE(pv_r1d,1) == jpk ) THEN   ;   idim3 = 3
+            ELSE                               ;   idim3 = 5
+            ENDIF
+                                              idims = 2   ;   idimid(1:idims) = (/idim3,4/)
          ELSEIF( PRESENT(pv_r2d) ) THEN   ;   idims = 3   ;   idimid(1:idims) = (/1,2  ,4/)
-         ELSEIF( PRESENT(pv_r3d) ) THEN   ;   idims = 4   ;   idimid(1:idims) = (/1,2,3,4/)
+         ELSEIF( PRESENT(pv_r3d) ) THEN
+            IF( SIZE(pv_r3d,3) == jpk ) THEN   ;   idim3 = 3
+            ELSE                               ;   idim3 = 5
+            ENDIF
+                                              idims = 4   ;   idimid(1:idims) = (/1,2,idim3,4/)
          ENDIF
          IF( PRESENT(ktype) ) THEN   ! variable external type
             SELECT CASE (ktype)
-            CASE (jp_r8)  ;   itype = NF90_DOUBLE
-            CASE (jp_r4)  ;   itype = NF90_FLOAT
-            CASE (jp_i4)  ;   itype = NF90_INT
-            CASE (jp_i2)  ;   itype = NF90_SHORT
-            CASE (jp_i1)  ;   itype = NF90_BYTE
+            CASE (jp_r8)   ;   itype = NF90_DOUBLE
+            CASE (jp_r4)   ;   itype = NF90_FLOAT
+            CASE (jp_i4)   ;   itype = NF90_INT
+            CASE (jp_i2)   ;   itype = NF90_SHORT
+            CASE (jp_i1)   ;   itype = NF90_BYTE
             CASE DEFAULT   ;   CALL ctl_stop( TRIM(clinfo)//' unknown variable type' )
             END SELECT
          ELSE
@@ -833,12 +699,9 @@ CONTAINS
                CALL iom_nf90_check( NF90_PUT_VAR  ( if90id, idmy, glamt(ix1:ix2, iy1:iy2) ), clinfo )
                CALL iom_nf90_check( NF90_INQ_VARID( if90id, 'nav_lat'     , idmy )         , clinfo )
                CALL iom_nf90_check( NF90_PUT_VAR  ( if90id, idmy, gphit(ix1:ix2, iy1:iy2) ), clinfo )
-               IF(iom_file(kiomid)%nlev == jpk ) THEN 
-                  !NEMO
-                  CALL iom_nf90_check( NF90_INQ_VARID( if90id, 'nav_lev'     , idmy ), clinfo )
-                  CALL iom_nf90_check( NF90_PUT_VAR  ( if90id, idmy, gdept_1d       ), clinfo )
-               ELSE
-                  CALL iom_nf90_check( NF90_INQ_VARID( if90id, 'numcat'     , idmy ), clinfo)
+               CALL iom_nf90_check( NF90_INQ_VARID( if90id, 'nav_lev'     , idmy ), clinfo )
+               CALL iom_nf90_check( NF90_PUT_VAR  ( if90id, idmy, gdept_1d       ), clinfo )
+               IF( NF90_INQ_VARID( if90id, 'numcat', idmy ) == nf90_noerr ) THEN
                   CALL iom_nf90_check( NF90_PUT_VAR  ( if90id, idmy, (/ (idlv, idlv = 1,iom_file(kiomid)%nlev) /)), clinfo )
                ENDIF
                ! +++ WRONG VALUE: to be improved but not really useful...

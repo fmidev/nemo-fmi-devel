@@ -70,7 +70,7 @@ CONTAINS
             CASE DEFAULT           ;   CALL ctl_stop( 'bdy_tra : unrecognised option for open boundaries for T and S' )
             END SELECT
             ! Boundary points should be updated
-            CALL lbc_bdy_lnk( tsa(:,:,:,jn), 'T', 1., ib_bdy )
+            CALL lbc_bdy_lnk( 'bdytra', tsa(:,:,:,jn), 'T', 1., ib_bdy )
             ! 
          END DO
       END DO

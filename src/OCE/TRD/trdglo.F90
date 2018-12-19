@@ -248,10 +248,10 @@ CONTAINS
          ! I.3 Sums over the global domain
          ! ---------------------------------
          IF( lk_mpp ) THEN
-            CALL mpp_sum( peke )
-            CALL mpp_sum( umo , jptot_dyn )
-            CALL mpp_sum( vmo , jptot_dyn )
-            CALL mpp_sum( hke , jptot_dyn )
+            CALL mpp_sum( 'trdglo', peke )
+            CALL mpp_sum( 'trdglo', umo , jptot_dyn )
+            CALL mpp_sum( 'trdglo', vmo , jptot_dyn )
+            CALL mpp_sum( 'trdglo', hke , jptot_dyn )
          ENDIF
 
          ! I.2 Print dynamic trends in the ocean.output file
@@ -391,10 +391,10 @@ CONTAINS
          ! I.1 Sums over the global domain
          ! -------------------------------
          IF( lk_mpp ) THEN
-            CALL mpp_sum( tmo, jptot_tra )   
-            CALL mpp_sum( smo, jptot_tra )
-            CALL mpp_sum( t2 , jptot_tra )
-            CALL mpp_sum( s2 , jptot_tra )
+            CALL mpp_sum( 'trdglo', tmo, jptot_tra )   
+            CALL mpp_sum( 'trdglo', smo, jptot_tra )
+            CALL mpp_sum( 'trdglo', t2 , jptot_tra )
+            CALL mpp_sum( 'trdglo', s2 , jptot_tra )
          ENDIF
 
          ! I.2 Print tracers trends in the ocean.output file
@@ -525,7 +525,7 @@ CONTAINS
       DO jk = 1, jpkm1
          tvolt = tvolt + SUM( e1e2t(:,:) * e3t_n(:,:,jk) * tmask(:,:,jk) * tmask_i(:,:) )
       END DO
-      IF( lk_mpp )   CALL mpp_sum( tvolt )   ! sum over the global domain
+      CALL mpp_sum( 'trdglo', tvolt )   ! sum over the global domain
 
       IF(lwp) WRITE(numout,*) '                total ocean volume at T-point   tvolt = ',tvolt
 
@@ -545,8 +545,8 @@ CONTAINS
             END DO
          END DO
       END DO
-      IF( lk_mpp )   CALL mpp_sum( tvolu )   ! sums over the global domain
-      IF( lk_mpp )   CALL mpp_sum( tvolv )
+      CALL mpp_sum( 'trdglo', tvolu )   ! sums over the global domain
+      CALL mpp_sum( 'trdglo', tvolv )
 
       IF(lwp) THEN
          WRITE(numout,*) '                total ocean volume at U-point   tvolu = ',tvolu

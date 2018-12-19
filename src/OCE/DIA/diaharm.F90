@@ -21,6 +21,7 @@ MODULE diaharm
    USE ioipsl          ! NetCDF IPSL library
    USE lbclnk          ! ocean lateral boundary conditions (or mpp link)
    USE timing          ! preformance summary
+   USE lib_mpp           ! MPP library
 
    IMPLICIT NONE
    PRIVATE
@@ -125,9 +126,9 @@ CONTAINS
       ENDIF
       !
       IF (nb_ana > jpmax_harmo) THEN
-        IF(lwp) WRITE(numout,*) ' E R R O R dia_harm_init : nb_ana must be lower than jpmax_harmo, stop'
-        IF(lwp) WRITE(numout,*) ' jpmax_harmo= ', jpmax_harmo
-        nstop = nstop + 1
+         WRITE(ctmp1,*) 'Can not use XIOS in iom_g0d, file: '//TRIM(clname)//', var:'//TRIM(cdvar)
+         WRITE(ctmp2,*) ' jpmax_harmo= ', jpmax_harmo
+         CALL ctl_stop( 'dia_harm_init', ctmp1, ctmp2 )
       ENDIF
 
       ALLOCATE(name    (nb_ana))

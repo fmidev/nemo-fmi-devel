@@ -68,7 +68,7 @@ CONTAINS
       !                            !  create 'mesh_mask.nc' file
       !                            ! ============================
       !
-      CALL iom_open( TRIM(clnam), inum, ldwrt = .TRUE., kiolib = jprstlib )
+      CALL iom_open( TRIM(clnam), inum, ldwrt = .TRUE. )
  
       CALL iom_rstput( 0, 0, inum, 'tmask', tmask_crs, ktype = jp_i1 )    ! land-sea mask
       CALL iom_rstput( 0, 0, inum, 'umask', umask_crs, ktype = jp_i1 )

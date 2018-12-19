@@ -550,7 +550,7 @@ CONTAINS
             ENDIF
             this => this%next
          ENDDO ! WHILE
-         CALL mpp_sum(i)
+         CALL mpp_sum('icblbc', i)
          IF( i .GT. 0 ) THEN
             WRITE( numicb,'(a,i4)') 'send_bergs_to_other_pes: # of bergs outside computational domain = ',i
             CALL ctl_stop('send_bergs_to_other_pes:  there are bergs still in halos!')

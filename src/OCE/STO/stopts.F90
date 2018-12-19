@@ -53,7 +53,7 @@ CONTAINS
       !!----------------------------------------------------------------------
 
       DO jts = 1, jpts
-        CALL lbc_lnk( pts(:,:,:,jts), 'T' , 1._wp )
+        CALL lbc_lnk( 'stopts', pts(:,:,:,jts), 'T' , 1._wp )
       ENDDO
 
       DO jdof = 1, nn_sto_eos
@@ -122,7 +122,7 @@ CONTAINS
       ! Lateral boundary conditions on pts_ran
       DO jdof = 1, nn_sto_eos
          DO jts = 1, jpts
-            CALL lbc_lnk( pts_ran(:,:,:,jts,jdof), 'T' , 1._wp )
+            CALL lbc_lnk( 'stopts', pts_ran(:,:,:,jts,jdof), 'T' , 1._wp )
          END DO
       END DO
 

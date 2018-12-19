@@ -308,7 +308,7 @@ CONTAINS
             DEALLOCATE( ztrdt, ztrds )
          ENDIF
          !
-         CALL lbc_lnk_multi( tsa(:,:,:,jp_tem), 'T', 1., tsa(:,:,:,jp_sal), 'T', 1. )
+         CALL lbc_lnk_multi( 'tranpc', tsa(:,:,:,jp_tem), 'T', 1., tsa(:,:,:,jp_sal), 'T', 1. )
          !
          IF( lwp .AND. l_LB_debug ) THEN
             WRITE(numout,*) 'Exiting tra_npc , kt = ',kt,', => numb. of statically instable water-columns: ', inpcc

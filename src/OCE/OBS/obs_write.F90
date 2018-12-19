@@ -591,8 +591,8 @@ CONTAINS
          ENDDO
 
          CALL obs_mpp_sum_integer( inumgoodobs, inumgoodobsmpp )
-         CALL mpp_sum(zsumx)
-         CALL mpp_sum(zsumx2)
+         CALL mpp_sum('obs_write', zsumx)
+         CALL mpp_sum('obs_write', zsumx2)
 
          IF (lwp) THEN
             WRITE(numout,*) 'Type: ',fbdata%cname(jvar),'  Total number of good observations: ',inumgoodobsmpp 

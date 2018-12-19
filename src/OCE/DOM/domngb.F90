@@ -66,7 +66,8 @@ CONTAINS
       zdist(:,:) = zglam(:,:) * zglam(:,:) + zgphi(:,:) * zgphi(:,:)
       
       IF( lk_mpp ) THEN  
-         CALL mpp_minloc( zdist(:,:), zmask, zmini, kii, kjj)
+         CALL mpp_minloc( 'domngb', zdist(:,:), zmask, zmini, iloc)
+         kii = iloc(1) ; kjj = iloc(2)
       ELSE
          iloc(:) = MINLOC( zdist(:,:), mask = zmask(:,:) == 1.e0 )
          kii = iloc(1) + nimpp - 1

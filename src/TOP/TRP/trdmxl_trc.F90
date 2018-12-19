@@ -63,8 +63,8 @@ CONTAINS
       ALLOCATE( ztmltrd2(jpi,jpj,jpltrd_trc,jptra) ,      &
          &      ndextrd1(jpi*jpj), nidtrd(jptra), nh_t(jptra),  STAT=trd_mxl_trc_alloc)
          !
-      IF( lk_mpp                )   CALL mpp_sum ( trd_mxl_trc_alloc )
-      IF( trd_mxl_trc_alloc /=0 )   CALL ctl_warn('trd_mxl_trc_alloc: failed to allocate arrays')
+      CALL mpp_sum ( 'trdmxl_trc', trd_mxl_trc_alloc )
+      IF( trd_mxl_trc_alloc /=0 )   CALL ctl_stop( 'STOP', 'trd_mxl_trc_alloc: failed to allocate arrays' )
       !
    END FUNCTION trd_mxl_trc_alloc
 
@@ -289,7 +289,7 @@ CONTAINS
          DO jn = 1, jptra
             IF( ln_trdtrc(jn) ) THEN
                DO jl = 1, jpltrd_trc
-                  CALL lbc_lnk( tmltrd_trc(:,:,jl,jn), 'T', 1. )        ! lateral boundary conditions
+                  CALL lbc_lnk( 'trdmxl_trc', tmltrd_trc(:,:,jl,jn), 'T', 1. )        ! lateral boundary conditions
                END DO
             ENDIF
          END DO
@@ -424,7 +424,7 @@ CONTAINS
                
          !-- Lateral boundary conditions
                IF ( cn_cfg .NE. 'gyre' ) THEN
-                  CALL lbc_lnk_multi( ztmltot(:,:,jn) , 'T', 1. , ztmlres(:,:,jn) , 'T', 1., &
+                  CALL lbc_lnk_multi( 'trdmxl_trc', ztmltot(:,:,jn) , 'T', 1. , ztmlres(:,:,jn) , 'T', 1., &
                      &                ztmlatf(:,:,jn) , 'T', 1. , ztmlrad(:,:,jn) , 'T', 1. )
                ENDIF
 
@@ -475,9 +475,9 @@ CONTAINS
 
          !-- Lateral boundary conditions 
                IF ( cn_cfg .NE. 'gyre' ) THEN            ! other than GYRE configuration    
-                  CALL lbc_lnk_multi( ztmltot2(:,:,jn), 'T', 1., ztmlres2(:,:,jn), 'T', 1. )
+                  CALL lbc_lnk_multi( 'trdmxl_trc', ztmltot2(:,:,jn), 'T', 1., ztmlres2(:,:,jn), 'T', 1. )
                   DO jl = 1, jpltrd_trc
-                     CALL lbc_lnk( ztmltrd2(:,:,jl,jn), 'T', 1. )       ! will be output in the NetCDF trends file
+                     CALL lbc_lnk( 'trdmxl_trc', ztmltrd2(:,:,jl,jn), 'T', 1. )       ! will be output in the NetCDF trends file
                   END DO
                ENDIF
 
@@ -775,16 +775,15 @@ CONTAINS
       ! -------------------------------------------------
 
       IF( ( lk_trdmxl_trc ) .AND. ( MOD( nitend-nittrc000+1, nn_trd_trc ) /= 0 ) ) THEN
-         WRITE(numout,cform_err)
-         WRITE(numout,*) '                Your nitend parameter, nitend = ', nitend
-         WRITE(numout,*) '                is no multiple of the trends diagnostics frequency        '
-         WRITE(numout,*) '                          you defined, nn_trd_trc   = ', nn_trd_trc
-         WRITE(numout,*) '                This will not allow you to restart from this simulation.  '
-         WRITE(numout,*) '                You should reconsider this choice.                        ' 
-         WRITE(numout,*) 
-         WRITE(numout,*) '                N.B. the nitend parameter is also constrained to be a     '
-         WRITE(numout,*) '                multiple of the sea-ice frequency parameter (typically 5) '
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '                Your nitend parameter, nitend = ', nitend
+         WRITE(ctmp2,*) '                is no multiple of the trends diagnostics frequency        '
+         WRITE(ctmp3,*) '                          you defined, nn_trd_trc   = ', nn_trd_trc
+         WRITE(ctmp4,*) '                This will not allow you to restart from this simulation.  '
+         WRITE(ctmp5,*) '                You should reconsider this choice.                        ' 
+         WRITE(ctmp6,*) 
+         WRITE(ctmp7,*) '                N.B. the nitend parameter is also constrained to be a     '
+         WRITE(ctmp8,*) '                multiple of the sea-ice frequency parameter (typically 5) '
+         CALL ctl_stop( ctmp1, ctmp2, ctmp3, ctmp4, ctmp5, ctmp6, ctmp7, ctmp8 )
       ENDIF
 
       ! * Debugging information *
@@ -794,16 +793,14 @@ CONTAINS
       ENDIF
 
       IF( ( ln_trcadv_muscl .OR. ln_trcadv_muscl2 ) .AND. .NOT. ln_trdmxl_trc_instant ) THEN
-         WRITE(numout,cform_err)
-         WRITE(numout,*) '                Currently, you can NOT use simultaneously tracer MUSCL    '
-         WRITE(numout,*) '                advection and window averaged diagnostics of ML trends.   '
-         WRITE(numout,*) '                WHY? Everything in trdmxl_trc is coded for leap-frog, and '
-         WRITE(numout,*) '                MUSCL scheme is Euler forward for passive tracers (note   '
-         WRITE(numout,*) '                that MUSCL is leap-frog for active tracers T/S).          '
-         WRITE(numout,*) '                In particuliar, entrainment trend would be FALSE. However '
-         WRITE(numout,*) '                this residual is correct for instantaneous ML diagnostics.'
-         WRITE(numout,*) 
-         nstop = nstop + 1
+         WRITE(ctmp1,*) '                Currently, you can NOT use simultaneously tracer MUSCL    '
+         WRITE(ctmp2,*) '                advection and window averaged diagnostics of ML trends.   '
+         WRITE(ctmp3,*) '                WHY? Everything in trdmxl_trc is coded for leap-frog, and '
+         WRITE(ctmp4,*) '                MUSCL scheme is Euler forward for passive tracers (note   '
+         WRITE(ctmp5,*) '                that MUSCL is leap-frog for active tracers T/S).          '
+         WRITE(ctmp6,*) '                In particuliar, entrainment trend would be FALSE. However '
+         WRITE(ctmp7,*) '                this residual is correct for instantaneous ML diagnostics.'
+         CALL ctl_stop( ctmp1, ctmp2, ctmp3, ctmp4, ctmp5, ctmp6, ctmp7 )
       ENDIF
 
       ! I.2 Initialize arrays to zero or read a restart file

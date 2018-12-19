@@ -329,12 +329,12 @@ CONTAINS
       END DO
       
       ! synchronisation
-      IF( lk_mpp )   CALL mpp_sum( zgifl , jpnfl )   ! sums over the global domain
-      IF( lk_mpp )   CALL mpp_sum( zgjfl , jpnfl )
-      IF( lk_mpp )   CALL mpp_sum( zgkfl , jpnfl )
-      IF( lk_mpp )   CALL mpp_sum( zagefl, jpnfl )
-      IF( lk_mpp )   CALL mpp_sum( iil   , jpnfl )
-      IF( lk_mpp )   CALL mpp_sum( ijl   , jpnfl )
+      CALL mpp_sum( 'floblk', zgifl , jpnfl )   ! sums over the global domain
+      CALL mpp_sum( 'floblk', zgjfl , jpnfl )
+      CALL mpp_sum( 'floblk', zgkfl , jpnfl )
+      CALL mpp_sum( 'floblk', zagefl, jpnfl )
+      CALL mpp_sum( 'floblk', iil   , jpnfl )
+      CALL mpp_sum( 'floblk', ijl   , jpnfl )
       
       ! Test to know if a  float hasn't integrated enought time
       IF( ln_argo ) THEN

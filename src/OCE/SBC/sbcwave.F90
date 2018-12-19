@@ -214,7 +214,7 @@ CONTAINS
          DEALLOCATE( zstokes_psi_u_top, zstokes_psi_v_top )
       ENDIF
 
-      CALL lbc_lnk_multi( usd, 'U', -1., vsd, 'V', -1. )
+      CALL lbc_lnk_multi( 'sbcwave', usd, 'U', -1., vsd, 'V', -1. )
 
       !
       !                       !==  vertical Stokes Drift 3D velocity  ==!
@@ -239,7 +239,7 @@ CONTAINS
       ENDIF
 #endif
       !
-      CALL lbc_lnk( ze3divh, 'T', 1. )
+      CALL lbc_lnk( 'sbcwave', ze3divh, 'T', 1. )
       !
       IF( ln_linssh ) THEN   ;   ik = 1   ! none zero velocity through the sea surface
       ELSE                   ;   ik = 2   ! w=0 at the surface (set one for all in sbc_wave_init)
@@ -300,7 +300,7 @@ CONTAINS
                taum(ji,jj) = SQRT( tauw_x(ji,jj)*tauw_x(ji,jj) + tauw_y(ji,jj)*tauw_y(ji,jj) )
             END DO
          END DO
-         CALL lbc_lnk_multi( utau(:,:), 'U', -1. , vtau(:,:), 'V', -1. , taum(:,:) , 'T', -1. )
+         CALL lbc_lnk_multi( 'sbcwave', utau(:,:), 'U', -1. , vtau(:,:), 'V', -1. , taum(:,:) , 'T', -1. )
       ENDIF
       !
    END SUBROUTINE sbc_wstress

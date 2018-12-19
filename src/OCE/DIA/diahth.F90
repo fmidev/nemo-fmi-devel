@@ -53,8 +53,8 @@ CONTAINS
       !
       ALLOCATE( hth(jpi,jpj), hd20(jpi,jpj), hd28(jpi,jpj), htc3(jpi,jpj), STAT=dia_hth_alloc )
       !
-      IF( lk_mpp           )   CALL mpp_sum ( dia_hth_alloc )
-      IF(dia_hth_alloc /= 0)   CALL ctl_warn('dia_hth_alloc: failed to allocate arrays.')
+      CALL mpp_sum ( 'diahth', dia_hth_alloc )
+      IF(dia_hth_alloc /= 0)   CALL ctl_stop( 'STOP', 'dia_hth_alloc: failed to allocate arrays.' )
       !
    END FUNCTION dia_hth_alloc
 
@@ -122,7 +122,7 @@ CONTAINS
                &      zmaxdzT(jpi,jpj), &
                &      zthick(jpi,jpj),  &
                &      zdelr(jpi,jpj), STAT=ji)
-            IF( lk_mpp  )   CALL mpp_sum(ji)
+            CALL mpp_sum('diahth', ji)
             IF( ji /= 0 )   CALL ctl_stop( 'STOP', 'dia_hth : unable to allocate standard ocean arrays' )
          END IF
 
