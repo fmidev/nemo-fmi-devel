@@ -37,7 +37,7 @@
    ln_dynADV1D      = .false.         !  dyn.: only advection 1D                  (Schar & Smolarkiewicz 1996 test case)
    ln_dynADV2D      = .false.         !  dyn.: only advection 2D w prescribed vel.(rn_uvice + advection)
       rn_uice       =   0.5           !        prescribed ice u-velocity
-      rn_vice       =   0.            !        prescribed ice v-velocity
+      rn_vice       =   0.5           !        prescribed ice v-velocity
 /
 !------------------------------------------------------------------------------
 &namdyn_rdgrft  !   Ice ridging/rafting
@@ -46,7 +46,6 @@
 !------------------------------------------------------------------------------
 &namdyn_rhg     !   Ice rheology
 !------------------------------------------------------------------------------
-      ln_aEVP       = .false.         !     adaptive rheology (Kimmritz et al. 2016 & 2017)
 /
 !------------------------------------------------------------------------------
 &namdyn_adv     !   Ice advection
