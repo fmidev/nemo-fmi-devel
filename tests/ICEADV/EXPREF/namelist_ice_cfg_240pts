@@ -33,9 +33,10 @@
 !------------------------------------------------------------------------------
 &namdyn         !   Ice dynamics
 !------------------------------------------------------------------------------
-   ln_dynFULL       = .false.         !  dyn.: full ice dynamics               (rheology + advection + ridging/rafting + correction)
+   ln_dynALL        = .false.         !  dyn.: full ice dynamics               (rheology + advection + ridging/rafting + correction)
    ln_dynRHGADV     = .false.         !  dyn.: no ridge/raft & no corrections  (rheology + advection)
-   ln_dynADV        = .true.          !  dyn.: only advection w prescribed vel.(rn_uvice + advection)
+   ln_dynADV1D      = .true.          !  dyn.: only advection 1D                  (Schar & Smolarkiewicz 1996 test case)
+   ln_dynADV2D      = .false.         !  dyn.: only advection 2D w prescribed vel.(rn_uvice + advection)
       rn_uice       =   1.            !        prescribed ice u-velocity
       rn_vice       =   0.            !        prescribed ice v-velocity
 /
@@ -52,7 +53,7 @@
 !------------------------------------------------------------------------------
    ln_adv_Pra       = .false.         !  Advection scheme (Prather)
    ln_adv_UMx       = .true.          !  Advection scheme (Ultimate-Macho)
-      nn_UMx        =   20             !     order of the scheme for UMx (1-5 ; 20=centered 2nd order)
+      nn_UMx        =   5             !     order of the scheme for UMx (1-5 ; 20=centered 2nd order)
 /
 !------------------------------------------------------------------------------
 &namforcing     !   Ice surface forcing
