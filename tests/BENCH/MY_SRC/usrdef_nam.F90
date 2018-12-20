@@ -55,11 +55,11 @@ CONTAINS
       INTEGER ::   nn_perio    ! periodicity
       !                              !!* nammpp namelist *!!
       CHARACTER(len=1) ::   cn_mpi_send
-      INTEGER          ::   nn_buffer, jpni, jpnj, jpnij
+      INTEGER          ::   nn_buffer, jpni, jpnj
       LOGICAL          ::   ln_nnogather
       !!
       NAMELIST/namusr_def/ nn_isize, nn_jsize, nn_ksize, nn_perio
-      NAMELIST/nammpp/ cn_mpi_send, nn_buffer, jpni, jpnj, jpnij, ln_nnogather
+      NAMELIST/nammpp/ cn_mpi_send, nn_buffer, jpni, jpnj, ln_nnogather
       !!----------------------------------------------------------------------     
       !
       REWIND( numnam_cfg )          ! Namelist namusr_def (exist in namelist_cfg only)

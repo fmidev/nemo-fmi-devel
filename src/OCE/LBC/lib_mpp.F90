@@ -208,7 +208,7 @@ CONTAINS
       INTEGER ::   mynode, ierr, code, ji, ii, ios
       LOGICAL ::   mpi_was_called
       !
-      NAMELIST/nammpp/ cn_mpi_send, nn_buffer, jpni, jpnj, jpnij, ln_nnogather
+      NAMELIST/nammpp/ cn_mpi_send, nn_buffer, jpni, jpnj, ln_nnogather
       !!----------------------------------------------------------------------
       !
       ii = 1
@@ -230,7 +230,7 @@ CONTAINS
       WRITE(ldtxt(ii),*) '      size exported buffer   nn_buffer   = ', nn_buffer,' bytes';   ii = ii + 1
       !
       IF( jpni < 1 .OR. jpnj < 1  ) THEN
-         WRITE(ldtxt(ii),*) '      jpni, jpnj and jpnij will be calculated automatically' ;   ii = ii + 1
+         WRITE(ldtxt(ii),*) '      jpni and jpnj will be calculated automatically' ;   ii = ii + 1
       ELSE
          WRITE(ldtxt(ii),*) '      processor grid extent in i         jpni = ',jpni       ;   ii = ii + 1
          WRITE(ldtxt(ii),*) '      processor grid extent in j         jpnj = ',jpnj       ;   ii = ii + 1

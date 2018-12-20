@@ -1297,7 +1297,6 @@
    ln_nnogather =  .true.  !  activate code to avoid mpi_allgather use at the northfold
    jpni        =   0       !  jpni   number of processors following i (set automatically if < 1)
    jpnj        =   0       !  jpnj   number of processors following j (set automatically if < 1)
-   jpnij       =   0       !  jpnij  number of local domains (set automatically if < 1)
 /
 !-----------------------------------------------------------------------
 &namctl        !   Control prints                                       (default: OFF)
