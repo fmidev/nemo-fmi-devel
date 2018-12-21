@@ -51,15 +51,15 @@ for model in $models; do
 done
 
 echo
-echo '¤ Namelist parameters unfollowing naming conventions (^[cdlnr]n_*)'
+echo '¤ Namelist parameters unfollowing naming conventions (^[cdlnr]n_* or uppercase somewhere)'
 
 for nlst in $( ls namelists ); do
-    np_list=$( f90nml namelists/$nlst 2> /dev/null | awk '/=/ { print $1 }' )
+    np_list=$( sed '/^ *[!/&]/d; s|[!/&].*||' namelists/$nlst | tr -d ' ' | cut -d= -f1 )
     array=()
 
     for np in ${np_list}; do
 
-        if [[ ! ${np:0:3} =~ ^[cdlnr]n_$ ]]; then
+        if [[ ! ${np:0:3} =~ ^[cdlnr]n_$ || $( echo $np | grep [A-Z] ) ]]; then
             array+=$np' '
         fi
 
