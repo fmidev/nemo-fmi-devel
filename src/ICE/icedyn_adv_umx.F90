@@ -34,17 +34,20 @@ MODULE icedyn_adv_umx
    REAL(wp) ::   z1_6   = 1._wp /   6._wp   ! =1/6
    REAL(wp) ::   z1_120 = 1._wp / 120._wp   ! =1/120
    
+   ! limiter: 1=nonosc, 2=superbee, 3=h3(rachid)
+   INTEGER ::   kn_limiter = 1
+
    ! if T interpolated at u/v points is negative, then interpolate T at u/v points using the upstream scheme
-   LOGICAL :: ll_neg = .TRUE.
+   LOGICAL ::   ll_neg = .TRUE.
    
    ! alternate directions for upstream
-   LOGICAL :: ll_upsxy = .TRUE.
+   LOGICAL ::   ll_upsxy = .TRUE.
 
    ! alternate directions for high order
-   LOGICAL :: ll_hoxy = .TRUE.
+   LOGICAL ::   ll_hoxy = .TRUE.
    
    ! prelimiter: use it to avoid overshoot in H
-   LOGICAL :: ll_prelimiter_zalesak = .TRUE.  ! from: Zalesak(1979) eq. 14 => better for 1D. Not well defined in 2D
+   LOGICAL ::   ll_prelimiter_zalesak = .TRUE.  ! from: Zalesak(1979) eq. 14 => better for 1D. Not well defined in 2D
 
 
    !! * Substitutions
@@ -212,13 +215,32 @@ CONTAINS
       !!                  ***  ROUTINE adv_umx  ***
       !! 
       !! **  Purpose :   Compute the now trend due to total advection of 
-      !!       tracers and add it to the general trend of tracer equations
+      !!                 tracers and add it to the general trend of tracer equations
       !!
-      !! **  Method  :   TVD scheme, i.e. 2nd order centered scheme with
-      !!       corrected flux (monotonic correction)
-      !!       note: - this advection scheme needs a leap-frog time scheme
+      !! **  Method  :   - calculate upstream fluxes and upstream solution for tracer H
+      !!                 - calculate tracer H at u and v points (Ultimate)
+      !!                 - calculate the high order fluxes using alterning directions (Macho?)
+      !!                 - apply a limiter on the fluxes (nonosc)
+      !!                 - convert this tracer flux to a tracer content flux (uH -> uV)
+      !!                 - calculate the high order solution for tracer content V
       !!
-      !! ** Action : - pt  the after advective tracer
+      !! ** Action : solve 2 equations => a) da/dt = -div(ua)
+      !!                                  b) dV/dt = -div(uV) using dH/dt = -u.grad(H)
+      !!             in eq. b), - fluxes uH are evaluated (with UMx) and limited (with nonosc). This step is necessary to get a good H.
+      !!                        - then we convert this flux to a "volume" flux this way => uH*ua/u
+      !!                             where ua is the flux from eq. a)
+      !!                        - at last we estimate dV/dt = -div(uH*ua/u)
+      !!
+      !! ** Note : - this method can lead to small negative V (since we only limit H) => corrected in icedyn_adv.F90 conserving mass etc.
+      !!           - negative tracers at u-v points can also occur from the Ultimate scheme (usually at the ice edge) and the solution for now
+      !!             is to apply an upstream scheme when it occurs. A better solution would be to degrade the order of
+      !!             the scheme automatically by applying a mask of the ice cover inside Ultimate (not done).
+      !!           - Eventhough 1D tests give very good results (typically the one from Schar & Smolarkiewiecz), the 2D is less good.
+      !!             Large values of H can appear for very small ice concentration, and when it does it messes the things up since we
+      !!             work on H (and not V). It probably comes from the prelimiter of zalesak which is coded for 1D and not 2D.
+      !!             Therefore, after advection we limit the thickness to the largest value of the 9-points around (only if ice
+      !!             concentration is small).
+      !! To-do: expand the prelimiter from zalesak to make it work in 2D
       !!----------------------------------------------------------------------
       REAL(wp)                        , INTENT(in   )           ::   pamsk          ! advection of concentration (1) or other tracers (0)
       INTEGER                         , INTENT(in   )           ::   kn_umx         ! order of the scheme (1-5=UM or 20=CEN2)
@@ -234,114 +256,25 @@ CONTAINS
       !
       INTEGER  ::   ji, jj, jl       ! dummy loop indices  
       REAL(wp) ::   ztra             ! local scalar
-      INTEGER  ::   kn_limiter = 1   ! 1=nonosc ; 2=superbee ; 3=h3(rachid)
-      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zfu_ho , zfv_ho , zt_u, zt_v, zpt
+      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zfu_ho , zfv_ho , zpt
       REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zfu_ups, zfv_ups, zt_ups
       !!----------------------------------------------------------------------
       !
-      !  upstream (_ups) advection with initial mass fluxes
-      ! ---------------------------------------------------
-      !
-      IF( .NOT. ll_upsxy ) THEN         !** no alternate directions **!
-         DO jl = 1, jpl
-            DO jj = 1, jpjm1
-               DO ji = 1, fs_jpim1
-                  zfu_ups(ji,jj,jl) = MAX( pu(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pu(ji,jj), 0._wp ) * pt(ji+1,jj,jl)
-                  zfv_ups(ji,jj,jl) = MAX( pv(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pv(ji,jj), 0._wp ) * pt(ji,jj+1,jl)
-               END DO
-            END DO
-         END DO
-
-      ELSE                              !** alternate directions **!
-         !
-         IF( MOD( (kt - 1) / nn_fsbc , 2 ) ==  MOD( (jt - 1) , 2 ) ) THEN   !==  odd ice time step:  adv_x then adv_y  ==!
-            !
-            DO jl = 1, jpl              !-- flux in x-direction
-               DO jj = 1, jpjm1
-                  DO ji = 1, fs_jpim1
-                     zfu_ups(ji,jj,jl) = MAX( pu(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pu(ji,jj), 0._wp ) * pt(ji+1,jj,jl)
-                  END DO
-               END DO
-            END DO
-            !
-            DO jl = 1, jpl              !-- first guess of tracer from u-flux
-               DO jj = 2, jpjm1
-                  DO ji = fs_2, fs_jpim1
-                     zpt(ji,jj,jl) = ( pt(ji,jj,jl) - ( zfu_ups(ji,jj,jl) - zfu_ups(ji-1,jj,jl) ) * pdt * r1_e1e2t(ji,jj)  &
-                        &            + pt(ji,jj,jl) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
-                        &            ) * tmask(ji,jj,1)
-                  END DO
-               END DO
-            END DO
-            CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
-            !
-            DO jl = 1, jpl              !-- flux in y-direction
-               DO jj = 1, jpjm1
-                  DO ji = 1, fs_jpim1
-                     zfv_ups(ji,jj,jl) = MAX( pv(ji,jj), 0._wp ) * zpt(ji,jj,jl) + MIN( pv(ji,jj), 0._wp ) * zpt(ji,jj+1,jl)
-                  END DO
-               END DO
-            END DO
-            !
-         ELSE                                                               !==  even ice time step:  adv_y then adv_x  ==!
-            !
-            DO jl = 1, jpl              !-- flux in y-direction
-               DO jj = 1, jpjm1
-                  DO ji = 1, fs_jpim1
-                     zfv_ups(ji,jj,jl) = MAX( pv(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pv(ji,jj), 0._wp ) * pt(ji,jj+1,jl)
-                  END DO
-               END DO
-            END DO
-            !
-            DO jl = 1, jpl              !-- first guess of tracer from v-flux
-               DO jj = 2, jpjm1
-                  DO ji = fs_2, fs_jpim1
-                     zpt(ji,jj,jl) = ( pt(ji,jj,jl) - ( zfv_ups(ji,jj,jl) - zfv_ups(ji,jj-1,jl) ) * pdt * r1_e1e2t(ji,jj) &
-                        &            + pt(ji,jj,jl) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) &
-                        &            * tmask(ji,jj,1)
-                  END DO
-               END DO
-            END DO
-            CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
-            !
-            DO jl = 1, jpl              !-- flux in x-direction
-               DO jj = 1, jpjm1
-                  DO ji = 1, fs_jpim1
-                     zfu_ups(ji,jj,jl) = MAX( pu(ji,jj), 0._wp ) * zpt(ji,jj,jl) + MIN( pu(ji,jj), 0._wp ) * zpt(ji+1,jj,jl)
-                  END DO
-               END DO
-            END DO
-            !
-         ENDIF
-         
-      ENDIF
-      !
-      DO jl = 1, jpl                    !-- after tracer with upstream scheme
-         DO jj = 2, jpjm1
-            DO ji = fs_2, fs_jpim1
-               ztra          = - (   zfu_ups(ji,jj,jl) - zfu_ups(ji-1,jj  ,jl)   &
-                  &                + zfv_ups(ji,jj,jl) - zfv_ups(ji  ,jj-1,jl) ) * r1_e1e2t(ji,jj)
-               zt_ups(ji,jj,jl) = ( pt (ji,jj,jl) + pdt * ztra + ( pt(ji,jj,jl) * pdt * ( pu(ji,jj) - pu(ji-1,jj) )   &
-                  &                                            +   pt(ji,jj,jl) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) ) &
-                  &                                              * r1_e1e2t(ji,jj) * (1.-pamsk) ) * tmask(ji,jj,1)
-            END DO
-         END DO
-      END DO
-      CALL lbc_lnk( 'icedyn_adv_umx', zt_ups, 'T', 1. )
-
+      ! Upstream (_ups) fluxes 
+      ! -----------------------
+      CALL upstream( pamsk, jt, kt, pdt, pt, pu, pv, zt_ups, zfu_ups, zfv_ups )
+      
       ! High order (_ho) fluxes 
       ! -----------------------
       SELECT CASE( kn_umx )
          !
       CASE ( 20 )                          !== centered second order ==!
          !
-         CALL cen2( pamsk, kn_limiter, jt, kt, pdt, pt, pu, pv, puc, pvc, ptc, zfu_ho, zfv_ho,  &
-            &       zt_ups, zfu_ups, zfv_ups )
+         CALL cen2( pamsk, jt, kt, pdt, pt, pu, pv, puc, pvc, ptc, zt_ups, zfu_ups, zfv_ups, zfu_ho, zfv_ho )
          !
       CASE ( 1:5 )                         !== 1st to 5th order ULTIMATE-MACHO scheme ==!
          !
-         CALL macho( pamsk, kn_limiter, kn_umx, jt, kt, pdt, pt, pu, pv, puc, pvc, pubox, pvbox, ptc, zt_u, zt_v, zfu_ho, zfv_ho,  &
-            &        zt_ups, zfu_ups, zfv_ups )
+         CALL macho( pamsk, kn_umx, jt, kt, pdt, pt, pu, pv, puc, pvc, pubox, pvbox, ptc, zt_ups, zfu_ups, zfv_ups, zfu_ho, zfv_ho )
          !
       END SELECT
       !
@@ -371,9 +304,9 @@ CONTAINS
             END DO
          END DO
       ENDIF
-      !
-      ! in case of advection of A: output u*a(ho)
-      ! -----------------------------------------
+      !                                   --ho
+      ! in case of advection of A: output u*a
+      ! -------------------------------------
       IF( PRESENT( pua_ho ) ) THEN
          DO jl = 1, jpl
             DO jj = 1, jpjm1
@@ -390,9 +323,9 @@ CONTAINS
       DO jl = 1, jpl
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1 
-               ztra = - ( zfu_ho(ji,jj,jl) - zfu_ho(ji-1,jj,jl) + zfv_ho(ji,jj,jl) - zfv_ho(ji,jj-1,jl) ) * r1_e1e2t(ji,jj) * pdt  
-               
-               ptc(ji,jj,jl) = ( ptc(ji,jj,jl) + ztra ) * tmask(ji,jj,1)               
+               ztra = - ( zfu_ho(ji,jj,jl) - zfu_ho(ji-1,jj,jl) + zfv_ho(ji,jj,jl) - zfv_ho(ji,jj-1,jl) )  
+               !
+               ptc(ji,jj,jl) = ( ptc(ji,jj,jl) + ztra * r1_e1e2t(ji,jj) * pdt ) * tmask(ji,jj,1)               
             END DO
          END DO
       END DO
@@ -401,20 +334,128 @@ CONTAINS
    END SUBROUTINE adv_umx
 
 
-   SUBROUTINE cen2( pamsk, kn_limiter, jt, kt, pdt, pt, pu, pv, puc, pvc, ptc, pfu_ho, pfv_ho, &
-      &             pt_ups, pfu_ups, pfv_ups )
+   SUBROUTINE upstream( pamsk, jt, kt, pdt, pt, pu, pv, pt_ups, pfu_ups, pfv_ups )
       !!---------------------------------------------------------------------
-      !!                    ***  ROUTINE macho  ***
+      !!                    ***  ROUTINE upstream  ***
       !!     
-      !! **  Purpose :   compute  
-      !!
-      !! **  Method  :   ... ???
-      !!                 TIM = transient interpolation Modeling 
-      !!
-      !! Reference : Leonard, B.P., 1991, Comput. Methods Appl. Mech. Eng., 88, 17-74. 
+      !! **  Purpose :   compute the upstream fluxes and upstream guess of tracer
       !!----------------------------------------------------------------------
       REAL(wp)                        , INTENT(in   ) ::   pamsk            ! advection of concentration (1) or other tracers (0)
-      INTEGER                         , INTENT(in   ) ::   kn_limiter       ! limiter
+      INTEGER                         , INTENT(in   ) ::   jt               ! number of sub-iteration
+      INTEGER                         , INTENT(in   ) ::   kt               ! number of iteration
+      REAL(wp)                        , INTENT(in   ) ::   pdt              ! tracer time-step
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt               ! tracer fields
+      REAL(wp), DIMENSION(:,:  )      , INTENT(in   ) ::   pu, pv           ! 2 ice velocity components
+      REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pt_ups           ! upstream guess of tracer 
+      REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pfu_ups, pfv_ups ! upstream fluxes 
+      !
+      INTEGER  ::   ji, jj, jl    ! dummy loop indices
+      REAL(wp) ::   ztra          ! local scalar
+      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zpt
+      !!----------------------------------------------------------------------
+
+      IF( .NOT. ll_upsxy ) THEN         !** no alternate directions **!
+         !
+         DO jl = 1, jpl
+            DO jj = 1, jpjm1
+               DO ji = 1, fs_jpim1
+                  pfu_ups(ji,jj,jl) = MAX( pu(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pu(ji,jj), 0._wp ) * pt(ji+1,jj,jl)
+                  pfv_ups(ji,jj,jl) = MAX( pv(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pv(ji,jj), 0._wp ) * pt(ji,jj+1,jl)
+               END DO
+            END DO
+         END DO
+         !
+      ELSE                              !** alternate directions **!
+         !
+         IF( MOD( (kt - 1) / nn_fsbc , 2 ) ==  MOD( (jt - 1) , 2 ) ) THEN   !==  odd ice time step:  adv_x then adv_y  ==!
+            !
+            DO jl = 1, jpl              !-- flux in x-direction
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
+                     pfu_ups(ji,jj,jl) = MAX( pu(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pu(ji,jj), 0._wp ) * pt(ji+1,jj,jl)
+                  END DO
+               END DO
+            END DO
+            !
+            DO jl = 1, jpl              !-- first guess of tracer from u-flux
+               DO jj = 2, jpjm1
+                  DO ji = fs_2, fs_jpim1
+                     ztra = - ( pfu_ups(ji,jj,jl) - pfu_ups(ji-1,jj,jl) )              &
+                        &   + ( pu     (ji,jj   ) - pu     (ji-1,jj   ) ) * pt(ji,jj,jl) * (1.-pamsk)
+                     !
+                     zpt(ji,jj,jl) = ( pt(ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
+                  END DO
+               END DO
+            END DO
+            CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
+            !
+            DO jl = 1, jpl              !-- flux in y-direction
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
+                     pfv_ups(ji,jj,jl) = MAX( pv(ji,jj), 0._wp ) * zpt(ji,jj,jl) + MIN( pv(ji,jj), 0._wp ) * zpt(ji,jj+1,jl)
+                  END DO
+               END DO
+            END DO
+            !
+         ELSE                                                               !==  even ice time step:  adv_y then adv_x  ==!
+            !
+            DO jl = 1, jpl              !-- flux in y-direction
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
+                     pfv_ups(ji,jj,jl) = MAX( pv(ji,jj), 0._wp ) * pt(ji,jj,jl) + MIN( pv(ji,jj), 0._wp ) * pt(ji,jj+1,jl)
+                  END DO
+               END DO
+            END DO
+            !
+            DO jl = 1, jpl              !-- first guess of tracer from v-flux
+               DO jj = 2, jpjm1
+                  DO ji = fs_2, fs_jpim1
+                     ztra = - ( pfv_ups(ji,jj,jl) - pfv_ups(ji,jj-1,jl) )  &
+                        &   + ( pv     (ji,jj   ) - pv     (ji,jj-1   ) ) * pt(ji,jj,jl) * (1.-pamsk)
+                     !
+                     zpt(ji,jj,jl) = ( pt(ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
+                  END DO
+               END DO
+            END DO
+            CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
+            !
+            DO jl = 1, jpl              !-- flux in x-direction
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
+                     pfu_ups(ji,jj,jl) = MAX( pu(ji,jj), 0._wp ) * zpt(ji,jj,jl) + MIN( pu(ji,jj), 0._wp ) * zpt(ji+1,jj,jl)
+                  END DO
+               END DO
+            END DO
+            !
+         ENDIF
+         
+      ENDIF
+      !
+      DO jl = 1, jpl                    !-- after tracer with upstream scheme
+         DO jj = 2, jpjm1
+            DO ji = fs_2, fs_jpim1
+               ztra = - (   pfu_ups(ji,jj,jl) - pfu_ups(ji-1,jj  ,jl)   &
+                  &       + pfv_ups(ji,jj,jl) - pfv_ups(ji  ,jj-1,jl) ) &
+                  &   + (   pu     (ji,jj   ) - pu     (ji-1,jj     )   &
+                  &       + pv     (ji,jj   ) - pv     (ji  ,jj-1   ) ) * pt(ji,jj,jl) * (1.-pamsk)
+               !
+               pt_ups(ji,jj,jl) = ( pt (ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
+            END DO
+         END DO
+      END DO
+      CALL lbc_lnk( 'icedyn_adv_umx', pt_ups, 'T', 1. )
+
+   END SUBROUTINE upstream
+
+   
+   SUBROUTINE cen2( pamsk, jt, kt, pdt, pt, pu, pv, puc, pvc, ptc, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+      !!---------------------------------------------------------------------
+      !!                    ***  ROUTINE cen2  ***
+      !!     
+      !! **  Purpose :   compute the high order fluxes using a centered
+      !!                 second order scheme 
+      !!----------------------------------------------------------------------
+      REAL(wp)                        , INTENT(in   ) ::   pamsk            ! advection of concentration (1) or other tracers (0)
       INTEGER                         , INTENT(in   ) ::   jt               ! number of sub-iteration
       INTEGER                         , INTENT(in   ) ::   kt               ! number of iteration
       REAL(wp)                        , INTENT(in   ) ::   pdt              ! tracer time-step
@@ -422,12 +463,13 @@ CONTAINS
       REAL(wp), DIMENSION(:,:  )      , INTENT(in   ) ::   pu, pv           ! 2 ice velocity components
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   puc, pvc         ! 2 ice velocity * A components
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   ptc              ! tracer content at before time step 
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt_ups           ! upstream guess of tracer 
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pfu_ups, pfv_ups ! upstream fluxes 
       REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pfu_ho, pfv_ho   ! high order fluxes 
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt_ups           ! upstream guess of tracer content 
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(inout) ::   pfu_ups, pfv_ups ! upstream fluxes 
       !
       INTEGER  ::   ji, jj, jl    ! dummy loop indices
-      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zzt
+      REAL(wp) ::   ztra          ! local scalar
+      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zpt
       !!----------------------------------------------------------------------
       !
       IF( .NOT.ll_hoxy ) THEN           !** no alternate directions **!
@@ -441,13 +483,10 @@ CONTAINS
             END DO
          END DO
          IF    ( kn_limiter == 1 ) THEN
-            CALL nonosc_2d( pamsk, pdt, pu, puc, pv, pvc, ptc, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
-         ELSEIF( kn_limiter == 2 ) THEN
-            CALL limiter_x( pdt, pu, pt, pfu_ho )
-            CALL limiter_y( pdt, pv, pt, pfv_ho )
-         ELSEIF( kn_limiter == 3 ) THEN
-            CALL limiter_x( pdt, pu, pt, pfu_ho, pfu_ups )
-            CALL limiter_y( pdt, pv, pt, pfv_ho, pfv_ups )
+            CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+         ELSEIF( kn_limiter == 2 .OR. kn_limiter == 3 ) THEN
+            CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
+            CALL limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
          ENDIF
          !
       ELSE                              !** alternate directions **!
@@ -461,29 +500,28 @@ CONTAINS
                   END DO
                END DO
             END DO
-            IF( kn_limiter == 2 )   CALL limiter_x( pdt, pu, pt, pfu_ho )
-            IF( kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ho, pfu_ups )
+            IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
 
             DO jl = 1, jpl              !-- first guess of tracer from u-flux
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1
-                     zzt(ji,jj,jl) = ( pt(ji,jj,jl) - ( pfu_ho(ji,jj,jl) - pfu_ho(ji-1,jj,jl) ) * pdt * r1_e1e2t(ji,jj)        &
-                        &            + pt(ji,jj,jl) * pdt * ( pu(ji,jj) - pu(ji-1,jj) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) &
-                        &         * tmask(ji,jj,1)
+                     ztra = - ( pfu_ho(ji,jj,jl) - pfu_ho(ji-1,jj,jl) )              &
+                        &   + ( pu    (ji,jj   ) - pu    (ji-1,jj   ) ) * pt(ji,jj,jl) * (1.-pamsk)
+                     !
+                     zpt(ji,jj,jl) = ( pt(ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                   END DO
                END DO
             END DO
-            CALL lbc_lnk( 'icedyn_adv_umx', zzt, 'T', 1. )
+            CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
 
             DO jl = 1, jpl              !-- flux in y-direction
                DO jj = 1, jpjm1
                   DO ji = 1, fs_jpim1
-                     pfv_ho(ji,jj,jl) = 0.5 * pv(ji,jj) * ( zzt(ji,jj,jl) + zzt(ji,jj+1,jl) )
+                     pfv_ho(ji,jj,jl) = 0.5 * pv(ji,jj) * ( zpt(ji,jj,jl) + zpt(ji,jj+1,jl) )
                   END DO
                END DO
             END DO
-            IF( kn_limiter == 2 )   CALL limiter_y( pdt, pv, pt, pfv_ho )
-            IF( kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ho, pfv_ups )
+            IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
 
          ELSE                                                               !==  even ice time step:  adv_y then adv_x  ==!
             !
@@ -494,52 +532,48 @@ CONTAINS
                   END DO
                END DO
             END DO
-            IF( kn_limiter == 2 )   CALL limiter_y( pdt, pv, pt, pfv_ho )
-            IF( kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ho, pfv_ups )
+            IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
             !
             DO jl = 1, jpl              !-- first guess of tracer from v-flux
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1
-                     zzt(ji,jj,jl) = ( pt(ji,jj,jl) - ( pfv_ho(ji,jj,jl) - pfv_ho(ji,jj-1,jl) ) * pdt * r1_e1e2t(ji,jj) &
-                        &                     + pt(ji,jj,jl) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) ) &
-                        &         * tmask(ji,jj,1)
+                     ztra = - ( pfv_ho(ji,jj,jl) - pfv_ho(ji,jj-1,jl) )  &
+                        &   + ( pv    (ji,jj   ) - pv    (ji,jj-1   ) ) * pt(ji,jj,jl) * (1.-pamsk)
+                     !
+                     zpt(ji,jj,jl) = ( pt(ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
                   END DO
                END DO
             END DO
-            CALL lbc_lnk( 'icedyn_adv_umx', zzt, 'T', 1. )
+            CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
             !
             DO jl = 1, jpl              !-- flux in x-direction
                DO jj = 1, jpjm1
                   DO ji = 1, fs_jpim1
-                     pfu_ho(ji,jj,jl) = 0.5 * pu(ji,jj) * ( zzt(ji,jj,jl) + zzt(ji+1,jj,jl) )
+                     pfu_ho(ji,jj,jl) = 0.5 * pu(ji,jj) * ( zpt(ji,jj,jl) + zpt(ji+1,jj,jl) )
                   END DO
                END DO
             END DO
-            IF( kn_limiter == 2 )   CALL limiter_x( pdt, pu, pt, pfu_ho )
-            IF( kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ho, pfu_ups )
+            IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
 
          ENDIF
-         IF( kn_limiter == 1 )   CALL nonosc_2d( pamsk, pdt, pu, puc, pv, pvc, ptc, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+         IF( kn_limiter == 1 )   CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
          
       ENDIF
    
    END SUBROUTINE cen2
 
    
-   SUBROUTINE macho( pamsk, kn_limiter, kn_umx, jt, kt, pdt, pt, pu, pv, puc, pvc, pubox, pvbox, ptc, pt_u, pt_v, pfu_ho, pfv_ho, &
-      &              pt_ups, pfu_ups, pfv_ups )
+   SUBROUTINE macho( pamsk, kn_umx, jt, kt, pdt, pt, pu, pv, puc, pvc, pubox, pvbox, ptc, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE macho  ***
       !!     
-      !! **  Purpose :   compute  
+      !! **  Purpose :   compute the high order fluxes using Ultimate-Macho scheme  
       !!
-      !! **  Method  :   ... ???
-      !!                 TIM = transient interpolation Modeling 
+      !! **  Method  :   ...
       !!
       !! Reference : Leonard, B.P., 1991, Comput. Methods Appl. Mech. Eng., 88, 17-74. 
       !!----------------------------------------------------------------------
       REAL(wp)                        , INTENT(in   ) ::   pamsk            ! advection of concentration (1) or other tracers (0)
-      INTEGER                         , INTENT(in   ) ::   kn_limiter       ! limiter
       INTEGER                         , INTENT(in   ) ::   kn_umx           ! order of the scheme (1-5=UM or 20=CEN2)
       INTEGER                         , INTENT(in   ) ::   jt               ! number of sub-iteration
       INTEGER                         , INTENT(in   ) ::   kt               ! number of iteration
@@ -549,81 +583,74 @@ CONTAINS
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   puc, pvc         ! 2 ice velocity * A components
       REAL(wp), DIMENSION(:,:  )      , INTENT(in   ) ::   pubox, pvbox     ! upstream velocity
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   ptc              ! tracer content at before time step 
-      REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pt_u, pt_v       ! tracer at u- and v-points 
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt_ups           ! upstream guess of tracer 
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pfu_ups, pfv_ups ! upstream fluxes 
       REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pfu_ho, pfv_ho   ! high order fluxes 
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt_ups           ! upstream guess of tracer content 
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(inout) ::   pfu_ups, pfv_ups ! upstream fluxes 
       !
       INTEGER  ::   ji, jj, jl    ! dummy loop indices
-      REAL(wp) ::   ztra
-      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zzt, zzfu_ho, zzfv_ho
+      REAL(wp), DIMENSION(jpi,jpj,jpl) ::   zt_u, zt_v, zpt
       !!----------------------------------------------------------------------
       !
       IF( MOD( (kt - 1) / nn_fsbc , 2 ) ==  MOD( (jt - 1) , 2 ) ) THEN   !==  odd ice time step:  adv_x then adv_y  ==!
          !
          !                                                        !--  ultimate interpolation of pt at u-point  --!
-         CALL ultimate_x( kn_umx, pdt, pt, pu, pt_u, pfu_ho )
+         CALL ultimate_x( kn_umx, pdt, pt, pu, zt_u, pfu_ho )
          !                                                        !--  limiter in x --!
-         IF( kn_limiter == 2 )   CALL limiter_x( pdt, pu, pt, pfu_ho )
-         IF( kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ho, pfu_ups )
-         !                                                        !--  advective form update in zzt  --!
+         IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
+         !                                                        !--  advective form update in zpt  --!
          DO jl = 1, jpl
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
-                  zzt(ji,jj,jl) = pt(ji,jj,jl) - pubox(ji,jj   ) * pdt * ( pt_u(ji,jj,jl) - pt_u(ji-1,jj,jl) ) * r1_e1t(ji,jj)  &
-                     &                         - pt   (ji,jj,jl) * pdt * ( pu  (ji,jj) - pu  (ji-1,jj) ) * r1_e1e2t(ji,jj) * pamsk
-                  zzt(ji,jj,jl) = zzt(ji,jj,jl) * tmask(ji,jj,1)
+                  zpt(ji,jj,jl) = ( pt(ji,jj,jl) - (  pubox(ji,jj   ) * ( zt_u(ji,jj,jl) - zt_u(ji-1,jj,jl) ) * r1_e1t  (ji,jj) &
+                     &                              + pt   (ji,jj,jl) * ( pu  (ji,jj   ) - pu  (ji-1,jj   ) ) * r1_e1e2t(ji,jj) &
+                     &                                                                                        * pamsk           &
+                     &                             ) * pdt ) * tmask(ji,jj,1) 
                END DO
             END DO
          END DO
-         CALL lbc_lnk( 'icedyn_adv_umx', zzt, 'T', 1. )
+         CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
          !
          !                                                        !--  ultimate interpolation of pt at v-point  --!
          IF( ll_hoxy ) THEN
-            CALL ultimate_y( kn_umx, pdt, zzt, pv, pt_v, pfv_ho )
+            CALL ultimate_y( kn_umx, pdt, zpt, pv, zt_v, pfv_ho )
          ELSE
-            CALL ultimate_y( kn_umx, pdt, pt, pv, pt_v, pfv_ho )
+            CALL ultimate_y( kn_umx, pdt, pt , pv, zt_v, pfv_ho )
          ENDIF
          !                                                        !--  limiter in y --!
-         IF( kn_limiter == 2 )   CALL limiter_y( pdt, pv, pt, pfv_ho )
-         IF( kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ho, pfv_ups )
+         IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
          !         
          !
       ELSE                                                               !==  even ice time step:  adv_y then adv_x  ==!
          !
          !                                                        !--  ultimate interpolation of pt at v-point  --!
-         CALL ultimate_y( kn_umx, pdt, pt, pv, pt_v, pfv_ho )
+         CALL ultimate_y( kn_umx, pdt, pt, pv, zt_v, pfv_ho )
          !                                                        !--  limiter in y --!
-         IF( kn_limiter == 2 )   CALL limiter_y( pdt, pv, pt, pfv_ho )
-         IF( kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ho, pfv_ups )
-         !                                                        !--  advective form update in zzt  --!
+         IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
+         !                                                        !--  advective form update in zpt  --!
          DO jl = 1, jpl
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
-                  zzt(ji,jj,jl) = pt(ji,jj,jl) - pvbox(ji,jj   ) * pdt * ( pt_v(ji,jj,jl) - pt_v(ji,jj-1,jl) ) * r1_e2t(ji,jj)  &
-                     &                         - pt   (ji,jj,jl) * pdt * ( pv  (ji,jj) - pv  (ji,jj-1) ) * r1_e1e2t(ji,jj) * pamsk
-                  zzt(ji,jj,jl) = zzt(ji,jj,jl) * tmask(ji,jj,1)
+                  zpt(ji,jj,jl) = ( pt(ji,jj,jl) - (  pvbox(ji,jj   ) * ( zt_v(ji,jj,jl) - zt_v(ji,jj-1,jl) ) * r1_e2t  (ji,jj) &
+                     &                              + pt   (ji,jj,jl) * ( pv  (ji,jj   ) - pv  (ji,jj-1   ) ) * r1_e1e2t(ji,jj) &
+                     &                                                                                        * pamsk           &
+                     &                             ) * pdt ) * tmask(ji,jj,1) 
                END DO
             END DO
          END DO
-         CALL lbc_lnk( 'icedyn_adv_umx', zzt, 'T', 1. )
+         CALL lbc_lnk( 'icedyn_adv_umx', zpt, 'T', 1. )
          !
          !                                                        !--  ultimate interpolation of pt at u-point  --!
          IF( ll_hoxy ) THEN
-            CALL ultimate_x( kn_umx, pdt, zzt, pu, pt_u, pfu_ho )
+            CALL ultimate_x( kn_umx, pdt, zpt, pu, zt_u, pfu_ho )
          ELSE
-            CALL ultimate_x( kn_umx, pdt, pt, pu, pt_u, pfu_ho )
+            CALL ultimate_x( kn_umx, pdt, pt , pu, zt_u, pfu_ho )
          ENDIF
          !                                                        !--  limiter in x --!
-         IF( kn_limiter == 2 )   CALL limiter_x( pdt, pu, pt, pfu_ho )
-         IF( kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ho, pfu_ups )
-         !
+         IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
          !
       ENDIF
 
-      IF( kn_limiter == 1 ) THEN
-         CALL nonosc_2d ( pamsk, pdt, pu, puc, pv, pvc, ptc, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
-      ENDIF
+      IF( kn_limiter == 1 )   CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !
    END SUBROUTINE macho
 
@@ -632,10 +659,9 @@ CONTAINS
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE ultimate_x  ***
       !!     
-      !! **  Purpose :   compute  
+      !! **  Purpose :   compute tracer at u-points 
       !!
-      !! **  Method  :   ... ???
-      !!                 TIM = transient interpolation Modeling 
+      !! **  Method  :   ...
       !!
       !! Reference : Leonard, B.P., 1991, Comput. Methods Appl. Mech. Eng., 88, 17-74. 
       !!----------------------------------------------------------------------
@@ -713,10 +739,10 @@ CONTAINS
                   zcu  = pu(ji,jj) * r1_e2u(ji,jj) * pdt * r1_e1u(ji,jj)
                   zdx2 = e1u(ji,jj) * e1u(ji,jj)
 !!rachid          zdx2 = e1u(ji,jj) * e1t(ji,jj)
-                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                      pt  (ji+1,jj,jl) + pt  (ji,jj,jl)        &
-                     &                                               -              zcu   * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) )  )   &
-                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) * (                         ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)        &
-                     &                                               - SIGN( 1._wp, zcu ) * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) )  )   )
+                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                      pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
+                     &                                               -              zcu   * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) * (                         ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
+                     &                                               - SIGN( 1._wp, zcu ) * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) )
                END DO
             END DO
          END DO
@@ -729,10 +755,10 @@ CONTAINS
                   zcu  = pu(ji,jj) * r1_e2u(ji,jj) * pdt * r1_e1u(ji,jj)
                   zdx2 = e1u(ji,jj) * e1u(ji,jj)
 !!rachid          zdx2 = e1u(ji,jj) * e1t(ji,jj)
-                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                pt  (ji+1,jj,jl) + pt  (ji,jj,jl)        &
-                     &                                               -          zcu * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) )  )   &
-                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) * (                   ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)        &
-                     &                                               - 0.5_wp * zcu * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) )  )   )
+                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
+                     &                                               -          zcu * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) * (                   ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
+                     &                                               - 0.5_wp * zcu * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) )
                END DO
             END DO
          END DO
@@ -746,11 +772,11 @@ CONTAINS
                   zdx2 = e1u(ji,jj) * e1u(ji,jj)
 !!rachid          zdx2 = e1u(ji,jj) * e1t(ji,jj)
                   zdx4 = zdx2 * zdx2
-                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (            (                   pt  (ji+1,jj,jl) + pt  (ji,jj,jl)       &
-                     &                                                     -          zcu * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) )   &
-                     &        + z1_6   * zdx2 * ( zcu*zcu - 1._wp ) *     (                   ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)       &
-                     &                                                     - 0.5_wp * zcu * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) )   &
-                     &        + z1_120 * zdx4 * ( zcu*zcu - 1._wp ) * ( zcu*zcu - 4._wp ) * ( ztu4(ji+1,jj,jl) + ztu4(ji,jj,jl)       &
+                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (            (                   pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
+                     &                                                     -          zcu * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6   * zdx2 * ( zcu*zcu - 1._wp ) *     (                   ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
+                     &                                                     - 0.5_wp * zcu * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) &
+                     &        + z1_120 * zdx4 * ( zcu*zcu - 1._wp ) * ( zcu*zcu - 4._wp ) * ( ztu4(ji+1,jj,jl) + ztu4(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcu ) * ( ztu4(ji+1,jj,jl) - ztu4(ji,jj,jl) ) ) )
                END DO
             END DO
@@ -789,10 +815,9 @@ CONTAINS
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE ultimate_y  ***
       !!     
-      !! **  Purpose :   compute  
+      !! **  Purpose :   compute tracer at v-points 
       !!
-      !! **  Method  :   ... ???
-      !!                 TIM = transient interpolation Modeling 
+      !! **  Method  :   ...
       !!
       !! Reference : Leonard, B.P., 1991, Comput. Methods Appl. Mech. Eng., 88, 17-74. 
       !!----------------------------------------------------------------------
@@ -870,9 +895,9 @@ CONTAINS
                   zcv  = pv(ji,jj) * r1_e1v(ji,jj) * pdt * r1_e2v(ji,jj)
                   zdy2 = e2v(ji,jj) * e2v(ji,jj)
 !!rachid          zdy2 = e2v(ji,jj) * e2t(ji,jj)
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)       &
-                     &                                     -                        zcv   * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) )   &
-                     &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                         ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)       &
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
+                     &                                     -                        zcv   * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                         ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcv ) * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) )
                END DO
             END DO
@@ -885,9 +910,9 @@ CONTAINS
                   zcv  = pv(ji,jj) * r1_e1v(ji,jj) * pdt * r1_e2v(ji,jj)
                   zdy2 = e2v(ji,jj) * e2v(ji,jj)
 !!rachid          zdy2 = e2v(ji,jj) * e2t(ji,jj)
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                        ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)       &
-                     &                                               -          zcv * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) )   &
-                     &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                   ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)       &
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                        ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
+                     &                                               -          zcv * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                   ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
                      &                                               - 0.5_wp * zcv * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) )
                END DO
             END DO
@@ -901,11 +926,11 @@ CONTAINS
                   zdy2 = e2v(ji,jj) * e2v(ji,jj)
 !!rachid          zdy2 = e2v(ji,jj) * e2t(ji,jj)
                   zdy4 = zdy2 * zdy2
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)      &
-                     &                                                     -          zcv * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) )  &
-                     &        + z1_6   * zdy2 * ( zcv*zcv - 1._wp ) *     (                   ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)      &
-                     &                                                     - 0.5_wp * zcv * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) )  &
-                     &        + z1_120 * zdy4 * ( zcv*zcv - 1._wp ) * ( zcv*zcv - 4._wp ) * ( ztv4(ji,jj+1,jl) + ztv4(ji,jj,jl)      &
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
+                     &                                                     -          zcv * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6   * zdy2 * ( zcv*zcv - 1._wp ) *     (                   ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
+                     &                                                     - 0.5_wp * zcv * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) &
+                     &        + z1_120 * zdy4 * ( zcv*zcv - 1._wp ) * ( zcv*zcv - 4._wp ) * ( ztv4(ji,jj+1,jl) + ztv4(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcv ) * ( ztv4(ji,jj+1,jl) - ztv4(ji,jj,jl) ) ) )
                END DO
             END DO
@@ -940,27 +965,21 @@ CONTAINS
    END SUBROUTINE ultimate_y
      
 
-   SUBROUTINE nonosc_2d( pamsk, pdt, pu, puc, pv, pvc, ptc, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+   SUBROUTINE nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE nonosc  ***
       !!     
-       !! **  Purpose :   compute monotonic tracer fluxes from the upstream 
+      !! **  Purpose :   compute monotonic tracer fluxes from the upstream 
       !!       scheme and the before field by a nonoscillatory algorithm 
       !!
-      !! **  Method  :   ... ???
-      !!       warning : pt and pt_ups must be masked, but the boundaries
-      !!       conditions on the fluxes are not necessary zalezak (1979)
-      !!       drange (1995) multi-dimensional forward-in-time and upstream-
-      !!       in-space based differencing for fluid
+      !! **  Method  :   ...
       !!----------------------------------------------------------------------
       REAL(wp)                   , INTENT(in   ) ::   pamsk            ! advection of concentration (1) or other tracers (0)
       REAL(wp)                   , INTENT(in   ) ::   pdt              ! tracer time-step
       REAL(wp), DIMENSION (:,:  ), INTENT(in   ) ::   pu               ! ice i-velocity => u*e2
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   puc              ! ice i-velocity *A => u*e2*a
       REAL(wp), DIMENSION (:,:  ), INTENT(in   ) ::   pv               ! ice j-velocity => v*e1
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   pvc              ! ice j-velocity *A => v*e1*a
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   ptc, pt, pt_ups  ! before field & upstream guess of after field
-      REAL(wp), DIMENSION (:,:,:), INTENT(inout) ::   pfv_ups, pfu_ups ! upstream flux
+      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   pt, pt_ups       ! before field & upstream guess of after field
+      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   pfv_ups, pfu_ups ! upstream flux
       REAL(wp), DIMENSION (:,:,:), INTENT(inout) ::   pfv_ho, pfu_ho   ! monotonic flux
       !
       INTEGER  ::   ji, jj, jl    ! dummy loop indices
@@ -1003,40 +1022,20 @@ CONTAINS
          END DO
          CALL lbc_lnk_multi( 'icedyn_adv_umx', zti_ups, 'T', 1., ztj_ups, 'T', 1. )
 
-         !! this does not work ??
-         !!            DO jj = 2, jpjm1
-         !!               DO ji = fs_2, fs_jpim1
-         !!                  IF( SIGN( 1., pfu_ho(ji,jj) ) /= SIGN( 1., pt_ups (ji+1,jj  ) - pt_ups (ji  ,jj) ) .AND.     &
-         !!               &      SIGN( 1., pfv_ho(ji,jj) ) /= SIGN( 1., pt_ups (ji  ,jj+1) - pt_ups (ji  ,jj) )           &
-         !!               &    ) THEN
-         !!                     IF( SIGN( 1., pfu_ho(ji,jj) ) /= SIGN( 1., zti_ups(ji+1,jj ) - zti_ups(ji  ,jj) ) .AND.   &
-         !!               &         SIGN( 1., pfv_ho(ji,jj) ) /= SIGN( 1., ztj_ups(ji,jj+1 ) - ztj_ups(ji  ,jj) )         &
-         !!               &       ) THEN
-         !!                        pfu_ho(ji,jj) = 0.  ;   pfv_ho(ji,jj) = 0.
-         !!                     ENDIF
-         !!                     IF( SIGN( 1., pfu_ho(ji,jj) ) /= SIGN( 1., pt_ups (ji  ,jj) - pt_ups (ji-1,jj  ) ) .AND.  &
-         !!               &         SIGN( 1., pfv_ho(ji,jj) ) /= SIGN( 1., pt_ups (ji  ,jj) - pt_ups (ji  ,jj-1) )        &
-         !!               &       )  THEN
-         !!                        pfu_ho(ji,jj) = 0.  ;   pfv_ho(ji,jj) = 0.
-         !!                     ENDIF
-         !!                  ENDIF
-         !!                END DO
-         !!            END DO            
-
          DO jl = 1, jpl
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
                   IF ( pfu_ho(ji,jj,jl) * ( pt_ups(ji+1,jj,jl) - pt_ups(ji,jj,jl) ) <= 0. .AND.  &
                      & pfv_ho(ji,jj,jl) * ( pt_ups(ji,jj+1,jl) - pt_ups(ji,jj,jl) ) <= 0. ) THEN
                      !
-                     IF(  pfu_ho(ji,jj,jl) * ( zti_ups(ji+1,jj,jl) - zti_ups(ji,jj,jl) ) <= 0 .AND.  &
-                        & pfv_ho(ji,jj,jl) * ( ztj_ups(ji,jj+1,jl) - ztj_ups(ji,jj,jl) ) <= 0) THEN
+                     IF(  pfu_ho(ji,jj,jl) * ( zti_ups(ji+1,jj,jl) - zti_ups(ji,jj,jl) ) <= 0. .AND.  &
+                        & pfv_ho(ji,jj,jl) * ( ztj_ups(ji,jj+1,jl) - ztj_ups(ji,jj,jl) ) <= 0. ) THEN
                         pfu_ho(ji,jj,jl)=0.
                         pfv_ho(ji,jj,jl)=0.
                      ENDIF
                      !
-                     IF(  pfu_ho(ji,jj,jl) * ( pt_ups(ji  ,jj,jl) - pt_ups(ji-1,jj,jl) ) <= 0 .AND.  &
-                        & pfv_ho(ji,jj,jl) * ( pt_ups(ji  ,jj,jl) - pt_ups(ji,jj-1,jl) ) <= 0) THEN
+                     IF(  pfu_ho(ji,jj,jl) * ( pt_ups(ji  ,jj,jl) - pt_ups(ji-1,jj,jl) ) <= 0. .AND.  &
+                        & pfv_ho(ji,jj,jl) * ( pt_ups(ji  ,jj,jl) - pt_ups(ji,jj-1,jl) ) <= 0. ) THEN
                         pfu_ho(ji,jj,jl)=0.
                         pfv_ho(ji,jj,jl)=0.
                      ENDIF
@@ -1048,7 +1047,6 @@ CONTAINS
          CALL lbc_lnk_multi( 'icedyn_adv_umx', pfu_ho, 'U', -1., pfv_ho, 'V', -1. )   ! lateral boundary cond.
 
       ENDIF
-
 
       ! Search local extrema
       ! --------------------
@@ -1085,9 +1083,9 @@ CONTAINS
                zneg = MAX( 0., pfu_ho(ji  ,jj,jl) ) - MIN( 0., pfu_ho(ji-1,jj,jl) ) &
                   & + MAX( 0., pfv_ho(ji,jj  ,jl) ) - MIN( 0., pfv_ho(ji,jj-1,jl) )
                !
-               zpos = zpos - ( pt(ji,jj,jl) * MIN( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MIN( 0., pv(ji,jj) - pv(ji,jj-1) ) &
+               zpos = zpos - (pt(ji,jj,jl) * MIN( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MIN( 0., pv(ji,jj) - pv(ji,jj-1)) &
                   &          ) * ( 1. - pamsk )
-               zneg = zneg + ( pt(ji,jj,jl) * MAX( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MAX( 0., pv(ji,jj) - pv(ji,jj-1) ) &
+               zneg = zneg + (pt(ji,jj,jl) * MAX( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MAX( 0., pv(ji,jj) - pv(ji,jj-1)) &
                   &          ) * ( 1. - pamsk )
                !
                !                                  ! up & down beta terms
@@ -1153,22 +1151,21 @@ CONTAINS
 !!         END DO
 
       END DO
-
       !
-      !
-   END SUBROUTINE nonosc_2d
+   END SUBROUTINE nonosc
 
-   SUBROUTINE limiter_x( pdt, pu, pt, pfu_ho, pfu_ups )
+   
+   SUBROUTINE limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE limiter_x  ***
       !!     
       !! **  Purpose :   compute flux limiter 
       !!----------------------------------------------------------------------
-      REAL(wp)                   , INTENT(in   )           ::   pdt          ! tracer time-step
-      REAL(wp), DIMENSION (:,:  ), INTENT(in   )           ::   pu           ! ice i-velocity => u*e2
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   )           ::   pt           ! ice tracer
-      REAL(wp), DIMENSION (:,:,:), INTENT(inout)           ::   pfu_ho       ! high order flux
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ), OPTIONAL ::   pfu_ups      ! upstream flux
+      REAL(wp)                  , INTENT(in   ) ::   pdt          ! tracer time-step
+      REAL(wp), DIMENSION(:,:  ), INTENT(in   ) ::   pu           ! ice i-velocity => u*e2
+      REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   pt           ! ice tracer
+      REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   pfu_ups      ! upstream flux
+      REAL(wp), DIMENSION(:,:,:), INTENT(inout) ::   pfu_ho       ! high order flux
       !
       REAL(wp) ::   Cr, Rjm, Rj, Rjp, uCFL, zpsi, zh3, zlimiter, Rr
       INTEGER  ::   ji, jj, jl    ! dummy loop indices
@@ -1193,7 +1190,7 @@ CONTAINS
                Rj  = zslpx(ji  ,jj,jl)
                Rjp = zslpx(ji+1,jj,jl)
 
-               IF( PRESENT(pfu_ups) ) THEN
+               IF( kn_limiter == 3 ) THEN
 
                   IF( pu(ji,jj) > 0. ) THEN   ;   Rr = Rjm
                   ELSE                        ;   Rr = Rjp
@@ -1209,7 +1206,7 @@ CONTAINS
                   ENDIF
                   pfu_ho(ji,jj,jl) = pfu_ups(ji,jj,jl) + zlimiter
 
-               ELSE
+               ELSEIF( kn_limiter == 2 ) THEN
                   IF( Rj /= 0. ) THEN
                      IF( pu(ji,jj) > 0. ) THEN   ;   Cr = Rjm / Rj
                      ELSE                        ;   Cr = Rjp / Rj
@@ -1222,7 +1219,6 @@ CONTAINS
                   zpsi = MAX( 0., MAX( MIN(1.,2.*Cr), MIN(2.,Cr) ) )
                   ! -- van albada 2 --
                   !!zpsi = 2.*Cr / (Cr*Cr+1.)
-
                   ! -- sweby (with beta=1) --
                   !!zpsi = MAX( 0., MAX( MIN(1.,1.*Cr), MIN(1.,Cr) ) )
                   ! -- van Leer --
@@ -1253,17 +1249,18 @@ CONTAINS
       !
    END SUBROUTINE limiter_x
 
-   SUBROUTINE limiter_y( pdt, pv, pt, pfv_ho, pfv_ups )
+   
+   SUBROUTINE limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE limiter_y  ***
       !!     
       !! **  Purpose :   compute flux limiter 
       !!----------------------------------------------------------------------
-      REAL(wp)                   , INTENT(in   )           ::   pdt          ! tracer time-step
-      REAL(wp), DIMENSION (:,:  ), INTENT(in   )           ::   pv           ! ice i-velocity => u*e2
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   )           ::   pt           ! ice tracer
-      REAL(wp), DIMENSION (:,:,:), INTENT(inout)           ::   pfv_ho       ! high order flux
-      REAL(wp), DIMENSION (:,:,:), INTENT(in   ), OPTIONAL ::   pfv_ups      ! upstream flux
+      REAL(wp)                   , INTENT(in   ) ::   pdt          ! tracer time-step
+      REAL(wp), DIMENSION (:,:  ), INTENT(in   ) ::   pv           ! ice i-velocity => u*e2
+      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   pt           ! ice tracer
+      REAL(wp), DIMENSION (:,:,:), INTENT(in   ) ::   pfv_ups      ! upstream flux
+      REAL(wp), DIMENSION (:,:,:), INTENT(inout) ::   pfv_ho       ! high order flux
       !
       REAL(wp) ::   Cr, Rjm, Rj, Rjp, vCFL, zpsi, zh3, zlimiter, Rr
       INTEGER  ::   ji, jj, jl    ! dummy loop indices
@@ -1288,7 +1285,7 @@ CONTAINS
                Rj  = zslpy(ji,jj  ,jl)
                Rjp = zslpy(ji,jj+1,jl)
 
-               IF( PRESENT(pfv_ups) ) THEN
+               IF( kn_limiter == 3 ) THEN
 
                   IF( pv(ji,jj) > 0. ) THEN   ;   Rr = Rjm
                   ELSE                        ;   Rr = Rjp
@@ -1304,7 +1301,7 @@ CONTAINS
                   ENDIF
                   pfv_ho(ji,jj,jl) = pfv_ups(ji,jj,jl) + zlimiter
 
-               ELSE
+               ELSEIF( kn_limiter == 2 ) THEN
 
                   IF( Rj /= 0. ) THEN
                      IF( pv(ji,jj) > 0. ) THEN   ;   Cr = Rjm / Rj
@@ -1318,7 +1315,6 @@ CONTAINS
                   zpsi = MAX( 0., MAX( MIN(1.,2.*Cr), MIN(2.,Cr) ) )
                   ! -- van albada 2 --
                   !!zpsi = 2.*Cr / (Cr*Cr+1.)
-
                   ! -- sweby (with beta=1) --
                   !!zpsi = MAX( 0., MAX( MIN(1.,1.*Cr), MIN(1.,Cr) ) )
                   ! -- van Leer --
