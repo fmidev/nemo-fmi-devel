@@ -1,6 +1,9 @@
 !-----------------------------------------------------------------------
 &namzdf        !   vertical physics manager                             (default: NO selection)
 !-----------------------------------------------------------------------
+   !                       ! adaptive-implicit vertical advection
+   ln_zad_Aimp = .false.      !  Courant number dependent scheme (Shchepetkin 2015)
+   !
    !                       ! type of vertical closure (required)
    ln_zdfcst   = .false.      !  constant mixing
    ln_zdfric   = .false.      !  local Richardson dependent formulation (T =>   fill namzdf_ric)

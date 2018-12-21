@@ -10,5 +10,5 @@
    ln_flork4   = .false.   !  trajectories computed with a 4th order Runge-Kutta (T)
    !                       !  or computed with Blanke' scheme (F)
    ln_ariane   = .true.    !  Input with Ariane tool convention(T)
-   ln_flo_ascii= .true.    !  Output with Ariane tool netcdf convention(F) or ascii file (T)
+   ln_flo_ascii = .true.    !  Output with Ariane tool netcdf convention(F) or ascii file (T)
 /

@@ -9,5 +9,5 @@
    rn_lat      = 20.       ! reference latitude (degrees) of MLE coef.                        (case rn_mle=1)
    nn_mld_uv   = 0         ! space interpolation of MLD at u- & v-pts (0=min,1=averaged,2=max)
    nn_conv     = 0         ! =1 no MLE in case of convection ; =0 always MLE
-   rn_rho_c_mle= 0.01      ! delta rho criterion used to calculate MLD for FK
+   rn_rho_c_mle = 0.01      ! delta rho criterion used to calculate MLD for FK
 /

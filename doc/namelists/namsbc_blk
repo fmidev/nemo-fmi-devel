@@ -3,8 +3,8 @@
 !-----------------------------------------------------------------------
    !                    !  bulk algorithm :
    ln_NCAR     = .false.   ! "NCAR"      algorithm   (Large and Yeager 2008)
-   ln_COARE_3p0= .false.   ! "COARE 3.0" algorithm   (Fairall et al. 2003)
-   ln_COARE_3p5= .false.   ! "COARE 3.5" algorithm   (Edson et al. 2013)
+   ln_COARE_3p0 = .false.   ! "COARE 3.0" algorithm   (Fairall et al. 2003)
+   ln_COARE_3p5 = .false.   ! "COARE 3.5" algorithm   (Edson et al. 2013)
    ln_ECMWF    = .false.   ! "ECMWF"     algorithm   (IFS cycle 31)
       !
       rn_zqt      = 10.       !  Air temperature & humidity reference height (m)

@@ -6,7 +6,7 @@
    ln_coords_file = .true.    !  =T : read bdy coordinates from file
       cn_coords_file = 'coordinates.bdy.nc'  !  bdy coordinates files
    ln_mask_file   = .false.   !  =T : read mask from file
-      cn_mask_file= ''        !  name of mask file (if ln_mask_file=.TRUE.)
+      cn_mask_file = ''        !  name of mask file (if ln_mask_file=.TRUE.)
    cn_dyn2d    = 'none'       !
    nn_dyn2d_dta   =  0        !  = 0, bdy data are equal to the initial state
       !                       !  = 1, bdy data are read in 'bdydata   .nc' files
@@ -28,7 +28,7 @@
    ln_tra_dmp    =.false.     !  open boudaries conditions for tracers
    ln_dyn3d_dmp  =.false.     !  open boundary condition for baroclinic velocities
    rn_time_dmp   =  1.        !  Damping time scale in days
-   rn_time_dmp_out= 1.        !  Outflow damping time scale
+   rn_time_dmp_out = 1.        !  Outflow damping time scale
    nn_rimwidth   = 10         !  width of the relaxation zone
    ln_vol        = .false.    !  total volume correction (see nn_volctl parameter)
    nn_volctl     =  1         !  = 0, the total water flux across open boundaries is zero

@@ -31,7 +31,7 @@
    cn_velfbfiles = 'vel_01.nc'       ! Velocity feedback input observation file names
    cn_altbiasfile = 'altbias.nc'     ! Altimeter bias input file name
    cn_sstbiasfiles = 'sstbias.nc'    ! SST bias input file name
-   cn_gridsearchfile='gridsearch.nc' ! Grid search file name
+   cn_gridsearchfile ='gridsearch.nc' ! Grid search file name
    rn_gridsearchres = 0.5            ! Grid search resolution
    rn_mdtcorr  = 1.61                ! MDT  correction
    rn_mdtcutoff = 65.0               ! MDT cutoff for computed correction
