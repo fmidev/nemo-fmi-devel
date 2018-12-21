@@ -89,8 +89,12 @@
          !  must be two during the first two time steps
          !  to correct possible incoherent values on North fold lines from restart 
 
-         !!!!!!!!! temporary switch off this optimisation ==> force TRUE !!!!!!!!
+#if defined key_agrif
+         !!!!!!!!!           temporary switch off this optimisation ==> force TRUE           !!!!!!!!
+         !!!!!!!!!  needed to get the same results without agrif and with agrif and no zoom  !!!!!!!!
+         !!!!!!!!!                    I don't know why we must do that...                    !!!!!!!!
          l_full_nf_update = .TRUE.
+#endif
 
          ! Two lines update (slower but necessary to avoid different values ion identical grid points
          IF ( l_full_nf_update .OR.                          &    ! if coupling fields

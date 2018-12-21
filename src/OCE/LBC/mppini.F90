@@ -923,12 +923,12 @@ CONTAINS
       !!
       !! ** Method  : read iproc strips (of length jpiglo) of the land-sea mask
       !!----------------------------------------------------------------------
-      REAL(wp), INTENT(  out) :: propland    ! proportion of land points (between 0 and 1)
+      REAL(wp), INTENT(  out) :: propland    ! proportion of land points in the global domain (between 0 and 1)
       !
       INTEGER, DIMENSION(jpni*jpnj) ::   kusedom_1d
-      INTEGER :: inboce 
+      INTEGER :: inboce, iarea
       INTEGER :: iproc, idiv, ijsz
-      INTEGER :: ijstr, ijend, ijcnt
+      INTEGER :: ijstr
       LOGICAL, ALLOCATABLE, DIMENSION(:,:) ::   lloce
       !!----------------------------------------------------------------------
       ! do nothing if there is no land-sea mask
@@ -940,28 +940,27 @@ CONTAINS
       ! number of processes reading the bathymetry file 
       iproc = MINVAL( (/mppsize, jpjglo/2, 100/) )  ! read a least 2 lines, no more that 100 processes reading at the same time
       
-      ! we want to read iproc strips of the land-sea mask. -> pick up iproc processes among mppsize processes
+      ! we want to read iproc strips of the land-sea mask. -> pick up iproc processes every idiv processes starting at 1
       IF( iproc == 1 ) THEN   ;   idiv = mppsize
       ELSE                    ;   idiv = ( mppsize - 1 ) / ( iproc - 1 )
       ENDIF
-      ijsz = jpjglo / iproc
-      IF( narea <= MOD(jpjglo,iproc) ) ijsz = ijsz + 1
-      
-      IF( MOD( narea-1, idiv ) == 0 .AND. (idiv /= 1 .OR. narea <= iproc ) ) THEN
+
+      iarea = (narea-1)/idiv   ! involed process number (starting counting at 0)
+      IF( MOD( narea-1, idiv ) == 0 .AND. iarea < iproc ) THEN   ! beware idiv can be = to 1
          !
-         ijstr = (narea-1)*(jpjglo/iproc) + MIN(narea-1, MOD(jpjglo,iproc)) + 1
-         ijend = ijstr + ijsz - 1
-         ijcnt = ijend - ijstr + 1
+         ijsz = jpjglo / iproc                                               ! width of the stripe to read
+         IF( iarea < MOD(jpjglo,iproc) ) ijsz = ijsz + 1
+         ijstr = iarea*(jpjglo/iproc) + MIN(iarea, MOD(jpjglo,iproc)) + 1    ! starting j position of the reading
          !
-         ALLOCATE( lloce(jpiglo, ijcnt) )   ! allocate the strip
-         CALL mpp_init_readbot_strip( ijstr, ijcnt, lloce )
-         inboce = COUNT(lloce)
+         ALLOCATE( lloce(jpiglo, ijsz) )                                     ! allocate the strip
+         CALL mpp_init_readbot_strip( ijstr, ijsz, lloce )
+         inboce = COUNT(lloce)                                               ! number of ocean point in the stripe
          DEALLOCATE(lloce)
          !
       ELSE
          inboce = 0
       ENDIF
-      CALL mpp_sum( 'mppini', inboce )
+      CALL mpp_sum( 'mppini', inboce )   ! total number of ocean points over the global domain
       !
       propland = REAL( jpiglo*jpjglo - inboce, wp ) / REAL( jpiglo*jpjglo, wp ) 
       !
@@ -977,15 +976,14 @@ CONTAINS
       !!
       !! ** Method  : read knbj strips (of length jpiglo) of the land-sea mask
       !!----------------------------------------------------------------------
-      INTEGER,                       INTENT(in   ) ::   knbi, knbj
-      LOGICAL, DIMENSION(knbi,knbj), INTENT(  out) ::   ldisoce   ! 
+      INTEGER,                       INTENT(in   ) ::   knbi, knbj     ! domain decomposition
+      LOGICAL, DIMENSION(knbi,knbj), INTENT(  out) ::   ldisoce        ! .true. if a sub domain constains 1 ocean point 
       !
-      INTEGER, DIMENSION(knbi,knbj) ::   inboce
+      INTEGER, DIMENSION(knbi,knbj) ::   inboce                        ! number oce oce pint in each mpi subdomain
       INTEGER, DIMENSION(knbi*knbj) ::   inboce_1d
-      INTEGER :: idiv, i2read, inj
-      INTEGER :: iimax, ijmax
-      INTEGER :: ji,jj
-      LOGICAL, ALLOCATABLE, DIMENSION(:,:) ::   lloce
+      INTEGER :: idiv, iimax, ijmax, iarea
+      INTEGER :: ji
+      LOGICAL, ALLOCATABLE, DIMENSION(:,:) ::   lloce                  ! lloce(i,j) = .true. if the point (i,j) is ocean 
       INTEGER, ALLOCATABLE, DIMENSION(:,:) ::   iimppt, ilci
       INTEGER, ALLOCATABLE, DIMENSION(:,:) ::   ijmppt, ilcj
       !!----------------------------------------------------------------------
@@ -995,29 +993,24 @@ CONTAINS
          RETURN
       ENDIF
 
-      ! we want to read knbj strips of the land-sea mask. -> pick up knbj processes among mppsize processes
+      ! we want to read knbj strips of the land-sea mask. -> pick up knbj processes every idiv processes starting at 1
       IF( knbj == 1 ) THEN   ;   idiv = mppsize
       ELSE                   ;   idiv = ( mppsize - 1 ) / ( knbj - 1 )
       ENDIF
-      inboce(:,:) = 0
-      IF( MOD( narea-1, idiv ) == 0 .AND. (idiv /= 1 .OR. narea <= knbj ) ) THEN
+      inboce(:,:) = 0          ! default no ocean point found
+      iarea = (narea-1)/idiv   ! involed process number (starting counting at 0)
+      IF( MOD( narea-1, idiv ) == 0 .AND. iarea < knbj ) THEN   ! beware idiv can be = to 1
          !
          ALLOCATE( iimppt(knbi,knbj), ijmppt(knbi,knbj), ilci(knbi,knbj), ilcj(knbi,knbj) )
          CALL mpp_basic_decomposition( knbi, knbj, iimax, ijmax, iimppt, ijmppt, ilci, ilcj )
          !
-         i2read = knbj / mppsize    ! strip number to be read by this process
-         IF( ( narea - 1 ) / idiv < MOD(knbj,mppsize) ) i2read = i2read + 1
-         DO jj = 1, i2read
-            ! strip number to be read (from 1 to knbj)
-            inj = ( narea - 1 ) * ( knbj / mppsize ) + MIN( MOD(knbj,mppsize), ( narea - 1 ) / idiv ) + jj
-            ALLOCATE( lloce(jpiglo, ilcj(1,inj)) )                              ! allocate the strip
-            CALL mpp_init_readbot_strip( ijmppt(1,inj), ilcj(1,inj), lloce )   ! read the strip
-            DO  ji = 1, knbi
-               inboce(ji,inj) = COUNT( lloce(iimppt(ji,1):iimppt(ji,1)+ilci(ji,1)-1,:) )
-            END DO
-            DEALLOCATE(lloce)
+         ALLOCATE( lloce(jpiglo, ilcj(1,iarea+1)) )                                         ! allocate the strip
+         CALL mpp_init_readbot_strip( ijmppt(1,iarea+1), ilcj(1,iarea+1), lloce )           ! read the strip
+         DO  ji = 1, knbi
+            inboce(ji,iarea+1) = COUNT( lloce(iimppt(ji,1):iimppt(ji,1)+ilci(ji,1)-1,:) )   ! number of ocean point in a subdomain
          END DO
          !
+         DEALLOCATE(lloce)
          DEALLOCATE(iimppt, ijmppt, ilci, ilcj)
          !
       ENDIF
@@ -1025,7 +1018,7 @@ CONTAINS
       inboce_1d = RESHAPE(inboce, (/ knbi*knbj /))
       CALL mpp_sum( 'mppini', inboce_1d )
       inboce = RESHAPE(inboce_1d, (/knbi, knbj/))
-      ldisoce = inboce /= 0
+      ldisoce(:,:) = inboce(:,:) /= 0
       !
    END SUBROUTINE mpp_init_isoce
    
@@ -1040,11 +1033,11 @@ CONTAINS
       !!
       !! ** Method  : read stipe of size (jpiglo,...)
       !!----------------------------------------------------------------------
-      INTEGER                         , INTENT(in   ) :: kjstr       ! 
-      INTEGER                         , INTENT(in   ) :: kjcnt       ! 
-      LOGICAL, DIMENSION(jpiglo,kjcnt), INTENT(  out) :: ldoce       ! 
+      INTEGER                         , INTENT(in   ) :: kjstr       ! starting j position of the reading
+      INTEGER                         , INTENT(in   ) :: kjcnt       ! number of lines to read
+      LOGICAL, DIMENSION(jpiglo,kjcnt), INTENT(  out) :: ldoce       ! ldoce(i,j) = .true. if the point (i,j) is ocean 
       !
-      INTEGER                           ::   inumsave                     ! local logical unit
+      INTEGER                           ::   inumsave                ! local logical unit
       REAL(wp), DIMENSION(jpiglo,kjcnt) ::   zbot, zbdy 
       !!----------------------------------------------------------------------
       !
@@ -1053,15 +1046,15 @@ CONTAINS
       IF( numbot /= -1 ) THEN
          CALL iom_get( numbot, jpdom_unknown, 'bottom_level', zbot, kstart = (/1,kjstr/), kcount = (/jpiglo, kjcnt/) )
       ELSE
-         zbot(:,:) = 1.   ! put a non-null value
+         zbot(:,:) = 1.                         ! put a non-null value
       ENDIF
 
-       IF( numbdy /= -1 ) THEN   ! Adjust  with bdy_msk if it exists    
+       IF( numbdy /= -1 ) THEN                  ! Adjust with bdy_msk if it exists    
          CALL iom_get ( numbdy, jpdom_unknown, 'bdy_msk', zbdy, kstart = (/1,kjstr/), kcount = (/jpiglo, kjcnt/) )
          zbot(:,:) = zbot(:,:) * zbdy(:,:)
       ENDIF
       !
-      ldoce = zbot > 0.
+      ldoce(:,:) = zbot(:,:) > 0.
       numout = inumsave
       !
    END SUBROUTINE mpp_init_readbot_strip

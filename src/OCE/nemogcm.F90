@@ -237,8 +237,10 @@ CONTAINS
       ENDIF
 #endif
       !
-      IF( nstop == 0 ) THEN   ;   STOP 0
-      ELSE                    ;   STOP 999
+      IF(lwm) THEN
+         IF( nstop == 0 ) THEN   ;   STOP 0
+         ELSE                    ;   STOP 999
+         ENDIF
       ENDIF
       !
    END SUBROUTINE nemo_gcm
