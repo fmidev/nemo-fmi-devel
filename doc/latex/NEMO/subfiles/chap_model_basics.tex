@@ -27,7 +27,7 @@
 
 
 The ocean is a fluid that can be described to a good approximation by the primitive equations,
-$i.e.$ the Navier-Stokes equations along with a nonlinear equation of state which
+\ie the Navier-Stokes equations along with a nonlinear equation of state which
 couples the two active tracers (temperature and salinity) to the fluid velocity,
 plus the following additional assumptions made from scale considerations:
 
@@ -54,9 +54,9 @@ be zero.
 Because the gravitational force is so dominant in the equations of large-scale motions,
 it is useful to choose an orthogonal set of unit vectors (\textbf{i},\textbf{j},\textbf{k}) linked to
 the earth such that \textbf{k} is the local upward vector and (\textbf{i},\textbf{j}) are two vectors orthogonal to
-\textbf{k}, $i.e.$ tangent to the geopotential surfaces.
+\textbf{k}, \ie tangent to the geopotential surfaces.
 Let us define the following variables: \textbf{U} the vector velocity, $\textbf{U}=\textbf{U}_h + w\, \textbf{k}$ 
-(the subscript $h$ denotes the local horizontal vector, $i.e.$ over the (\textbf{i},\textbf{j}) plane), 
+(the subscript $h$ denotes the local horizontal vector, \ie over the (\textbf{i},\textbf{j}) plane), 
 $T$ the potential temperature, $S$ the salinity, \textit{$\rho $} the \textit{in situ} density.
 The vector invariant form of the primitive equations in the (\textbf{i},\textbf{j},\textbf{k}) vector system
 provides the following six equations
@@ -150,12 +150,12 @@ the other components of the earth system.
   They are usually neglected in the model
   \footnote{
     In fact, it has been shown that the heat flux associated with the solid Earth cooling
-    ($i.e.$the geothermal heating) is not negligible for the thermohaline circulation of the world ocean
+    (\ie the geothermal heating) is not negligible for the thermohaline circulation of the world ocean
     (see \autoref{subsec:TRA_bbc}).
   }.
   The boundary condition is thus set to no flux of heat and salt across solid boundaries.
   For momentum, the situation is different. There is no flow across solid boundaries,
-  $i.e.$ the velocity normal to the ocean bottom and coastlines is zero (in other words,
+  \ie the velocity normal to the ocean bottom and coastlines is zero (in other words,
   the bottom velocity is parallel to solid boundaries). This kinematic boundary condition
   can be expressed as:
   \begin{equation}
@@ -224,9 +224,9 @@ The flow is barotropic and the surface moves up and down with gravity as the res
 The phase speed of such waves is high (some hundreds of metres per second) so that
 the time step would have to be very short if they were present in the model.
 The latter strategy filters out these waves since the rigid lid approximation implies $\eta=0$,
-$i.e.$ the sea surface is the surface $z=0$.
+\ie the sea surface is the surface $z=0$.
 This well known approximation increases the surface wave speed to infinity and
-modifies certain other longwave dynamics ($e.g.$ barotropic Rossby or planetary waves).
+modifies certain other longwave dynamics (\eg barotropic Rossby or planetary waves).
 The rigid-lid hypothesis is an obsolescent feature in modern OGCMs.
 It has been available until the release 3.1 of  \NEMO, and it has been removed in release 3.2 and followings.
 Only the free surface formulation is now described in the this document (see the next sub-section).
@@ -301,7 +301,7 @@ a split-explicit scheme strongly inspired the one proposed by \citet{Shchepetkin
 \label{subsec:PE_tensorial}
 
 In many ocean circulation problems, the flow field has regions of enhanced dynamics
-($i.e.$ surface layers, western boundary currents, equatorial currents, or ocean fronts).
+(\ie surface layers, western boundary currents, equatorial currents, or ocean fronts).
 The representation of such dynamical processes can be improved by
 specifically increasing the model resolution in these regions.
 As well, it may be convenient to use a lateral boundary-following coordinate system to
@@ -321,7 +321,7 @@ Let (\textit{i},\textit{j},\textit{k}) be a set of orthogonal curvilinear coordi
 the sphere associated with the positively oriented orthogonal set of unit vectors
 (\textbf{i},\textbf{j},\textbf{k}) linked to the earth such that
 \textbf{k} is the local upward vector and (\textbf{i},\textbf{j}) are two vectors orthogonal to \textbf{k},
-$i.e.$ along geopotential surfaces (\autoref{fig:referential}).
+\ie along geopotential surfaces (\autoref{fig:referential}).
 Let $(\lambda,\varphi,z)$ be the geographical coordinate system in which a position is defined by
 the latitude $\varphi(i,j)$, the longitude $\lambda(i,j)$ and
 the distance from the centre of the earth $a+z(k)$ where $a$ is the earth's radius and
@@ -486,7 +486,7 @@ The last term of the right hand side is obviously zero, and thus the nonlinear t
 
 This is the so-called \textit{vector invariant form} of the momentum advection term.
 For some purposes, it can be advantageous to write this term in the so-called flux form,
-$i.e.$ to write it as the divergence of fluxes.
+\ie to write it as the divergence of fluxes.
 For example, the first component of \autoref{eq:PE_vector_form} (the $i$-component) is transformed as follows:
 \begin{flalign*}
   &{
@@ -596,7 +596,7 @@ The latter is called the \emph{metric} term and can be viewed as a modification 
 \]
 
 Note that in the case of geographical coordinate,
-$i.e.$ when $(i,j) \to (\lambda ,\varphi )$ and $(e_1 ,e_2) \to (a \,\cos \varphi ,a)$,
+\ie when $(i,j) \to (\lambda ,\varphi )$ and $(e_1 ,e_2) \to (a \,\cos \varphi ,a)$,
 we recover the commonly used modification of the Coriolis parameter $f \to f+(u/a) \tan \varphi$.
 
 To sum up, the curvilinear $z$-coordinate equations solved by the ocean model can be written in
@@ -719,11 +719,11 @@ varying from more than 6,000 meters in abyssal trenches to zero at the coast.
 Last but not least, the ocean stratification exerts a strong barrier to vertical motions and mixing. 
 Therefore, in order to represent the ocean with respect to
 the first point a space and time dependent vertical coordinate that follows the variation of the sea surface height
-$e.g.$ an $z$*-coordinate;
+\eg an \zstar-coordinate;
 for the second point, a space variation to fit the change of bottom topography
-$e.g.$ a terrain-following or $\sigma$-coordinate;
+\eg a terrain-following or $\sigma$-coordinate;
 and for the third point, one will be tempted to use a space and time dependent coordinate that
-follows the isopycnal surfaces, $e.g.$ an isopycnic coordinate.
+follows the isopycnal surfaces, \eg an isopycnic coordinate.
 
 In order to satisfy two or more constrains one can even be tempted to mixed these coordinate systems, as in
 HYCOM (mixture of $z$-coordinate at the surface, isopycnic coordinate in the ocean interior and $\sigma$ at
@@ -789,7 +789,7 @@ the physical processes producing a flux across the layer interfaces.
 
 
 In this section we first establish the PE in the generalised vertical $s$-coordinate,
-then we discuss the particular cases available in \NEMO, namely $z$, $z$*, $s$, and $\tilde z$.  
+then we discuss the particular cases available in \NEMO, namely $z$, \zstar, $s$, and \ztilde.  
 %}
 
 % -------------------------------------------------------------------------------------------------------------
@@ -799,8 +799,8 @@ then we discuss the particular cases available in \NEMO, namely $z$, $z$*, $s$, 
 
 Starting from the set of equations established in \autoref{sec:PE_zco} for the special case $k=z$ and thus $e_3=1$,
 we introduce an arbitrary vertical coordinate $s=s(i,j,k,t)$,
-which includes $z$-, \textit{z*}- and $\sigma-$coordinates as special cases
-($s=z$, $s=\textit{z*}$, and $s=\sigma=z/H$ or $=z/\left(H+\eta \right)$, resp.).
+which includes $z$-, \zstar- and $\sigma-$coordinates as special cases
+($s=z$, $s=\zstar$, and $s=\sigma=z/H$ or $=z/\left(H+\eta \right)$, resp.).
 A formal derivation of the transformed equations is given in \autoref{apdx:A}.
 Let us define the vertical scale factor by $e_3=\partial_s z$  ($e_3$ is now a function of $(i,j,k,t)$ ),
 and the slopes in the (\textbf{i},\textbf{j}) directions between $s-$ and $z-$surfaces by:
@@ -916,9 +916,9 @@ Add a few works on z and zps and s and underlies the differences between all of 
 
 
 % -------------------------------------------------------------------------------------------------------------
-% Curvilinear z*-coordinate System
+% Curvilinear \zstar-coordinate System
 % -------------------------------------------------------------------------------------------------------------
-\subsection{Curvilinear \textit{z*}--coordinate system}
+\subsection{Curvilinear \zstar--coordinate system}
 \label{subsec:PE_zco_star}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -928,7 +928,7 @@ Add a few works on z and zps and s and underlies the differences between all of 
     \caption{	\protect\label{fig:z_zstar}
       (a) $z$-coordinate in linear free-surface case ;
       (b) $z-$coordinate in non-linear free surface case ;
-      (c) re-scaled height coordinate (become popular as the \textit{z*-}coordinate
+      (c) re-scaled height coordinate (become popular as the \zstar-coordinate
       \citep{Adcroft_Campin_OM04} ).
     }
   \end{center}
@@ -940,28 +940,28 @@ In that case, the free surface equation is nonlinear, and the variations of volu
 These coordinates systems is presented in a report \citep{Levier2007} available on the \NEMO web site. 
 
 %\gmcomment{
-The \textit{z*} coordinate approach is an unapproximated, non-linear free surface implementation which allows one to
+The \zstar coordinate approach is an unapproximated, non-linear free surface implementation which allows one to
 deal with large amplitude free-surface variations relative to the vertical resolution \citep{Adcroft_Campin_OM04}.
-In the \textit{z*} formulation,
+In the \zstar formulation,
 the variation of the column thickness due to sea-surface undulations is not concentrated in the surface level,
 as in the $z$-coordinate formulation, but is equally distributed over the full water column.
 Thus vertical levels naturally follow sea-surface variations, with a linear attenuation with depth,
 as illustrated by figure fig.1c.
-Note that with a flat bottom, such as in fig.1c, the bottom-following $z$ coordinate and \textit{z*} are equivalent.
-The definition and modified oceanic equations for the rescaled vertical coordinate  \textit{z*},
+Note that with a flat bottom, such as in fig.1c, the bottom-following $z$ coordinate and \zstar are equivalent.
+The definition and modified oceanic equations for the rescaled vertical coordinate  \zstar,
 including the treatment of fresh-water flux at the surface, are detailed in Adcroft and Campin (2004).
 The major points are summarized here.
-The position ( \textit{z*}) and vertical discretization (\textit{z*}) are expressed as:
+The position ( \zstar) and vertical discretization (\zstar) are expressed as:
 \[
   % \label{eq:z-star}
-  H +  \textit{z*} = (H + z) / r \quad \text{and} \ \delta \textit{z*} = \delta z / r \quad \text{with} \ r = \frac{H+\eta} {H}
+  H +  \zstar = (H + z) / r \quad \text{and} \ \delta \zstar = \delta z / r \quad \text{with} \ r = \frac{H+\eta} {H}
 \] 
-Since the vertical displacement of the free surface is incorporated in the vertical coordinate \textit{z*},
-the upper and lower boundaries are at fixed  \textit{z*} position,
-$\textit{z*} = 0$ and  $\textit{z*} = -H$ respectively.
+Since the vertical displacement of the free surface is incorporated in the vertical coordinate \zstar,
+the upper and lower boundaries are at fixed  \zstar position,
+$\zstar = 0$ and  $\zstar = -H$ respectively.
 Also the divergence of the flow field is no longer zero as shown by the continuity equation:
 \[ 
-  \frac{\partial r}{\partial t} = \nabla_{\textit{z*}} \cdot \left( r \; \rm{\bf U}_h \right)
+  \frac{\partial r}{\partial t} = \nabla_{\zstar} \cdot \left( r \; \rm{\bf U}_h \right)
   \left( r \; w\textit{*} \right) = 0 
 \] 
 %}
@@ -1068,7 +1068,7 @@ The horizontal pressure force in $s$-coordinate consists of two terms (see \auto
 
 The second term in \autoref{eq:PE_p_sco} depends on the tilt of the coordinate surface and
 introduces a truncation error that is not present in a $z$-model.
-In the special case of a $\sigma-$coordinate (i.e. a depth-normalised coordinate system $\sigma = z/H$),
+In the special case of a $\sigma-$coordinate (\ie depth-normalised coordinate system $\sigma = z/H$),
 \citet{Haney1991} and \citet{Beckmann1993} have given estimates of the magnitude of this truncation error.
 It depends on topographic slope, stratification, horizontal and vertical resolution, the equation of state,
 and the finite difference scheme.
@@ -1096,7 +1096,7 @@ Spurious diffusion along $s$-surfaces will induce a bump of isoneutral surfaces 
 and thus will generate there a baroclinic eddy.
 In contrast, the ocean will stay at rest in a $z$-model.
 As for the truncation error, the problem can be reduced by introducing the terrain-following coordinate below
-the strongly stratified portion of the water column ($i.e.$ the main thermocline) \citep{Madec_al_JPO96}.
+the strongly stratified portion of the water column (\ie the main thermocline) \citep{Madec_al_JPO96}.
 An alternate solution consists of rotating the lateral diffusive tensor to geopotential or to isoneutral surfaces
 (see \autoref{subsec:PE_ldf}).
 Unfortunately, the slope of isoneutral surfaces relative to the $s$-surfaces can very large,
@@ -1113,10 +1113,10 @@ It also offers a completely general transformation, $s=s(i,j,z)$ for the vertica
 % -------------------------------------------------------------------------------------------------------------
 % Curvilinear z-tilde coordinate System
 % -------------------------------------------------------------------------------------------------------------
-\subsection{\texorpdfstring{Curvilinear $\tilde{z}$--coordinate}{}}
+\subsection{\texorpdfstring{Curvilinear \ztilde--coordinate}{}}
 \label{subsec:PE_zco_tilde}
 
-The $\tilde{z}$-coordinate has been developed by \citet{Leclair_Madec_OM11}.
+The \ztilde-coordinate has been developed by \citet{Leclair_Madec_OM11}.
 It is available in \NEMO since the version 3.4.
 Nevertheless, it is currently not robust enough to be used in all possible configurations.
 Its use is therefore not recommended.
@@ -1135,7 +1135,7 @@ a few kilometres in the horizontal, a few meters in the vertical and a few minut
 They are usually solved at larger scales: the specified grid spacing and time step of the numerical model.
 The effects of smaller scale motions (coming from the advective terms in the Navier-Stokes equations) must be represented entirely in terms of large-scale patterns to close the equations.
 These effects appear in the equations as the divergence of turbulent fluxes
-($i.e.$ fluxes associated with the mean correlation of small scale perturbations).
+(\ie fluxes associated with the mean correlation of small scale perturbations).
 Assuming a turbulent closure hypothesis is equivalent to choose a formulation for these fluxes.
 It is usually called the subgrid scale physics.
 It must be emphasized that this is the weakest part of the primitive equations,
@@ -1180,7 +1180,7 @@ At the sea surface and at the bottom, turbulent fluxes of momentum, heat and sal
 (see \autoref{chap:SBC} and \autoref{chap:ZDF} and \autoref{sec:TRA_bbl}).
 All the vertical physics is embedded in the specification of the eddy coefficients.
 They can be assumed to be either constant, or function of the local fluid properties
-($e.g.$ Richardson number, Brunt-Vais\"{a}l\"{a} frequency...),
+(\eg Richardson number, Brunt-Vais\"{a}l\"{a} frequency...),
 or computed from a turbulent closure model.
 The choices available in \NEMO are discussed in \autoref{chap:ZDF}).
 
@@ -1195,7 +1195,7 @@ Lateral turbulence can be roughly divided into a mesoscale turbulence associated
 their underlying physics are included in the primitive equations),
 and a sub mesoscale turbulence which is never explicitly solved even partially, but always parameterized.
 The formulation of lateral eddy fluxes depends on whether the mesoscale is below or above the grid-spacing
-($i.e.$ the model is eddy-resolving or not).
+(\ie the model is eddy-resolving or not).
 
 In non-eddy-resolving configurations, the closure is similar to that used for the vertical physics.
 The lateral turbulent fluxes are assumed to depend linearly on the lateral gradients of large-scale quantities.
@@ -1203,14 +1203,14 @@ The resulting lateral diffusive and dissipative operators are of second order.
 Observations show that lateral mixing induced by mesoscale turbulence tends to be along isopycnal surfaces
 (or more precisely neutral surfaces \cite{McDougall1987}) rather than across them.
 As the slope of neutral surfaces is small in the ocean, a common approximation is to assume that
-the `lateral' direction is the horizontal, $i.e.$ the lateral mixing is performed along geopotential surfaces.
+the `lateral' direction is the horizontal, \ie the lateral mixing is performed along geopotential surfaces.
 This leads to a geopotential second order operator for lateral subgrid scale physics.
 This assumption can be relaxed: the eddy-induced turbulent fluxes can be better approached by assuming that
 they depend linearly on the gradients of large-scale quantities computed along neutral surfaces.
 In such a case, the diffusive operator is an isoneutral second order operator and
 it has components in the three space directions.
 However,
-both horizontal and isoneutral operators have no effect on mean ($i.e.$ large scale) potential energy whereas
+both horizontal and isoneutral operators have no effect on mean (\ie large scale) potential energy whereas
 potential energy is a main source of turbulence (through baroclinic instabilities).
 \citet{Gent1990} have proposed a parameterisation of mesoscale eddy-induced turbulence which
 associates an eddy-induced velocity to the isoneutral diffusion.
@@ -1311,7 +1311,7 @@ Their values are thus independent of the vertical coordinate, but their expressi
   \tilde{r}_n =
   \begin{cases}
     r_n            &      \text{in $z$-coordinate}    \\
-    r_n + \sigma_n &      \text{in \textit{z*} and $s$-coordinates}
+    r_n + \sigma_n &      \text{in \zstar and $s$-coordinates}
   \end{cases}
                      \quad \text{where } n=1,2
 \end{align}
@@ -1358,7 +1358,7 @@ Such a formulation ensures a complete separation between the vorticity and horiz
 (see \autoref{apdx:C}).
 Unfortunately, it is only available in \textit{iso-level} direction.
 When a rotation is required
-($i.e.$ geopotential diffusion in $s-$coordinates or isoneutral diffusion in both $z$- and $s$-coordinates),
+(\ie geopotential diffusion in $s-$coordinates or isoneutral diffusion in both $z$- and $s$-coordinates),
 the $u$ and $v-$fields are considered as independent scalar fields, so that the diffusive operator is given by:
 \[
   % \label{eq:PE_lapU_iso}
@@ -1370,7 +1370,7 @@ the $u$ and $v-$fields are considered as independent scalar fields, so that the 
 where $\Re$ is given by \autoref{eq:PE_iso_tensor}.
 It is the same expression as those used for diffusive operator on tracers.
 It must be emphasised that such a formulation is only exact in a Cartesian coordinate system,
-$i.e.$ on a $f-$ or $\beta-$plane, not on the sphere.
+\ie on a $f-$ or $\beta-$plane, not on the sphere.
 It is also a very good approximation in vicinity of the Equator in
 a geographical coordinate system \citep{Lengaigne_al_JGR03}.
 
@@ -1381,6 +1381,8 @@ the harmonic eddy diffusion coefficient set to the square root of the biharmonic
 Nevertheless it is currently not available in the iso-neutral case.
 
 \biblio
+
+\pindex
 
 \end{document}
 

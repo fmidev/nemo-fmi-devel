@@ -34,7 +34,7 @@ At this level of complexity, the resulting schemes are dispersive schemes.
 Therefore, they require the addition of a diffusive operator to be stable.
 The alternative is to use diffusive schemes such as upstream or flux corrected schemes.
 This last option was rejected because we prefer a complete handling of the model diffusion,
-i.e. of the model physics rather than letting the advective scheme produces its own implicit diffusion without
+\ie of the model physics rather than letting the advective scheme produces its own implicit diffusion without
 controlling the space and time structure of this implicit diffusion.
 Note that in some very specific cases as passive tracer studies, the positivity of the advective scheme is required.
 In that case, and in that case only, the advective scheme used for passive tracer is a flux correction scheme
@@ -59,7 +59,7 @@ have no effect on the vorticity of the flow.
 
 \textbf{* relative, planetary and total vorticity term:}
 
-Let us define as either the relative, planetary and total potential vorticity, i.e. ?, ?, and ?, respectively.
+Let us define as either the relative, planetary and total potential vorticity, \ie, ?, and ?, respectively.
 The continuous formulation of the vorticity term satisfies following integral constraints:
 \[
   % \label{eq:vor_vorticity}
@@ -121,7 +121,7 @@ In continuous formulation, a pressure gradient has no contribution to the evolut
 the curl of a gradient is zero.
 This properties is satisfied locally with the choice of discretization we have made (property (II.1.9)~).
 In addition, when the equation of state is linear
-(i.e. when an advective-diffusive equation for density can be derived from those of temperature and salinity)
+(\ie when an advective-diffusive equation for density can be derived from those of temperature and salinity)
 the change of horizontal kinetic energy due to the work of pressure forces is balanced by the change of
 potential energy due to buoyancy forces:
 
@@ -163,7 +163,7 @@ otherwise there is no guarantee that the surface pressure force work vanishes.
 \label{sec:Invariant_tra}
 
 In continuous formulation, the advective terms of the tracer equations conserve the tracer content and
-the quadratic form of the tracer, $i.e.$
+the quadratic form of the tracer, \ie
 \[
   % \label{eq:tra_tra2}
   \int_D {\nabla .\left( {T\;{\textbf{U}}} \right)\;dv} =0
@@ -282,7 +282,7 @@ conservation of horizontal divergence, dissipation of square of the horizontal d
 
 In discrete form, all these properties are satisfied in $z$-coordinate (see Appendix C).
 In $s$-coordinates, only first order properties can be demonstrated,
-$i.e.$ the vertical momentum physics conserve momentum, potential vorticity, and horizontal divergence.
+\ie the vertical momentum physics conserve momentum, potential vorticity, and horizontal divergence.
 
 % -------------------------------------------------------------------------------------------------------------
 %       Conservation Properties on Tracer Physics
@@ -293,7 +293,7 @@ $i.e.$ the vertical momentum physics conserve momentum, potential vorticity, and
 The numerical schemes used for tracer subgridscale physics are written in such a way that
 the heat and salt contents are conserved (equations in flux form, second order centred finite differences).
 As a form flux is used to compute the temperature and salinity,
-the quadratic form of these quantities (i.e. their variance) globally tends to diminish.
+the quadratic form of these quantities (\ie their variance) globally tends to diminish.
 As for the advective term, there is generally no strict conservation of mass even if,
 in practice, the mass is conserved with a very good accuracy. 
 
@@ -308,7 +308,7 @@ variance, i.e.
   \end{aligned}
 \]
 
-\textbf{* vertical physics: }conservation of tracer, dissipation of tracer variance, $i.e.$
+\textbf{* vertical physics: }conservation of tracer, dissipation of tracer variance, \ie
 
 \[
   % \label{eq:trazdf_t_t2}
@@ -328,5 +328,7 @@ prevents the use of implicit resolution in the vertical.
 It has not been implemented.
 
 \biblio
+
+\pindex
 
 \end{document}

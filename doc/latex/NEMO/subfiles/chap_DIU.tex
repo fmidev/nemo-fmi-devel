@@ -30,7 +30,7 @@ The skin temperature can be split into three parts:
 
 Models are provided for both the warm layer, \mdl{diurnal\_bulk}, and the cool skin, \mdl{cool\_skin}.
 Foundation SST is not considered as it can be obtained either from the main NEMO model
-($i.e.$ from the temperature of the top few model levels) or from some other source.  
+(\ie from the temperature of the top few model levels) or from some other source.  
 It must be noted that both the cool skin and warm layer models produce estimates of the change in temperature
 ($\Delta T_{\rm{cs}}$ and $\Delta T_{\rm{wl}}$) and
 both must be added to a foundation SST to obtain the true skin temperature.
@@ -79,7 +79,7 @@ which can be related to the 10\,m wind speed $u_{10}$ through
 the relationship $u^*_{w} = u_{10}\sqrt{\frac{C_d\rho_a}{\rho_w}}$, where $C_d$ is the drag coefficient,
 and $\rho_a$ is the density of air.
 The symbol $Q$ in equation (\autoref{eq:ecmwf1}) is the instantaneous total thermal energy flux into
-the diurnal layer, $i.e.$
+the diurnal layer, \ie
 \[
   Q = Q_{\rm{sol}} + Q_{\rm{lw}} + Q_{\rm{h}}\mbox{,}
   % \label{eq:e_flux_eqn}
@@ -101,7 +101,7 @@ parametrizes the stability of the water column and is given by:
                                     \end{array} \right. \label{eq:stab_func_eqn}
 \end{equation}
 where $\zeta=\frac{D_T}{L}$.  It is clear that the first derivative of (\autoref{eq:stab_func_eqn}),
-and thus of (\autoref{eq:ecmwf1}), is discontinuous at $\zeta=0$ ($i.e.$ $Q\rightarrow0$ in
+and thus of (\autoref{eq:ecmwf1}), is discontinuous at $\zeta=0$ (\ie $Q\rightarrow0$ in
 equation (\autoref{eq:ecmwf2})).
 
 The two terms on the right hand side of (\autoref{eq:ecmwf1}) represent different processes.
@@ -154,5 +154,7 @@ $\gamma$ is a dimensionless function of wind speed $u$:
 \]
 
 \biblio
+
+\pindex
 
 \end{document}

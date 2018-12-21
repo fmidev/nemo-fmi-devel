@@ -63,7 +63,7 @@ This is the generalisation to three dimensions of the well-known ``C'' grid in A
 The relative and planetary vorticity, $\zeta$ and $f$, are defined in the centre of each vertical edge and
 the barotropic stream function $\psi$ is defined at horizontal points overlying the $\zeta$ and $f$-points.
 
-The ocean mesh ($i.e.$ the position of all the scalar and vector points) is defined by
+The ocean mesh (\ie the position of all the scalar and vector points) is defined by
 the transformation that gives ($\lambda$ ,$\varphi$ ,$z$) as a function of $(i,j,k)$.
 The grid-points are located at integer or integer and a half value of $(i,j,k)$ as indicated on \autoref{tab:cell}.
 In all the following, subscripts $u$, $v$, $w$, $f$, $uw$, $vw$ or $fw$ indicate the position of
@@ -161,7 +161,7 @@ and its divergence defined at $t$-points:
 \end{align*}
 
 The vertical average over the whole water column denoted by an overbar becomes for a quantity $q$ which
-is a masked field (i.e. equal to zero inside solid area):
+is a masked field (\ie equal to zero inside solid area):
 \begin{equation}
   \label{eq:DOM_bar}
   \bar q 	=         \frac{1}{H}    \int_{k^b}^{k^o} {q\;e_{3q} \,dk}
@@ -190,8 +190,7 @@ Let $a$ and $b$ be two fields defined on the mesh, with value zero inside contin
 Using integration by parts it can be shown that
 the differencing operators ($\delta_i$, $\delta_j$ and $\delta_k$) are skew-symmetric linear operators,
 and further that the averaging operators $\overline{\,\cdot\,}^{\,i}$, $\overline{\,\cdot\,}^{\,k}$ and
-$\overline{\,\cdot\,}^{\,k}$) are symmetric linear operators,
-$i.e.$
+$\overline{\,\cdot\,}^{\,k}$) are symmetric linear operators, \ie
 \begin{align}
   \label{eq:DOM_di_adj}
   \sum\limits_i { a_i \;\delta_i \left[ b \right]}
@@ -218,18 +217,18 @@ demonstrate integral conservative properties of the discrete formulation chosen.
     \includegraphics[width=0.90\textwidth]{Fig_index_hor}
     \caption{
       \protect\label{fig:index_hor}
-      Horizontal integer indexing used in the \textsc{Fortran} code.
+      Horizontal integer indexing used in the \fortran code.
       The dashed area indicates the cell in which variables contained in arrays have the same $i$- and $j$-indices
     }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-The array representation used in the \textsc{Fortran} code requires an integer indexing while
+The array representation used in the \fortran code requires an integer indexing while
 the analytical definition of the mesh (see \autoref{subsec:DOM_cell}) is associated with the use of
 integer values for $t$-points and both integer and integer and a half values for all the other points.
 Therefore a specific integer indexing must be defined for points other than $t$-points
-($i.e.$ velocity and vorticity grid-points).
+(\ie velocity and vorticity grid-points).
 Furthermore, the direction of the vertical indexing has been changed so that the surface level is at $k=1$.
 
 % -----------------------------------
@@ -251,7 +250,7 @@ A $t$-point and its nearest northeast $f$-point have the same $i$-and $j$-indice
 \label{subsec:DOM_Num_Index_vertical}
 
 In the vertical, the chosen indexing requires special attention since
-the $k$-axis is re-orientated downward in the \textsc{Fortran} code compared to
+the $k$-axis is re-orientated downward in the \fortran code compared to
 the indexing used in the semi-discrete equations and given in \autoref{subsec:DOM_cell}.
 The sea surface corresponds to the $w$-level $k=1$ which is the same index as $t$-level just below
 (\autoref{fig:index_vert}).
@@ -262,7 +261,7 @@ in opposition to what is done in the horizontal plane where
 it is the $t$-point and the nearest velocity points in the direction of the horizontal axis that
 have the same $i$ or $j$ index
 (compare the dashed area in \autoref{fig:index_hor} and \autoref{fig:index_vert}).
-Since the scale factors are chosen to be strictly positive, a \emph{minus sign} appears in the \textsc{Fortran} 
+Since the scale factors are chosen to be strictly positive, a \emph{minus sign} appears in the \fortran 
 code \emph{before all the vertical derivatives} of the discrete equations given in this documentation.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -271,7 +270,7 @@ code \emph{before all the vertical derivatives} of the discrete equations given 
     \includegraphics[width=.90\textwidth]{Fig_index_vert}
     \caption{
       \protect\label{fig:index_vert}
-      Vertical integer indexing used in the \textsc{Fortran } code.
+      Vertical integer indexing used in the \fortran code.
       Note that the $k$-axis is orientated downward.
       The dashed area indicates the cell in which variables contained in arrays have the same $k$-index.
     }
@@ -299,7 +298,7 @@ see \autoref{sec:LBC_mpp}).
 % ================================================================
 \section{Needed fields}
 \label{sec:DOM_fields}
-The ocean mesh ($i.e.$ the position of all the scalar and vector points) is defined by the transformation that gives $(\lambda,\varphi,z)$ as a function of $(i,j,k)$.
+The ocean mesh (\ie the position of all the scalar and vector points) is defined by the transformation that gives $(\lambda,\varphi,z)$ as a function of $(i,j,k)$.
 The grid-points are located at integer or integer and a half values of as indicated in \autoref{tab:cell}.
 The associated scale factors are defined using the analytical first derivative of the transformation
 \autoref{eq:scale_factors}.
@@ -351,7 +350,7 @@ they provide the horizontal and vertical mesh.
 \subsection{Coordinates and scale factors}
 \label{subsec:DOM_hgr_coord_e}
 
-The ocean mesh ($i.e.$ the position of all the scalar and vector points) is defined by
+The ocean mesh (\ie the position of all the scalar and vector points) is defined by
 the transformation that gives $(\lambda,\varphi,z)$ as a function of $(i,j,k)$.
 The grid-points are located at integer or integer and a half values of as indicated in \autoref{tab:cell}.
 The associated scale factors are defined using the analytical first derivative of the transformation
@@ -390,7 +389,7 @@ Note that the horizontal position of and scale factors at $w$-points are exactly
 thus no specific arrays are defined at $w$-points. 
 
 Note that the definition of the scale factors
-($i.e.$ as the analytical first derivative of the transformation that
+(\ie as the analytical first derivative of the transformation that
 gives $(\lambda,\varphi,z)$ as a function of $(i,j,k)$)
 is specific to the \NEMO model \citep{Marti_al_JGR92}.
 As an example, $e_{1t}$ is defined locally at a $t$-point,
@@ -460,7 +459,7 @@ In the vertical, the model mesh is determined by four things:
 (1) the bathymetry given in meters; 
 (2) the number of levels of the model (\jp{jpk}); 
 (3) the analytical transformation $z(i,j,k)$ and the vertical scale factors (derivatives of the transformation); and
-(4) the masking system, $i.e.$ the number of wet model levels at each 
+(4) the masking system, \ie the number of wet model levels at each 
 $(i,j)$ column of points.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -562,7 +561,7 @@ Three options are possible for defining the bathymetry, according to the namelis
   read a bathymetry and ice shelf draft (if needed).
   The \ifile{bathy\_meter} file (Netcdf format) provides the ocean depth (positive, in meters) at
   each grid point of the model grid.
-  The bathymetry is usually built by interpolating a standard bathymetry product ($e.g.$ ETOPO2) onto
+  The bathymetry is usually built by interpolating a standard bathymetry product (\eg ETOPO2) onto
   the horizontal ocean mesh.
   Defining the bathymetry also defines the coastline: where the bathymetry is zero,
   no model levels are defined (all levels are masked).
@@ -925,7 +924,7 @@ A hydrostatic consistency parameter diagnostic following \citet{Haney1991} has b
 and is output as part of the model mesh file at the start of the run.
 
 % -------------------------------------------------------------------------------------------------------------
-%        z*- or s*-coordinate
+%        \zstar- or \sstar-coordinate
 % -------------------------------------------------------------------------------------------------------------
 \subsection{$Z^*$- or $S^*$-coordinate (\protect\np{ln\_linssh}\forcode{ = .false.}) }
 \label{subsec:DOM_zgr_star}
@@ -944,7 +943,7 @@ Whatever the vertical coordinate used,
 the model offers the possibility of representing the bottom topography with steps that
 follow the face of the model cells (step like topography) \citep{Madec_al_JPO96}.
 The distribution of the steps in the horizontal is defined in a 2D integer array, mbathy,
-which gives the number of ocean levels ($i.e.$ those that are not masked) at each $t$-point.
+which gives the number of ocean levels (\ie those that are not masked) at each $t$-point.
 mbathy is computed from the meter bathymetry using the definiton of gdept as
 the number of $t$-points which gdept $\leq$ bathy.
 
@@ -960,7 +959,7 @@ By default, misfdep(:,:)=1 and no cells are masked.
 In case of ice shelf cavities, modifications of the model bathymetry and ice shelf draft into 
 the cavities are performed in the \textit{zgr\_isf} routine.
 The compatibility between ice shelf draft and bathymetry is checked. 
-All the locations where the isf cavity is thinnest than \np{rn\_isfhmin} meters are grounded ($i.e.$ masked). 
+All the locations where the isf cavity is thinnest than \np{rn\_isfhmin} meters are grounded (\ie masked). 
 If only one cell on the water column is opened at $t$-, $u$- or $v$-points,
 the bathymetry or the ice shelf draft is dug to fit this constrain.
 If the incompatibility is too strong (need to dig more than 1 cell), the cell is masked.\\ 
@@ -1015,5 +1014,7 @@ By default, the ocean start from rest (the velocity field is set to zero) and th
 \end{description}
 
 \biblio
+
+\pindex
 
 \end{document}

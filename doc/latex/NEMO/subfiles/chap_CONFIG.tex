@@ -64,7 +64,7 @@ Therefore, defining \key{c1d} changes five main things in the code behaviour:
   the lateral boundary condition routine (\rou{lbc\_lnk}) set the value of the central column of
   the 3x3 domain is imposed over the whole domain;
 \item[(3)]
-  a call to \rou{lbc\_lnk} is systematically done when reading input data ($i.e.$ in \mdl{iom});
+  a call to \rou{lbc\_lnk} is systematically done when reading input data (\ie in \mdl{iom});
 \item[(3)]
   a simplified \rou{stp} routine is used (\rou{stp\_c1d}, see \mdl{step\_c1d} module) in which
   both lateral tendancy terms and lateral physics are not called;
@@ -102,7 +102,7 @@ In this namelist\_cfg the name of domain input file is set in \ngn{namcfg} block
     \caption{
       \protect\label{fig:MISC_ORCA_msh}
       ORCA mesh conception.
-      The departure from an isotropic Mercator grid start poleward of 20\degN.
+      The departure from an isotropic Mercator grid start poleward of 20\deg{N}.
       The two "north pole" are the foci of a series of embedded ellipses (blue curves) which
       are determined analytically and form the i-lines of the ORCA mesh (pseudo latitudes).
       Then, following \citet{Madec_Imbard_CD96}, the normal to the series of ellipses (red curves) is computed which
@@ -137,15 +137,15 @@ or even the scale factor derivatives over the whole ocean domain, as the mesh is
       \textit{Top}: Horizontal scale factors ($e_1$, $e_2$) and
       \textit{Bottom}: ratio of anisotropy ($e_1 / e_2$)
       for ORCA 0.5\deg ~mesh.
-      South of 20\degN a Mercator grid is used ($e_1 = e_2$) so that the anisotropy ratio is 1.
-      Poleward of 20\degN, the two "north pole" introduce a weak anisotropy over the ocean areas ($< 1.2$) except in
+      South of 20\deg{N} a Mercator grid is used ($e_1 = e_2$) so that the anisotropy ratio is 1.
+      Poleward of 20\deg{N}, the two "north pole" introduce a weak anisotropy over the ocean areas ($< 1.2$) except in
       vicinity of Victoria Island (Canadian Arctic Archipelago).
     }
   \end{center}
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-The method is applied to Mercator grid ($i.e.$ same zonal and meridional grid spacing) poleward of 20\degN,
+The method is applied to Mercator grid (\ie same zonal and meridional grid spacing) poleward of 20\deg{N},
 so that the Equator is a mesh line, which provides a better numerical solution for equatorial dynamics.
 The choice of the series of embedded ellipses (position of the foci and variation of the ellipses)
 is a compromise between maintaining the ratio of mesh anisotropy ($e_1 / e_2$) close to one in the ocean
@@ -210,7 +210,7 @@ The ORCA\_R05 and higher global configurations do not incorporate any regional r
 
 For ORCA\_R1 and R025, setting the configuration key to 75 allows to use 75 vertical levels, otherwise 46 are used.
 In the other ORCA configurations, 31 levels are used
-(see \autoref{tab:orca_zgr} \sfcomment{HERE I need to put new table for ORCA2 values} and \autoref{fig:zgr}).
+(see \autoref{tab:orca_zgr} %\sfcomment{HERE I need to put new table for ORCA2 values} and \autoref{fig:zgr}).
 
 Only the ORCA\_R2 is provided with all its input files in the \NEMO distribution.
 It is very similar to that used as part of the climate model developed at IPSL for the 4th IPCC assessment of
@@ -247,13 +247,13 @@ over which an analytical seasonal forcing is applied.
 This allows to investigate the spontaneous generation of a large number of interacting, transient mesoscale eddies 
 and their contribution to the large scale circulation. 
 
-The domain geometry is a closed rectangular basin on the $\beta$-plane centred at $\sim$ 30\degN and
+The domain geometry is a closed rectangular basin on the $\beta$-plane centred at $\sim$ 30\deg{N} and
 rotated by 45\deg, 3180~km long, 2120~km wide and 4~km deep (\autoref{fig:MISC_strait_hand}).
 The domain is bounded by vertical walls and by a flat bottom.
 The configuration is meant to represent an idealized North Atlantic or North Pacific basin.
 The circulation is forced by analytical profiles of wind and buoyancy fluxes.
 The applied forcings vary seasonally in a sinusoidal manner between winter and summer extrema \citep{Levy_al_OM10}. 
-The wind stress is zonal and its curl changes sign at 22\degN and 36\degN.
+The wind stress is zonal and its curl changes sign at 22\deg{N} and 36\deg{N}.
 It forces a subpolar gyre in the north, a subtropical gyre in the wider part of the domain and
 a small recirculation gyre in the southern corner.
 The net heat flux takes the form of a restoring toward a zonal apparent air temperature profile.
@@ -320,5 +320,7 @@ The Baltic boundary is included within the river input file and is specified as 
 Unlike ordinary river points the Baltic inputs also include salinity and temperature data.
 
 \biblio
+
+\pindex
 
 \end{document}

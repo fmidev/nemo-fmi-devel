@@ -67,7 +67,7 @@ MISC correspond to "extracting tendency terms" or "vorticity balance"?}
 \subsection{Horizontal divergence and relative vorticity (\protect\mdl{divcur})}
 \label{subsec:DYN_divcur}
 
-The vorticity is defined at an $f$-point ($i.e.$ corner point) as follows:
+The vorticity is defined at an $f$-point (\ie corner point) as follows:
 \begin{equation}
   \label{eq:divcur_cur}
   \zeta =\frac{1}{e_{1f}\,e_{2f} }\left( {\;\delta_{i+1/2} \left[ {e_{2v}\;v} \right]
@@ -122,7 +122,7 @@ If river runoff is expressed as a surface freshwater flux (see \autoref{chap:SBC
 The sea-surface height is evaluated using exactly the same time stepping scheme as
 the tracer equation \autoref{eq:tra_nxt}:
 a leapfrog scheme in combination with an Asselin time filter,
-$i.e.$ the velocity appearing in \autoref{eq:dynspg_ssh} is centred in time (\textit{now} velocity).
+\ie the velocity appearing in \autoref{eq:dynspg_ssh} is centred in time (\textit{now} velocity).
 This is of paramount importance.
 Replacing $T$ by the number $1$ in the tracer equation and summing over the water column must lead to
 the sea surface height equation otherwise tracer content will not be conserved
@@ -148,12 +148,12 @@ re-orientated downward.
 In the case of a linear free surface, the time derivative in \autoref{eq:wzv} disappears.
 The upper boundary condition applies at a fixed level $z=0$.
 The top vertical velocity is thus equal to the divergence of the barotropic transport
-($i.e.$ the first term in the right-hand-side of \autoref{eq:dynspg_ssh}).
+(\ie the first term in the right-hand-side of \autoref{eq:dynspg_ssh}).
 
 Note also that whereas the vertical velocity has the same discrete expression in $z$- and $s$-coordinates,
 its physical meaning is not the same:
 in the second case, $w$ is the velocity normal to the $s$-surfaces.
-Note also that the $k$-axis is re-orientated downwards in the \textsc{fortran} code compared to
+Note also that the $k$-axis is re-orientated downwards in the \fortran code compared to
 the indexing used in the semi-discrete equations such as \autoref{eq:wzv}
 (see \autoref{subsec:DOM_Num_Index_vertical}). 
 
@@ -173,7 +173,7 @@ applications of the \NEMO ocean model.
 The flux form option (see next section) has been present since version $2$.
 Options are defined through the \ngn{namdyn\_adv} namelist variables Coriolis and
 momentum advection terms are evaluated using a leapfrog scheme,
-$i.e.$ the velocity appearing in these expressions is centred in time (\textit{now} velocity). 
+\ie the velocity appearing in these expressions is centred in time (\textit{now} velocity). 
 At the lateral boundaries either free slip, no slip or partial slip boundary conditions are applied following
 \autoref{chap:LBC}.
 
@@ -207,7 +207,7 @@ The vorticity terms are all computed in dedicated routines that can be found in 
 
 In the enstrophy conserving case (ENS scheme),
 the discrete formulation of the vorticity term provides a global conservation of the enstrophy
-($ [ (\zeta +f ) / e_{3f} ]^2 $ in $s$-coordinates) for a horizontally non-divergent flow ($i.e.$ $\chi$=$0$),
+($ [ (\zeta +f ) / e_{3f} ]^2 $ in $s$-coordinates) for a horizontally non-divergent flow (\ie $\chi$=$0$),
 but does not conserve the total kinetic energy.
 It is given by:
 \begin{equation}
@@ -277,7 +277,7 @@ In both the ENS and ENE schemes,
 it is apparent that the combination of $i$ and $j$ averages of the velocity allows for
 the presence of grid point oscillation structures that will be invisible to the operator.
 These structures are \textit{computational modes} that will be at least partly damped by
-the momentum diffusion operator ($i.e.$ the subgrid-scale advection), but not by the resolved advection term.
+the momentum diffusion operator (\ie the subgrid-scale advection), but not by the resolved advection term.
 The ENS and ENE schemes therefore do not contribute to dump any grid point noise in the horizontal velocity field.
 Such noise would result in more noise in the vertical velocity field, an undesirable feature.
 This is a well-known characteristic of $C$-grid discretization where
@@ -326,7 +326,7 @@ extends by continuity the value of $e_{3f}$ into the land areas.
 This case introduces a sub-grid-scale topography at f-points
 (with a systematic reduction of $e_{3f}$ when a model level intercept the bathymetry)
 that tends to reinforce the topostrophy of the flow
-($i.e.$ the tendency of the flow to follow the isobaths) \citep{Penduff_al_OS07}. 
+(\ie the tendency of the flow to follow the isobaths) \citep{Penduff_al_OS07}. 
 
 Next, the vorticity triads, $ {^i_j}\mathbb{Q}^{i_p}_{j_p}$ can be defined at a $T$-point as
 the following triad combinations of the neighbouring potential vorticities defined at f-points
@@ -353,7 +353,7 @@ Finally, the vorticity terms are represented as:
 
 This EEN scheme in fact combines the conservation properties of the ENS and ENE schemes.
 It conserves both total energy and potential enstrophy in the limit of horizontally nondivergent flow
-($i.e.$ $\chi$=$0$) (see \autoref{subsec:C_vorEEN}). 
+(\ie $\chi$=$0$) (see \autoref{subsec:C_vorEEN}). 
 Applied to a realistic ocean configuration, it has been shown that it leads to a significant reduction of
 the noise in the vertical velocity field \citep{Le_Sommer_al_OM09}.
 Furthermore, used in combination with a partial steps representation of bottom topography,
@@ -421,7 +421,7 @@ an option which is only available with a TVD scheme (see \np{ln\_traadv\_tvd\_zt
 Options are defined through the \ngn{namdyn\_adv} namelist variables.
 In the flux form (as in the vector invariant form),
 the Coriolis and momentum advection terms are evaluated using a leapfrog scheme,
-$i.e.$ the velocity appearing in their expressions is centred in time (\textit{now} velocity).
+\ie the velocity appearing in their expressions is centred in time (\textit{now} velocity).
 At the lateral boundaries either free slip,
 no slip or partial slip boundary conditions are applied following \autoref{chap:LBC}.
 
@@ -445,7 +445,7 @@ It is given by:
 Any of the (\autoref{eq:dynvor_ens}), (\autoref{eq:dynvor_ene}) and (\autoref{eq:dynvor_een}) schemes can be used to
 compute the product of the Coriolis parameter and the vorticity.
 However, the energy-conserving scheme (\autoref{eq:dynvor_een}) has exclusively been used to date.
-This term is evaluated using a leapfrog scheme, $i.e.$ the velocity is centred in time (\textit{now} velocity).
+This term is evaluated using a leapfrog scheme, \ie the velocity is centred in time (\textit{now} velocity).
 
 %--------------------------------------------------------------------------------------------------------------
 %           Flux form Advection term
@@ -477,7 +477,7 @@ or a $3^{rd}$ order upstream biased scheme, UBS.
 The latter is described in \citet{Shchepetkin_McWilliams_OM05}.
 The schemes are selected using the namelist logicals \np{ln\_dynadv\_cen2} and \np{ln\_dynadv\_ubs}. 
 In flux form, the schemes differ by the choice of a space and time interpolation to define the value of
-$u$ and $v$ at the centre of each face of $u$- and $v$-cells, $i.e.$ at the $T$-, $f$-,
+$u$ and $v$ at the centre of each face of $u$- and $v$-cells, \ie at the $T$-, $f$-,
 and $uw$-points for $u$ and at the $f$-, $T$- and $vw$-points for $v$. 
 
 %-------------------------------------------------------------
@@ -497,7 +497,7 @@ In the centered $2^{nd}$ order formulation, the velocity is evaluated as the mea
   \right.
 \end{equation} 
 
-The scheme is non diffusive (i.e. conserves the kinetic energy) but dispersive ($i.e.$ it may create false extrema).
+The scheme is non diffusive (\ie conserves the kinetic energy) but dispersive (\ie it may create false extrema).
 It is therefore notoriously noisy and must be used in conjunction with an explicit diffusion operator to
 produce a sensible solution.
 The associated time-stepping is performed using a leapfrog scheme in conjunction with an Asselin time-filter,
@@ -521,18 +521,18 @@ For example, the evaluation of $u_T^{ubs} $ is done as follows:
   \end{cases}
 \end{equation}
 where $u"_{i+1/2} =\delta_{i+1/2} \left[ {\delta_i \left[ u \right]} \right]$.
-This results in a dissipatively dominant ($i.e.$ hyper-diffusive) truncation error
+This results in a dissipatively dominant (\ie hyper-diffusive) truncation error
 \citep{Shchepetkin_McWilliams_OM05}.
 The overall performance of the advection scheme is similar to that reported in \citet{Farrow1995}.
 It is a relatively good compromise between accuracy and smoothness.
 It is not a \emph{positive} scheme, meaning that false extrema are permitted.
 But the amplitudes of the false extrema are significantly reduced over those in the centred second order method.
 As the scheme already includes a diffusion component, it can be used without explicit lateral diffusion on momentum 
-($i.e.$ \np{ln\_dynldf\_lap}\forcode{ = }\np{ln\_dynldf\_bilap}\forcode{ = .false.}),
+(\ie \np{ln\_dynldf\_lap}\forcode{ = }\np{ln\_dynldf\_bilap}\forcode{ = .false.}),
 and it is recommended to do so.
 
 The UBS scheme is not used in all directions.
-In the vertical, the centred $2^{nd}$ order evaluation of the advection is preferred, $i.e.$ $u_{uw}^{ubs}$ and
+In the vertical, the centred $2^{nd}$ order evaluation of the advection is preferred, \ie $u_{uw}^{ubs}$ and
 $u_{vw}^{ubs}$ in \autoref{eq:dynadv_cen2} are used.
 UBS is diffusive and is associated with vertical mixing of momentum. \gmcomment{ gm  pursue the 
 sentence:Since vertical mixing of momentum is a source term of the TKE equation...  }
@@ -569,12 +569,12 @@ This is an error and should be suppressed soon.
 Options are defined through the \ngn{namdyn\_hpg} namelist variables.
 The key distinction between the different algorithms used for
 the hydrostatic pressure gradient is the vertical coordinate used,
-since HPG is a \emph{horizontal} pressure gradient, $i.e.$ computed along geopotential surfaces.
+since HPG is a \emph{horizontal} pressure gradient, \ie computed along geopotential surfaces.
 As a result, any tilt of the surface of the computational levels will require a specific treatment to
 compute the hydrostatic pressure gradient.
 
 The hydrostatic pressure gradient term is evaluated either using a leapfrog scheme,
-$i.e.$ the density appearing in its expression is centred in time (\emph{now} $\rho$),
+\ie the density appearing in its expression is centred in time (\emph{now} $\rho$),
 or a semi-implcit scheme.
 At the lateral boundaries either free slip, no slip or partial slip boundary conditions are applied.
 
@@ -651,7 +651,7 @@ module \mdl{zpsdhe} located in the TRA directory and described in \autoref{sec:T
 \label{subsec:DYN_hpg_sco}
 
 Pressure gradient formulations in an $s$-coordinate have been the subject of a vast number of papers
-($e.g.$, \citet{Song1998, Shchepetkin_McWilliams_OM05}). 
+(\eg, \citet{Song1998, Shchepetkin_McWilliams_OM05}). 
 A number of different pressure gradient options are coded but the ROMS-like,
 density Jacobian with cubic polynomial method is currently disabled whilst known bugs are under investigation.
 
@@ -703,7 +703,7 @@ No other scheme are working with the ice shelf.\\
 
 $\bullet$ The main hypothesis to compute the ice shelf load is that the ice shelf is in an isostatic equilibrium.
 The top pressure is computed integrating from surface to the base of the ice shelf a reference density profile
-(prescribed as density of a water at 34.4 PSU and -1.9\degC) and
+(prescribed as density of a water at 34.4 PSU and -1.9\deg{C}) and
 corresponds to the water replaced by the ice shelf.
 This top pressure is constant over time.
 A detailed description of this method is described in \citet{Losch2008}.\\
@@ -727,7 +727,7 @@ A semi-implicit scheme for doubling the stability limit associated with IGWs can
 \citep{Brown_Campana_MWR78, Maltrud1998}.
 It involves the evaluation of the hydrostatic pressure gradient as
 an average over the three time levels $t-\rdt$, $t$, and $t+\rdt$
-($i.e.$  \textit{before},  \textit{now} and  \textit{after} time-steps),
+(\ie \textit{before}, \textit{now} and  \textit{after} time-steps),
 rather than at the central time level $t$ only, as in the standard leapfrog scheme. 
 
 $\bullet$ leapfrog scheme (\np{ln\_dynhpg\_imp}\forcode{ = .true.}):
@@ -819,7 +819,7 @@ As a consequence the update of the $next$ velocities is done in module \mdl{dyns
 In the explicit free surface formulation (\key{dynspg\_exp} defined),
 the model time step is chosen to be small enough to resolve the external gravity waves
 (typically a few tens of seconds).
-The surface pressure gradient, evaluated using a leap-frog scheme ($i.e.$ centered in time),
+The surface pressure gradient, evaluated using a leap-frog scheme (\ie centered in time),
 is thus simply given by :
 \begin{equation}
   \label{eq:dynspg_exp}
@@ -831,7 +831,7 @@ is thus simply given by :
   \right.
 \end{equation} 
 
-Note that in the non-linear free surface case ($i.e.$ \key{vvl} defined),
+Note that in the non-linear free surface case (\ie \key{vvl} defined),
 the surface pressure gradient is already included in the momentum tendency through
 the level thickness variation allowed in the computation of the hydrostatic pressure gradient.
 Thus, nothing is done in the \mdl{dynspg\_exp} module.
@@ -947,7 +947,7 @@ obtain exact conservation.
 One can eventually choose to feedback instantaneous values by not using any time filter
 (\np{ln\_bt\_av}\forcode{ = .false.}). 
 In that case, external mode equations are continuous in time,
-$i.e.$ they are not re-initialized when starting a new sub-stepping sequence.
+\ie they are not re-initialized when starting a new sub-stepping sequence.
 This is the method used so far in the POM model, the stability being maintained by
 refreshing at (almost) each barotropic time step advection and horizontal diffusion terms.
 Since the latter terms have not been added in \NEMO for computational efficiency,
@@ -1123,7 +1123,7 @@ The options available for lateral diffusion are to use either laplacian (rotated
 The coefficients may be constant or spatially variable;
 the description of the coefficients is found in the chapter on lateral physics (\autoref{chap:LDF}).
 The lateral diffusion of momentum is evaluated using a forward scheme,
-$i.e.$ the velocity appearing in its expression is the \textit{before} velocity in time,
+\ie the velocity appearing in its expression is the \textit{before} velocity in time,
 except for the pure vertical component that appears when a tensor of rotation is used.
 This latter term is solved implicitly together with the vertical diffusion term (see \autoref{chap:STP}).
 
@@ -1139,7 +1139,7 @@ no slip or partial slip boundary conditions are applied according to the user's 
   physically motivated Laplace operator.
   In finite difference methods,
   the biharmonic operator is frequently the method of choice to achieve this scale selective dissipation since
-  its damping time ($i.e.$ its spin down time) scale like $\lambda^{-4}$ for disturbances of wavelength $\lambda$
+  its damping time (\ie its spin down time) scale like $\lambda^{-4}$ for disturbances of wavelength $\lambda$
   (so that short waves damped more rapidelly than long ones),
   whereas the Laplace operator damping time scales only like $\lambda^{-2}$.
 }
@@ -1314,7 +1314,7 @@ the atmospheric pressure is taken into account when computing the surface pressu
 the tidal potential is taken into account when computing the surface pressure gradient.
 
 (3) When \np{nn\_ice\_embd}\forcode{ = 2} and LIM or CICE is used
-($i.e.$ when the sea-ice is embedded in the ocean),
+(\ie when the sea-ice is embedded in the ocean),
 the snow-ice mass is taken into account when computing the surface pressure gradient.
 
 
@@ -1334,7 +1334,7 @@ the snow-ice mass is taken into account when computing the surface pressure grad
 
 Options are defined through the \ngn{namdom} namelist variables.
 The general framework for dynamics time stepping is a leap-frog scheme,
-$i.e.$ a three level centred time scheme associated with an Asselin time filter (cf. \autoref{chap:STP}).
+\ie a three level centred time scheme associated with an Asselin time filter (cf. \autoref{chap:STP}).
 The scheme is applied to the velocity, except when
 using the flux form of momentum advection (cf. \autoref{sec:DYN_adv_cor_flux})
 in the variable volume case (\key{vvl} defined),
@@ -1377,5 +1377,7 @@ and only array swapping and Asselin filtering is done in \mdl{dynnxt}.
 
 % ================================================================
 \biblio
+
+\pindex
 
 \end{document}

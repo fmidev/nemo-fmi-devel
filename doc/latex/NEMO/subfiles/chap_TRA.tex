@@ -38,7 +38,7 @@ the lateral diffusion (LDF), the vertical diffusion (ZDF), the contributions fro
 the contribution from the bottom boundary Layer (BBL) parametrisation, and an internal damping (DMP) term.
 The terms QSR, BBC, BBL and DMP are optional.
 The external forcings and parameterisations require complex inputs and complex calculations
-($e.g.$ bulk formulae, estimation of mixing coefficients) that are carried out in the SBC, LDF and ZDF modules and 
+(\eg bulk formulae, estimation of mixing coefficients) that are carried out in the SBC, LDF and ZDF modules and 
 described in \autoref{chap:SBC}, \autoref{chap:LDF} and \autoref{chap:ZDF}, respectively.
 Note that \mdl{tranpc}, the non-penetrative convection module, although located in the NEMO/OPA/TRA directory as
 it directly modifies the tracer fields, is described with the model vertical physics (ZDF) together with
@@ -68,9 +68,9 @@ The user has the option of extracting each tendency term on the RHS of the trace
 \nlst{namtra_adv}
 %-------------------------------------------------------------------------------------------------------------
 
-When considered ($i.e.$ when \np{ln\_traadv\_NONE} is not set to \forcode{.true.}),
+When considered (\ie when \np{ln\_traadv\_NONE} is not set to \forcode{.true.}),
 the advection tendency of a tracer is expressed in flux form,
-$i.e.$ as the divergence of the advective fluxes.
+\ie as the divergence of the advective fluxes.
 Its discrete expression is given by :
 \begin{equation}
   \label{eq:tra_adv}
@@ -84,7 +84,7 @@ The flux form in \autoref{eq:tra_adv} implicitly requires the use of the continu
 Indeed, it is obtained by using the following equality:
 $\nabla \cdot \left( \vect{U}\,T \right)=\vect{U} \cdot \nabla T$ which
 results from the use of the continuity equation,  $\partial _t e_3 + e_3\;\nabla \cdot \vect{U}=0$
-(which reduces to $\nabla \cdot \vect{U}=0$ in linear free surface, $i.e.$ \np{ln\_linssh}\forcode{ = .true.}).
+(which reduces to $\nabla \cdot \vect{U}=0$ in linear free surface, \ie \np{ln\_linssh}\forcode{ = .true.}).
 Therefore it is of paramount importance to design the discrete analogue of the advection tendency so that
 it is consistent with the continuity equation in order to enforce the conservation properties of
 the continuous equations.
@@ -126,7 +126,7 @@ At the sea surface the boundary condition depends on the type of sea surface cho
   the vertical boundary condition is applied at the fixed surface $z=0$ rather than on the moving surface $z=\eta$.
   There is a non-zero advective flux which is set for all advection schemes as
   $\left. {\tau_w } \right|_{k=1/2} =T_{k=1} $,
-  $i.e.$ the product of surface velocity (at $z=0$) by the first level tracer value.
+  \ie the product of surface velocity (at $z=0$) by the first level tracer value.
 \item[non-linear free surface:]
   (\np{ln\_linssh}\forcode{ = .false.})
   convergence/divergence in the first ocean level moves the free surface up/down.
@@ -140,7 +140,7 @@ two quantities that are not correlated \citep{Roullet_Madec_JGR00,Griffies_al_MW
 
 The velocity field that appears in (\autoref{eq:tra_adv} and \autoref{eq:tra_adv_zco})
 is the centred (\textit{now}) \textit{effective} ocean velocity,
-$i.e.$ the \textit{eulerian} velocity (see \autoref{chap:DYN}) plus
+\ie the \textit{eulerian} velocity (see \autoref{chap:DYN}) plus
 the eddy induced velocity (\textit{eiv}) and/or
 the mixed layer eddy induced velocity (\textit{eiv}) when
 those parameterisations are used (see \autoref{chap:LDF}).
@@ -155,7 +155,7 @@ The choice is made in the \textit{\ngn{namtra\_adv}} namelist,
 by setting to \forcode{.true.} one of the logicals \textit{ln\_traadv\_xxx}.
 The corresponding code can be found in the \mdl{traadv\_xxx} module,
 where \textit{xxx} is a 3 or 4 letter acronym corresponding to each scheme.
-By default ($i.e.$ in the reference namelist, \ngn{namelist\_ref}), all the logicals are set to \forcode{.false.}.
+By default (\ie in the reference namelist, \ngn{namelist\_ref}), all the logicals are set to \forcode{.false.}.
 If the user does not select an advection scheme in the configuration namelist (\ngn{namelist\_cfg}),
 the tracers will \textit{not} be advected!
 
@@ -198,8 +198,8 @@ For example, in the $i$-direction :
   \tau_u^{cen2} =\overline T ^{i+1/2}
 \end{equation}
 
-CEN2 is non diffusive ($i.e.$ it conserves the tracer variance, $\tau^2)$ but dispersive
-($i.e.$ it may create false extrema).
+CEN2 is non diffusive (\ie it conserves the tracer variance, $\tau^2)$ but dispersive
+(\ie it may create false extrema).
 It is therefore notoriously noisy and must be used in conjunction with an explicit diffusion operator to
 produce a sensible solution.
 The associated time-stepping is performed using a leapfrog scheme in conjunction with an Asselin time-filter,
@@ -233,7 +233,7 @@ it requires changes in the discretisation of the tracer advection together with 
 and the momentum advection and pressure terms.
 
 A direct consequence of the pseudo-fourth order nature of the scheme is that it is not non-diffusive,
-$i.e.$ the global variance of a tracer is not preserved using CEN4.
+\ie the global variance of a tracer is not preserved using CEN4.
 Furthermore, it must be used in conjunction with an explicit diffusion operator to produce a sensible solution.
 As in CEN2 case, the time-stepping is performed using a leapfrog scheme in conjunction with an Asselin time-filter,
 so $T$ in (\autoref{eq:tra_adv_cen4}) is the \textit{now} tracer.
@@ -273,7 +273,7 @@ For example, in the $i$-direction :
 \end{equation}
 where $c_u$ is a flux limiter function taking values between 0 and 1.
 The FCT order is the one of the centred scheme used
-($i.e.$ it depends on the setting of \np{nn\_fct\_h} and \np{nn\_fct\_v}).
+(\ie it depends on the setting of \np{nn\_fct\_h} and \np{nn\_fct\_v}).
 There exist many ways to define $c_u$, each corresponding to a different FCT scheme.
 The one chosen in \NEMO is described in \citet{Zalesak_JCP79}.
 $c_u$ only departs from $1$ when the advective term produces a local extremum in the tracer field.
@@ -355,7 +355,7 @@ For example, in the $i$-direction:
 \end{equation}
 where $\tau "_i =\delta_i \left[ {\delta_{i+1/2} \left[ \tau \right]} \right]$.
 
-This results in a dissipatively dominant (i.e. hyper-diffusive) truncation error
+This results in a dissipatively dominant (\ie hyper-diffusive) truncation error
 \citep{Shchepetkin_McWilliams_OM05}.
 The overall performance of the advection scheme is similar to that reported in \cite{Farrow1995}.
 It is a relatively good compromise between accuracy and smoothness.
@@ -446,7 +446,7 @@ Options are defined through the \ngn{namtra\_ldf} namelist variables.
 They are regrouped in four items, allowing to specify 
 $(i)$   the type of operator used (none, laplacian, bilaplacian),
 $(ii)$  the direction along which the operator acts (iso-level, horizontal, iso-neutral),
-$(iii)$ some specific options related to the rotated operators ($i.e.$ non-iso-level operator), and
+$(iii)$ some specific options related to the rotated operators (\ie non-iso-level operator), and
 $(iv)$  the specification of eddy diffusivity coefficient (either constant or variable in space and time).
 Item $(iv)$ will be described in \autoref{chap:LDF}.
 The direction along which the operators act is defined through the slope between
@@ -454,7 +454,7 @@ this direction and the iso-level surfaces.
 The slope is computed in the \mdl{ldfslp} module and will also be described in \autoref{chap:LDF}.
 
 The lateral diffusion of tracers is evaluated using a forward scheme,
-$i.e.$ the tracers appearing in its expression are the \textit{before} tracers in time,
+\ie the tracers appearing in its expression are the \textit{before} tracers in time,
 except for the pure vertical component that appears when a rotation tensor is used.
 This latter component is solved implicitly together with the vertical diffusion term (see \autoref{chap:STP}).
 When \np{ln\_traldf\_msc}\forcode{ = .true.}, a Method of Stabilizing Correction is used in which
@@ -490,7 +490,7 @@ Both laplacian and bilaplacian operators ensure the total tracer variance decrea
 Their primary role is to provide strong dissipation at the smallest scale supported by the grid while
 minimizing the impact on the larger scale features.
 The main difference between the two operators is the scale selectiveness.
-The bilaplacian damping time ($i.e.$ its spin down time) scales like $\lambda^{-4}$ for
+The bilaplacian damping time (\ie its spin down time) scales like $\lambda^{-4}$ for
 disturbances of wavelength $\lambda$ (so that short waves damped more rapidelly than long ones),
 whereas the laplacian damping time scales only like $\lambda^{-2}$.
 
@@ -505,7 +505,7 @@ whereas the laplacian damping time scales only like $\lambda^{-2}$.
 The choice of a direction of action determines the form of operator used.
 The operator is a simple (re-entrant) laplacian acting in the (\textbf{i},\textbf{j}) plane when
 iso-level option is used (\np{ln\_traldf\_lev}\forcode{ = .true.}) or
-when a horizontal ($i.e.$ geopotential) operator is demanded in \textit{z}-coordinate
+when a horizontal (\ie geopotential) operator is demanded in \zstar-coordinate
 (\np{ln\_traldf\_hor} and \np{ln\_zco} equal \forcode{.true.}).
 The associated code can be found in the \mdl{traldf\_lap\_blp} module.
 The operator is a rotated (re-entrant) laplacian when
@@ -513,7 +513,7 @@ the direction along which it acts does not coincide with the iso-level surfaces,
 that is when standard or triad iso-neutral option is used
 (\np{ln\_traldf\_iso} or \np{ln\_traldf\_triad} equals \forcode{.true.},
 see \mdl{traldf\_iso} or \mdl{traldf\_triad} module, resp.), or
-when a horizontal ($i.e.$ geopotential) operator is demanded in \textit{s}-coordinate
+when a horizontal (\ie geopotential) operator is demanded in \textit{s}-coordinate
 (\np{ln\_traldf\_hor} and \np{ln\_sco} equal \forcode{.true.})
 \footnote{In this case, the standard iso-neutral operator will be automatically selected}.
 In that case, a rotation is applied to the gradient(s) that appears in the operator so that
@@ -543,7 +543,7 @@ It is implemented in the \rou{traldf\_lap} subroutine found in the \mdl{traldf\_
 The module also contains \rou{traldf\_blp}, the subroutine calling twice \rou{traldf\_lap} in order to
 compute the iso-level bilaplacian operator. 
 
-It is a \emph{horizontal} operator ($i.e.$ acting along geopotential surfaces) in
+It is a \emph{horizontal} operator (\ie acting along geopotential surfaces) in
 the $z$-coordinate with or without partial steps, but is simply an iso-level operator in the $s$-coordinate.
 It is thus used when, in addition to \np{ln\_traldf\_lap} or \np{ln\_traldf\_blp}\forcode{ = .true.},
 we have \np{ln\_traldf\_lev}\forcode{ = .true.} or \np{ln\_traldf\_hor}~=~\np{ln\_zco}\forcode{ = .true.}.
@@ -592,7 +592,7 @@ takes the following semi-discrete space form in $z$- and $s$-coordinates:
 \end{equation}
 where $b_t$=$e_{1t}\,e_{2t}\,e_{3t}$  is the volume of $T$-cells,
 $r_1$ and $r_2$ are the slopes between the surface of computation ($z$- or $s$-surfaces) and
-the surface along which the diffusion operator acts ($i.e.$ horizontal or iso-neutral surfaces).
+the surface along which the diffusion operator acts (\ie horizontal or iso-neutral surfaces).
 It is thus used when, in addition to \np{ln\_traldf\_lap}\forcode{ = .true.},
 we have \np{ln\_traldf\_iso}\forcode{ = .true.},
 or both \np{ln\_traldf\_hor}\forcode{ = .true.} and \np{ln\_zco}\forcode{ = .true.}.
@@ -675,7 +675,7 @@ The vertical diffusion operator given by (\autoref{eq:PE_zdf}) takes the followi
 \]
 where $A_w^{vT}$ and $A_w^{vS}$ are the vertical eddy diffusivity coefficients on temperature and salinity,
 respectively.
-Generally, $A_w^{vT}=A_w^{vS}$ except when double diffusive mixing is parameterised ($i.e.$ \key{zdfddm} is defined).
+Generally, $A_w^{vT}=A_w^{vS}$ except when double diffusive mixing is parameterised (\ie \key{zdfddm} is defined).
 The way these coefficients are evaluated is given in \autoref{chap:ZDF} (ZDF).
 Furthermore, when iso-neutral mixing is used, both mixing coefficients are increased by
 $\frac{e_{1w}\,e_{2w} }{e_{3w} }\ \left( {r_{1w} ^2+r_{2w} ^2} \right)$ to account for
@@ -714,7 +714,7 @@ The two formulations are completely equivalent;
 the forcing terms in trasbc are the surface fluxes divided by the thickness of the top model layer. 
 
 Due to interactions and mass exchange of water ($F_{mass}$) with other Earth system components
-($i.e.$ atmosphere, sea-ice, land), the change in the heat and salt content of the surface layer of the ocean is due
+(\ie atmosphere, sea-ice, land), the change in the heat and salt content of the surface layer of the ocean is due
 both to the heat and salt fluxes crossing the sea surface (not linked with $F_{mass}$) and
 to the heat and salt content of the mass exchange.
 They are both included directly in $Q_{ns}$, the surface heat flux,
@@ -724,7 +724,7 @@ By doing this, the forcing formulation is the same for any tracer (including tem
 The surface module (\mdl{sbcmod}, see \autoref{chap:SBC}) provides the following forcing fields (used on tracers):
 
 $\bullet$ $Q_{ns}$, the non-solar part of the net surface heat flux that crosses the sea surface
-(i.e. the difference between the total surface heat flux and the fraction of the short wave flux that 
+(\ie the difference between the total surface heat flux and the fraction of the short wave flux that 
 penetrates into the water column, see \autoref{subsec:TRA_qsr})
 plus the heat content associated with of the mass exchange with the atmosphere and lands.
 
@@ -795,7 +795,7 @@ heat flux:
     Q_{ns} &= Q_\text{Total} - Q_{sr}
   \end{split}
 \end{equation}
-where $Q_{sr}$ is the penetrative part of the surface heat flux ($i.e.$ the shortwave radiation) and
+where $Q_{sr}$ is the penetrative part of the surface heat flux (\ie the shortwave radiation) and
 $I$ is the downward irradiance ($\left. I \right|_{z=\eta}=Q_{sr}$).
 The additional term in \autoref{eq:PE_qsr} is discretized as follows:
 \begin{equation}
@@ -842,7 +842,7 @@ but with much greater computational efficiency.
 The 2-bands formulation does not reproduce the full model very well. 
 
 The RGB formulation is used when \np{ln\_qsr\_rgb}\forcode{ = .true.}.
-The RGB attenuation coefficients ($i.e.$ the inverses of the extinction length scales) are tabulated over
+The RGB attenuation coefficients (\ie the inverses of the extinction length scales) are tabulated over
 61 nonuniform chlorophyll classes ranging from 0.01 to 10 g.Chl/L
 (see the routine \rou{trc\_oce\_rgb} in \mdl{trc\_oce} module).
 Four types of chlorophyll can be chosen in the RGB formulation:
@@ -866,11 +866,11 @@ the temperature trend, and the surface heat flux is modified in routine \mdl{tra
 When the $z$-coordinate is preferred to the $s$-coordinate,
 the depth of $w-$levels does not significantly vary with location.
 The level at which the light has been totally absorbed
-($i.e.$ it is less than the computer precision) is computed once,
+(\ie it is less than the computer precision) is computed once,
 and the trend associated with the penetration of the solar radiation is only added down to that level.
 Finally, note that when the ocean is shallow ($<$ 200~m), part of the solar radiation can reach the ocean floor.
 In this case, we have chosen that all remaining radiation is absorbed in the last ocean level
-($i.e.$ $I$ is masked). 
+(\ie $I$ is masked). 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{figure}[!t]
@@ -913,13 +913,13 @@ In this case, we have chosen that all remaining radiation is absorbed in the las
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 Usually it is assumed that there is no exchange of heat or salt through the ocean bottom,
-$i.e.$ a no flux boundary condition is applied on active tracers at the bottom.
+\ie a no flux boundary condition is applied on active tracers at the bottom.
 This is the default option in \NEMO, and it is implemented using the masking technique.
 However, there is a non-zero heat flux across the seafloor that is associated with solid earth cooling.
 This flux is weak compared to surface fluxes (a mean global value of $\sim0.1\;W/m^2$ \citep{Stein_Stein_Nat92}),
 but it warms systematically the ocean and acts on the densest water masses.
 Taking this flux into account in a global ocean model increases the deepest overturning cell
-($i.e.$ the one associated with the Antarctic Bottom Water) by a few Sverdrups  \citep{Emile-Geay_Madec_OS09}. 
+(\ie the one associated with the Antarctic Bottom Water) by a few Sverdrups  \citep{Emile-Geay_Madec_OS09}. 
 
 Options are defined through the  \ngn{namtra\_bbc} namelist variables.
 The presence of geothermal heating is controlled by setting the namelist parameter \np{ln\_trabbc} to true.
@@ -975,7 +975,7 @@ the diffusive flux between two adjacent cells at the ocean floor is given by
 with $\nabla_\sigma$ the lateral gradient operator taken between bottom cells,
 and  $A_l^\sigma$ the lateral diffusivity in the BBL.
 Following \citet{Beckmann_Doscher1997}, the latter is prescribed with a spatial dependence,
-$i.e.$ in the conditional form
+\ie in the conditional form
 \begin{equation}
   \label{eq:tra_bbl_coef}
   A_l^\sigma (i,j,t)=\left\{ {
@@ -1005,8 +1005,8 @@ $\overline{S}^\sigma$ and $\overline{H}^\sigma$, the along bottom mean temperatu
 \subsection{Advective bottom boundary layer  (\protect\np{nn\_bbl\_adv}\forcode{ = 1..2})}
 \label{subsec:TRA_bbl_adv}
 
-\sgacomment{"downsloping flow" has been replaced by "downslope flow" in the following
-if this is not what is meant then "downwards sloping flow" is also a possibility"}
+%\sgacomment{"downsloping flow" has been replaced by "downslope flow" in the following
+%if this is not what is meant then "downwards sloping flow" is also a possibility"}
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{figure}[!t]
@@ -1028,7 +1028,7 @@ if this is not what is meant then "downwards sloping flow" is also a possibility
 
 %!!      nn_bbl_adv = 1   use of the ocean velocity as bbl velocity
 %!!      nn_bbl_adv = 2   follow Campin and Goosse (1999) implentation
-%!!        i.e. transport proportional to the along-slope density gradient
+%!!        \ie transport proportional to the along-slope density gradient
 
 %%%gmcomment   :  this section has to be really written
 
@@ -1040,14 +1040,14 @@ The density difference causes dense water to move down the slope.
 the downslope velocity is chosen to be the Eulerian ocean velocity just above the topographic step
 (see black arrow in \autoref{fig:bbl}) \citep{Beckmann_Doscher1997}.
 It is a \textit{conditional advection}, that is, advection is allowed only
-if dense water overlies less dense water on the slope ($i.e.$ $\nabla_\sigma \rho  \cdot  \nabla H<0$) and
-if the velocity is directed towards greater depth ($i.e.$ $\vect{U}  \cdot  \nabla H>0$).
+if dense water overlies less dense water on the slope (\ie $\nabla_\sigma \rho  \cdot  \nabla H<0$) and
+if the velocity is directed towards greater depth (\ie $\vect{U}  \cdot  \nabla H>0$).
 
 \np{nn\_bbl\_adv}\forcode{ = 2}:
 the downslope velocity is chosen to be proportional to $\Delta \rho$,
 the density difference between the higher cell and lower cell densities \citep{Campin_Goosse_Tel99}.
 The advection is allowed only  if dense water overlies less dense water on the slope
-($i.e.$ $\nabla_\sigma \rho  \cdot  \nabla H<0$).
+(\ie $\nabla_\sigma \rho  \cdot  \nabla H<0$).
 For example, the resulting transport of the downslope flow, here in the $i$-direction (\autoref{fig:bbl}),
 is simply given by the following expression:
 \[
@@ -1111,7 +1111,7 @@ Options are defined through the  \ngn{namtra\_dmp} namelist variables.
 The restoring term is added when the namelist parameter \np{ln\_tradmp} is set to true.
 It also requires that both \np{ln\_tsd\_init} and \np{ln\_tsd\_tradmp} are set to true in
 \textit{namtsd} namelist as well as \np{sn\_tem} and \np{sn\_sal} structures are correctly set
-($i.e.$ that $T_o$ and $S_o$ are provided in input files and read using \mdl{fldread},
+(\ie that $T_o$ and $S_o$ are provided in input files and read using \mdl{fldread},
 see \autoref{subsec:SBC_fldread}).
 The restoring coefficient $\gamma$ is a three-dimensional array read in during the \rou{tra\_dmp\_init} routine.
 The file name is specified by the namelist variable \np{cn\_resto}.
@@ -1147,7 +1147,7 @@ run on the same machine as the NEMO model.
 A \ifile{mesh\_mask} file for the model configuration is required as an input.
 This can be generated by carrying out a short model run with the namelist parameter \np{nn\_msh} set to 1.
 The namelist parameter \np{ln\_tradmp} will also need to be set to .false. for this to work.
-The \nl{nam\_dmp\_create} namelist in the DMP\_TOOLS directory is used to specify options for
+The \ngn{nam\_dmp\_create} namelist in the DMP\_TOOLS directory is used to specify options for
 the restoration coefficient.
 
 %--------------------------------------------nam_dmp_create-------------------------------------------------
@@ -1155,13 +1155,13 @@ the restoration coefficient.
 %-------------------------------------------------------------------------------------------------------
 
 \np{cp\_cfg}, \np{cp\_cpz}, \np{jp\_cfg} and \np{jperio} specify the model configuration being used and
-should be the same as specified in \nl{namcfg}.
-The variable \nl{lzoom} is used to specify that the damping is being used as in case \textit{a} above to
+should be the same as specified in \ngn{namcfg}.
+The variable \np{lzoom} is used to specify that the damping is being used as in case \textit{a} above to
 provide boundary conditions to a zoom configuration.
 In the case of the arctic or antarctic zoom configurations this includes some specific treatment.
 Otherwise damping is applied to the 6 grid points along the ocean boundaries.
 The open boundaries are specified by the variables \np{lzoom\_n}, \np{lzoom\_e}, \np{lzoom\_s}, \np{lzoom\_w} in
-the \nl{nam\_zoom\_dmp} name list.
+the \ngn{nam\_zoom\_dmp} name list.
 
 The remaining switch namelist variables determine the spatial variation of the restoration coefficient in
 non-zoom configurations.
@@ -1200,7 +1200,7 @@ with \np{rn\_surf} as surface value, \np{rn\_bot} as bottom value and a transiti
 
 Options are defined through the  \ngn{namdom} namelist variables.
 The general framework for tracer time stepping is a modified leap-frog scheme \citep{Leclair_Madec_OM09},
-$i.e.$ a three level centred time scheme associated with a Asselin time filter (cf. \autoref{sec:STP_mLF}):
+\ie a three level centred time scheme associated with a Asselin time filter (cf. \autoref{sec:STP_mLF}):
 \begin{equation}
   \label{eq:tra_nxt}
   \begin{aligned}
@@ -1212,7 +1212,7 @@ $i.e.$ a three level centred time scheme associated with a Asselin time filter (
 \end{equation} 
 where RHS is the right hand side of the temperature equation, the subscript $f$ denotes filtered values,
 $\gamma$ is the Asselin coefficient, and $S$ is the total forcing applied on $T$
-($i.e.$ fluxes plus content in mass exchanges).
+(\ie fluxes plus content in mass exchanges).
 $\gamma$ is initialized as \np{rn\_atfp} (\textbf{namelist} parameter).
 Its default value is \np{rn\_atfp}\forcode{ = 10.e-3}.
 Note that the forcing correction term in the filter is not applied in linear free surface
@@ -1281,7 +1281,7 @@ controls the EOS used (\forcode{= -1} for TEOS10 ; \forcode{= 0} for EOS-80 ; \f
   Note that a slightly higher precision polynomial form is now used replacement of
   the TEOS-10 rational function approximation for hydrographic data analysis \citep{TEOS10}.
   A key point is that conservative state variables are used:
-  Absolute Salinity (unit: g/kg, notation: $S_A$) and Conservative Temperature (unit: \degC, notation: $\Theta$).
+  Absolute Salinity (unit: g/kg, notation: $S_A$) and Conservative Temperature (unit: \deg{C}, notation: $\Theta$).
   The pressure in decibars is approximated by the depth in meters.
   With TEOS10, the specific heat capacity of sea water, $C_p$, is a constant.
   It is set to $C_p=3991.86795711963~J\,Kg^{-1}\,^{\circ}K^{-1}$, according to \citet{TEOS10}.
@@ -1362,7 +1362,7 @@ controls the EOS used (\forcode{= -1} for TEOS10 ; \forcode{= 0} for EOS-80 ; \f
 \subsection{Brunt-V\"{a}is\"{a}l\"{a} frequency (\protect\np{nn\_eos}\forcode{ = 0..2})}
 \label{subsec:TRA_bn2}
 
-An accurate computation of the ocean stability (i.e. of $N$, the brunt-V\"{a}is\"{a}l\"{a} frequency) is of
+An accurate computation of the ocean stability (\ie of $N$, the brunt-V\"{a}is\"{a}l\"{a} frequency) is of
 paramount importance as determine the ocean stratification and is used in several ocean parameterisations
 (namely TKE, GLS, Richardson number dependent vertical diffusion, enhanced vertical diffusion,
 non-penetrative convection, tidal mixing  parameterisation, iso-neutral diffusion).
@@ -1377,7 +1377,7 @@ where $(T,S) = (\Theta, S_A)$ for TEOS10, $= (\theta, S_p)$ for TEOS-80, or $=(T
 and, $\alpha$ and $\beta$ are the thermal and haline expansion coefficients.
 The coefficients are a polynomial function of temperature, salinity and depth which
 expression depends on the chosen EOS.
-They are computed through \textit{eos\_rab}, a \textsc{Fortran} function that can be found in \mdl{eosbn2}.
+They are computed through \textit{eos\_rab}, a \fortran function that can be found in \mdl{eosbn2}.
 
 % -------------------------------------------------------------------------------------------------------------
 %        Freezing Point of Seawater
@@ -1395,10 +1395,10 @@ The freezing point of seawater is a function of salinity and pressure \citep{UNE
 \end{equation}
 
 \autoref{eq:tra_eos_fzp} is only used to compute the potential freezing point of sea water
-($i.e.$ referenced to the surface $p=0$),
+(\ie referenced to the surface $p=0$),
 thus the pressure dependent terms in \autoref{eq:tra_eos_fzp} (last term) have been dropped.
 The freezing point is computed through \textit{eos\_fzp},
-a \textsc{Fortran} function that can be found in \mdl{eosbn2}.  
+a \fortran function that can be found in \mdl{eosbn2}.  
 
 
 % -------------------------------------------------------------------------------------------------------------
@@ -1509,5 +1509,7 @@ partial cells should be further investigated in the near future.
 %%%
 
 \biblio
+
+\pindex
 
 \end{document}

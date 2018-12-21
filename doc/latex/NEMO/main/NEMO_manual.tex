@@ -16,7 +16,6 @@
 
 %% Custom style
 \usepackage{../main/NEMO_manual}
-\usepackage{../main/NEMO_minted}
 
 \makeindex
 
@@ -24,16 +23,15 @@
 %% 
 %% ==============================================================================
 
-%% Trick to include biblio in subfile compilation
-\newcommand{\biblio}{
-  \bibliographystyle{../main/ametsoc}
-  \bibliography{../main/NEMO_manual}
-}
+%% Include references and index for single subfile compilation
+\newcommand{\biblio}{\bibliography{../main/NEMO_manual}}
+\newcommand{\pindex}{\printindex}
 
 \begin{document}
 
-%% Trick to include biblio in subfile compilation
-\def\biblio{}
+%% Override custom cmds for full manual compilation
+\renewcommand{\biblio}{}
+\renewcommand{\pindex}{}
 
 
 %% Frontmatter
@@ -50,17 +48,21 @@
 }
 
 \author{
-\Large Gurvan Madec, and the NEMO team					                                             \\
-\texttt{\small\href{mailto:gurvan.madec@locean-ipsl.umpc.fr}{gurvan.madec@locean-ipsl.umpc.fr}}	\\
+  \Large Gurvan Madec and NEMO System Team
+  \thanks{
+    Yevgeny Aksenov, Mireck Andrejczuk, Mike Bell, Romain Bourdalle-Badie, Cl\'{e}ment Bricaud,
+    J\'{e}r\^{o}me Chanut, Stefania Ciliberti, Emanuela Clementi, Andrew Coward, Damiano Delrosso,
+    Massimiliano Drudi, Christian Eth\'{e}, Simona Flavoni, Doroteaciro Iovino, Claire L\'{e}vy, Tomas Lovato,
+    Nicolas Martin, S\'{e}bastien Masson, Pierre Mathiot, Gelsomina Mattia, Francesca Mele, Silvia Mocavero,
+    George Nurser, Enda O'Dea, Julien Paul, Cl\'{e}ment Rousset, Dave Storkey, Martin Vancoppenolle
+  }                                                        \\
+                                                           \\
+  \textit{Issue 27, Notes du P\^{o}le de mod\'{e}lisation} \\
+  \textit{Institut Pierre-Simon Laplace (IPSL)}            \\
+  \textit{ISSN 1288-1619}
 }
 
-\date{
-Decembre 2017																											\\
-{\small  -- version 4.0 alpha --}																				\\
-~																															\\
-\textit{\small Note du P\^ole de mod\'{e}lisation de l'Institut Pierre-Simon Laplace No 27 }	\\
-\vspace{0.45cm}{ ISSN No 1288-1619.}
-}
+\date{Version 4.0 -- January 2019}
 %\date{\today}
 
 \maketitle

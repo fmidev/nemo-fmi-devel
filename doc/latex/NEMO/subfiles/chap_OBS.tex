@@ -29,7 +29,7 @@ For {\em in situ} profiles, a 1D vertical interpolator is needed in addition to
 provide model fields at the observation depths.
 This now works in a generalised vertical coordinate system. 
 
-Some profile observation types (e.g. tropical moored buoys) are made available as daily averaged quantities.
+Some profile observation types (\eg tropical moored buoys) are made available as daily averaged quantities.
 The observation operator code can be set-up to calculate the equivalent daily average model temperature fields using
 the \np{nn\_profdavtypes} namelist array.
 Some SST observations are equivalent to a night-time average value and
@@ -541,7 +541,7 @@ variables:
 For most observation types, the horizontal extent of the observation is small compared to the model grid size and so
 the model equivalent of the observation is calculated by interpolating from
 the four surrounding grid points to the observation location.
-Some satellite observations (e.g. microwave satellite SST data, or satellite SSS data) have a footprint which
+Some satellite observations (\eg microwave satellite SST data, or satellite SSS data) have a footprint which
 is similar in size or larger than the model grid size (particularly when the grid size is small).
 In those cases the model counterpart should be calculated by averaging the model grid points over
 the same size as the footprint.
@@ -611,7 +611,7 @@ Four different possibilities are available for computing the weights.
    \end{align*}
    and $M$ corresponds to $B$, $C$ or $D$.
    A more stable form of the great-circle distance formula for small distances ($x$ near 1)
-   involves the arcsine function ($e.g.$ see p.~101 of \citet{Daley_Barker_Bk01}:
+   involves the arcsine function (\eg see p.~101 of \citet{Daley_Barker_Bk01}:
    \begin{align*}
      s\left( {\rm P}, {\rm M} \right) & \hspace{-2mm} = \hspace{-2mm} & \sin^{-1} \! \left\{ \sqrt{ 1 - x^2 } \right\}
    \end{align*}
@@ -681,7 +681,7 @@ Figs.~\autoref{fig:obsavgrec} and~\autoref{fig:obsavgrad}.
     \caption{
       \protect\label{fig:obsavgrec}
       Weights associated with each model grid box (blue lines and numbers)
-      for an observation at -170.5E, 56.0N with a rectangular footprint of 1\deg x 1\deg.
+      for an observation at -170.5\deg{E}, 56.0\deg{N} with a rectangular footprint of 1\deg x 1\deg.
     }
   \end{center}
 \end{figure}
@@ -694,7 +694,7 @@ Figs.~\autoref{fig:obsavgrec} and~\autoref{fig:obsavgrad}.
     \caption{
       \protect\label{fig:obsavgrad}
       Weights associated with each model grid box (blue lines and numbers)
-      for an observation at -170.5E, 56.0N with a radial footprint with diameter 1\deg.
+      for an observation at -170.5\deg{E}, 56.0\deg{N} with a radial footprint with diameter 1\deg.
     } 
   \end{center}
 \end{figure}
@@ -740,7 +740,7 @@ To determine if P is inside the cell, we verify that the cross-products
   % \label{eq:cross}
 \end{align*}
 point in the opposite direction to the unit normal $\widehat{\bf k}$
-(i.e., that the coefficients of $\widehat{\bf k}$ are negative),
+(\ie that the coefficients of $\widehat{\bf k}$ are negative),
 where ${{\bf r}_{}}_{\rm PA}$, ${{\bf r}_{}}_{\rm PB}$, etc. correspond to
 the vectors between points P and A, P and B, etc..
 The method used is similar to the method used in the SCRIP interpolation package \citep{Jones_1998}.
@@ -789,7 +789,7 @@ The grid-point domain decomposition is clearly visible on the plot.
 The advantage of this approach is that all information needed for horizontal interpolation is available without
 any MPP communication.
 Of course, this is under the assumption that we are only using a $2 \times 2$ grid-point stencil for
-the interpolation (e.g., bilinear interpolation).
+the interpolation (\eg bilinear interpolation).
 For higher order interpolation schemes this is no longer valid.
 A disadvantage with the above scheme is that the number of observations on each processor can be very different.
 If the cost of the actual interpolation is expensive relative to the communication of data needed for interpolation,
@@ -994,15 +994,15 @@ Each should be specified as a single string of character data.
 
 \begin{description}
 \item[cl4\_prefix]
-  Prefix for class 4 files e.g. class4
+  Prefix for class 4 files \eg class4
 \item[cl4\_date]
   YYYYMMDD validity date
 \item[cl4\_sys]
-  The name of the class 4 model system e.g. FOAM
+  The name of the class 4 model system \eg FOAM
 \item[cl4\_cfg]
-  The name of the class 4 model configuration e.g. orca025
+  The name of the class 4 model configuration \eg orca025
 \item[cl4\_vn]
-  The name of the class 4 model version e.g. 12.0
+  The name of the class 4 model version \eg 12.0
 \end{description}
 
 \noindent
@@ -1020,9 +1020,9 @@ These are also useful pieces of information when collaborating with external par
 \item[cl4\_inst]
   The name of the producers institution.
 \item[cl4\_cfg]
-  The name of the class 4 model configuration e.g. orca025
+  The name of the class 4 model configuration \eg orca025
 \item[cl4\_vn]
-  The name of the class 4 model version e.g. 12.0
+  The name of the class 4 model version \eg 12.0
 \end{description}
 
 \noindent
@@ -1163,7 +1163,7 @@ This technique has not been used before so experimentation is needed before resu
 
 Some tools for viewing and processing of observation and feedback files are provided in
 the NEMO repository for convenience.
-These include OBSTOOLS which are a collection of Fortran programs which are helpful to deal with feedback files.
+These include OBSTOOLS which are a collection of \fortran programs which are helpful to deal with feedback files.
 They do such tasks as observation file conversion, printing of file contents,
 some basic statistical analysis of feedback files.
 The other tool is an IDL program called dataplot which uses a graphical interface to
@@ -1172,7 +1172,7 @@ OBSTOOLS and dataplot are described in more detail below.
 
 \subsection{Obstools}
 
-A series of Fortran utilities is provided with NEMO called OBSTOOLS.
+A series of \fortran utilities is provided with NEMO called OBSTOOLS.
 This are helpful in handling observation files and the feedback file output from the NEMO observation operator.
 The utilities are as follows
 
@@ -1396,5 +1396,7 @@ a function of depth (\autoref{fig:obsdataplotprofile}).
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 \biblio
+
+\pindex
 
 \end{document}

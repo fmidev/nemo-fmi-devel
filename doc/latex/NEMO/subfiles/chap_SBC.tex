@@ -39,7 +39,7 @@ a bulk formulae formulation (CORE (\np{ln\_blk\_core}\forcode{ = .true.}),
 CLIO (\np{ln\_blk\_clio}\forcode{ = .true.}) bulk formulae) and
 a coupled or mixed forced/coupled formulation (exchanges with a atmospheric model via the OASIS coupler)
 (\np{ln\_cpl} or \np{ln\_mixcpl}\forcode{ = .true.}). 
-When used ($i.e.$ \np{ln\_apr\_dyn}\forcode{ = .true.}),
+When used (\ie \np{ln\_apr\_dyn}\forcode{ = .true.}),
 the atmospheric pressure forces both ocean and ice dynamics.
 
 The frequency at which the forcing fields have to be updated is given by the \np{nn\_fsbc} namelist parameter.
@@ -104,12 +104,12 @@ The surface ocean stress is the stress exerted by the wind and the sea-ice on th
 It is applied in \mdl{dynzdf} module as a surface boundary condition of the computation of
 the momentum vertical mixing trend (see \autoref{eq:dynzdf_sbc} in \autoref{sec:DYN_zdf}).
 As such, it has to be provided as a 2D vector interpolated onto the horizontal velocity ocean mesh,
-$i.e.$ resolved onto the model (\textbf{i},\textbf{j}) direction at $u$- and $v$-points.
+\ie resolved onto the model (\textbf{i},\textbf{j}) direction at $u$- and $v$-points.
 
 The surface heat flux is decomposed into two parts, a non solar and a solar heat flux,
 $Q_{ns}$ and $Q_{sr}$, respectively.
 The former is the non penetrative part of the heat flux
-($i.e.$ the sum of sensible, latent and long wave heat fluxes plus
+(\ie the sum of sensible, latent and long wave heat fluxes plus
 the heat content of the mass exchange with the atmosphere and sea-ice).
 It is applied in \mdl{trasbc} module as a surface boundary condition trend of
 the first level temperature time evolution equation
@@ -136,7 +136,7 @@ the mass exchanged with the atmosphere, the sea-ice and the ice shelves.
 %created!)
 %
 %Especially the \np{nn\_fsbc}, the \mdl{sbc\_oce} module (fluxes + mean sst sss ssu 
-%ssv) i.e. information required by flux computation or sea-ice
+%ssv) \ie information required by flux computation or sea-ice
 %
 %\mdl{sbc\_oce} containt the definition in memory of the 7 fields (6+runoff), add 
 %a word on runoff: included in surface bc or add as lateral obc{\ldots}.
@@ -174,7 +174,7 @@ it is these averaged fields which are used to computes the surface fluxes at a f
       \protect\label{tab:ssm}
       Ocean variables provided by the ocean to the surface module (SBC).
       The variable are averaged over nn{\_}fsbc time step,
-      $i.e.$ the frequency of computation of surface fluxes.
+      \ie the frequency of computation of surface fluxes.
     }
   \end{center}
 \end{table}
@@ -257,7 +257,7 @@ where
       naming nomenclature for climatological or interannual input file, as a function of the Open/close frequency.
       The stem name is assumed to be 'fn'.
       For weekly files, the 'LLL' corresponds to the first three letters of the first day of the week
-      ($i.e.$ 'sun','sat','fri','thu','wed','tue','mon').
+      (\ie 'sun','sat','fri','thu','wed','tue','mon').
       The 'YYYY', 'MM' and 'DD' should be replaced by the actual year/month/day, always coded with 4 or 2 digits.
       Note that (1) in mpp, if the file is split over each subdomain, the suffix '.nc' is replaced by '\_PPPP.nc',
       where 'PPPP' is the process number coded with 4 digits;
@@ -517,7 +517,7 @@ Routines replaced are:
   \mdl{sbcmod}:
   This has been cut down and now only calculates surface forcing and the ice model required.
   New surface modules that can function when only the surface level of the ocean state is defined can also be added
-  (e.g. icebergs).
+  (\eg icebergs).
 \item
   \mdl{daymod}:
   No ocean restarts are read or written (though the ice model restarts are retained),
@@ -789,7 +789,7 @@ an equivalent inverse barometer sea surface height, $\eta_{ib}$, using:
 where $P_{atm}$ is the atmospheric pressure and $P_o$ a reference atmospheric pressure.
 A value of $101,000~N/m^2$ is used unless \np{ln\_ref\_apr} is set to true.
 In this case $P_o$ is set to the value of $P_{atm}$ averaged over the ocean domain,
-$i.e.$ the mean value of $\eta_{ib}$ is kept to zero at all time step.
+\ie the mean value of $\eta_{ib}$ is kept to zero at all time step.
 
 The gradient of $\eta_{ib}$ is added to the RHS of the ocean momentum equation (see \mdl{dynspg} for the ocean).
 For sea-ice, the sea surface height, $\eta_m$, which is provided to the sea ice model is set to $\eta - \eta_{ib}$
@@ -917,7 +917,7 @@ After the user specified depth is read ini,
 the number of grid boxes this corresponds to is calculated and stored in the variable \np{nz\_rnf}.
 The variable \textit{h\_dep} is then calculated to be the depth (in metres) of
 the bottom of the lowest box the river water is being added to
-(i.e. the total depth that river water is being added to in the model).
+(\ie the total depth that river water is being added to in the model).
 
 The mass/volume addition due to the river runoff is, at each relevant depth level, added to
 the horizontal divergence (\textit{hdivn}) in the subroutine \rou{sbc\_rnf\_div} (called from \mdl{divcur}).
@@ -954,7 +954,7 @@ In doing this water is moved into boxes below, throughout the water column,
 so the large volume addition to the surface box is spread between all the grid boxes.
 
 It is also possible for runnoff to be specified as a negative value for modelling flow through straits,
-i.e. modelling the Baltic flow in and out of the North Sea.
+\ie modelling the Baltic flow in and out of the North Sea.
 When the flow is out of the domain there is no change in temperature and salinity,
 regardless of the namelist options used,
 as the ocean water leaving the domain removes heat and salt (at the same concentration) with it. 
@@ -1151,7 +1151,7 @@ Two initialisation schemes are possible.
   When the model runs, ice is accumulated at each grid point which has a non-zero source term.
   At each time step, a test is performed to see if there is enough ice mass to
   calve an iceberg of each class in order (1 to 10).
-  Note that this is the initial mass multiplied by the number each particle represents ($i.e.$ the scaling).
+  Note that this is the initial mass multiplied by the number each particle represents (\ie the scaling).
   If there is enough ice, a new iceberg is spawned and the total available ice reduced accordingly.
 \end{description}
 
@@ -1217,7 +1217,7 @@ in \ngn{namsbc} namelist and filling the \ngn{namsbc\_cpl} namelist.
 \subsection{Neutral drag coefficient from wave model (\protect\np{ln\_cdgw})}
 \label{subsec:SBC_wave_cdgw}
 
-The neutral surface drag coefficient provided from an external data source ($i.e.$ a wave model), 
+The neutral surface drag coefficient provided from an external data source (\ie a wave model), 
 can be used by setting the logical variable \np{ln\_cdgw} \forcode{= .true.} in \ngn{namsbc} namelist. 
 Then using the routine \rou{turb\_ncar} and starting from the neutral drag coefficent provided, 
 the drag coefficient is computed according to the stable/unstable conditions of the 
@@ -1423,7 +1423,7 @@ The detail of the algoritm used can be found in the appendix~A of \cite{Bernie_a
 The algorithm preserve the daily mean incoming SWF as the reconstructed SWF at
 a given time step is the mean value of the analytical cycle over this time step (\autoref{fig:SBC_diurnal}).
 The use of diurnal cycle reconstruction requires the input SWF to be daily
-($i.e.$ a frequency of 24 and a time interpolation set to true in \np{sn\_qsr} namelist parameter).
+(\ie a frequency of 24 and a time interpolation set to true in \np{sn\_qsr} namelist parameter).
 Furthermore, it is recommended to have a least 8 surface module time step per day,
 that is  $\rdt \ nn\_fsbc < 10,800~s = 3~h$.
 An example of recontructed SWF is given in \autoref{fig:SBC_dcy} for a 12 reconstructed diurnal cycle,
@@ -1544,7 +1544,7 @@ the value of the \np{nn\_ice} namelist parameter found in \ngn{namsbc} namelist.
   provide the surface ocean fluxes.
   Note that the activation of a sea-ice model is is done by defining a CPP key (\key{lim3} or \key{cice}).
   The activation automatically overwrites the read value of nn{\_}ice to its appropriate value
-  ($i.e.$ $2$ for LIM-3 or $3$ for CICE).
+  (\ie $2$ for LIM-3 or $3$ for CICE).
 \end{description}
 
 % {Description of Ice-ocean interface to be added here or in LIM 2 and 3 doc ?}
@@ -1627,5 +1627,7 @@ In \NEMO, two way of controlling the the freshwater budget.
 % in ocean-ice models. 
 
 \biblio
+
+\pindex
 
 \end{document}

@@ -49,7 +49,7 @@ $\bullet$ reduced scale factor in the cross-strait direction to a value in bette
 the true mean width of the strait (\autoref{fig:MISC_strait_hand}).
 This technique is sometime called "partially open face" or "partially closed cells".
 The key issue here is only to reduce the faces of $T$-cell
-($i.e.$ change the value of the horizontal scale factors at $u$- or $v$-point) but not the volume of the $T$-cell.
+(\ie change the value of the horizontal scale factors at $u$- or $v$-point) but not the volume of the $T$-cell.
 Indeed, reducing the volume of strait $T$-cell can easily produce a numerical instability at
 that grid point that would require a reduction of the model time step.
 The changes associated with strait management are done in \mdl{domhgr},
@@ -73,7 +73,7 @@ This is done in \mdl{dommsk} together with the setting of the coastal value of f
       Note that the scale factors of the strait $T$-point remains unchanged.
       \textit{Bottom}: using viscous boundary layers.
       The four fmask parameters along the strait coastlines are set to a value larger than 4,
-      $i.e.$ "strong" no-slip case (see \autoref{fig:LBC_shlat}) creating a large viscous boundary layer that
+      \ie "strong" no-slip case (see \autoref{fig:LBC_shlat}) creating a large viscous boundary layer that
       allows a reduced transport through the strait.
     }
   \end{center}
@@ -112,7 +112,7 @@ consider an ORCA1 configuration using the extended grid bathymetry and coordinat
 \ifile{eORCA1\_coordinates}
 \noindent These files define a horizontal domain of 362x332.
 Assuming the first row with open ocean wet points in the non-isf bathymetry for this set is row 42
-(Fortran indexing) then the formally correct setting for \np{open\_ocean\_jstart} is 41.
+(\fortran indexing) then the formally correct setting for \np{open\_ocean\_jstart} is 41.
 Using this value as the first row to be read will result in a 362x292 domain which is the same size as
 the original ORCA1 domain.
 Thus the extended coordinates and bathymetry files can be used with all the original input files for ORCA1 if
@@ -166,19 +166,19 @@ the \np{namelist\_cfg} file according to their needs.
 \subsection{Issues with intrinsinc SIGN function (\protect\key{nosignedzero})}
 \label{subsec:MISC_sign}
 
-The SIGN(A, B) is the \textsc {Fortran} intrinsic function delivers the magnitude of A with the sign of B.
+The SIGN(A, B) is the \fortran intrinsic function delivers the magnitude of A with the sign of B.
 For example, SIGN(-3.0,2.0) has the value 3.0.
 The problematic case is when the second argument is zero, because, on platforms that support IEEE arithmetic,
 zero is actually a signed number.
 There is a positive zero and a negative zero.
 
-In \textsc{Fortran}~90, the processor was required always to deliver a positive result for SIGN(A, B) if B was zero.
-Nevertheless, in \textsc{Fortran}~95, the processor is allowed to do the correct thing and deliver ABS(A) when
+In \fninety, the processor was required always to deliver a positive result for SIGN(A, B) if B was zero.
+Nevertheless, in \fninety, the processor is allowed to do the correct thing and deliver ABS(A) when
 B is a positive zero and -ABS(A) when B is a negative zero.
 This change in the specification becomes apparent only when B is of type real, and is zero,
 and the processor is capable of distinguishing between positive and negative zero,
 and B is negative real zero.
-Then SIGN delivers a negative result where, under \textsc{Fortran}~90 rules, it used to return a positive result.
+Then SIGN delivers a negative result where, under \fninety rules, it used to return a positive result.
 This change may be especially sensitive for the ice model,
 so we overwrite the intrinsinc function with our own function simply performing :   \\
 \verb?   IF( B >= 0.e0 ) THEN   ;   SIGN(A,B) = ABS(A)  ?    \\
@@ -294,5 +294,7 @@ without adjusting either the time-step or the physical parameterisations.
 
 % ================================================================
 \biblio
+
+\pindex
 
 \end{document}

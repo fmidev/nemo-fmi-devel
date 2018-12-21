@@ -21,7 +21,7 @@
 
 Having defined the continuous equations in \autoref{chap:PE}, we need now to choose a time discretization,
 a key feature of an ocean model as it exerts a strong influence on the structure of the computer code
-($i.e.$ on its flowchart).
+(\ie on its flowchart).
 In the present chapter, we provide a general description of the \NEMO time stepping strategy and
 the consequences for the order in which the equations are solved.
 
@@ -66,7 +66,7 @@ case time-splitting options are used.
 The time stepping used for processes other than diffusion is the well-known leapfrog scheme
 \citep{Mesinger_Arakawa_Bk76}.
 This scheme is widely used for advection processes in low-viscosity fluids.
-It is a time centred scheme, $i.e.$ the RHS in \autoref{eq:STP} is evaluated at time step $t$, the now time step.
+It is a time centred scheme, \ie the RHS in \autoref{eq:STP} is evaluated at time step $t$, the now time step.
 It may be used for momentum and tracer advection, pressure gradient, and Coriolis terms,
 but not for diffusion terms.
 It is an efficient method that achieves second-order accuracy with
@@ -228,7 +228,7 @@ Significant changes have been introduced by \cite{Leclair_Madec_OM09} in the LF-
 The modifications affect both the forcing and filtering treatments in the LF-RA scheme.
 
 In a classical LF-RA environment, the forcing term is centred in time,
-$i.e.$ it is time-stepped over a $2\rdt$ period:
+\ie it is time-stepped over a $2\rdt$ period:
 $x^t  = x^t + 2\rdt Q^t $ where $Q$ is the forcing applied to $x$,
 and the time filter is given by \autoref{eq:STP_asselin} so that $Q$ is redistributed over several time step.
 In the modified LF-RA environment, these two formulations have been replaced by:
@@ -295,7 +295,7 @@ The first time step of this three level scheme when starting from initial condit
   % \label{eq:DOM_euler}
   x^1 = x^0 + \rdt \ \text{RHS}^0
 \]
-This is done simply by keeping the leapfrog environment ($i.e.$ the \autoref{eq:STP} three level time stepping) but
+This is done simply by keeping the leapfrog environment (\ie the \autoref{eq:STP} three level time stepping) but
 setting all $x^0$ (\textit{before}) and $x^{1}$ (\textit{now}) fields equal at the first time step and
 using half the value of $\rdt$.
 
@@ -406,5 +406,7 @@ Tracer case (NB for momentum in vector invariant form take care!)
 }
 %%
 \biblio
+
+\pindex
 
 \end{document}

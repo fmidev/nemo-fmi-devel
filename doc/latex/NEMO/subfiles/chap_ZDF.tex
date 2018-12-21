@@ -24,7 +24,7 @@ The discrete form of the ocean subgrid scale physics has been presented in
 At the surface and bottom boundaries, the turbulent fluxes of momentum, heat and salt have to be defined.
 At the surface they are prescribed from the surface forcing (see \autoref{chap:SBC}),
 while at the bottom they are set to zero for heat and salt,
-unless a geothermal flux forcing is prescribed as a bottom boundary condition ($i.e.$ \key{trabbl} defined,
+unless a geothermal flux forcing is prescribed as a bottom boundary condition (\ie \key{trabbl} defined,
 see \autoref{subsec:TRA_bbc}), and specified through a bottom friction parameterisation for momentum
 (see \autoref{sec:ZDF_bfr}).
 
@@ -85,7 +85,7 @@ The vertical mixing coefficients are diagnosed from the large scale variables co
 \textit{In situ} measurements have been used to link vertical turbulent activity to large scale ocean structures.
 The hypothesis of a mixing mainly maintained by the growth of Kelvin-Helmholtz like instabilities leads to
 a dependency between the vertical eddy coefficients and the local Richardson number
-($i.e.$ the ratio of stratification to vertical shear).
+(\ie the ratio of stratification to vertical shear).
 Following \citet{Pacanowski_Philander_JPO81}, the following formulation has been implemented:
 \[
   % \label{eq:zdfric}
@@ -253,7 +253,7 @@ evaluate the dissipation and mixing length scales as
     \quad &\text{ from $k=jpk$ to $1$ }\ \\
   \end{aligned}
 \]
-where $l^{(k)}$ is computed using \autoref{eq:tke_mxl0_1}, $i.e.$ $l^{(k)} = \sqrt {2 {\bar e}^{(k)} / {N^2}^{(k)} }$.
+where $l^{(k)}$ is computed using \autoref{eq:tke_mxl0_1}, \ie $l^{(k)} = \sqrt {2 {\bar e}^{(k)} / {N^2}^{(k)} }$.
 
 In the \np{nn\_mxl}\forcode{ = 2} case, the dissipation and mixing length scales take the same value:
 $ l_k=  l_\epsilon = \min \left(\ l_{up} \;,\;  l_{dwn}\ \right)$, while in the \np{nn\_mxl}\forcode{ = 3} case,
@@ -325,7 +325,7 @@ an extra source terms of TKE, $P_{LC}$.
 The presence of $P_{LC}$ in \autoref{eq:zdftke_e}, the TKE equation, is controlled by setting \np{ln\_lc} to
 \forcode{.true.} in the namtke namelist.
  
-By making an analogy with the characteristic convective velocity scale ($e.g.$, \citet{D'Alessio_al_JPO98}),
+By making an analogy with the characteristic convective velocity scale (\eg, \citet{D'Alessio_al_JPO98}),
 $P_{LC}$ is assumed to be : 
 \[
 P_{LC}(z) = \frac{w_{LC}^3(z)}{H_{LC}}
@@ -368,12 +368,12 @@ Vertical mixing parameterizations commonly used in ocean general circulation mod
 produce mixed-layer depths that are too shallow during summer months and windy conditions.
 This bias is particularly acute over the Southern Ocean.
 To overcome this systematic bias, an ad hoc parameterization is introduced into the TKE scheme \cite{Rodgers_2014}. 
-The parameterization is an empirical one, $i.e.$ not derived from theoretical considerations,
+The parameterization is an empirical one, \ie not derived from theoretical considerations,
 but rather is meant to account for observed processes that affect the density structure of 
 the ocean’s planetary boundary layer that are not explicitly captured by default in the TKE scheme 
-($i.e.$ near-inertial oscillations and ocean swells and waves).
+(\ie near-inertial oscillations and ocean swells and waves).
 
-When using this parameterization ($i.e.$ when \np{nn\_etau}\forcode{ = 1}),
+When using this parameterization (\ie when \np{nn\_etau}\forcode{ = 1}),
 the TKE input to the ocean ($S$) imposed by the winds in the form of near-inertial oscillations,
 swell and waves is parameterized by \autoref{eq:ZDF_Esbc} the standard TKE surface boundary condition,
 plus a depth depend one given by:
@@ -402,7 +402,7 @@ They will be removed in the next release.
 % internal waves are in principle included in the RANS equations, but later partially 
 % excluded by the hydrostatic assumption and the model resolution. 
 % Thus far, the representation of internal wave mixing in ocean models has been relatively crude 
-% (e.g. Mellor, 1989; Large et al., 1994; Meier, 2001; Axell, 2002; St. Laurent and Garrett, 2002).
+% (\eg Mellor, 1989; Large et al., 1994; Meier, 2001; Axell, 2002; St. Laurent and Garrett, 2002).
 
 % -------------------------------------------------------------------------------------------------------------
 %        TKE discretization considerations
@@ -653,7 +653,7 @@ The OSMOSIS turbulent closure scheme is based on......   TBC
 \nlst{namzdf}
 %--------------------------------------------------------------------------------------------------------------
 
-Static instabilities (i.e. light potential densities under heavy ones) may occur at particular ocean grid points.
+Static instabilities (\ie light potential densities under heavy ones) may occur at particular ocean grid points.
 In nature, convective processes quickly re-establish the static stability of the water column.
 These processes have been removed from the model via the hydrostatic assumption so they must be parameterized.
 Three parameterisations are available to deal with convective processes:
@@ -698,7 +698,7 @@ Options are defined through the \ngn{namzdf} namelist variables.
 The non-penetrative convective adjustment is used when \np{ln\_zdfnpc}\forcode{ = .true.}.
 It is applied at each \np{nn\_npc} time step and mixes downwards instantaneously the statically unstable portion of
 the water column, but only until the density structure becomes neutrally stable
-($i.e.$ until the mixed portion of the water column has \textit{exactly} the density of the water just below)
+(\ie until the mixed portion of the water column has \textit{exactly} the density of the water just below)
 \citep{Madec_al_JPO91}.
 The associated algorithm is an iterative process used in the following way (\autoref{fig:npc}):
 starting from the top of the ocean, the first instability is found.
@@ -747,7 +747,7 @@ Options are defined through the  \ngn{namzdf} namelist variables.
 The enhanced vertical diffusion parameterisation is used when \np{ln\_zdfevd}\forcode{ = .true.}.
 In this case, the vertical eddy mixing coefficients are assigned very large values
 (a typical value is $10\;m^2s^{-1})$ in regions where the stratification is unstable
-($i.e.$ when $N^2$ the Brunt-Vais\"{a}l\"{a} frequency is negative) \citep{Lazar_PhD97, Lazar_al_JPO99}.
+(\ie when $N^2$ the Brunt-Vais\"{a}l\"{a} frequency is negative) \citep{Lazar_PhD97, Lazar_al_JPO99}.
 This is done either on tracers only (\np{nn\_evdm}\forcode{ = 0}) or
 on both momentum and tracers (\np{nn\_evdm}\forcode{ = 1}).
 
@@ -759,7 +759,7 @@ This parameterisation of convective processes is less time consuming than
 the convective adjustment algorithm presented above when mixing both tracers and
 momentum in the case of static instabilities.
 It requires the use of an implicit time stepping on vertical diffusion terms
-(i.e. \np{ln\_zdfexp}\forcode{ = .false.}).
+(\ie np{ln\_zdfexp}\forcode{ = .false.}).
 
 Note that the stability test is performed on both \textit{before} and \textit{now} values of $N^2$.
 This removes a potential source of divergence of odd and even time step in
@@ -783,7 +783,7 @@ However, in the vicinity of the sea surface (first ocean layer), the eddy coeffi
 the turbulent closure scheme do not usually exceed $10^{-2}m.s^{-1}$,
 because the mixing length scale is bounded by the distance to the sea surface.
 It can thus be useful to combine the enhanced vertical diffusion with the turbulent closure scheme,
-$i.e.$ setting the \np{ln\_zdfnpc} namelist parameter to true and
+\ie setting the \np{ln\_zdfnpc} namelist parameter to true and
 defining the turbulent closure CPP key all together.
 
 The KPP turbulent closure scheme already includes enhanced vertical diffusion in the case of convection,
@@ -854,7 +854,7 @@ To represent mixing of $S$ and $T$ by salt fingering, we adopt the diapycnal dif
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 The factor 0.7 in \autoref{eq:zdfddm_f_T} reflects the measured ratio $\alpha F_T /\beta F_S \approx  0.7$ of
-buoyancy flux of heat to buoyancy flux of salt ($e.g.$, \citet{McDougall_Taylor_JMR84}).
+buoyancy flux of heat to buoyancy flux of salt (\eg, \citet{McDougall_Taylor_JMR84}).
 Following  \citet{Merryfield1999}, we adopt $R_c = 1.6$, $n = 6$, and $A^{\ast v} = 10^{-4}~m^2.s^{-1}$.
 
 To represent mixing of S and T by diffusive layering,  the diapycnal diffusivities suggested by
@@ -954,7 +954,7 @@ where $\textbf{U}_h^b = (u_b\;,\;v_b)$ is the near-bottom, horizontal, ocean vel
 \label{subsec:ZDF_bfr_linear}
 
 The linear bottom friction parameterisation (including the special case of a free-slip condition) assumes that
-the bottom friction is proportional to the interior velocity (i.e. the velocity of the last model level):
+the bottom friction is proportional to the interior velocity (\ie the velocity of the last model level):
 \[
   % \label{eq:zdfbfr_linear}
   {\cal F}_h^\textbf{U} = \frac{A^{vm}}{e_3} \; \frac{\partial \textbf{U}_h}{\partial k} = r \; \textbf{U}_h^b
@@ -1048,7 +1048,7 @@ the namelist.
 
 For stability, the drag coefficient is bounded such that it is kept greater or equal to
 the base \np{rn\_bfri2} value and it is not allowed to exceed the value of an additional namelist parameter:
-\np{rn\_bfri2\_max}, i.e.:
+\np{rn\_bfri2\_max}, \ie
 \[
   rn\_bfri2 \leq C_D \leq rn\_bfri2\_max
 \]
@@ -1134,7 +1134,7 @@ As NEMO only updates the barotropic pressure gradient and Coriolis' forcing term
 we need to remove the bottom friction induced by these two terms which has been included in the 3-D momentum trend 
 and update it with the latest value.
 On the other hand, the bottom friction contributed by the other terms
-(e.g. the advection term, viscosity term) has been included in the 3-D momentum equations and
+(\eg the advection term, viscosity term) has been included in the 3-D momentum equations and
 should not be added in the 2-D barotropic mode.
 
 The implementation of the implicit bottom friction in \mdl{dynspg\_ts} is done in two steps as the following:
@@ -1174,7 +1174,7 @@ Extra attention is required, however, when using split-explicit time stepping (\
 In this case the free surface equation is solved with a small time step \np{rn\_rdt}/\np{nn\_baro},
 while the three dimensional prognostic variables are solved with the longer time step of \np{rn\_rdt} seconds.
 The trend in the barotropic momentum due to bottom friction appropriate to this method is that given by
-the selected parameterisation ($i.e.$ linear or non-linear bottom friction) computed with
+the selected parameterisation (\ie linear or non-linear bottom friction) computed with
 the evolving velocities at each barotropic timestep. 
 
 In the case of non-linear bottom friction, we have elected to partially linearise the problem by
@@ -1263,7 +1263,7 @@ with a typical value of $500\,m$) \citep{St_Laurent_Nash_DSR04},
 and is normalized so that vertical integral over the water column is unity. 
 
 The associated vertical viscosity is calculated from the vertical diffusivity assuming a Prandtl number of 1,
-$i.e.$ $A^{vm}_{tides}=A^{vT}_{tides}$.
+\ie $A^{vm}_{tides}=A^{vT}_{tides}$.
 In the limit of $N \rightarrow 0$ (or becoming negative), the vertical diffusivity is capped at $300\,cm^2/s$ and
 impose a lower limit on $N^2$ of \np{rn\_n2min} usually set to $10^{-8} s^{-2}$.
 These bounds are usually rarely encountered.
@@ -1311,7 +1311,7 @@ First, the Indonesian archipelago is a complex geographic region with a series o
 large, deep, semi-enclosed basins connected via numerous narrow straits.
 Once generated, internal tides remain confined within this semi-enclosed area and hardly radiate away.
 Therefore all the internal tides energy is consumed within this area.
-So it is assumed that $q = 1$, $i.e.$ all the energy generated is available for mixing.
+So it is assumed that $q = 1$, \ie all the energy generated is available for mixing.
 Note that for test purposed, the ITF tidal dissipation efficiency is a namelist parameter (\np{rn\_tfe\_itf}).
 A value of $1$ or close to is this recommended for this parameter.
 
@@ -1399,5 +1399,7 @@ the abyssal hill topography \citep{Goff_JGR2010} and the latitude.
 % ================================================================
 
 \biblio
+
+\pindex
 
 \end{document}

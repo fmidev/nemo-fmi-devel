@@ -9,7 +9,7 @@
 
 \minitoc
 
-%%%  Appendix put in gmcomment as it has not been updated for z* and s coordinate
+%%%  Appendix put in gmcomment as it has not been updated for \zstar and s coordinate
 %I'm writting this appendix. It will be available in a forthcoming release of the documentation
 
 %\gmcomment{
@@ -38,9 +38,9 @@ partial derivative notation: $\partial_\bullet = \frac{\partial}{\partial \bulle
 
 $dv=e_1\,e_2\,e_3 \,di\,dj\,dk$  is the volume element, with only $e_3$ that depends on time.
 $D$ and $S$ are the ocean domain volume and surface, respectively.
-No wetting/drying is allow ($i.e.$ $\frac{\partial S}{\partial t} = 0$).
+No wetting/drying is allow (\ie $\frac{\partial S}{\partial t} = 0$).
 Let $k_s$ and $k_b$ be the ocean surface and bottom, resp.
-($i.e.$ $s(k_s) = \eta$ and $s(k_b)=-H$, where $H$ is the bottom depth).
+(\ie $s(k_s) = \eta$ and $s(k_b)=-H$, where $H$ is the bottom depth).
 \begin{flalign*}
   z(k) = \eta - \int\limits_{\tilde{k}=k}^{\tilde{k}=k_s}  e_3(\tilde{k}) \;d\tilde{k}
   = \eta - \int\limits_k^{k_s}  e_3 \;d\tilde{k}
@@ -98,11 +98,11 @@ that is in a more compact form:
 \section{Continuous conservation}
 \label{sec:C.1}
 
-The discretization of pimitive equation in $s$-coordinate ($i.e.$ time and space varying vertical coordinate)
+The discretization of pimitive equation in $s$-coordinate (\ie time and space varying vertical coordinate)
 must be chosen so that the discrete equation of the model satisfy integral constrains on energy and enstrophy. 
 
 Let us first establish those constraint in the continuous world.
-The total energy ($i.e.$ kinetic plus potential energies) is conserved:
+The total energy (\ie kinetic plus potential energies) is conserved:
 \begin{flalign}
   \label{eq:Tot_Energy}
   \partial_t \left( \int_D \left( \frac{1}{2} {\textbf{U}_h}^2 +  \rho \, g \, z \right) \;dv \right)  = & 0
@@ -486,10 +486,10 @@ The change of Kinetic Energy (KE) due to the vertical advection is exactly balan
   =  -   \int_D \textbf{U}_h \cdot \nabla_h \left( \frac{1}{2}\;{\textbf{U}_h}^2 \right)\;dv
   +   \frac{1}{2} \int_D {  \frac{{\textbf{U}_h}^2}{e_3} \partial_t ( e_3) \;dv }
 \]
-Indeed, using successively \autoref{eq:DOM_di_adj} ($i.e.$ the skew symmetry property of the $\delta$ operator)
+Indeed, using successively \autoref{eq:DOM_di_adj} (\ie the skew symmetry property of the $\delta$ operator)
 and the continuity equation, then \autoref{eq:DOM_di_adj} again,
 then the commutativity of operators $\overline {\,\cdot \,}$ and $\delta$, and finally \autoref{eq:DOM_mi_adj}
-($i.e.$ the symmetry property of the $\overline {\,\cdot \,}$ operator)
+(\ie the symmetry property of the $\overline {\,\cdot \,}$ operator)
 applied in the horizontal and vertical directions, it becomes:
 \begin{flalign*}
   & - \int_D \textbf{U}_h \cdot \text{KEG}\;dv
@@ -598,7 +598,7 @@ Blah blah required on the the step representation of bottom topography.....
 }
 
 When the equation of state is linear
-($i.e.$ when an advection-diffusion equation for density can be derived from those of temperature and salinity)
+(\ie when an advection-diffusion equation for density can be derived from those of temperature and salinity)
 the change of KE due to the work of pressure forces is balanced by
 the change of potential energy due to buoyancy forces: 
 \[
@@ -620,7 +620,7 @@ the work of pressure forces can be written as:
   \delta_{j+1/2} [p_t] - g\;\overline \rho^{\,j+1/2}\delta_{j+1/2} [z_t]      \Bigr)  \; v\;b_v \;  \biggr\}   && \\
   %
   \allowdisplaybreaks
-  \intertext{Using successively \autoref{eq:DOM_di_adj}, $i.e.$ the skew symmetry property of
+  \intertext{Using successively \autoref{eq:DOM_di_adj}, \ie the skew symmetry property of
     the $\delta$ operator, \autoref{eq:wzv}, the continuity equation, \autoref{eq:dynhpg_sco},
     the hydrostatic equation in the $s$-coordinate, and $\delta_{k+1/2} \left[ z_t \right] \equiv e_{3w} $,
     which comes from the definition of $z_t$, it becomes: }
@@ -810,7 +810,7 @@ Because of the centered second order scheme, it conserves the horizontal kinetic
 \end{equation}
 
 Let us first consider the first term of the scalar product
-($i.e.$ just the the terms associated with the i-component of the advection):
+(\ie just the the terms associated with the i-component of the advection):
 \begin{flalign*}
   &  - \int_D u \cdot \nabla \cdot \left(   \textbf{U}\,u   \right) \; dv   \\
   %
@@ -866,7 +866,7 @@ which is the discrete form of $ \frac{1}{2} \int_D u \cdot \nabla \cdot \left(  
 
 When the UBS scheme is used to evaluate the flux form momentum advection,
 the discrete operator does not contribute to the global budget of linear momentum (flux form).
-The horizontal kinetic energy is not conserved, but forced to decay ($i.e.$ the scheme is diffusive). 
+The horizontal kinetic energy is not conserved, but forced to decay (\ie the scheme is diffusive). 
 
 % ================================================================
 % Discrete Enstrophy Conservation
@@ -892,7 +892,7 @@ In the ENS scheme, the vorticity term is descretized as follows:
 \end{equation} 
 
 The scheme does not allow but the conservation of the total kinetic energy but the conservation of $q^2$,
-the potential enstrophy for a horizontally non-divergent flow ($i.e.$ when $\chi$=$0$).
+the potential enstrophy for a horizontally non-divergent flow (\ie when $\chi$=$0$).
 Indeed, using the symmetry or skew symmetry properties of the operators
 ( \autoref{eq:DOM_mi_adj} and \autoref{eq:DOM_di_adj}),
 it can be shown that:
@@ -941,7 +941,7 @@ the discrete form of the right hand side of \autoref{eq:C_1.1} can be transforme
     \end{array}
   }
 \end{flalign*}
-The later equality is obtain only when the flow is horizontally non-divergent, $i.e.$ $\chi$=$0$. 
+The later equality is obtain only when the flow is horizontally non-divergent, \ie $\chi$=$0$. 
 
 % -------------------------------------------------------------------------------------------------------------
 %       Vorticity Term with EEN scheme
@@ -970,7 +970,7 @@ and the vorticity triads, ${^i_j}\mathbb{Q}^{i_p}_{j_p}$, defined at $T$-point, 
   = \frac{1}{12} \ \left(   q^{i-i_p}_{j+j_p} + q^{i+j_p}_{j+i_p} + q^{i+i_p}_{j-j_p}  \right)
 \end{equation}
 
-This formulation does conserve the potential enstrophy for a horizontally non-divergent flow ($i.e.$ $\chi=0$). 
+This formulation does conserve the potential enstrophy for a horizontally non-divergent flow (\ie $\chi=0$). 
 
 Let consider one of the vorticity triad, for example ${^{i}_j}\mathbb{Q}^{+1/2}_{+1/2} $,
 similar manipulation can be done for the 3 others.
@@ -1025,9 +1025,9 @@ this triad only can be transformed as follow:
 All the numerical schemes used in NEMO are written such that the tracer content is conserved by
 the internal dynamics and physics (equations in flux form).
 For advection,
-only the CEN2 scheme ($i.e.$ $2^{nd}$ order finite different scheme) conserves the global variance of tracer.
+only the CEN2 scheme (\ie $2^{nd}$ order finite different scheme) conserves the global variance of tracer.
 Nevertheless the other schemes ensure that the global variance decreases
-($i.e.$ they are at least slightly diffusive).
+(\ie they are at least slightly diffusive).
 For diffusion, all the schemes ensure the decrease of the total tracer variance, except the iso-neutral operator.
 There is generally no strict conservation of mass,
 as the equation of state is non linear with respect to $T$ and $S$.
@@ -1071,7 +1071,7 @@ the conservation of the tracer content due to the advection tendency is obtained
 \end{flalign*}
 
 The conservation of the variance of tracer due to the advection tendency can be achieved only with the CEN2 scheme,
-$i.e.$ when $\tau_u= \overline T^{\,i+1/2}$, $\tau_v= \overline T^{\,j+1/2}$, and $\tau_w= \overline T^{\,k+1/2}$. 
+\ie when $\tau_u= \overline T^{\,i+1/2}$, $\tau_v= \overline T^{\,j+1/2}$, and $\tau_w= \overline T^{\,k+1/2}$. 
 It can be demonstarted as follows:
 \begin{flalign*}
   &\int_D { \frac{1}{e_3} Q      \frac{\partial \left( e_3 \, T \right) }{\partial t} \;dv }
@@ -1107,7 +1107,7 @@ which is the discrete form of $ \frac{1}{2} \int_D {  T^2 \frac{1}{e_3} \frac{\p
 The discrete formulation of the horizontal diffusion of momentum ensures
 the conservation of potential vorticity and the horizontal divergence,
 and the dissipation of the square of these quantities
-($i.e.$ enstrophy and the variance of the horizontal divergence) as well as
+(\ie enstrophy and the variance of the horizontal divergence) as well as
 the dissipation of the horizontal kinetic energy.
 In particular, when the eddy coefficients are horizontally uniform,
 it ensures a complete separation of vorticity and horizontal divergence fields,
@@ -1345,7 +1345,7 @@ Indeed:
   e_{1f}\,e_{2f}\,e_{3f} \; \equiv 0   &&
 \end{flalign*}
 
-If the vertical diffusion coefficient is uniform over the whole domain, the enstrophy is dissipated, $i.e.$
+If the vertical diffusion coefficient is uniform over the whole domain, the enstrophy is dissipated, \ie
 \begin{flalign*}
   \int\limits_D \zeta \, \textbf{k} \cdot \nabla \times
   \left(   \frac{1} {e_3}\; \frac{\partial } {\partial k}
@@ -1395,7 +1395,7 @@ Similarly, the horizontal divergence is obviously conserved:
   \left( \frac{1} {e_3 }\; \frac{\partial } {\partial k}
     \left( \frac{A^{\,vm}} {e_3 }\; \frac{\partial \textbf{U}_h } {\partial k} \right) \right)\; dv = 0    &&&
 \end{flalign*}
-and the square of the horizontal divergence decreases ($i.e.$ the horizontal divergence is dissipated) if
+and the square of the horizontal divergence decreases (\ie the horizontal divergence is dissipated) if
 the vertical diffusion coefficient is uniform over the whole domain:
 
 \begin{flalign*}
@@ -1462,7 +1462,7 @@ This property is only satisfied in the $z$-coordinate:
 The numerical schemes used for tracer subgridscale physics are written such that
 the heat and salt contents are conserved (equations in flux form).
 Since a flux form is used to compute the temperature and salinity,
-the quadratic form of these quantities ($i.e.$ their variance) globally tends to diminish.
+the quadratic form of these quantities (\ie their variance) globally tends to diminish.
 As for the advection term, there is conservation of mass only if the Equation Of Seawater is linear. 
 
 % -------------------------------------------------------------------------------------------------------------
@@ -1528,5 +1528,7 @@ constraint on the dissipation of tracer variance:
 %%%%  end of appendix in gm comment
 %}
 \biblio
+
+\pindex
 
 \end{document}

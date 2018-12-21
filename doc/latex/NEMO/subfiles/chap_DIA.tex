@@ -82,7 +82,7 @@ aspects of the diagnostic output stream, such as:
 \item
   The possibility to extract a vertical or an horizontal subdomain.
 \item
-  The choice of the temporal operation to perform, $e.g.$: average, accumulate, instantaneous, min, max and once.
+  The choice of the temporal operation to perform, \eg: average, accumulate, instantaneous, min, max and once.
 \item
   Control over metadata via a large XML "database" of possible output fields.
 \end{itemize}
@@ -105,7 +105,7 @@ an external code called \href{https://forge.ipsl.jussieu.fr/ioserver/browser/XIO
 This new IO server can take advantage of the parallel I/O functionality of NetCDF4 to
 create a single output file and therefore to bypass the rebuilding phase.
 Note that writing in parallel into the same NetCDF files requires that your NetCDF4 library is linked to
-an HDF5 library that has been correctly compiled ($i.e.$ with the configure option $--$enable-parallel).
+an HDF5 library that has been correctly compiled (\ie with the configure option $--$enable-parallel).
 Note that the files created by iomput through XIOS are incompatible with NetCDF3.
 All post-processsing and visualization tools must therefore be compatible with NetCDF4 and not only NetCDF3.
 
@@ -221,7 +221,7 @@ The \href{https://forge.ipsl.jussieu.fr/nemo/wiki/Users/ModelInterfacing/InputsO
 \subsubsection{Add your own outputs}
 
 It is very easy to add your own outputs with iomput.
-Many standard fields and diagnostics are already prepared ($i.e.$, steps 1 to 3 below have been done) and
+Many standard fields and diagnostics are already prepared (\ie, steps 1 to 3 below have been done) and
 simply need to be activated by including the required output in a file definition in iodef.xml (step 4).
 To add new output variables, all 4 of the following steps must be taken.
 
@@ -250,7 +250,7 @@ the array passed to iomput.
 The grid\_ref attribute refers to definitions set in iodef.xml which, in turn,
 reference grids and axes either defined in the code
 (iom\_set\_domain\_attr and iom\_set\_axis\_attr in \mdl{iom}) or defined in the domain\_def.xml file.
-$e.g.$:
+\eg:
 
 \begin{xmllines}
 <grid id="grid_T_3D" domain_ref="grid_T" axis_ref="deptht"/>
@@ -1348,7 +1348,7 @@ nn_nchunks_i=4, nn_nchunks_j=4 and nn_nchunks_k=31
 \end{forlines}
 
 \noindent for a standard ORCA2\_LIM configuration gives chunksizes of {\small\tt 46x38x1} respectively in
-the mono-processor case (i.e. global domain of {\small\tt 182x149x31}).
+the mono-processor case (\ie global domain of {\small\tt 182x149x31}).
 An illustration of the potential space savings that NetCDF4 chunking and compression provides is given in 
 table \autoref{tab:NC4} which compares the results of two short runs of the ORCA2\_LIM reference configuration with
 a 4x2 mpi partitioning.
@@ -1418,7 +1418,7 @@ the invidual processing regions and different chunking choices may be desired.
 
 Each trend of the dynamics and/or temperature and salinity time evolution equations can be send to
 \mdl{trddyn} and/or \mdl{trdtra} modules (see TRD directory) just after their computation
-($i.e.$ at the end of each $dyn\cdots.F90$ and/or $tra\cdots.F90$ routines).
+(\ie at the end of each $dyn\cdots.F90$ and/or $tra\cdots.F90$ routines).
 This capability is controlled by options offered in \ngn{namtrd} namelist.
 Note that the output are done with xIOS, and therefore the \key{IOM} is required.
 
@@ -1450,7 +1450,7 @@ the \key{trdtrc} and \key{trdmld\_trc} CPP keys.
 
 \textbf{Note that} in the current version (v3.6), many changes has been introduced but not fully tested.
 In particular, options associated with \np{ln\_dyn\_mxl}, \np{ln\_vor\_trd}, and \np{ln\_tra\_mxl} are not working,
-and none of the options have been tested with variable volume ($i.e.$ \key{vvl} defined).
+and none of the options have been tested with variable volume (\ie \key{vvl} defined).
 
 % -------------------------------------------------------------------------------------------------------------
 %       On-line Floats trajectories
@@ -1656,7 +1656,7 @@ with:
 
  - \texttt{long2 lat2}, coordinates of the second extremity of the section;
 
- - \texttt{nclass}    the number of bounds of your classes (e.g. 3 bounds for 2 classes);
+ - \texttt{nclass}    the number of bounds of your classes (\eg bounds for 2 classes);
 
  - \texttt{okstrpond} to compute    heat and       salt transports, \texttt{nostrpond} if no;
 
@@ -1823,10 +1823,10 @@ the evolution equation of the mean sea level
 \end{equation}
 
 The first term in equation \autoref{eq:ssh_nBq} alters sea level by adding or subtracting mass from the ocean. 
-The second term arises from temporal changes in the global mean density; $i.e.$ from steric effects.
+The second term arises from temporal changes in the global mean density; \ie from steric effects.
 
 In a Boussinesq fluid, $\rho$ is replaced by $\rho_o$ in all the equation except when $\rho$ appears multiplied by
-the gravity ($i.e.$ in the hydrostatic balance of the primitive Equations).
+the gravity (\ie in the hydrostatic balance of the primitive Equations).
 In particular, the mass conservation equation, \autoref{eq:Co_nBq}, degenerates into the incompressibility equation:
 
 \[
@@ -1873,7 +1873,7 @@ in \autoref{eq:M_Bq} leads to a very simple form for the steric height:
 
 The above formulation of the steric height of a Boussinesq ocean requires four remarks.
 First, one can be tempted to define $\rho_o$ as the initial value of $\mathcal{M}/\mathcal{V}$,
-$i.e.$ set $\mathcal{D}_{t=0}=0$, so that the initial steric height is zero.
+\ie set $\mathcal{D}_{t=0}=0$, so that the initial steric height is zero.
 We do not recommend that.
 Indeed, in this case $\rho_o$ depends on the initial state of the ocean.
 Since $\rho_o$ has a direct effect on the dynamics of the ocean
@@ -1889,7 +1889,7 @@ does not change when the sea level is changing as it is the case in all global o
 (wetting and drying of grid point is not allowed).
   
 Third, the discretisation of \autoref{eq:steric_Bq} depends on the type of free surface which is considered.
-In the non linear free surface case, $i.e.$ \key{vvl} defined, it is given by
+In the non linear free surface case, \ie \key{vvl} defined, it is given by
 
 \[
   \eta_s = - \frac{ \sum_{i,\,j,\,k} d_a\; e_{1t} e_{2t} e_{3t} }{ \sum_{i,\,j,\,k}       e_{1t} e_{2t} e_{3t} }
@@ -1912,7 +1912,7 @@ This depression is a result of the mass of sea ice/snow system acting on the liq
 There is, however, no dynamical effect associated with these depressions in the liquid ocean sea level,
 so that there are no associated ocean currents.
 Hence, the dynamically relevant sea level is the effective sea level,
-$i.e.$ the sea level as if sea ice (and snow) were converted to liquid seawater \citep{Campin_al_OM08}.
+\ie the sea level as if sea ice (and snow) were converted to liquid seawater \citep{Campin_al_OM08}.
 However, in the current version of \NEMO the sea-ice is levitating above the ocean without mass exchanges between
 ice and ocean.
 Therefore the model effective sea level is always given by $\eta + \eta_s$, whether or not there is sea ice present.
@@ -1948,7 +1948,7 @@ Among the available diagnostics the following ones are obtained when defining th
 
 - the turbocline depth (based on a turbulent mixing coefficient criterion) (\mdl{diahth})
 
-- the depth of the 20\deg C isotherm (\mdl{diahth})
+- the depth of the 20\deg{C} isotherm (\mdl{diahth})
 
 - the depth of the thermocline (maximum of the vertical temperature gradient) (\mdl{diahth})
 
@@ -1967,7 +1967,7 @@ The poleward heat and salt transports, their advective and diffusive component,
 and the meriodional stream function can be computed on-line in \mdl{diaptr} \np{ln\_diaptr} to true
 (see the \textit{\ngn{namptr} } namelist below).
 When \np{ln\_subbas}\forcode{ = .true.}, transports and stream function are computed for the Atlantic, Indian,
-Pacific and Indo-Pacific Oceans (defined north of 30\deg S) as well as for the World Ocean.
+Pacific and Indo-Pacific Oceans (defined north of 30\deg{S}) as well as for the World Ocean.
 The sub-basin decomposition requires an input file (\ifile{subbasins}) which contains three 2D mask arrays,
 the Indo-Pacific mask been deduced from the sum of the Indian and Pacific mask (\autoref{fig:mask_subasins}).
 
@@ -2058,5 +2058,7 @@ The maximum values from the run are also copied to the ocean.output file.
 % ================================================================
 
 \biblio
+
+\pindex
 
 \end{document}

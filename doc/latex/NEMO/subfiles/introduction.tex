@@ -27,12 +27,12 @@ This model has been used for a wide range of applications, both regional or glob
 as a forced ocean model and as a model coupled with the sea-ice and/or the atmosphere.  
 
 This manual is organised in as follows.
-\autoref{chap:PE} presents the model basics, $i.e.$ the equations and their assumptions,
+\autoref{chap:PE} presents the model basics, \ie the equations and their assumptions,
 the vertical coordinates used, and the subgrid scale physics.
 This part deals with the continuous equations of the model
 (primitive equations, with temperature, salinity and an equation of seawater).
 The equations are written in a curvilinear coordinate system, with a choice of vertical coordinates
-($z$, $s$, \textit{z*}, \textit{s*}, $\tilde{z}$, $\tilde{s}$, and a mixture of them).
+($z$, $s$, \zstar, \sstar, \ztilde, \stilde, and a mixture of them).
 Momentum equations are formulated in vector invariant or flux form.
 Dimensional units in the meter, kilogram, second (MKS) international system are used throughout.
 
@@ -47,7 +47,7 @@ whether the free surface is linear or not.
 Full step or partial step $z$-coordinate or $s$- (terrain-following) coordinate is used with
 linear free surface (level position are then fixed in time).
 In non-linear free surface,
-the corresponding rescaled height coordinate formulation (\textit{z*} or \textit{s*}) is used
+the corresponding rescaled height coordinate formulation (\zstar or \sstar) is used
 (the level position then vary in time as a function of the sea surface heigh).
 The following two chapters (\autoref{chap:TRA} and \autoref{chap:DYN}) describe the discretisation of
 the prognostic equations for the active tracers and the momentum.
@@ -63,7 +63,7 @@ Within the \NEMO system the ocean model is interactively coupled with a sea ice 
 with biogeochemistry models (PISCES, LOBSTER).
 Interactive coupling to Atmospheric models is possible via the OASIS coupler \citep{OASIS2006}.
 Two-way nesting is also available through an interface to the AGRIF package
-(Adaptative Grid Refinement in \textsc{Fortran}) \citep{Debreu_al_CG2008}.
+(Adaptative Grid Refinement in \fortran) \citep{Debreu_al_CG2008}.
 The interface code for coupling to an alternative sea ice model (CICE, \citet{Hunke2008}) has now been upgraded so
 that it works for both global and regional domains, although AGRIF is still not available.
 
@@ -88,14 +88,14 @@ or \citet{Umlauf_Burchard_JMS03} mixing schemes.
 \noindent CPP keys and namelists are used for inputs to the code.  \newline
 
 \noindent \index{CPP keys} CPP keys \newline
-Some CPP keys are implemented in the FORTRAN code to allow code selection at compiling step.
+Some CPP keys are implemented in the \fortran code to allow code selection at compiling step.
 This selection of code at compilation time reduces the reliability of the whole platform since
 it changes the code from one set of CPP keys to the other.
 It is used only when the addition/suppression of the part of code highly changes the amount of memory at run time.
 Usual coding looks like : 
 \begin{forlines}
 #if defined key_option1
-	! This part of the FORTRAN code will be active
+	! This part of the \fortran code will be active
 	! only if key_option1 is activated at compiling step
 #endif
 \end{forlines}
@@ -105,7 +105,7 @@ Usual coding looks like :
 The namelist allows to input variables (character, logical, real and integer) into the code.
 There is one namelist file for each component of NEMO (dynamics, sea-ice, biogeochemistry...)
 containing all the FOTRAN namelists needed.
-The implementation in NEMO uses a two step process. For each FORTRAN namelist, two files are read:
+The implementation in NEMO uses a two step process. For each \fortran namelist, two files are read:
 \begin{enumerate}
 \item
   A reference namelist (in \path{CONFIG/SHARED/namelist_ref}) is read first.
@@ -134,7 +134,7 @@ Originally developed of data assimilation, it is a fantastic tool for model and 
 Finally, \autoref{chap:CFG} provides a brief introduction to the pre-defined model configurations
 (water column model, ORCA and GYRE families of configurations).
 
-The model is implemented in \textsc{Fortran 90}, with preprocessing (C-pre-processor).
+The model is implemented in \fninety, with preprocessing (C-pre-processor).
 It runs under UNIX.
 It is optimized for vector computers and parallelised by domain decomposition with MPI.
 All input and output is done in NetCDF (Network Common Data Format) with a optional direct access format for output.
@@ -145,7 +145,7 @@ Those rules are briefly presented in \autoref{apdx:D} and a more complete docume
 the \NEMO web site.
 
 The model is organized with a high internal modularity based on physics.
-For example, each trend ($i.e.$, a term in the RHS of the prognostic equation) for momentum and tracers
+For example, each trend (\ie, a term in the RHS of the prognostic equation) for momentum and tracers
 is computed in a dedicated module.
 To make it easier for the user to find his way around the code, the module names follow a three-letter rule.
 For example, \mdl{traldf} is a module related to the TRAcers equation, computing the Lateral DiFfussion. 
@@ -192,7 +192,7 @@ This release differs significantly from version 8, documented in \citet{Madec199
 $\bullet$ The main modifications from OPA v8 and NEMO/OPA v3.2 are :\\
 \begin{enumerate}
 \item
-  transition to full native \textsc{Fortran} 90, deep code restructuring and drastic reduction of CPP keys; 
+  transition to full native \fninety, deep code restructuring and drastic reduction of CPP keys; 
 \item
   introduction of partial step representation of bottom topography
   \citep{Barnier_al_OD06, Le_Sommer_al_OM09, Penduff_al_OS07};
@@ -207,13 +207,13 @@ $\bullet$ The main modifications from OPA v8 and NEMO/OPA v3.2 are :\\
   more choices for the treatment of the free surface: full explicit, split-explicit or filtered schemes,
   and suppression of the rigid-lid option;
 \item
-  non linear free surface associated with the rescaled height coordinate \textit{z*} or \textit{s};
+  non linear free surface associated with the rescaled height coordinate \zstar or \textit{s};
 \item
   additional schemes for vector and flux forms of the momentum advection;
 \item
   additional advection schemes for tracers;
 \item
-  implementation of the AGRIF package (Adaptative Grid Refinement in \textsc{Fortran}) \citep{Debreu_al_CG2008};
+  implementation of the AGRIF package (Adaptative Grid Refinement in \fortran) \citep{Debreu_al_CG2008};
 \item
   online diagnostics : tracers trend in the mixed layer and vorticity balance;
 \item
@@ -317,5 +317,7 @@ $\bullet$ The main modifications from NEMO/OPA v3.6 and  v4.0 are :\\
 
 
 \biblio
+
+\pindex
 
 \end{document}

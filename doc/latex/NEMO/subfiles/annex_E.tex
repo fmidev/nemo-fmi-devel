@@ -47,7 +47,7 @@ a constant i-grid spacing ($\Delta i=1$).
 Alternative choice: introduce the scale factors:  
 $\tau "_i =\frac{e_{1T}}{e_{2T}\,e_{3T}}\delta_i \left[ \frac{e_{2u} e_{3u} }{e_{1u} }\delta_{i+1/2}[\tau] \right]$.
 
-This results in a dissipatively dominant (i.e. hyper-diffusive) truncation error
+This results in a dissipatively dominant (\ie hyper-diffusive) truncation error
 \citep{Shchepetkin_McWilliams_OM05}.
 The overall performance of the advection scheme is similar to that reported in \cite{Farrow1995}.
 It is a relatively good compromise between accuracy and smoothness.
@@ -134,7 +134,7 @@ bilaplacian:
   \end{split}
 \end{equation}
 with ${A_u^{lT}}^2 = \frac{1}{12} {e_{1u}}^3\ |u|$, 
-$i.e.$ $A_u^{lT} = \frac{1}{\sqrt{12}} \,e_{1u}\ \sqrt{ e_{1u}\,|u|\,}$
+\ie $A_u^{lT} = \frac{1}{\sqrt{12}} \,e_{1u}\ \sqrt{ e_{1u}\,|u|\,}$
 it comes:
 \begin{equation}
   \label{eq:tra_ldf_lap}
@@ -146,7 +146,7 @@ it comes:
           [T] \right] \right] \right]
   \end{split}
 \end{equation}
-if the velocity is uniform ($i.e.$ $|u|=cst$) then the diffusive flux is
+if the velocity is uniform (\ie $|u|=cst$) then the diffusive flux is
 \begin{equation}
   \label{eq:tra_ldf_lap}
   \begin{split}
@@ -165,7 +165,7 @@ beurk....  reverte the logic: starting from the diffusive part of the advective 
     F_u^{lT} &= - \frac{1}{2} e_{2u} e_{3u}\,|u|_{i+1/2} \;\frac{1}{6} \;\delta_{i+1/2}[\tau"_i]
   \end{split}
 \end{equation}
-if the velocity is uniform ($i.e.$ $|u|=cst$) and
+if the velocity is uniform (\ie $|u|=cst$) and
 choosing $\tau "_i =\frac{e_{1T}}{e_{2T}\,e_{3T}}\delta_i \left[ \frac{e_{2u} e_{3u} }{e_{1u} } \delta_{i+1/2}[\tau] \right]$
 
 sol 1 coefficient at T-point ( add $e_{1u}$ and $e_{1T}$ on both side of first $\delta$):
@@ -217,7 +217,7 @@ The Leap-frog time stepping given by \autoref{eq:DOM_nxt} can be defined as:
 Note that \autoref{chap:LF} shows that the leapfrog time step is $\rdt$,
 not $2\rdt$ as it can be found sometimes in literature.
 The leap-Frog time stepping is a second order centered scheme.
-As such it respects the quadratic invariant in integral forms, $i.e.$ the following continuous property,
+As such it respects the quadratic invariant in integral forms, \ie the following continuous property,
 \[
   % \label{eq:Energy}
   \int_{t_0}^{t_1} {q\, \frac{\partial q}{\partial t} \;dt}
@@ -256,7 +256,7 @@ In time this boundary condition is not physical and \textbf{add something here!!
 
 Let try to define a scheme that get its inspiration from the \citet{Griffies_al_JPO98} scheme,
 but is formulated within the \NEMO framework
-($i.e.$ using scale factors rather than grid-size and having a position of $T$-points that
+(\ie using scale factors rather than grid-size and having a position of $T$-points that
 is not necessary in the middle of vertical velocity points, see \autoref{fig:zgr_e3}).
 
 In the formulation \autoref{eq:tra_ldf_iso} introduced in 1995 in OPA, the ancestor of \NEMO,
@@ -270,7 +270,7 @@ In other word, the operator applied to a tracer does not warranties the decrease
 To circumvent this, we have introduced a smoothing of the slopes of the iso-neutral surfaces
 (see \autoref{chap:LDF}).
 Nevertheless, this technique works fine for $T$ and $S$ as they are active tracers
-($i.e.$ they enter the computation of density), but it does not work for a passive tracer.
+(\ie they enter the computation of density), but it does not work for a passive tracer.
 \citep{Griffies_al_JPO98} introduce a different way to discretise the off-diagonal terms that
 nicely solve the problem.
 The idea is to get rid of combinations of an averaged in one direction combined with
@@ -385,7 +385,7 @@ This expression of the iso-neutral diffusion has been chosen in order to satisfy
 
 \item[$\bullet$ implicit treatment in the vertical]
   In the diagonal term associated with the vertical divergence of the iso-neutral fluxes
-  (i.e. the term associated with a second order vertical derivative)
+  \ie the term associated with a second order vertical derivative)
   appears only tracer values associated with a single water column.
   This is of paramount importance since it means that
   the implicit in time algorithm for solving the vertical diffusion equation can be used to evaluate this term.
@@ -398,7 +398,7 @@ This expression of the iso-neutral diffusion has been chosen in order to satisfy
   can be quite large.
 
 \item[$\bullet$ pure iso-neutral operator]
-  The iso-neutral flux of locally referenced potential density is zero, $i.e.$
+  The iso-neutral flux of locally referenced potential density is zero, \ie
   \begin{align*}
     % \label{eq:Gf_property2}
     \begin{matrix}
@@ -414,7 +414,7 @@ This expression of the iso-neutral diffusion has been chosen in order to satisfy
   the definition of the triads' slopes \autoref{eq:Gf_slopes}.
 
 \item[$\bullet$ conservation of tracer]
-  The iso-neutral diffusion term conserve the total tracer content, $i.e.$
+  The iso-neutral diffusion term conserve the total tracer content, \ie
   \[
     % \label{eq:Gf_property1}
     \sum_{i,j,k} \left\{ D_l^T \ b_T \right\} = 0
@@ -422,7 +422,7 @@ This expression of the iso-neutral diffusion has been chosen in order to satisfy
 This property is trivially satisfied since the iso-neutral diffusive operator is written in flux form.
 
 \item[$\bullet$ decrease of tracer variance]
-  The iso-neutral diffusion term does not increase the total tracer variance, $i.e.$
+  The iso-neutral diffusion term does not increase the total tracer variance, \ie
   \[
     % \label{eq:Gf_property1}
     \sum_{i,j,k} \left\{ T \ D_l^T \ b_T \right\} \leq 0
@@ -430,12 +430,12 @@ This property is trivially satisfied since the iso-neutral diffusive operator is
 The property is demonstrated in the \autoref{apdx:Gf_operator}.
 It is a key property for a diffusion term.
 It means that the operator is also a dissipation term,
-$i.e.$ it is a sink term for the square of the quantity on which it is applied.
+\ie it is a sink term for the square of the quantity on which it is applied.
 It therfore ensures that, when the diffusivity coefficient is large enough,
 the field on which it is applied become free of grid-point noise.
 
 \item[$\bullet$ self-adjoint operator]
-  The iso-neutral diffusion operator is self-adjoint, $i.e.$
+  The iso-neutral diffusion operator is self-adjoint, \ie
   \[
     % \label{eq:Gf_property1}
     \sum_{i,j,k} \left\{ S \ D_l^T \ b_T \right\} = \sum_{i,j,k} \left\{ D_l^S \ T \ b_T \right\}
@@ -456,7 +456,7 @@ an additional advection term is added.
 The associated velocity is the so called eddy induced velocity,
 the formulation of which depends on the slopes of iso-neutral surfaces.
 Contrary to the case of iso-neutral mixing, the slopes used here are referenced to the geopotential surfaces,
-$i.e.$ \autoref{eq:ldfslp_geo} is used in $z$-coordinate,
+\ie \autoref{eq:ldfslp_geo} is used in $z$-coordinate,
 and the sum \autoref{eq:ldfslp_geo} + \autoref{eq:ldfslp_iso} in $z^*$ or $s$-coordinates. 
 
 The eddy induced velocity is given by: 
@@ -577,7 +577,7 @@ This property has been used to reduce the computational time \citep{Griffies_JPO
 but it is not of practical use as usually $A \neq A_e$.
 Nevertheless this property can be used to choose a discret form of \autoref{eq:eiv_skew_continuous} which
 is consistent with the iso-neutral operator \autoref{eq:Gf_operator}.
-Using the slopes \autoref{eq:Gf_slopes} and defining $A_e$ at $T$-point($i.e.$ as $A$,
+Using the slopes \autoref{eq:Gf_slopes} and defining $A_e$ at $T$-point(\ie as $A$,
 the eddy diffusivity coefficient), the resulting discret form is given by:
 \begin{equation}
   \label{eq:eiv_skew}
@@ -599,7 +599,7 @@ $\mathbb{R}$ for the discret form to be exact.
 Such a choice of discretisation is consistent with the iso-neutral operator as
 it uses the same definition for the slopes.
 It also ensures the conservation of the tracer variance (see Appendix \autoref{apdx:eiv_skew}),
-$i.e.$ it does not include a diffusive component but is a "pure" advection term.
+\ie it does not include a diffusive component but is a "pure" advection term.
 
 $\ $\newpage      %force an empty line
 % ================================================================
@@ -839,8 +839,10 @@ shifted by 1 in $k$ direction.
 When summing over $k$ they cancel out with the neighbouring grid points.
 Exactly the same thing occurs for the triad ${_i^k \mathbb{R}_{-1/2}^{+1/2}}$ in the $i$ direction.
 Therefore the sum over the domain is zero,
-$i.e.$ the variance of the tracer is preserved by the discretisation of the skew fluxes.
+\ie the variance of the tracer is preserved by the discretisation of the skew fluxes.
 
 \biblio
+
+\pindex
 
 \end{document}

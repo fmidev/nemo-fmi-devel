@@ -21,7 +21,7 @@ Choosing one lateral physics scheme means for the user defining,
 (model level, geopotential or isopycnal surfaces); and
 (3) the space and time variations of the eddy coefficients.
 These three aspects of the lateral diffusion are set through namelist parameters
-(see the \textit{\ngn{nam\_traldf}} and \textit{\ngn{nam\_dynldf}} below).
+(see the \ngn{nam\_traldf} and \ngn{nam\_dynldf} below).
 Note that this chapter describes the standard implementation of iso-neutral tracer mixing,
 and Griffies's implementation, which is used if \np{traldf\_grif}\forcode{ = .true.},
 is described in Appdx\autoref{apdx:triad}
@@ -61,11 +61,11 @@ $r_{1f}$, $r_{1vw}$, $r_{2t}$, $r_{2vw}$ for $v$.
 
 \subsection{Slopes for tracer geopotential mixing in the $s$-coordinate}
 
-In $s$-coordinates, geopotential mixing ($i.e.$ horizontal mixing) $r_1$ and $r_2$ are the slopes between
+In $s$-coordinates, geopotential mixing (\ie horizontal mixing) $r_1$ and $r_2$ are the slopes between
 the geopotential and computational surfaces.
 Their discrete formulation is found by locally solving \autoref{eq:tra_ldf_iso} when
 the diffusive fluxes in the three directions are set to zero and $T$ is assumed to be horizontally uniform,
-$i.e.$ a linear function of $z_T$, the depth of a $T$-point. 
+\ie a linear function of $z_T$, the depth of a $T$-point. 
 %gm { Steven : My version is obviously wrong since I'm left with an arbitrary constant which is the local vertical temperature gradient}
 
 \begin{equation}
@@ -95,7 +95,7 @@ and either \np{ln\_traldf\_hor}\forcode{ = .true.} or \np{ln\_dynldf\_hor}\forco
 In iso-neutral mixing  $r_1$ and $r_2$ are the slopes between the iso-neutral and computational surfaces.
 Their formulation does not depend on the vertical coordinate used.
 Their discrete formulation is found using the fact that the diffusive fluxes of
-locally referenced potential density ($i.e.$ $in situ$ density) vanish.
+locally referenced potential density (\ie $in situ$ density) vanish.
 So, substituting $T$ by $\rho$ in \autoref{eq:tra_ldf_iso} and setting the diffusive fluxes in
 the three directions to zero leads to the following definition for the neutral slopes:
 
@@ -254,7 +254,7 @@ $1/100$ at $70$ metres and thereafter decreasing to zero at the bottom of the oc
       Vertical profile of the slope used for lateral mixing in the mixed layer:
       \textit{(a)} in the real ocean the slope is the iso-neutral slope in the ocean interior,
       which has to be adjusted at the surface boundary
-      (i.e. it must tend to zero at the surface since there is no mixing across the air-sea interface:
+      \ie it must tend to zero at the surface since there is no mixing across the air-sea interface:
       wall boundary condition).
       Nevertheless, the profile between the surface zero value and the interior iso-neutral one is unknown,
       and especially the value at the base of the mixed layer;
@@ -279,7 +279,7 @@ The slopes between the surface along which the diffusion operator acts and the s
 ($z$- or $s$-surfaces) are defined at $T$-, $f$-, and \textit{uw}- points for the $u$-component, and $T$-, $f$- and
 \textit{vw}- points for the $v$-component.
 They are computed from the slopes used for tracer diffusion,
-$i.e.$ \autoref{eq:ldfslp_geo} and \autoref{eq:ldfslp_iso} :
+\ie \autoref{eq:ldfslp_geo} and \autoref{eq:ldfslp_iso}:
 
 \[
   % \label{eq:ldfslp_dyn}
@@ -293,7 +293,7 @@ $i.e.$ \autoref{eq:ldfslp_geo} and \autoref{eq:ldfslp_iso} :
 
 The major issue remaining is in the specification of the boundary conditions.
 The same boundary conditions are chosen as those used for lateral diffusion along model level surfaces,
-$i.e.$ using the shear computed along the model levels and with no additional friction at the ocean bottom
+\ie using the shear computed along the model levels and with no additional friction at the ocean bottom
 (see \autoref{sec:LBC_coast}).
 
 
@@ -326,10 +326,10 @@ they are defined depend on both the space variation chosen and the type of opera
 The resulting eddy viscosity and diffusivity coefficients can be a function of more than one variable.
 Changes in the computer code when switching from one option to another have been minimized by
 introducing the eddy coefficients as statement functions
-(include file \hf{ldftra\_substitute} and \hf{ldfdyn\_substitute}).
+(include file \textit{ldftra\_substitute.h90} and \textit{ldfdyn\_substitute.h90}).
 The functions are replaced by their actual meaning during the preprocessing step (CPP).
 The specification of the space variation of the coefficient is made in \mdl{ldftra} and \mdl{ldfdyn},
-or more precisely in include files \hf{traldf\_cNd} and \hf{dynldf\_cNd}, with N=1, 2 or 3.
+or more precisely in include files \textit{traldf\_cNd.h90} and \textit{dynldf\_cNd.h90}, with N=1, 2 or 3.
 The user can modify these include files as he/she wishes.
 The way the mixing coefficient are set in the reference version can be briefly described as follows:
 
@@ -346,8 +346,8 @@ introducing depth-dependent mixing coefficients will require 3D arrays.
 In the 1D option, a hyperbolic variation of the lateral mixing coefficient is introduced in which
 the surface value is \np{rn\_aht0} (\np{rn\_ahm0}), the bottom value is 1/4 of the surface value,
 and the transition takes place around z=300~m with a width of 300~m
-($i.e.$ both the depth and the width of the inflection point are set to 300~m).
-This profile is hard coded in file \hf{traldf\_c1d}, but can be easily modified by users.
+(\ie both the depth and the width of the inflection point are set to 300~m).
+This profile is hard coded in file \textit{traldf\_c1d.h90}, but can be easily modified by users.
 
 \subsubsection{Horizontally varying mixing coefficients (\protect\key{traldf\_c2d} and \protect\key{dynldf\_c2d})}
 By default the horizontal variation of the eddy coefficient depends on the local mesh size and
@@ -383,7 +383,7 @@ ORCA2 and ORCA05 (see \&namcfg namelist).
 \subsubsection{Space varying mixing coefficients (\protect\key{traldf\_c3d} and \key{dynldf\_c3d})}
 
 The 3D space variation of the mixing coefficient is simply the combination of the 1D and 2D cases,
-$i.e.$ a hyperbolic tangent variation with depth associated with a grid size dependence of
+\ie a hyperbolic tangent variation with depth associated with a grid size dependence of
 the magnitude of the coefficient. 
 
 \subsubsection{Space and time varying mixing coefficients}
@@ -415,7 +415,7 @@ since it introduces spurious diapycnal diffusion (see \autoref{sec:LDF_slp}).
 (4) when an eddy induced advection term is used (\key{traldf\_eiv}),
 $A^{eiv}$, the eddy induced coefficient has to be defined.
 Its space variations are controlled by the same CPP variable as for the eddy diffusivity coefficient
-($i.e.$ \key{traldf\_cNd}). 
+(\ie \key{traldf\_cNd}). 
 
 (5) the eddy coefficient associated with a biharmonic operator must be set to a \emph{negative} value.
 
@@ -456,7 +456,7 @@ When Gent and McWilliams [1990] diffusion is used (\key{traldf\_eiv} defined),
 an eddy induced tracer advection term is added,
 the formulation of which depends on the slopes of iso-neutral surfaces.
 Contrary to the case of iso-neutral mixing, the slopes used here are referenced to the geopotential surfaces,
-$i.e.$ \autoref{eq:ldfslp_geo} is used in $z$-coordinates,
+\ie \autoref{eq:ldfslp_geo} is used in $z$-coordinates,
 and the sum \autoref{eq:ldfslp_geo} + \autoref{eq:ldfslp_iso} in $s$-coordinates.
 The eddy induced velocity is given by: 
 \begin{equation}
@@ -482,5 +482,7 @@ At the surface, lateral and bottom boundaries, the eddy induced velocity,
 and thus the advective eddy fluxes of heat and salt, are set to zero. 
 
 \biblio
+
+\pindex
 
 \end{document}

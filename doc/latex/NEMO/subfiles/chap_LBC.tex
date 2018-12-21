@@ -25,7 +25,7 @@
 
 %The lateral ocean boundary conditions contiguous to coastlines are Neumann conditions for heat and salt (no flux across boundaries) and Dirichlet conditions for momentum (ranging from free-slip to "strong" no-slip). They are handled automatically by the mask system (see \autoref{subsec:DOM_msk}). 
 
-%OPA allows land and topography grid points in the computational domain due to the presence of continents or islands, and includes the use of a full or partial step representation of bottom topography. The computation is performed over the whole domain, i.e. we do not try to restrict the computation to ocean-only points. This choice has two motivations. Firstly, working on ocean only grid points overloads the code and harms the code readability. Secondly, and more importantly, it drastically reduces the vector portion of the computation, leading to a dramatic increase of CPU time requirement on vector computers.  The current section describes how the masking affects the computation of the various terms of the equations with respect to the boundary condition at solid walls. The process of defining which areas are to be masked is described in \autoref{subsec:DOM_msk}.
+%OPA allows land and topography grid points in the computational domain due to the presence of continents or islands, and includes the use of a full or partial step representation of bottom topography. The computation is performed over the whole domain, \ie we do not try to restrict the computation to ocean-only points. This choice has two motivations. Firstly, working on ocean only grid points overloads the code and harms the code readability. Secondly, and more importantly, it drastically reduces the vector portion of the computation, leading to a dramatic increase of CPU time requirement on vector computers.  The current section describes how the masking affects the computation of the various terms of the equations with respect to the boundary condition at solid walls. The process of defining which areas are to be masked is described in \autoref{subsec:DOM_msk}.
 
 Options are defined through the \ngn{namlbc} namelist variables.
 The discrete representation of a domain with complex boundaries (coastlines and bottom topography) leads to
@@ -39,7 +39,7 @@ A mask array is a matrix whose elements are $1$ in the ocean domain and $0$ else
 A simple multiplication of a variable by its own mask ensures that it will remain zero over land areas.
 Since most of the boundary conditions consist of a zero flux across the solid boundaries,
 they can be simply applied by multiplying variables by the correct mask arrays,
-$i.e.$ the mask array of the grid point where the flux is evaluated.
+\ie the mask array of the grid point where the flux is evaluated.
 For example, the heat flux in the \textbf{i}-direction is evaluated at $u$-points.
 Evaluating this quantity as,
 
@@ -102,7 +102,7 @@ These are:
 
 \item[free-slip boundary condition (\np{rn\_shlat}\forcode{ = 0}):] the tangential velocity at
   the coastline is equal to the offshore velocity,
-  $i.e.$ the normal derivative of the tangential velocity is zero at the coast,
+  \ie the normal derivative of the tangential velocity is zero at the coast,
   so the vorticity: mask$_{f}$ array is set to zero inside the land and just at the coast
   (\autoref{fig:LBC_shlat}-a).
 
@@ -128,7 +128,7 @@ These are:
   \]
 
 \item["partial" free-slip boundary condition (0$<$\np{rn\_shlat}$<$2):] the tangential velocity at
-  the coastline is smaller than the offshore velocity, $i.e.$ there is a lateral friction but
+  the coastline is smaller than the offshore velocity, \ie there is a lateral friction but
   not strong enough to make the tangential velocity at the coast vanish (\autoref{fig:LBC_shlat}-c).
   This can be selected by providing a value of mask$_{f}$ strictly inbetween $0$ and $2$.
 
@@ -164,7 +164,7 @@ The choice of closed or cyclic model domain boundary condition is made by
 setting \np{jperio} to 0, 1, 2 or 7 in namelist \ngn{namcfg}.
 Each time such a boundary condition is needed, it is set by a call to routine \mdl{lbclnk}.
 The computation of momentum and tracer trends proceeds from $i=2$ to $i=jpi-1$ and from $j=2$ to $j=jpj-1$,
-$i.e.$ in the model interior.
+\ie in the model interior.
 To choose a lateral model boundary condition is to specify the first and last rows and columns of
 the model variables. 
 
@@ -241,7 +241,7 @@ Each processor has its own local memory and computes the model equation over a s
 The subdomain boundary conditions are specified through communications between processors which
 are organized by explicit statements (message passing method).
 
-A big advantage is that the method does not need many modifications of the initial FORTRAN code.
+A big advantage is that the method does not need many modifications of the initial \fortran code.
 From the modeller's point of view, each sub domain running on a processor is identical to the "mono-domain" code.
 In addition, the programmer manages the communications between subdomains,
 and the code is faster when the number of processors is increased.
@@ -266,12 +266,12 @@ computations in the inner sub-domain.
 The overlapping area consists of the two rows at each edge of the sub-domain.
 After a computation, a communication phase starts:
 each processor sends to its neighbouring processors the update values of the points corresponding to
-the interior overlapping area to its neighbouring sub-domain ($i.e.$ the innermost of the two overlapping rows).
+the interior overlapping area to its neighbouring sub-domain (\ie the innermost of the two overlapping rows).
 The communication is done through the Message Passing Interface (MPI).
 The data exchanges between processors are required at the very place where
 lateral domain boundary conditions are set in the mono-domain computation:
 the \rou{lbc\_lnk} routine (found in \mdl{lbclnk} module) which manages such conditions is interfaced with
-routines found in \mdl{lib\_mpp} module when running on an MPP computer ($i.e.$ when \key{mpp\_mpi} defined).
+routines found in \mdl{lib\_mpp} module when running on an MPP computer (\ie when \key{mpp\_mpi} defined).
 It has to be pointed out that when using the MPP version of the model,
 the east-west cyclic boundary condition is done implicitly,
 whilst the south-symmetric boundary condition option is not available.
@@ -354,7 +354,7 @@ When land processors are eliminated,
 the value corresponding to these locations in the model output files is undefined.
 Note that this is a problem for the meshmask file which requires to be defined over the whole domain.
 Therefore, user should not eliminate land processors when creating a meshmask file
-($i.e.$ when setting a non-zero value to \np{nn\_msh}).
+(\ie when setting a non-zero value to \np{nn\_msh}).
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{figure}[!ht]
@@ -517,7 +517,7 @@ the external depth-mean normal velocity,
 plus a correction term that allows gravity waves generated internally to exit the model boundary.
 Note that the sea-surface height gradient in \autoref{eq:bdy_fla1} is a spatial gradient across the model boundary,
 so that $\eta_{e}$ is defined on the $T$ points with $nbr=1$ and $\eta$ is defined on the $T$ points with $nbr=2$.
-$U$ and $U_{e}$ are defined on the $U$ or $V$ points with $nbr=1$, $i.e.$ between the two $T$ grid points.
+$U$ and $U_{e}$ are defined on the $U$ or $V$ points with $nbr=1$, \ie between the two $T$ grid points.
 
 %----------------------------------------------
 \subsection{Boundary geometry}
@@ -593,7 +593,7 @@ In particular:
 \end{enumerate}
 
 These restrictions mean that data files used with previous versions of the model may not work with version 3.4.
-A fortran utility {\it bdy\_reorder} exists in the TOOLS directory which
+A\fortran utility {\it bdy\_reorder} exists in the TOOLS directory which
 will re-order the data in old BDY data files. 
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -639,5 +639,7 @@ Options are defined through the  \ngn{nambdy\_tide} namelist variables.
  To be written....
 
 \biblio
+
+\pindex
 
 \end{document}
