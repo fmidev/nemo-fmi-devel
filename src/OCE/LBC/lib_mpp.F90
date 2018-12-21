@@ -152,7 +152,8 @@ MODULE lib_mpp
 
    ! Communications summary report
    CHARACTER(len=128), DIMENSION(:), ALLOCATABLE ::   crname_lbc                   !: names of lbc_lnk calling routines
-   CHARACTER(len=128), DIMENSION(:), ALLOCATABLE ::   crname_glb                   !: names of global comm  calling routines
+   CHARACTER(len=128), DIMENSION(:), ALLOCATABLE ::   crname_glb                   !: names of global comm calling routines
+   CHARACTER(len=128), DIMENSION(:), ALLOCATABLE ::   crname_dlg                   !: names of delayed global comm calling routines
    INTEGER, PUBLIC                               ::   ncom_stp = 0                 !: copy of time step # istp
    INTEGER, PUBLIC                               ::   ncom_fsbc = 1                !: copy of sbc time step # nn_fsbc
    INTEGER, PUBLIC                               ::   ncom_dttrc = 1               !: copy of top time step # nn_dttrc
@@ -161,6 +162,7 @@ MODULE lib_mpp
    INTEGER, PARAMETER, PUBLIC                    ::   ncom_rec_max = 2000          !: max number of communication record
    INTEGER, PUBLIC                               ::   n_sequence_lbc = 0           !: # of communicated arraysvia lbc
    INTEGER, PUBLIC                               ::   n_sequence_glb = 0           !: # of global communications
+   INTEGER, PUBLIC                               ::   n_sequence_dlg = 0           !: # of delayed global communications
    INTEGER, PUBLIC                               ::   numcom = -1                  !: logical unit for communicaton report
    LOGICAL, PUBLIC                               ::   l_full_nf_update = .TRUE.    !: logical for a full (2lines) update of bc at North fold report
    INTEGER,                    PARAMETER, PUBLIC ::   nbdelay = 2       !: number of delayed operations
@@ -602,7 +604,7 @@ CONTAINS
 
       isz = SIZE(y_in)
       
-      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ld_glb = .TRUE. )
+      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ld_dlg = .TRUE. )
 
       idvar = -1
       DO ji = 1, nbdelay
@@ -663,7 +665,7 @@ CONTAINS
 
       isz = SIZE(p_in)
 
-      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ld_glb = .TRUE. )
+      IF( narea == 1 .AND. numcom == -1 ) CALL mpp_report( cdname, ld_dlg = .TRUE. )
 
       idvar = -1
       DO ji = 1, nbdelay
@@ -1451,7 +1453,7 @@ CONTAINS
    END SUBROUTINE mpp_lnk_2d_icb
 
 
-   SUBROUTINE mpp_report( cdname, kpk, kpl, kpf, ld_lbc, ld_glb )
+   SUBROUTINE mpp_report( cdname, kpk, kpl, kpf, ld_lbc, ld_glb, ld_dlg )
       !!----------------------------------------------------------------------
       !!                  ***  routine mpp_report  ***
       !!
@@ -1460,9 +1462,9 @@ CONTAINS
       !!----------------------------------------------------------------------
       CHARACTER(len=*),           INTENT(in   ) ::   cdname      ! name of the calling subroutine
       INTEGER         , OPTIONAL, INTENT(in   ) ::   kpk, kpl, kpf
-      LOGICAL         , OPTIONAL, INTENT(in   ) ::   ld_lbc, ld_glb
+      LOGICAL         , OPTIONAL, INTENT(in   ) ::   ld_lbc, ld_glb, ld_dlg
       !!
-      LOGICAL ::   ll_lbc, ll_glb
+      LOGICAL ::   ll_lbc, ll_glb, ll_dlg
       INTEGER ::    ji,  jj,  jk,  jh, jf   ! dummy loop indices
       !!----------------------------------------------------------------------
       !
@@ -1470,6 +1472,8 @@ CONTAINS
       IF( PRESENT(ld_lbc) ) ll_lbc = ld_lbc
       ll_glb = .FALSE.
       IF( PRESENT(ld_glb) ) ll_glb = ld_glb
+      ll_dlg = .FALSE.
+      IF( PRESENT(ld_dlg) ) ll_dlg = ld_dlg
       !
       ! find the smallest common frequency: default = frequency product, if multiple, choose the larger of the 2 frequency
       IF( ncom_dttrc /= 1 )   CALL ctl_stop( 'STOP', 'mpp_report, ncom_dttrc /= 1 not coded...' ) 
@@ -1490,6 +1494,12 @@ CONTAINS
             n_sequence_glb = n_sequence_glb + 1
             IF( n_sequence_glb > ncom_rec_max ) CALL ctl_stop( 'STOP', 'lib_mpp, increase ncom_rec_max' )   ! deadlock
             crname_glb(n_sequence_glb) = cdname     ! keep the name of the calling routine
+         ENDIF
+         IF( ll_dlg ) THEN
+            IF( .NOT. ALLOCATED(crname_dlg) ) ALLOCATE( crname_dlg(ncom_rec_max) )
+            n_sequence_dlg = n_sequence_dlg + 1
+            IF( n_sequence_dlg > ncom_rec_max ) CALL ctl_stop( 'STOP', 'lib_mpp, increase ncom_rec_max' )   ! deadlock
+            crname_dlg(n_sequence_dlg) = cdname     ! keep the name of the calling routine
          ENDIF
       ELSE IF ( ncom_stp == nit000+2*ncom_freq ) THEN
          CALL ctl_opn( numcom, 'communication_report.txt', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, .FALSE., narea )
@@ -1536,6 +1546,22 @@ CONTAINS
             DEALLOCATE(crname_glb)
          ELSE
             WRITE(numcom,*) ' No MPI global communication '
+         ENDIF
+         WRITE(numcom,*) ' '
+         IF ( n_sequence_dlg > 0 ) THEN
+            WRITE(numcom,'(A,I4)') ' Delayed global communications : ', n_sequence_dlg
+            jj = 1
+            DO ji = 2, n_sequence_dlg
+               IF( crname_dlg(ji-1) /= crname_dlg(ji) ) THEN
+                  WRITE(numcom,'(A, I4, A, A)') ' - ', jj,' times by subroutine ', TRIM(crname_dlg(ji-1))
+                  jj = 0
+               END IF
+               jj = jj + 1 
+            END DO
+            WRITE(numcom,'(A, I4, A, A)') ' - ', jj,' times by subroutine ', TRIM(crname_dlg(n_sequence_dlg))
+            DEALLOCATE(crname_dlg)
+         ELSE
+            WRITE(numcom,*) ' No MPI delayed global communication '
          ENDIF
          WRITE(numcom,*) ' '
          WRITE(numcom,*) ' -----------------------------------------------'
