@@ -129,13 +129,9 @@
           <field field_ref="LNlight"  />
           <field field_ref="LDlight"  />
           <field field_ref="pdust"    />
-          <field field_ref="Fe2"      />
           <field field_ref="Fe3"      />
           <field field_ref="FeL1"     />
-          <field field_ref="FeL2"     />
-          <field field_ref="FeP"      />
           <field field_ref="TL1"      />
-          <field field_ref="TL2"      />
           <field field_ref="Sdenit"   />
           <field field_ref="Totlig"   />
 	</file>
