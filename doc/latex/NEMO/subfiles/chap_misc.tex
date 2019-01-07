@@ -80,6 +80,23 @@ This is done in \mdl{dommsk} together with the setting of the coastal value of f
 \end{figure}
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+%>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+\begin{figure}[!tbp]
+  \begin{center}
+    \includegraphics[width=1.0\textwidth]{Fig_closea_mask_example}
+    \caption{
+      \protect\label{fig:closea_mask_example}
+      Example of mask fields for the closea module. \textit{Left}: a
+      closea\_mask field; \textit{Right}: a closea\_mask\_rnf
+      field. In this example, if ln\_closea is set to .true., the mean
+      freshwater flux over each of the American Great Lakes will be
+      set to zero, and the total residual for all the lakes, if
+      negative, will be put into the St Laurence Seaway in the area
+      shown. 
+    }
+  \end{center}
+\end{figure}
+%>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 % ================================================================
 % Closed seas
@@ -87,8 +104,66 @@ This is done in \mdl{dommsk} together with the setting of the coastal value of f
 \section{Closed seas (\protect\mdl{closea})}
 \label{sec:MISC_closea}
 
-\colorbox{yellow}{Add here a short description of the way closed seas are managed}
+Some configurations include inland seas and lakes as ocean
+points. This is particularly the case for configurations that are
+coupled to an atmosphere model where one might want to include inland
+seas and lakes as ocean model points in order to provide a better
+bottom boundary condition for the atmosphere. However there is no
+route for freshwater to run off from the lakes to the ocean and this
+can lead to large drifts in the sea surface height over the lakes. The
+closea module provides options to either fill in closed seas and lakes
+at run time, or to set the net surface freshwater flux for each lake
+to zero and put the residual flux into the ocean.
 
+Prior to NEMO 4 the locations of inland seas and lakes was set via
+hardcoded indices for various ORCA configurations. From NEMO 4 onwards
+the inland seas and lakes are defined using mask fields in the
+domain configuration file. The options are as follows.
+
+\begin{enumerate}
+\item{{\bf No ``closea\_mask'' field is included in domain configuration
+  file.} In this case the closea module does nothing.}
+
+\item{{\bf A field called closea\_mask is included in the domain
+configuration file and ln\_closea=.false. in namelist namcfg.} In this
+case the inland seas defined by the closea\_mask field are filled in
+(turned to land points) at run time. That is every point in
+closea\_mask that is nonzero is set to be a land point.}
+
+\item{{\bf A field called closea\_mask is included in the domain
+configuration file and ln\_closea=.true. in namelist namcfg.} Each
+inland sea or group of inland seas is set to a positive integer value
+in the closea\_mask field (see Figure \ref{fig:closea_mask_example}
+for an example). The net surface flux over each inland sea or group of
+inland seas is set to zero each timestep and the residual flux is
+distributed over the global ocean (ie. all ocean points where
+closea\_mask is zero).}
+
+\item{{\bf Fields called closea\_mask and closea\_mask\_rnf are
+included in the domain configuration file and ln\_closea=.true. in
+namelist namcfg.} This option works as for option 3, except that if
+the net surface flux over an inland sea is negative (net
+precipitation) it is put into the ocean at specified runoff points. A
+net positive surface flux (net evaporation) is still spread over the
+global ocean. The mapping from inland seas to runoff points is defined
+by the closea\_mask\_rnf field. Each mapping is defined by a positive
+integer value for the inland sea(s) and the corresponding runoff
+points. An example is given in Figure
+\ref{fig:closea_mask_example}. If no mapping is provided for a
+particular inland sea then the residual is spread over the global
+ocean.}
+
+\item{{\bf Fields called closea\_mask and closea\_mask\_emp are
+included in the domain configuration file and ln\_closea=.true. in
+namelist namcfg.} This option works the same as option 4 except that
+the nonzero net surface flux is sent to the ocean at the specified
+runoff points regardless of whether it is positive or negative. The
+mapping from inland seas to runoff points in this case is defined by
+the closea\_mask\_emp field.}
+\end{enumerate}
+
+There is a python routine to create the closea\_mask fields and append
+them to the domain configuration file in the utils/tools/DOMAINcfg directory. 
 
 % ================================================================
 % Sub-Domain Functionality 
