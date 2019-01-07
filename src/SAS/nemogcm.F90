@@ -301,6 +301,9 @@ CONTAINS
          WRITE(numout,cform_aaa)                                        ! Flag AAAAAAA
          !
       ENDIF
+      ! open /dev/null file to be able to supress output write easily
+      CALL ctl_opn( numnul, '/dev/null', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, 6, .FALSE. )
+      !
       !                                      ! Domain decomposition
       CALL mpp_init                          ! MPP
 
