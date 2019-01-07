@@ -40,7 +40,6 @@ Quick Start Guide
 	:caption: Advanced use
 
 	zooms
-	coarsening
 	coupling
 	assimilation
 	tracers
@@ -55,8 +54,8 @@ Quick Start Guide
 
 .. Next headings markup acording to readme.rst
 
-How to cite NEMO
-================
+Reference publications
+======================
 
 ..	bibliography:: references.bib
 	:all:

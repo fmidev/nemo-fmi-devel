@@ -1,6 +1,6 @@
-**********************
-Embedded zooms (AGRIF)
-**********************
+**************
+Embedded zooms
+**************
 
 .. contents::
    :local:

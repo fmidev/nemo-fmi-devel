@@ -1,9 +1,9 @@
-:Authors: NEMO System Team
 :Release: |release|
 :Date:    |today|
 
-`NEMO`_ for *Nucleus for European Modelling of the Ocean* is a state-of-the-art modelling framework for
-research activities and forecasting services in ocean and climate sciences.
+`NEMO`_ for *Nucleus for European Modelling of the Ocean* is a state-of-the-art modelling framework,
+for research activities and forecasting services in ocean and climate sciences,
+developed in a sustainable way by a European consortium since 2008.
 
 .. contents::
 	:local:
@@ -20,31 +20,32 @@ The NEMO ocean model has 3 major components:
 - |TOP| models the [on|off]line oceanic tracers transport and the biogeochemical processes
   (``./src/MBG``) :cite:`TOP_manual`.
 
-These physical core engines are described in their respective <reference publications> that must be cited for
-any work related to their use.
+These physical core engines are described in their respective `reference publications`_,
+that must be cited for any work related to their use.
 
-Applications and capabilities
-=============================
+Assets and ready-to-use solutions
+=================================
 
 Not only does the NEMO framework model the ocean circulation,
 it offers various features to enable
 
-- Create :doc:`embedded zooms <zooms>` seamlessly with 2-way nesting package `AGRIF`_.
-- :doc:`Low cost biogeochemistry <coarsening>` and :doc:`alternative model opportunity <tracers>`.
-- Versatile :doc:`assimilation <assimilation>`.
-- :doc:`Output diagnostics <diagnostics>` with `XIOS`_ server.
-- :doc:`Coupling <coupling>` via `OASIS`_ for Earth system modelling.
+- Create :doc:`embedded zooms <zooms>` seamlessly thanks to 2-way nesting package `AGRIF`_.
+- Opportunity to integrate an :doc:`alternative biogeochemistry model <tracers>`
+- Versatile :doc:`data_assimilation <data assimilation>`.
+- Generation of :doc:`diagnostics <diagnostics>` through effective `XIOS`_ server.
+- Roll-out Earth system modelling with :doc:`coupling interface <coupling>` to `OASIS`_.
 
-| Several :doc:`builtins configurations <configurations>` are provided to assess the skills and performances of
+| Several :doc:`built-in configurations <configurations>` are provided to evaluate the skills and performances of
 	the model which can be used as templates for :doc:`setting up a new configuration <setup>` (``./cfgs``).
-| The end user could also find some :doc:`idealised test cases <test_cases>` online to serve as templates and
+| The end user could also find online some :doc:`idealised test cases <test_cases>` to serve as templates and
 	to study particular processes (``./tests``).
 
 A set of :doc:`utilities <tools>` is also provided to [pre|post]process your data (``./tools``).
 
-Literature
-==========
+Project literature
+==================
 
+A tutorial 
 :doc:`install`
 
 The reference documentation is archived online
@@ -75,8 +76,8 @@ assess the model potential and evolution.
 Used by a wide audience, numerous :website:`associated projects <projects>` have been carried out and
 extensive :website:`bibliography <bibliography/publications>` published.
 
-Community development
-=====================
+Collaborative development
+=========================
 
 | The NEMO Consortium pulling together 5 European institutes (`CMCC`_, `CNRS`_, `MOI`_, `Met Office`_ and `NERC`_)
 	plans the sustainable development in order to keep a reliable evolving framework since 2008.
@@ -87,3 +88,5 @@ Community development
 
 When the need arises, :forge:`working groups <wiki/WorkingGroups>` are created or resumed to
 gather the community expertise for advising on the development activities.
+
+:doc:`<contributing>`

@@ -1,6 +1,6 @@
-*********************
-Oceanic tracers (TOP)
-*********************
+***************
+Oceanic tracers
+***************
 
 .. contents::
 	:local:

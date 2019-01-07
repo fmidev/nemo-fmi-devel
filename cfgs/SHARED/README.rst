@@ -1,6 +1,6 @@
-******************
-Diagnostics (XIOS)
-******************
+***********
+Diagnostics
+***********
 
 .. contents::
 	:local:

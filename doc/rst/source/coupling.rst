@@ -1,6 +1,6 @@
-**********************
-Coupling (OASIS & SAS)
-**********************
+********
+Coupling
+********
 
 NEMO currently exploits OASIS-3-MCT to implement a generalised coupled interface
 (`Coupled Formulation <http://forge.ipsl.jussieu.fr/nemo/doxygen/node50.html?doc=NEMO>`_).
