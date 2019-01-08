@@ -696,19 +696,16 @@ This method can provide a more accurate calculation of the horizontal pressure g
 \subsection{Ice shelf cavity}
 \label{subsec:DYN_hpg_isf}
 Beneath an ice shelf, the total pressure gradient is the sum of the pressure gradient due to the ice shelf load and
-the pressure gradient due to the ocean load.
-If cavity opened (\np{ln\_isfcav}\forcode{ = .true.}) these 2 terms can be calculated by
-setting \np{ln\_dynhpg\_isf}\forcode{ = .true.}.
-No other scheme are working with the ice shelf.\\
+the pressure gradient due to the ocean load (\np{ln\_dynhpg\_isf}\forcode{ = .true.}).\\
 
-$\bullet$ The main hypothesis to compute the ice shelf load is that the ice shelf is in an isostatic equilibrium.
+The main hypothesis to compute the ice shelf load is that the ice shelf is in an isostatic equilibrium.
 The top pressure is computed integrating from surface to the base of the ice shelf a reference density profile
 (prescribed as density of a water at 34.4 PSU and -1.9\deg{C}) and
 corresponds to the water replaced by the ice shelf.
 This top pressure is constant over time.
 A detailed description of this method is described in \citet{Losch2008}.\\
 
-$\bullet$ The ocean load is computed using the expression \autoref{eq:dynhpg_sco} described in
+The pressure gradient due to ocean load is computed using the expression \autoref{eq:dynhpg_sco} described in
 \autoref{subsec:DYN_hpg_sco}. 
 
 %--------------------------------------------------------------------------------------------------------------

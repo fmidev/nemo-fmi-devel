@@ -920,7 +920,7 @@ the bottom of the lowest box the river water is being added to
 (\ie the total depth that river water is being added to in the model).
 
 The mass/volume addition due to the river runoff is, at each relevant depth level, added to
-the horizontal divergence (\textit{hdivn}) in the subroutine \rou{sbc\_rnf\_div} (called from \mdl{divcur}).
+the horizontal divergence (\textit{hdivn}) in the subroutine \rou{sbc\_rnf\_div} (called from \mdl{divhor}).
 This increases the diffusion term in the vicinity of the river, thereby simulating a momentum flux.
 The sea surface height is calculated using the sum of the horizontal divergence terms,
 and so the river runoff indirectly forces an increase in sea surface height. 
@@ -989,56 +989,86 @@ as the ocean water leaving the domain removes heat and salt (at the same concent
 
 \nlst{namsbc_isf}
 %--------------------------------------------------------------------------------------------------------
-Namelist variable in \ngn{namsbc}, \np{nn\_isf}, controls the ice shelf representation used. 
+The namelist variable in \ngn{namsbc}, \np{nn\_isf}, controls the ice shelf representation.
+Description and result of sensitivity test to \np{nn\_isf} are presented in \citet{Mathiot2017}. 
+The different options are illustrated in \autoref{fig:SBC_isf}.
+
 \begin{description}
-\item[\np{nn\_isf}\forcode{ = 1}]
+\item[\np{nn\_isf}\forcode{ = 1}]:
   The ice shelf cavity is represented (\np{ln\_isfcav}\forcode{ = .true.} needed).
-  The fwf and heat flux are computed.
-  Two different bulk formula are available:
+  The fwf and heat flux are depending of the local water properties.
+  Two different bulk formulae are available:
+
 	\begin{description}
-	\item[\np{nn\_isfblk}\forcode{ = 1}]
-     The bulk formula used to compute the melt is based the one described in \citet{Hunter2006}.
-     This formulation is based on a balance between the upward ocean heat flux and
-     the latent heat flux at the ice shelf base.
-	\item[\np{nn\_isfblk}\forcode{ = 2}]
-     The bulk formula used to compute the melt is based the one described in \citet{Jenkins1991}.
-     This formulation is based on a 3 equations formulation
-     (a heat flux budget, a salt flux budget and a linearised freezing point temperature equation).
+	\item[\np{nn\_isfblk}\forcode{ = 1}]:
+     The melt rate is based on a balance between the upward ocean heat flux and
+     the latent heat flux at the ice shelf base. A complete description is available in \citet{Hunter2006}.
+	\item[\np{nn\_isfblk}\forcode{ = 2}]:
+     The melt rate and the heat flux are based on a 3 equations formulation
+     (a heat flux budget at the ice base, a salt flux budget at the ice base and a linearised freezing point temperature equation). 
+     A complete description is available in \citet{Jenkins1991}.
 	\end{description}
-   For this 2 bulk formulations, there are 3 different ways to compute the exchange coeficient:
+
+     Temperature and salinity used to compute the melt are the average temperature in the top boundary layer \citet{Losch2008}. 
+     Its thickness is defined by \np{rn\_hisf\_tbl}.
+     The fluxes and friction velocity are computed using the mean temperature, salinity and velocity in the the first \np{rn\_hisf\_tbl} m.
+     Then, the fluxes are spread over the same thickness (ie over one or several cells).
+     If \np{rn\_hisf\_tbl} larger than top $e_{3}t$, there is no more feedback between the freezing point at the interface and the the top cell temperature.
+     This can lead to super-cool temperature in the top cell under melting condition.
+     If \np{rn\_hisf\_tbl} smaller than top $e_{3}t$, the top boundary layer thickness is set to the top cell thickness.\\
+
+     Each melt bulk formula depends on a exchange coeficient ($\Gamma^{T,S}$) between the ocean and the ice. 
+     There are 3 different ways to compute the exchange coeficient:
 	\begin{description}
-   \item[\np{nn\_gammablk}\forcode{ = 0}]
-     The salt and heat exchange coefficients are constant and defined by \np{rn\_gammas0} and \np{rn\_gammat0}
-	\item[\np{nn\_gammablk}\forcode{ = 1}]
+        \item[\np{nn\_gammablk}\forcode{ = 0}]:
+     The salt and heat exchange coefficients are constant and defined by \np{rn\_gammas0} and \np{rn\_gammat0}. 
+\[
+  % \label{eq:sbc_isf_gamma_iso}
+\gamma^{T} = \np{rn\_gammat0}
+\]
+\[
+\gamma^{S} = \np{rn\_gammas0}
+\]
+     This is the recommended formulation for ISOMIP.
+	\item[\np{nn\_gammablk}\forcode{ = 1}]:
      The salt and heat exchange coefficients are velocity dependent and defined as
-     \np{rn\_gammas0}$ \times u_{*}$ and \np{rn\_gammat0}$ \times u_{*}$ where
-     $u_{*}$ is the friction velocity in the top boundary layer (ie first \np{rn\_hisf\_tbl} meters).
-     See \citet{Jenkins2010} for all the details on this formulation.
-	\item[\np{nn\_gammablk}\forcode{ = 2}]
-     The salt and heat exchange coefficients are velocity and stability dependent and defined as
-     $\gamma_{T,S} = \frac{u_{*}}{\Gamma_{Turb} + \Gamma^{T,S}_{Mole}}$ where
-     $u_{*}$ is the friction velocity in the top boundary layer (ie first \np{rn\_hisf\_tbl} meters),
+\[
+\gamma^{T} = \np{rn\_gammat0} \times u_{*} 
+\]
+\[
+\gamma^{S} = \np{rn\_gammas0} \times u_{*}
+\]
+     where $u_{*}$ is the friction velocity in the top boundary layer (ie first \np{rn\_hisf\_tbl} meters).
+     See \citet{Jenkins2010} for all the details on this formulation. It is the recommended formulation for realistic application.
+	\item[\np{nn\_gammablk}\forcode{ = 2}]:
+     The salt and heat exchange coefficients are velocity and stability dependent and defined as:
+\[
+\gamma^{T,S} = \frac{u_{*}}{\Gamma_{Turb} + \Gamma^{T,S}_{Mole}} 
+\]
+     where $u_{*}$ is the friction velocity in the top boundary layer (ie first \np{rn\_hisf\_tbl} meters),
      $\Gamma_{Turb}$ the contribution of the ocean stability and
      $\Gamma^{T,S}_{Mole}$ the contribution of the molecular diffusion.
-     See \citet{Holland1999} for all the details on this formulation.
+     See \citet{Holland1999} for all the details on this formulation. 
+     This formulation has not been extensively tested in NEMO (not recommended).
    \end{description}
- \item[\np{nn\_isf}\forcode{ = 2}]
-   A parameterisation of isf is used. The ice shelf cavity is not represented.
-   The fwf is distributed along the ice shelf edge between the depth of the average grounding line (GL)
+ \item[\np{nn\_isf}\forcode{ = 2}]:
+   The ice shelf cavity is not represented.
+   The fwf and heat flux are computed using the \citet{Beckmann2003} parameterisation of isf melting.
+   The fluxes are distributed along the ice shelf edge between the depth of the average grounding line (GL)
    (\np{sn\_depmax\_isf}) and the base of the ice shelf along the calving front
    (\np{sn\_depmin\_isf}) as in (\np{nn\_isf}\forcode{ = 3}).
-   Furthermore the fwf and heat flux are computed using the \citet{Beckmann2003} parameterisation of isf melting.
    The effective melting length (\np{sn\_Leff\_isf}) is read from a file.
- \item[\np{nn\_isf}\forcode{ = 3}]
-   A simple parameterisation of isf is used. The ice shelf cavity is not represented.
+ \item[\np{nn\_isf}\forcode{ = 3}]:
+   The ice shelf cavity is not represented.
    The fwf (\np{sn\_rnfisf}) is prescribed and distributed along the ice shelf edge between
    the depth of the average grounding line (GL) (\np{sn\_depmax\_isf}) and
    the base of the ice shelf along the calving front (\np{sn\_depmin\_isf}).
    The heat flux ($Q_h$) is computed as $Q_h = fwf \times L_f$.
- \item[\np{nn\_isf}\forcode{ = 4}]
+ \item[\np{nn\_isf}\forcode{ = 4}]:
    The ice shelf cavity is opened (\np{ln\_isfcav}\forcode{ = .true.} needed).
    However, the fwf is not computed but specified from file \np{sn\_fwfisf}).
-   The heat flux ($Q_h$) is computed as $Q_h = fwf \times L_f$.\\
+   The heat flux ($Q_h$) is computed as $Q_h = fwf \times L_f$.
+   As in \np{nn\_isf}\forcode{ = 1}, the fluxes are spread over the top boundary layer thickness (\np{rn\_hisf\_tbl})\\
 \end{description}
 
 $\bullet$ \np{nn\_isf}\forcode{ = 1} and \np{nn\_isf}\forcode{ = 2} compute a melt rate based on
@@ -1052,20 +1082,22 @@ This can be useful if the water masses on the shelf are not realistic or
 the resolution (horizontal/vertical) are too coarse to have realistic melting or
 for studies where you need to control your heat and fw input.\\ 
 
-A namelist parameters control over how many meters the heat and fw fluxes are spread.
-\np{rn\_hisf\_tbl}] is the top boundary layer thickness as defined in \citet{Losch2008}.
-This parameter is only used if \np{nn\_isf}\forcode{ = 1} or \np{nn\_isf}\forcode{ = 4}.
-
-If \np{rn\_hisf\_tbl}\forcode{ = 0}., the fluxes are put in the top level whatever is its tickness. 
-
-If \np{rn\_hisf\_tbl} $>$ 0., the fluxes are spread over the first \np{rn\_hisf\_tbl} m
-(ie over one or several cells).\\
-
-The ice shelf melt is implemented as a volume flux with in the same way as for the runoff.
+The ice shelf melt is implemented as a volume flux as for the runoff.
 The fw addition due to the ice shelf melting is, at each relevant depth level, added to
-the horizontal divergence (\textit{hdivn}) in the subroutine \rou{sbc\_isf\_div}, called from \mdl{divcur}.
-See the runoff section \autoref{sec:SBC_rnf} for all the details about the divergence correction.
+the horizontal divergence (\textit{hdivn}) in the subroutine \rou{sbc\_isf\_div}, called from \mdl{divhor}.
+See the runoff section \autoref{sec:SBC_rnf} for all the details about the divergence correction.\\
 
+%>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+\begin{figure}[!t]
+  \begin{center}
+    \includegraphics[width=0.8\textwidth]{Fig_SBC_isf}
+    \caption{
+      \protect\label{fig:SBC_isf}
+      Illustration the location where the fwf is injected and whether or not the fwf is interactif or not depending of \np{nn\_isf}.
+    }
+  \end{center}
+\end{figure}
+%>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 \section{Ice sheet coupling}
 \label{sec:SBC_iscpl}
@@ -1074,44 +1106,56 @@ See the runoff section \autoref{sec:SBC_rnf} for all the details about the diver
 \nlst{namsbc_iscpl}
 %--------------------------------------------------------------------------------------------------------
 Ice sheet/ocean coupling is done through file exchange at the restart step.
-NEMO, at each restart step, read the bathymetry and ice shelf draft variable in a netcdf file.
+At each restart step:
+\begin{description}
+\item[Step 1]: the ice sheet model send a new bathymetry and ice shelf draft netcdf file.
+\item[Step 2]: a new domcfg.nc file is built using the DOMAINcfg tools.
+\item[Step 3]: NEMO run for a specific period and output the average melt rate over the period.
+\item[Step 4]: the ice sheet model run using the melt rate outputed in step 4.
+\item[Step 5]: go back to 1.
+\end{description}
+
 If \np{ln\_iscpl}\forcode{ = .true.}, the isf draft is assume to be different at each restart step with
 potentially some new wet/dry cells due to the ice sheet dynamics/thermodynamics.
-The wetting and drying scheme applied on the restart is very simple and described below for the 6 different cases:
+The wetting and drying scheme applied on the restart is very simple and described below for the 6 different possible cases:
 \begin{description}
-\item[Thin a cell down:]
+\item[Thin a cell down]:
   T/S/ssh are unchanged and U/V in the top cell are corrected to keep the barotropic transport (bt) constant
   ($bt_b=bt_n$).
-\item[Enlarge  a cell:]
+\item[Enlarge  a cell]:
   See case "Thin a cell down"
-\item[Dry a cell:]
+\item[Dry a cell]:
   mask, T/S, U/V and ssh are set to 0.
   Furthermore, U/V into the water column are modified to satisfy ($bt_b=bt_n$).
-\item[Wet a cell:] 
+\item[Wet a cell]: 
   mask is set to 1, T/S is extrapolated from neighbours, $ssh_n = ssh_b$ and U/V set to 0.
-  If no neighbours along i,j and k, T/S/U/V and mask are set to 0.
-\item[Dry a column:]
+  If no neighbours, T/S is extrapolated from old top cell value. 
+  If no neighbours along i,j and k (both previous test failed), T/S/U/V/ssh and mask are set to 0.
+\item[Dry a column]:
 	mask, T/S, U/V are set to 0 everywhere in the column and ssh set to 0.
-\item[Wet a column:]
+\item[Wet a column]:
   set mask to 1, T/S is extrapolated from neighbours, ssh is extrapolated from neighbours and U/V set to 0.
   If no neighbour, T/S/U/V and mask set to 0.
 \end{description}
-The extrapolation is call \np{nn\_drown} times.
+
+Furthermore, as the before and now fields are not compatible (modification of the geometry),
+the restart time step is prescribed to be an euler time step instead of a leap frog and $fields_b = fields_n$.\\
+
+The horizontal extrapolation to fill new cell with realistic value is called \np{nn\_drown} times.
 It means that if the grounding line retreat by more than \np{nn\_drown} cells between 2 coupling steps,
 the code will be unable to fill all the new wet cells properly.
-The default number is set up for the MISOMIP idealised experiments.\\
+The default number is set up for the MISOMIP idealised experiments.
 This coupling procedure is able to take into account grounding line and calving front migration.
 However, it is a non-conservative processe. 
-This could lead to a trend in heat/salt content and volume.
+This could lead to a trend in heat/salt content and volume.\\
+
 In order to remove the trend and keep the conservation level as close to 0 as possible,
 a simple conservation scheme is available with \np{ln\_hsb}\forcode{ = .true.}.
-The heat/salt/vol. gain/loss is diagnose, as well as the location.
-Based on what is done on sbcrnf to prescribed a source of heat/salt/vol.,
-the heat/salt/vol. gain/loss is removed/added, over a period of \np{rn\_fiscpl} time step, into the system. 
-So after \np{rn\_fiscpl} time step, all the heat/salt/vol. gain/loss due to extrapolation process is canceled.\\
+The heat/salt/vol. gain/loss is diagnosed, as well as the location.
+A correction increment is computed and apply each time step during the next \np{rn\_fiscpl} time steps. 
+For safety, it is advised to set \np{rn\_fiscpl} equal to the coupling period (smallest increment possible).
+The corrective increment is apply into the cell itself (if it is a wet cell), the neigbouring cells or the closest wet cell (if the cell is now dry).
 
-As the before and now fields are not compatible (modification of the geometry),
-the restart time step is prescribed to be an euler time step instead of a leap frog and $fields_b = fields_n$.
 %
 % ================================================================
 %        Handling of icebergs
