@@ -192,7 +192,7 @@ CONTAINS
             CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, pa_ip, pa_ip, zua_ho, zva_ho ) ! mp fraction
             zamsk = 0._wp
             !
-            zhvar(:,:,:) = pv_ip(:,:,:) * z1_ai(:,:,:)
+            zhvar(:,:,:) = pv_ip(:,:,:) * z1_aip(:,:,:)
             CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_ip )                 ! mp volume
          ENDIF
          !
@@ -270,18 +270,18 @@ CONTAINS
          !
       CASE ( 20 )                          !== centered second order ==!
          !
-         CALL cen2( pamsk, jt, kt, pdt, pt, pu, pv, puc, pvc, ptc, zt_ups, zfu_ups, zfv_ups, zfu_ho, zfv_ho )
+         CALL cen2( pamsk, jt, kt, pdt, pt, pu, pv, zt_ups, zfu_ups, zfv_ups, zfu_ho, zfv_ho )
          !
       CASE ( 1:5 )                         !== 1st to 5th order ULTIMATE-MACHO scheme ==!
          !
-         CALL macho( pamsk, kn_umx, jt, kt, pdt, pt, pu, pv, puc, pvc, pubox, pvbox, ptc, zt_ups, zfu_ups, zfv_ups, zfu_ho, zfv_ho )
+         CALL macho( pamsk, kn_umx, jt, kt, pdt, pt, pu, pv, pubox, pvbox, zt_ups, zfu_ups, zfv_ups, zfu_ho, zfv_ho )
          !
       END SELECT
       !
       !              --ho    --ho
       ! new fluxes = u*H  *  u*a / u
       ! ----------------------------
-      IF( pamsk == 0. ) THEN
+      IF( pamsk == 0._wp ) THEN
          DO jl = 1, jpl
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
@@ -439,7 +439,7 @@ CONTAINS
                   &   + (   pu     (ji,jj   ) - pu     (ji-1,jj     )   &
                   &       + pv     (ji,jj   ) - pv     (ji  ,jj-1   ) ) * pt(ji,jj,jl) * (1.-pamsk)
                !
-               pt_ups(ji,jj,jl) = ( pt (ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
+               pt_ups(ji,jj,jl) = ( pt(ji,jj,jl) + ztra * pdt * r1_e1e2t(ji,jj) ) * tmask(ji,jj,1)
             END DO
          END DO
       END DO
@@ -448,7 +448,7 @@ CONTAINS
    END SUBROUTINE upstream
 
    
-   SUBROUTINE cen2( pamsk, jt, kt, pdt, pt, pu, pv, puc, pvc, ptc, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+   SUBROUTINE cen2( pamsk, jt, kt, pdt, pt, pu, pv, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE cen2  ***
       !!     
@@ -461,8 +461,6 @@ CONTAINS
       REAL(wp)                        , INTENT(in   ) ::   pdt              ! tracer time-step
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt               ! tracer fields
       REAL(wp), DIMENSION(:,:  )      , INTENT(in   ) ::   pu, pv           ! 2 ice velocity components
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   puc, pvc         ! 2 ice velocity * A components
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   ptc              ! tracer content at before time step 
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt_ups           ! upstream guess of tracer 
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pfu_ups, pfv_ups ! upstream fluxes 
       REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pfu_ho, pfv_ho   ! high order fluxes 
@@ -477,11 +475,12 @@ CONTAINS
          DO jl = 1, jpl
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
-                  pfu_ho(ji,jj,jl) = 0.5 * pu(ji,jj) * ( pt(ji,jj,jl) + pt(ji+1,jj,jl) )
-                  pfv_ho(ji,jj,jl) = 0.5 * pv(ji,jj) * ( pt(ji,jj,jl) + pt(ji,jj+1,jl) )
+                  pfu_ho(ji,jj,jl) = 0.5_wp * pu(ji,jj) * ( pt(ji,jj,jl) + pt(ji+1,jj  ,jl) )
+                  pfv_ho(ji,jj,jl) = 0.5_wp * pv(ji,jj) * ( pt(ji,jj,jl) + pt(ji  ,jj+1,jl) )
                END DO
             END DO
          END DO
+         !
          IF    ( kn_limiter == 1 ) THEN
             CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
          ELSEIF( kn_limiter == 2 .OR. kn_limiter == 3 ) THEN
@@ -496,7 +495,7 @@ CONTAINS
             DO jl = 1, jpl              !-- flux in x-direction
                DO jj = 1, jpjm1
                   DO ji = 1, fs_jpim1
-                     pfu_ho(ji,jj,jl) = 0.5 * pu(ji,jj) * ( pt(ji,jj,jl) + pt(ji+1,jj,jl) )
+                     pfu_ho(ji,jj,jl) = 0.5_wp * pu(ji,jj) * ( pt(ji,jj,jl) + pt(ji+1,jj,jl) )
                   END DO
                END DO
             END DO
@@ -517,7 +516,7 @@ CONTAINS
             DO jl = 1, jpl              !-- flux in y-direction
                DO jj = 1, jpjm1
                   DO ji = 1, fs_jpim1
-                     pfv_ho(ji,jj,jl) = 0.5 * pv(ji,jj) * ( zpt(ji,jj,jl) + zpt(ji,jj+1,jl) )
+                     pfv_ho(ji,jj,jl) = 0.5_wp * pv(ji,jj) * ( zpt(ji,jj,jl) + zpt(ji,jj+1,jl) )
                   END DO
                END DO
             END DO
@@ -528,7 +527,7 @@ CONTAINS
             DO jl = 1, jpl              !-- flux in y-direction
                DO jj = 1, jpjm1
                   DO ji = 1, fs_jpim1
-                     pfv_ho(ji,jj,jl) = 0.5 * pv(ji,jj) * ( pt(ji,jj,jl) + pt(ji,jj+1,jl) )
+                     pfv_ho(ji,jj,jl) = 0.5_wp * pv(ji,jj) * ( pt(ji,jj,jl) + pt(ji,jj+1,jl) )
                   END DO
                END DO
             END DO
@@ -549,7 +548,7 @@ CONTAINS
             DO jl = 1, jpl              !-- flux in x-direction
                DO jj = 1, jpjm1
                   DO ji = 1, fs_jpim1
-                     pfu_ho(ji,jj,jl) = 0.5 * pu(ji,jj) * ( zpt(ji,jj,jl) + zpt(ji+1,jj,jl) )
+                     pfu_ho(ji,jj,jl) = 0.5_wp * pu(ji,jj) * ( zpt(ji,jj,jl) + zpt(ji+1,jj,jl) )
                   END DO
                END DO
             END DO
@@ -563,7 +562,7 @@ CONTAINS
    END SUBROUTINE cen2
 
    
-   SUBROUTINE macho( pamsk, kn_umx, jt, kt, pdt, pt, pu, pv, puc, pvc, pubox, pvbox, ptc, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+   SUBROUTINE macho( pamsk, kn_umx, jt, kt, pdt, pt, pu, pv, pubox, pvbox, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !!---------------------------------------------------------------------
       !!                    ***  ROUTINE macho  ***
       !!     
@@ -580,9 +579,7 @@ CONTAINS
       REAL(wp)                        , INTENT(in   ) ::   pdt              ! tracer time-step
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt               ! tracer fields
       REAL(wp), DIMENSION(:,:  )      , INTENT(in   ) ::   pu, pv           ! 2 ice velocity components
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   puc, pvc         ! 2 ice velocity * A components
       REAL(wp), DIMENSION(:,:  )      , INTENT(in   ) ::   pubox, pvbox     ! upstream velocity
-      REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   ptc              ! tracer content at before time step 
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pt_ups           ! upstream guess of tracer 
       REAL(wp), DIMENSION(:,:,:)      , INTENT(in   ) ::   pfu_ups, pfv_ups ! upstream fluxes 
       REAL(wp), DIMENSION(jpi,jpj,jpl), INTENT(  out) ::   pfu_ho, pfv_ho   ! high order fluxes 
@@ -713,8 +710,8 @@ CONTAINS
          DO jl = 1, jpl
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1   ! vector opt.
-                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (                           pt(ji+1,jj,jl) + pt(ji,jj,jl)   &
-                     &                                    - SIGN( 1._wp, pu(ji,jj) ) * ( pt(ji+1,jj,jl) - pt(ji,jj,jl) ) )
+                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (                                pt(ji+1,jj,jl) + pt(ji,jj,jl)   &
+                     &                                         - SIGN( 1._wp, pu(ji,jj) ) * ( pt(ji+1,jj,jl) - pt(ji,jj,jl) ) )
                END DO
             END DO
          END DO
@@ -726,7 +723,7 @@ CONTAINS
                DO ji = 1, fs_jpim1   ! vector opt.
                   zcu  = pu(ji,jj) * r1_e2u(ji,jj) * pdt * r1_e1u(ji,jj)
                   pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (                                pt(ji+1,jj,jl) + pt(ji,jj,jl)   &
-                     &                                               -              zcu   * ( pt(ji+1,jj,jl) - pt(ji,jj,jl) ) ) 
+                     &                                                            - zcu   * ( pt(ji+1,jj,jl) - pt(ji,jj,jl) ) ) 
                END DO
             END DO
          END DO
@@ -740,8 +737,8 @@ CONTAINS
                   zdx2 = e1u(ji,jj) * e1u(ji,jj)
 !!rachid          zdx2 = e1u(ji,jj) * e1t(ji,jj)
                   pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                      pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
-                     &                                               -              zcu   * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
-                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) * (                         ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
+                     &                                                            - zcu   * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) *    (                      ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcu ) * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) )
                END DO
             END DO
@@ -755,10 +752,10 @@ CONTAINS
                   zcu  = pu(ji,jj) * r1_e2u(ji,jj) * pdt * r1_e1u(ji,jj)
                   zdx2 = e1u(ji,jj) * e1u(ji,jj)
 !!rachid          zdx2 = e1u(ji,jj) * e1t(ji,jj)
-                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
-                     &                                               -          zcu * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
-                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) * (                   ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
-                     &                                               - 0.5_wp * zcu * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) )
+                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (         (                      pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
+                     &                                                            - zcu   * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdx2 * ( zcu*zcu - 1._wp ) *    (                      ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
+                     &                                                   - 0.5_wp * zcu   * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) )
                END DO
             END DO
          END DO
@@ -772,10 +769,10 @@ CONTAINS
                   zdx2 = e1u(ji,jj) * e1u(ji,jj)
 !!rachid          zdx2 = e1u(ji,jj) * e1t(ji,jj)
                   zdx4 = zdx2 * zdx2
-                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (            (                   pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
-                     &                                                     -          zcu * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
-                     &        + z1_6   * zdx2 * ( zcu*zcu - 1._wp ) *     (                   ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
-                     &                                                     - 0.5_wp * zcu * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) &
+                  pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (        (                       pt  (ji+1,jj,jl) + pt  (ji,jj,jl)     &
+                     &                                                            - zcu   * ( pt  (ji+1,jj,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6   * zdx2 * ( zcu*zcu - 1._wp ) * (                       ztu2(ji+1,jj,jl) + ztu2(ji,jj,jl)     &
+                     &                                                   - 0.5_wp * zcu   * ( ztu2(ji+1,jj,jl) - ztu2(ji,jj,jl) ) ) &
                      &        + z1_120 * zdx4 * ( zcu*zcu - 1._wp ) * ( zcu*zcu - 4._wp ) * ( ztu4(ji+1,jj,jl) + ztu4(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcu ) * ( ztu4(ji+1,jj,jl) - ztu4(ji,jj,jl) ) ) )
                END DO
@@ -792,8 +789,8 @@ CONTAINS
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
                   IF( pt_u(ji,jj,jl) < 0._wp ) THEN
-                     pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (                           pt(ji+1,jj,jl) + pt(ji,jj,jl)   &
-                        &                                    - SIGN( 1._wp, pu(ji,jj) ) * ( pt(ji+1,jj,jl) - pt(ji,jj,jl) ) )
+                     pt_u(ji,jj,jl) = 0.5_wp * umask(ji,jj,1) * (                                pt(ji+1,jj,jl) + pt(ji,jj,jl)   &
+                        &                                         - SIGN( 1._wp, pu(ji,jj) ) * ( pt(ji+1,jj,jl) - pt(ji,jj,jl) ) )
                   ENDIF
                END DO
             END DO
@@ -870,8 +867,8 @@ CONTAINS
          DO jl = 1, jpl
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                          ( pt(ji,jj+1,jl) + pt(ji,jj,jl) )  &
-                     &                                     - SIGN( 1._wp, pv(ji,jj) ) * ( pt(ji,jj+1,jl) - pt(ji,jj,jl) ) )
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                                pt(ji,jj+1,jl) + pt(ji,jj,jl)   &
+                     &                                         - SIGN( 1._wp, pv(ji,jj) ) * ( pt(ji,jj+1,jl) - pt(ji,jj,jl) ) )
                END DO
             END DO
          END DO
@@ -881,12 +878,11 @@ CONTAINS
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
                   zcv  = pv(ji,jj) * r1_e1v(ji,jj) * pdt * r1_e2v(ji,jj)
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (     ( pt(ji,jj+1,jl) + pt(ji,jj,jl) )  &
-                     &                                     - zcv * ( pt(ji,jj+1,jl) - pt(ji,jj,jl) ) )
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                                pt(ji,jj+1,jl) + pt(ji,jj,jl)   &
+                     &                                                            - zcv *   ( pt(ji,jj+1,jl) - pt(ji,jj,jl) ) )
                END DO
             END DO
          END DO
-         CALL lbc_lnk( 'icedyn_adv_umx', pt_v, 'V',  1. )
          !
       CASE( 3 )                                                !==  3rd order central TIM  ==! (Eq. 24)
          DO jl = 1, jpl
@@ -895,8 +891,8 @@ CONTAINS
                   zcv  = pv(ji,jj) * r1_e1v(ji,jj) * pdt * r1_e2v(ji,jj)
                   zdy2 = e2v(ji,jj) * e2v(ji,jj)
 !!rachid          zdy2 = e2v(ji,jj) * e2t(ji,jj)
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
-                     &                                     -                        zcv   * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (      (                         pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
+                     &                                                            - zcv   * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
                      &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                         ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcv ) * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) )
                END DO
@@ -910,10 +906,10 @@ CONTAINS
                   zcv  = pv(ji,jj) * r1_e1v(ji,jj) * pdt * r1_e2v(ji,jj)
                   zdy2 = e2v(ji,jj) * e2v(ji,jj)
 !!rachid          zdy2 = e2v(ji,jj) * e2t(ji,jj)
-                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                        ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
-                     &                                               -          zcv * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
-                     &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                   ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
-                     &                                               - 0.5_wp * zcv * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) )
+                  pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (      (                         pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
+                     &                                                            - zcv   * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6 * zdy2 * ( zcv*zcv - 1._wp ) * (                         ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
+                     &                                                   - 0.5_wp * zcv   * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) )
                END DO
             END DO
          END DO
@@ -927,9 +923,9 @@ CONTAINS
 !!rachid          zdy2 = e2v(ji,jj) * e2t(ji,jj)
                   zdy4 = zdy2 * zdy2
                   pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt  (ji,jj+1,jl) + pt  (ji,jj,jl)     &
-                     &                                                     -          zcv * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
-                     &        + z1_6   * zdy2 * ( zcv*zcv - 1._wp ) *     (                   ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
-                     &                                                     - 0.5_wp * zcv * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) &
+                     &                                                            - zcv   * ( pt  (ji,jj+1,jl) - pt  (ji,jj,jl) ) ) &
+                     &        + z1_6   * zdy2 * ( zcv*zcv - 1._wp ) * (                       ztv2(ji,jj+1,jl) + ztv2(ji,jj,jl)     &
+                     &                                                   - 0.5_wp * zcv   * ( ztv2(ji,jj+1,jl) - ztv2(ji,jj,jl) ) ) &
                      &        + z1_120 * zdy4 * ( zcv*zcv - 1._wp ) * ( zcv*zcv - 4._wp ) * ( ztv4(ji,jj+1,jl) + ztv4(ji,jj,jl)     &
                      &                                               - SIGN( 1._wp, zcv ) * ( ztv4(ji,jj+1,jl) - ztv4(ji,jj,jl) ) ) )
                END DO
@@ -946,8 +942,8 @@ CONTAINS
             DO jj = 1, jpjm1
                DO ji = 1, fs_jpim1
                   IF( pt_v(ji,jj,jl) < 0._wp ) THEN
-                     pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                          ( pt(ji,jj+1,jl) + pt(ji,jj,jl) )  &
-                        &                                     - SIGN( 1._wp, pv(ji,jj) ) * ( pt(ji,jj+1,jl) - pt(ji,jj,jl) ) )
+                     pt_v(ji,jj,jl) = 0.5_wp * vmask(ji,jj,1) * (                              ( pt(ji,jj+1,jl) + pt(ji,jj,jl) )  &
+                        &                                         - SIGN( 1._wp, pv(ji,jj) ) * ( pt(ji,jj+1,jl) - pt(ji,jj,jl) ) )
                   ENDIF
                END DO
             END DO
@@ -983,13 +979,12 @@ CONTAINS
       REAL(wp), DIMENSION (:,:,:), INTENT(inout) ::   pfv_ho, pfu_ho   ! monotonic flux
       !
       INTEGER  ::   ji, jj, jl    ! dummy loop indices
-      REAL(wp) ::   zpos, zneg, zbig, zsml, zup, zdo, z1_dt              ! local scalars
-      REAL(wp) ::   zau, zbu, zcu, zav, zbv, zcv, zsign, zcoef, zzt      !   -      -
+      REAL(wp) ::   zpos, zneg, zbig, zup, zdo, z1_dt              ! local scalars
+      REAL(wp) ::   zau, zbu, zcu, zav, zbv, zcv, zcoef, zzt       !   -      -
       REAL(wp), DIMENSION(jpi,jpj    ) :: zbup, zbdo
       REAL(wp), DIMENSION(jpi,jpj,jpl) :: zbetup, zbetdo, zti_ups, ztj_ups
       !!----------------------------------------------------------------------
       zbig = 1.e+40_wp
-      zsml = epsi20
       
       ! antidiffusive flux : high order minus low order
       ! --------------------------------------------------
@@ -1025,19 +1020,19 @@ CONTAINS
          DO jl = 1, jpl
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
-                  IF ( pfu_ho(ji,jj,jl) * ( pt_ups(ji+1,jj,jl) - pt_ups(ji,jj,jl) ) <= 0. .AND.  &
-                     & pfv_ho(ji,jj,jl) * ( pt_ups(ji,jj+1,jl) - pt_ups(ji,jj,jl) ) <= 0. ) THEN
+                  IF ( pfu_ho(ji,jj,jl) * ( pt_ups(ji+1,jj  ,jl) - pt_ups(ji,jj,jl) ) <= 0._wp .AND.  &
+                     & pfv_ho(ji,jj,jl) * ( pt_ups(ji  ,jj+1,jl) - pt_ups(ji,jj,jl) ) <= 0._wp ) THEN
                      !
-                     IF(  pfu_ho(ji,jj,jl) * ( zti_ups(ji+1,jj,jl) - zti_ups(ji,jj,jl) ) <= 0. .AND.  &
-                        & pfv_ho(ji,jj,jl) * ( ztj_ups(ji,jj+1,jl) - ztj_ups(ji,jj,jl) ) <= 0. ) THEN
-                        pfu_ho(ji,jj,jl)=0.
-                        pfv_ho(ji,jj,jl)=0.
+                     IF(  pfu_ho(ji,jj,jl) * ( zti_ups(ji+1,jj  ,jl) - zti_ups(ji,jj,jl) ) <= 0._wp .AND.  &
+                        & pfv_ho(ji,jj,jl) * ( ztj_ups(ji  ,jj+1,jl) - ztj_ups(ji,jj,jl) ) <= 0._wp ) THEN
+                        pfu_ho(ji,jj,jl)=0._wp
+                        pfv_ho(ji,jj,jl)=0._wp
                      ENDIF
                      !
-                     IF(  pfu_ho(ji,jj,jl) * ( pt_ups(ji  ,jj,jl) - pt_ups(ji-1,jj,jl) ) <= 0. .AND.  &
-                        & pfv_ho(ji,jj,jl) * ( pt_ups(ji  ,jj,jl) - pt_ups(ji,jj-1,jl) ) <= 0. ) THEN
-                        pfu_ho(ji,jj,jl)=0.
-                        pfv_ho(ji,jj,jl)=0.
+                     IF(  pfu_ho(ji,jj,jl) * ( pt_ups(ji,jj,jl) - pt_ups(ji-1,jj  ,jl) ) <= 0._wp .AND.  &
+                        & pfv_ho(ji,jj,jl) * ( pt_ups(ji,jj,jl) - pt_ups(ji  ,jj-1,jl) ) <= 0._wp ) THEN
+                        pfu_ho(ji,jj,jl)=0._wp
+                        pfv_ho(ji,jj,jl)=0._wp
                      ENDIF
                      !
                   ENDIF
@@ -1075,31 +1070,31 @@ CONTAINS
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1   ! vector opt.
                !
-               zup  = MAX( zbup(ji,jj), zbup(ji-1,jj  ), zbup(ji+1,jj  ), zbup(ji  ,jj-1), zbup(ji  ,jj+1) )  ! search max/min in neighbourhood
-               zdo  = MIN( zbdo(ji,jj), zbdo(ji-1,jj  ), zbdo(ji+1,jj  ), zbdo(ji  ,jj-1), zbdo(ji  ,jj+1) )
+               zup  = MAX( zbup(ji,jj), zbup(ji-1,jj), zbup(ji+1,jj), zbup(ji,jj-1), zbup(ji,jj+1) )  ! search max/min in neighbourhood
+               zdo  = MIN( zbdo(ji,jj), zbdo(ji-1,jj), zbdo(ji+1,jj), zbdo(ji,jj-1), zbdo(ji,jj+1) )
                !
-               zpos = MAX( 0., pfu_ho(ji-1,jj,jl) ) - MIN( 0., pfu_ho(ji  ,jj,jl) ) &  ! positive/negative part of the flux
-                  & + MAX( 0., pfv_ho(ji,jj-1,jl) ) - MIN( 0., pfv_ho(ji,jj  ,jl) )
-               zneg = MAX( 0., pfu_ho(ji  ,jj,jl) ) - MIN( 0., pfu_ho(ji-1,jj,jl) ) &
-                  & + MAX( 0., pfv_ho(ji,jj  ,jl) ) - MIN( 0., pfv_ho(ji,jj-1,jl) )
+               zpos = MAX( 0._wp, pfu_ho(ji-1,jj  ,jl) ) - MIN( 0._wp, pfu_ho(ji  ,jj  ,jl) ) &  ! positive/negative part of the flux
+                  & + MAX( 0._wp, pfv_ho(ji  ,jj-1,jl) ) - MIN( 0._wp, pfv_ho(ji  ,jj  ,jl) )
+               zneg = MAX( 0._wp, pfu_ho(ji  ,jj  ,jl) ) - MIN( 0._wp, pfu_ho(ji-1,jj  ,jl) ) &
+                  & + MAX( 0._wp, pfv_ho(ji  ,jj  ,jl) ) - MIN( 0._wp, pfv_ho(ji  ,jj-1,jl) )
                !
-               zpos = zpos - (pt(ji,jj,jl) * MIN( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MIN( 0., pv(ji,jj) - pv(ji,jj-1)) &
+               zpos = zpos - (pt(ji,jj,jl) * MIN( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MIN( 0., pv(ji,jj) - pv(ji,jj-1) ) &
                   &          ) * ( 1. - pamsk )
-               zneg = zneg + (pt(ji,jj,jl) * MAX( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MAX( 0., pv(ji,jj) - pv(ji,jj-1)) &
+               zneg = zneg + (pt(ji,jj,jl) * MAX( 0., pu(ji,jj) - pu(ji-1,jj) ) + pt(ji,jj,jl) * MAX( 0., pv(ji,jj) - pv(ji,jj-1) ) &
                   &          ) * ( 1. - pamsk )
                !
                !                                  ! up & down beta terms
-               IF( zpos > 0. ) THEN ; zbetup(ji,jj,jl) = MAX( 0._wp, zup - pt_ups(ji,jj,jl) ) / zpos * e1e2t(ji,jj) * z1_dt
-               ELSE                 ; zbetup(ji,jj,jl) = 0. ! zbig
+               IF( zpos > 0._wp ) THEN ; zbetup(ji,jj,jl) = MAX( 0._wp, zup - pt_ups(ji,jj,jl) ) / zpos * e1e2t(ji,jj) * z1_dt
+               ELSE                    ; zbetup(ji,jj,jl) = 0._wp ! zbig
                ENDIF
                !
-               IF( zneg > 0. ) THEN ; zbetdo(ji,jj,jl) = MAX( 0._wp, pt_ups(ji,jj,jl) - zdo ) / zneg * e1e2t(ji,jj) * z1_dt
-               ELSE                 ; zbetdo(ji,jj,jl) = 0. ! zbig
+               IF( zneg > 0._wp ) THEN ; zbetdo(ji,jj,jl) = MAX( 0._wp, pt_ups(ji,jj,jl) - zdo ) / zneg * e1e2t(ji,jj) * z1_dt
+               ELSE                    ; zbetdo(ji,jj,jl) = 0._wp ! zbig
                ENDIF
                !
                ! if all the points are outside ice cover
-               IF( zup == -zbig )   zbetup(ji,jj,jl) = 0. ! zbig
-               IF( zdo ==  zbig )   zbetdo(ji,jj,jl) = 0. ! zbig            
+               IF( zup == -zbig )   zbetup(ji,jj,jl) = 0._wp ! zbig
+               IF( zdo ==  zbig )   zbetdo(ji,jj,jl) = 0._wp ! zbig            
                !
             END DO
          END DO
@@ -1114,7 +1109,7 @@ CONTAINS
             DO ji = 1, fs_jpim1   ! vector opt.
                zau = MIN( 1._wp , zbetdo(ji,jj,jl) , zbetup(ji+1,jj,jl) )
                zbu = MIN( 1._wp , zbetup(ji,jj,jl) , zbetdo(ji+1,jj,jl) )
-               zcu = 0.5  + SIGN( 0.5 , pfu_ho(ji,jj,jl) )
+               zcu = 0.5_wp + SIGN( 0.5_wp , pfu_ho(ji,jj,jl) )
                !
                zcoef = ( zcu * zau + ( 1._wp - zcu ) * zbu )
                !
@@ -1127,7 +1122,7 @@ CONTAINS
             DO ji = 1, fs_jpim1   ! vector opt.
                zav = MIN( 1._wp , zbetdo(ji,jj,jl) , zbetup(ji,jj+1,jl) )
                zbv = MIN( 1._wp , zbetup(ji,jj,jl) , zbetdo(ji,jj+1,jl) )
-               zcv = 0.5  + SIGN( 0.5 , pfv_ho(ji,jj,jl) )
+               zcv = 0.5_wp + SIGN( 0.5_wp , pfv_ho(ji,jj,jl) )
                !
                zcoef = ( zcv * zav + ( 1._wp - zcv ) * zbv )
                !
