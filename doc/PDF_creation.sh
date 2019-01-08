@@ -1,8 +1,19 @@
 #!/bin/sh
 
-
 export opts='-shell-escape -pdf'
 model='NEMO'
+
+check_python_module() {
+    python -c "
+import sys
+try:
+    import $1
+    print('\nModule $1 is installed')
+except ImportError:
+    print('\nModule $1 is NOT installed')
+    print('')
+    sys.exit(42)"
+}
 
 clean() {
     ## Delete latex build files
@@ -24,7 +35,11 @@ build() {
     cd -
 }
 
+check_python_module pygments
+if [ $? -ne 0 ]; then echo 'Required python module pygments to correctly build the documentation is missing; exit 42'; echo ''; exit 42; fi
+
 clean
+
 build $model
 
 exit 0
