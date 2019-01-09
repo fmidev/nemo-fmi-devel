@@ -149,6 +149,7 @@ CONTAINS
                   pe3w (ji,jj,ik  ) = pdept(ji,jj,ik  ) - pdept(ji,jj,ik-1)
                   ! e3t into the ice shelf
                   pe3t (ji,jj,ik-1) = pdepw(ji,jj,ik  ) - pdepw(ji,jj,ik-1)
+                  pe3w (ji,jj,ik-1) = pdept(ji,jj,ik-1) - pdept(ji,jj,ik-2)
                END IF
             END DO
          END DO         

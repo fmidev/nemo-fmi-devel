@@ -244,7 +244,7 @@ CONTAINS
                      &                              * (1._wp - tmask(ji,jj,jk))
                END DO
                IF (ikt  >=  2) ziceload(ji,jj) = ziceload(ji,jj) + (2._wp * znad + zrhdtop_isf(ji,jj) + zrhd(ji,jj,ikt-1)) &
-                  &                                              * ( risfdep(ji,jj) - gdept_1d(ikt-1) )
+                  &                                              * ( risfdep(ji,jj) - gdept_n(ji,jj,ikt-1) )
             END DO
          END DO
          riceload(:,:) = ziceload(:,:)  ! need to be saved for diaar5
