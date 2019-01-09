@@ -132,7 +132,6 @@ CONTAINS
       INTEGER  ::   ib_bdy1, ib_bdy2, ib1, ib2             !   -       -
       INTEGER  ::   i_offset, j_offset                     !   -       -
       INTEGER , POINTER  ::  nbi, nbj, nbr                 ! short cuts
-      REAL(wp), POINTER  ::  flagu, flagv                  !    -   -
       REAL(wp), POINTER, DIMENSION(:,:)       ::   pmask    ! pointer to 2D mask fields
       REAL(wp) ::   zefl, zwfl, znfl, zsfl                 ! local scalars
       INTEGER, DIMENSION (2)                  ::   kdimsz
@@ -384,6 +383,15 @@ CONTAINS
             CASE DEFAULT   ;   CALL ctl_stop( 'nn_volctl must be 0 or 1' )
           END SELECT
           IF(lwp) WRITE(numout,*)
+          !
+          ! sanity check if used with tides        
+          IF( ln_tide ) THEN 
+             IF(lwp) WRITE(numout,*) ' The total volume correction is not working with tides. '
+             IF(lwp) WRITE(numout,*) ' Set ln_vol to .FALSE. '
+             IF(lwp) WRITE(numout,*) ' or '
+             IF(lwp) WRITE(numout,*) ' equilibriate your bdy input files '
+             CALL ctl_stop( 'The total volume correction is not working with tides.' )
+          END IF
         ELSE
           IF(lwp) WRITE(numout,*) 'No volume correction applied at open boundaries'
           IF(lwp) WRITE(numout,*)
@@ -1243,47 +1251,12 @@ CONTAINS
          END DO
          !
       END DO
-
-      ! Compute total lateral surface for volume correction:
-      ! ----------------------------------------------------
-      ! JC: this must be done at each time step with non-linear free surface
-      bdysurftot = 0._wp 
-      IF( ln_vol ) THEN  
-         igrd = 2      ! Lateral surface at U-points
-         DO ib_bdy = 1, nb_bdy
-            DO ib = 1, idx_bdy(ib_bdy)%nblenrim(igrd)
-               nbi => idx_bdy(ib_bdy)%nbi(ib,igrd)
-               nbj => idx_bdy(ib_bdy)%nbj(ib,igrd)
-               flagu => idx_bdy(ib_bdy)%flagu(ib,igrd)
-               bdysurftot = bdysurftot + hu_n   (nbi  , nbj)                           &
-                  &                    * e2u    (nbi  , nbj) * ABS( flagu ) &
-                  &                    * tmask_i(nbi  , nbj)                           &
-                  &                    * tmask_i(nbi+1, nbj)                   
-            END DO
-         END DO
-
-         igrd=3 ! Add lateral surface at V-points
-         DO ib_bdy = 1, nb_bdy
-            DO ib = 1, idx_bdy(ib_bdy)%nblenrim(igrd)
-               nbi => idx_bdy(ib_bdy)%nbi(ib,igrd)
-               nbj => idx_bdy(ib_bdy)%nbj(ib,igrd)
-               flagv => idx_bdy(ib_bdy)%flagv(ib,igrd)
-               bdysurftot = bdysurftot + hv_n   (nbi, nbj  )                           &
-                  &                    * e1v    (nbi, nbj  ) * ABS( flagv ) &
-                  &                    * tmask_i(nbi, nbj  )                           &
-                  &                    * tmask_i(nbi, nbj+1)
-            END DO
-         END DO
-         !
-         CALL mpp_sum( 'bdyini', bdysurftot )      ! sum over the global domain
-      END IF   
       !
       ! Tidy up
       !--------
       IF( nb_bdy>0 )   DEALLOCATE( nbidta, nbjdta, nbrdta )
       !
    END SUBROUTINE bdy_segs
-
 
    SUBROUTINE bdy_ctl_seg
       !!----------------------------------------------------------------------

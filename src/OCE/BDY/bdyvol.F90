@@ -8,6 +8,7 @@ MODULE bdyvol
    !!             -   !  2006-01  (J. Chanut) Bug correction
    !!            3.0  !  2008-04  (NEMO team)  add in the reference version
    !!            3.4  !  2011     (D. Storkey) rewrite in preparation for OBC-BDY merge
+   !!            4.0  !  2019-01  (P. Mathiot) adapted to time splitting     
    !!----------------------------------------------------------------------
    USE oce            ! ocean dynamics and tracers 
    USE bdy_oce        ! ocean open boundary conditions
@@ -23,7 +24,7 @@ MODULE bdyvol
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   bdy_vol    ! called by ???
+   PUBLIC   bdy_vol2d    ! called by dynspg_ts
 
    !!----------------------------------------------------------------------
    !! NEMO/OCE 4.0 , NEMO Consortium (2018)
@@ -32,15 +33,13 @@ MODULE bdyvol
    !!----------------------------------------------------------------------
 CONTAINS
 
-   SUBROUTINE bdy_vol( kt )
+   SUBROUTINE bdy_vol2d( kt, kc, pua2d, pva2d, phu, phv )
       !!----------------------------------------------------------------------
       !!                      ***  ROUTINE bdyvol  ***
       !!
       !! ** Purpose :   This routine controls the volume of the system. 
       !!      A correction velocity is calculated to correct the total transport 
       !!      through the unstructured OBC. 
-      !!      The total depth used is constant (H0) to be consistent with the 
-      !!      linear free surface coded in OPA 8.2    <<<=== !!gm  ???? true ????
       !!
       !! ** Method  :   The correction velocity (zubtpecor here) is defined calculating
       !!      the total transport through all open boundaries (trans_bdy) minus
@@ -64,30 +63,30 @@ CONTAINS
       !!            surface. 
       !!            (set nn_volctl to 1 in tne namelist for this option)
       !!----------------------------------------------------------------------
-      INTEGER, INTENT(in) ::   kt   ! ocean time-step index
+      INTEGER, INTENT(in) ::   kt, kc   ! ocean time-step index, cycle time-step
       !
       INTEGER  ::   ji, jj, jk, jb, jgrd
       INTEGER  ::   ib_bdy, ii, ij
-      REAL(wp) ::   zubtpecor, z_cflxemp, ztranst
+      REAL(wp) ::   zubtpecor, ztranst
+      REAL(wp), SAVE :: z_cflxemp                                  ! cumulated emp flux
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(inout) :: pua2d, pva2d  ! Barotropic velocities
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(in) :: phu, phv         ! Ocean depth at U- and V-points
       TYPE(OBC_INDEX), POINTER :: idx
       !!-----------------------------------------------------------------------------
       !
-      IF( ln_vol ) THEN
-      !
-      IF( kt == nit000 ) THEN 
-         IF(lwp) WRITE(numout,*)
-         IF(lwp) WRITE(numout,*)'bdy_vol : Correction of velocities along unstructured OBC'
-         IF(lwp) WRITE(numout,*)'~~~~~~~'
-      END IF 
-
       ! Calculate the cumulate surface Flux z_cflxemp (m3/s) over all the domain
       ! -----------------------------------------------------------------------
-!!gm replace these lines :
-      z_cflxemp = SUM ( ( emp(:,:) - rnf(:,:) + fwfisf(:,:) ) * bdytmask(:,:) * e1e2t(:,:) ) / rau0
-      CALL mpp_sum( 'bdyvol', z_cflxemp )     ! sum over the global domain
-!!gm   by :
-!!gm      z_cflxemp = glob_sum(  'bdyvol', ( emp(:,:)-rnf(:,:)+fwfisf(:,:) ) * bdytmask(:,:) * e1e2t(:,:)  ) / rau0
-!!gm
+      IF ( kc == 1 ) z_cflxemp = glob_sum( 'bdyvol', ( emp(:,:) - rnf(:,:) + fwfisf(:,:) ) * bdytmask(:,:) * e1e2t(:,:)  ) / rau0
+
+      ! Compute bdy surface each cycle if non linear free surface
+      ! ---------------------------------------------------------
+      IF ( .NOT. ln_linssh ) THEN
+         ! compute area each time step
+         bdysurftot = bdy_segs_surf( phu, phv )
+      ELSE
+         ! compute area only the first time
+         IF ( ( kt == nit000 ) .AND. ( kc == 1 ) ) bdysurftot = bdy_segs_surf( phu, phv )
+      END IF
 
       ! Transport through the unstructured open boundary
       ! ------------------------------------------------
@@ -97,61 +96,72 @@ CONTAINS
          !
          jgrd = 2                               ! cumulate u component contribution first 
          DO jb = 1, idx%nblenrim(jgrd)
-            DO jk = 1, jpkm1
-               ii = idx%nbi(jb,jgrd)
-               ij = idx%nbj(jb,jgrd)
-               zubtpecor = zubtpecor + idx%flagu(jb,jgrd) * ua(ii,ij, jk) * e2u(ii,ij) * e3u_n(ii,ij,jk)
-            END DO
+            ii = idx%nbi(jb,jgrd)
+            ij = idx%nbj(jb,jgrd)
+            zubtpecor = zubtpecor + idx%flagu(jb,jgrd) * pua2d(ii,ij) * e2u(ii,ij) * phu(ii,ij) * tmask_i(ii,ij) * tmask_i(ii+1,ij)
          END DO
          jgrd = 3                               ! then add v component contribution
          DO jb = 1, idx%nblenrim(jgrd)
-            DO jk = 1, jpkm1
-               ii = idx%nbi(jb,jgrd)
-               ij = idx%nbj(jb,jgrd)
-               zubtpecor = zubtpecor + idx%flagv(jb,jgrd) * va(ii,ij, jk) * e1v(ii,ij) * e3v_n(ii,ij,jk) 
-            END DO
+            ii = idx%nbi(jb,jgrd)
+            ij = idx%nbj(jb,jgrd)
+            zubtpecor = zubtpecor + idx%flagv(jb,jgrd) * pva2d(ii,ij) * e1v(ii,ij) * phv(ii,ij) * tmask_i(ii,ij) * tmask_i(ii,ij+1)
          END DO
          !
       END DO
-      CALL mpp_sum( 'bdyvol', zubtpecor )   ! sum over the global domain
+      IF( lk_mpp )   CALL mpp_sum( 'bdyvol', zubtpecor )   ! sum over the global domain
 
       ! The normal velocity correction
       ! ------------------------------
-      IF( nn_volctl==1 ) THEN   ;   zubtpecor = ( zubtpecor - z_cflxemp ) / bdysurftot 
+      IF( nn_volctl==1 ) THEN   ;   zubtpecor = ( zubtpecor - z_cflxemp ) / bdysurftot  ! maybe should be apply only once at the end
       ELSE                      ;   zubtpecor =   zubtpecor               / bdysurftot
       END IF
 
       ! Correction of the total velocity on the unstructured boundary to respect the mass flux conservation
       ! -------------------------------------------------------------
-      ztranst = 0._wp
       DO ib_bdy = 1, nb_bdy
          idx => idx_bdy(ib_bdy)
          !
          jgrd = 2                               ! correct u component
          DO jb = 1, idx%nblenrim(jgrd)
-            DO jk = 1, jpkm1
                ii = idx%nbi(jb,jgrd)
                ij = idx%nbj(jb,jgrd)
-               ua(ii,ij,jk) = ua(ii,ij,jk) - idx%flagu(jb,jgrd) * zubtpecor * umask(ii,ij,jk)
-               ztranst = ztranst + idx%flagu(jb,jgrd) * ua(ii,ij,jk) * e2u(ii,ij) * e3u_n(ii,ij,jk)
-            END DO
+               pua2d(ii,ij) = pua2d(ii,ij) - idx%flagu(jb,jgrd) * zubtpecor * tmask_i(ii,ij) * tmask_i(ii+1,ij)
          END DO
          jgrd = 3                              ! correct v component
          DO jb = 1, idx%nblenrim(jgrd)
-            DO jk = 1, jpkm1
                ii = idx%nbi(jb,jgrd)
                ij = idx%nbj(jb,jgrd)
-               va(ii,ij,jk) = va(ii,ij,jk) -idx%flagv(jb,jgrd) * zubtpecor * vmask(ii,ij,jk)
-               ztranst = ztranst + idx%flagv(jb,jgrd) * va(ii,ij,jk) * e1v(ii,ij) * e3v_n(ii,ij,jk)
-            END DO
+               pva2d(ii,ij) = pva2d(ii,ij) - idx%flagv(jb,jgrd) * zubtpecor * tmask_i(ii,ij) * tmask_i(ii,ij+1)
          END DO
          !
       END DO
-      CALL mpp_sum( 'bdyvol', ztranst )   ! sum over the global domain
- 
+      ! 
       ! Check the cumulated transport through unstructured OBC once barotropic velocities corrected
       ! ------------------------------------------------------
-      IF( lwp .AND. MOD( kt, nwrite ) == 0 ) THEN
+      IF( MOD( kt, nwrite ) == 0 .AND. ( kc == 1 ) ) THEN
+         !
+         ! compute residual transport across boundary
+         ztranst = 0._wp
+         DO ib_bdy = 1, nb_bdy
+            idx => idx_bdy(ib_bdy)
+            !
+            jgrd = 2                               ! correct u component
+            DO jb = 1, idx%nblenrim(jgrd)
+                  ii = idx%nbi(jb,jgrd)
+                  ij = idx%nbj(jb,jgrd)
+                  ztranst = ztranst + idx%flagu(jb,jgrd) * pua2d(ii,ij) * e2u(ii,ij) * phu(ii,ij) * tmask_i(ii,ij) * tmask_i(ii+1,ij)
+            END DO
+            jgrd = 3                              ! correct v component
+            DO jb = 1, idx%nblenrim(jgrd)
+                  ii = idx%nbi(jb,jgrd)
+                  ij = idx%nbj(jb,jgrd)
+                  ztranst = ztranst + idx%flagv(jb,jgrd) * pva2d(ii,ij) * e1v(ii,ij) * phv(ii,ij) * tmask_i(ii,ij) * tmask_i(ii,ij+1)
+            END DO
+            !
+         END DO
+         IF( lk_mpp )   CALL mpp_sum('bdyvol', ztranst )   ! sum over the global domain
+
+
          IF(lwp) WRITE(numout,*)
          IF(lwp) WRITE(numout,*)'bdy_vol : time step :', kt
          IF(lwp) WRITE(numout,*)'~~~~~~~ '
@@ -161,9 +171,51 @@ CONTAINS
          IF(lwp) WRITE(numout,*)'          cumulated transport ztranst   =', ztranst   , '(m3/s)'
       END IF 
       !
-      END IF ! ln_vol
-      !
-   END SUBROUTINE bdy_vol
+   END SUBROUTINE bdy_vol2d
+   !
+   REAL(wp) FUNCTION bdy_segs_surf(phu, phv)
+      !!----------------------------------------------------------------------
+      !!                 ***  ROUTINE bdy_ctl_seg  ***
+      !!
+      !! ** Purpose :   Compute total lateral surface for volume correction
+      !!
+      !!----------------------------------------------------------------------
 
+      REAL(wp), DIMENSION(jpi,jpj), INTENT(in) :: phu, phv ! water column thickness at U and V points
+      INTEGER            ::  igrd, ib_bdy, ib                ! loop indexes
+      INTEGER , POINTER  ::  nbi, nbj                        ! short cuts
+      REAL(wp), POINTER  ::  zflagu, zflagv                  !    -   -
+
+      ! Compute total lateral surface for volume correction:
+      ! ----------------------------------------------------
+      bdy_segs_surf = 0._wp
+      igrd = 2      ! Lateral surface at U-points
+      DO ib_bdy = 1, nb_bdy
+         DO ib = 1, idx_bdy(ib_bdy)%nblenrim(igrd)
+            nbi => idx_bdy(ib_bdy)%nbi(ib,igrd)
+            nbj => idx_bdy(ib_bdy)%nbj(ib,igrd)
+            zflagu => idx_bdy(ib_bdy)%flagu(ib,igrd)
+            bdy_segs_surf = bdy_segs_surf + phu(nbi, nbj)                              &
+               &                            * e2u(nbi, nbj) * ABS( zflagu )            &
+               &                            * tmask_i(nbi, nbj) * tmask_i(nbi+1, nbj)
+         END DO
+      END DO
+
+      igrd=3 ! Add lateral surface at V-points
+      DO ib_bdy = 1, nb_bdy
+         DO ib = 1, idx_bdy(ib_bdy)%nblenrim(igrd)
+            nbi => idx_bdy(ib_bdy)%nbi(ib,igrd)
+            nbj => idx_bdy(ib_bdy)%nbj(ib,igrd)
+            zflagv => idx_bdy(ib_bdy)%flagv(ib,igrd)
+            bdy_segs_surf = bdy_segs_surf + phv(nbi, nbj)                              &
+               &                            * e1v(nbi, nbj) * ABS( zflagv )            &
+               &                            * tmask_i(nbi, nbj) * tmask_i(nbi, nbj+1)
+         END DO
+      END DO
+      !
+      ! redirect the time to bdyvol as this variable is only used by bdyvol
+      IF( lk_mpp )   CALL mpp_sum( 'bdyvol', bdy_segs_surf ) ! sum over the global domain
+      !
+   END FUNCTION bdy_segs_surf
    !!======================================================================
 END MODULE bdyvol

@@ -40,6 +40,7 @@ MODULE dynspg_ts
    USE dynvor          ! vorticity term
    USE wet_dry         ! wetting/drying flux limter
    USE bdy_oce         ! open boundary
+   USE bdyvol          ! open boundary volume conservation
    USE bdytides        ! open boundary condition data
    USE bdydyn2d        ! open boundary conditions on barotropic variables
    USE sbctide         ! tides
@@ -791,8 +792,9 @@ CONTAINS
          ENDIF
          !                                                !* after ssh
          !                                                !  -----------
-         ! One should enforce volume conservation at open boundaries here
-         ! considering fluxes below:
+         !
+         ! Enforce volume conservation at open boundaries:
+         IF( ln_bdy .AND. ln_vol ) CALL bdy_vol2d( kt, jn, ua_e, va_e, zhup2_e, zhvp2_e )
          !
          zwx(:,:) = e2u(:,:) * ua_e(:,:) * zhup2_e(:,:)         ! fluxes at jn+0.5
          zwy(:,:) = e1v(:,:) * va_e(:,:) * zhvp2_e(:,:)

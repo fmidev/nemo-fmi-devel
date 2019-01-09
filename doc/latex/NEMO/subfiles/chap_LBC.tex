@@ -612,13 +612,13 @@ will re-order the data in old BDY data files.
 \subsection{Volume correction}
 \label{subsec:BDY_vol_corr}
 
-There is an option to force the total volume in the regional model to be constant,
-similar to the option in the OBC module.
-This is controlled  by the \np{nn\_volctl} parameter in the namelist.
-A value of \np{nn\_volctl}\forcode{ = 0} indicates that this option is not used.
-If \np{nn\_volctl}\forcode{ = 1} then a correction is applied to the normal velocities around the boundary at
+There is an option to force the total volume in the regional model to be constant.
+This is controlled  by the \np{ln\_vol} parameter in the namelist.
+A value of \np{ln\_vol}\forcode{ = .false.} indicates that this option is not used.
+Two options to control the volume are available (\np{nn\_volctl}). 
+If \np{nn\_volctl}\forcode{ = 0} then a correction is applied to the normal barotropic velocities around the boundary at
 each timestep to ensure that the integrated volume flow through the boundary is zero.
-If \np{nn\_volctl}\forcode{ = 2} then the calculation of the volume change on
+If \np{nn\_volctl}\forcode{ = 1} then the calculation of the volume change on
 the timestep includes the change due to the freshwater flux across the surface and
 the correction velocity corrects for this as well.
 
