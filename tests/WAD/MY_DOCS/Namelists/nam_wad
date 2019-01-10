@@ -10,4 +10,6 @@
    rn_wdmin2         =  0.0001  ! Tolerance of min wet depth on dried cells
    rn_wdld           =  2.5     ! Land elevation below which wetting/drying is allowed
    nn_wdit           =   20     ! Max iterations for W/D limiter
+   rn_wd_sbcdep      =  5.0     ! Depth at which to taper sbc fluxes
+   rn_wd_sbcfra      =  0.999   ! Fraction of SBC fluxes at taper depth (Must be <1)
 /

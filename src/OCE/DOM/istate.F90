@@ -99,6 +99,19 @@ CONTAINS
             CALL dta_tsd( nit000, tsb )       ! read 3D T and S data at nit000
             !
             sshb(:,:)   = 0._wp               ! set the ocean at rest
+            IF( ll_wd ) THEN
+               sshb(:,:) =  -ssh_ref  ! Added in 30 here for bathy that adds 30 as Iterative test CEOD 
+               !
+               ! Apply minimum wetdepth criterion
+               !
+               DO jj = 1,jpj
+                  DO ji = 1,jpi
+                     IF( ht_0(ji,jj) + sshb(ji,jj)  < rn_wdmin1 ) THEN
+                        sshb(ji,jj) = tmask(ji,jj,1)*( rn_wdmin1 - (ht_0(ji,jj)) )
+                     ENDIF
+                  END DO
+               END DO 
+            ENDIF 
             ub  (:,:,:) = 0._wp
             vb  (:,:,:) = 0._wp  
             !

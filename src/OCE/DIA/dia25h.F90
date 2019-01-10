@@ -12,6 +12,7 @@ MODULE dia25h
    !
    USE in_out_manager  ! I/O units
    USE iom             ! I/0 library
+   USE wet_dry
 
    IMPLICIT NONE
    PRIVATE
@@ -210,7 +211,11 @@ CONTAINS
          zw3d(:,:,:) = sn_25h(:,:,:)*tmask(:,:,:) + zmdi*(1.0-tmask(:,:,:))
          CALL iom_put( "salin25h", zw3d  )   ! salinity
          zw2d(:,:) = sshn_25h(:,:)*tmask(:,:,1) + zmdi*(1.0-tmask(:,:,1))
-         CALL iom_put( "ssh25h", zw2d )   ! sea surface 
+         IF( ll_wd ) THEN
+            CALL iom_put( "ssh25h", zw2d+ssh_ref )   ! sea surface 
+         ELSE
+            CALL iom_put( "ssh25h", zw2d )   ! sea surface
+         ENDIF
          ! Write velocities (instantaneous)
          zw3d(:,:,:) = un_25h(:,:,:)*umask(:,:,:) + zmdi*(1.0-umask(:,:,:))
          CALL iom_put("vozocrtx25h", zw3d)    ! i-current

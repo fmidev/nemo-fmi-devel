@@ -44,6 +44,8 @@ MODULE wet_dry
    REAL(wp), PUBLIC  ::   rn_wdmin1   !: minimum water depth on dried cells
    REAL(wp), PUBLIC  ::   r_rn_wdmin1 !: 1/minimum water depth on dried cells 
    REAL(wp), PUBLIC  ::   rn_wdmin2   !: tolerance of minimum water depth on dried cells
+   REAL(wp), PUBLIC  ::   rn_wd_sbcdep   !: Depth at which to taper sbc fluxes
+   REAL(wp), PUBLIC  ::   rn_wd_sbcfra   !: Fraction of SBC at taper depth
    REAL(wp), PUBLIC  ::   rn_wdld     !: land elevation below which wetting/drying will be considered
    INTEGER , PUBLIC  ::   nn_wdit     !: maximum number of iteration for W/D limiter
    LOGICAL,  PUBLIC  ::   ln_wd_dl_bc !: DL scheme: True implies 3D velocities are set to the barotropic values at points 
@@ -73,7 +75,7 @@ CONTAINS
       INTEGER  ::   ios, ierr   ! Local integer
       !!
       NAMELIST/namwad/ ln_wd_il, ln_wd_dl   , rn_wdmin0, rn_wdmin1, rn_wdmin2, rn_wdld,   &
-         &             nn_wdit , ln_wd_dl_bc, ln_wd_dl_rmp
+         &             nn_wdit , ln_wd_dl_bc, ln_wd_dl_rmp, rn_wd_sbcdep,rn_wd_sbcfra
       !!----------------------------------------------------------------------
       !
       REWIND( numnam_ref )              ! Namelist namwad in reference namelist : Parameters for Wetting/Drying
@@ -84,6 +86,7 @@ CONTAINS
 906   IF( ios >  0 )   CALL ctl_nam ( ios , 'namwad in configuration namelist', .TRUE. )
       IF(lwm) WRITE ( numond, namwad )
       !
+      IF( rn_wd_sbcfra>=1 )   CALL ctl_stop( 'STOP', 'rn_wd_sbcfra >=1 : must be < 1' )
       IF(lwp) THEN                  ! control print
          WRITE(numout,*)
          WRITE(numout,*) 'wad_init : Wetting and drying initialization through namelist read'
@@ -98,6 +101,8 @@ CONTAINS
          WRITE(numout,*) '      Max iteration for W/D limiter    nn_wdit      = ', nn_wdit
          WRITE(numout,*) '      T => baroclinic u,v=0 at dry pts: ln_wd_dl_bc = ', ln_wd_dl_bc     
          WRITE(numout,*) '      use a ramp for rwd limiter:  ln_wd_dl_rwd_rmp = ', ln_wd_dl_rmp
+         WRITE(numout,*) '      cut off depth sbc for wd   rn_wd_sbcdep       = ', rn_wd_sbcdep
+         WRITE(numout,*) '      fraction to start sbc wgt rn_wd_sbcfra        = ', rn_wd_sbcfra
       ENDIF
       IF( .NOT. ln_read_cfg ) THEN
          IF(lwp) WRITE(numout,*) '      No configuration file so seting ssh_ref to zero  '

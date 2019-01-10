@@ -57,6 +57,7 @@ MODULE sbcmod
    USE in_out_manager ! I/O manager
    USE lib_mpp        ! MPP library
    USE timing         ! Timing
+   USE wet_dry
    USE diurnal_bulk, ONLY:   ln_diurnal_only   ! diurnal SST diagnostic
 
    IMPLICIT NONE
@@ -376,6 +377,10 @@ CONTAINS
       INTEGER, INTENT(in) ::   kt   ! ocean time step
       !
       LOGICAL ::   ll_sas, ll_opa   ! local logical
+      !
+      REAL(wp) ::     zthscl        ! wd  tanh scale
+      REAL(wp), DIMENSION(jpi,jpj) ::  zwdht, zwght  ! wd dep over wd limit, wgt  
+
       !!---------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('sbc')
@@ -460,6 +465,30 @@ CONTAINS
 !!$!RBbug do not understand why see ticket 667
 !!$!clem: it looks like it is necessary for the north fold (in certain circumstances). Don't know why.
 !!$      CALL lbc_lnk( 'sbcmod', emp, 'T', 1. )
+      IF ( ll_wd ) THEN     ! If near WAD point limit the flux for now
+         zthscl = atanh(rn_wd_sbcfra)                     ! taper frac default is .999 
+         zwdht(:,:) = sshn(:,:) + ht_0(:,:) - rn_wdmin1   ! do this calc of water
+                                                     ! depth above wd limit once
+         WHERE( zwdht(:,:) <= 0.0 )
+            taum(:,:) = 0.0
+            utau(:,:) = 0.0
+            vtau(:,:) = 0.0
+            qns (:,:) = 0.0
+            qsr (:,:) = 0.0
+            emp (:,:) = min(emp(:,:),0.0) !can allow puddles to grow but not shrink
+            sfx (:,:) = 0.0
+         END WHERE
+         zwght(:,:) = tanh(zthscl*zwdht(:,:))
+         WHERE( zwdht(:,:) > 0.0  .and. zwdht(:,:) < rn_wd_sbcdep ) !  5 m hard limit here is arbitrary
+            qsr  (:,:) =  qsr(:,:)  * zwght(:,:)
+            qns  (:,:) =  qns(:,:)  * zwght(:,:)
+            taum (:,:) =  taum(:,:) * zwght(:,:)
+            utau (:,:) =  utau(:,:) * zwght(:,:)
+            vtau (:,:) =  vtau(:,:) * zwght(:,:)
+            sfx  (:,:) =  sfx(:,:)  * zwght(:,:)
+            emp  (:,:) =  emp(:,:)  * zwght(:,:)
+         END WHERE
+      ENDIF
       !
       IF( kt == nit000 ) THEN                          !   set the forcing field at nit000 - 1    !
          !                                             ! ---------------------------------------- !

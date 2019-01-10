@@ -11,6 +11,7 @@ MODULE diatmb
    !
    USE in_out_manager  ! I/O units
    USE iom             ! I/0 library
+   USE wet_dry
 
    IMPLICIT NONE
    PRIVATE
@@ -107,7 +108,12 @@ CONTAINS
       !
       CALL dia_calctmb( tsn(:,:,:,jp_tem), zwtmb )
       !ssh already output but here we output it masked
-      CALL iom_put( "sshnmasked", sshn(:,:)*tmask(:,:,1) + zmdi*(1.0 - tmask(:,:,1)) )
+      IF( ll_wd ) THEN
+         CALL iom_put( "sshnmasked", (sshn(:,:)+ssh_ref)*tmask(:,:,1) + zmdi*(1.0 - tmask(:,:,1)) )
+      ELSE
+         CALL iom_put( "sshnmasked", sshn(:,:)*tmask(:,:,1) + zmdi*(1.0 - tmask(:,:,1)) )
+      ENDIF
+
       CALL iom_put( "top_temp"  , zwtmb(:,:,1) )    ! tmb Temperature
       CALL iom_put( "mid_temp"  , zwtmb(:,:,2) )    ! tmb Temperature
       CALL iom_put( "bot_temp"  , zwtmb(:,:,3) )    ! tmb Temperature

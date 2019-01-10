@@ -26,7 +26,6 @@ MODULE trasbc
    USE traqsr         ! solar radiation penetration
    USE trd_oce        ! trends: ocean variables
    USE trdtra         ! trends manager: tracers 
-   USE wet_dry,  ONLY : ll_wd, rn_wdmin1, r_rn_wdmin1   ! Wetting and drying
 #if defined key_asminc   
    USE asminc         ! Assimilation increment
 #endif
@@ -124,19 +123,7 @@ CONTAINS
       !                             !==  Now sbc tracer content fields  ==!
       DO jj = 2, jpj
          DO ji = fs_2, fs_jpim1   ! vector opt.
-            IF ( ll_wd ) THEN     ! If near WAD point limit the flux for now
-               IF ( sshn(ji,jj) + ht_0(ji,jj) >  2._wp * rn_wdmin1 ) THEN
-                  sbc_tsc(ji,jj,jp_tem) = r1_rau0_rcp * qns(ji,jj)   ! non solar heat flux
-               ELSE IF ( sshn(ji,jj) + ht_0(ji,jj) >  rn_wdmin1 ) THEN
-                  sbc_tsc(ji,jj,jp_tem) = r1_rau0_rcp * qns(ji,jj) &
-                       &                * tanh ( 5._wp * ( ( sshn(ji,jj) + ht_0(ji,jj) -  rn_wdmin1 ) * r_rn_wdmin1 ) )
-               ELSE
-                  sbc_tsc(ji,jj,jp_tem) = 0._wp
-               ENDIF
-            ELSE 
-               sbc_tsc(ji,jj,jp_tem) = r1_rau0_rcp * qns(ji,jj)   ! non solar heat flux
-            ENDIF
-
+            sbc_tsc(ji,jj,jp_tem) = r1_rau0_rcp * qns(ji,jj)   ! non solar heat flux
             sbc_tsc(ji,jj,jp_sal) = r1_rau0     * sfx(ji,jj)   ! salt flux due to freezing/melting
          END DO
       END DO
