@@ -1,32 +1,27 @@
 %% ==============================================================================
-%% NEMO_book.tex: build the NEMO Reference Manual
+%% NEMO Reference Manual
 %% ==============================================================================
 
 
-%% Run ../build_NEMO_manual.sh to generate the PDF version (with pdflatex)
-
-%% Document layout
-%% ==============================================================================
-
-\documentclass[a4paper, 11pt]{book}
+%% Run ./PDF_creation.sh to generate the manual with latexmk
 
 
 %% Preamble
 %% ==============================================================================
 
-%% Custom style
+%% Document layout
+\documentclass{book}
+
+%% Custom style (.sty)
 \usepackage{../main/NEMO_manual}
-
-\makeindex
-
-
-%% 
-%% ==============================================================================
 
 %% Include references and index for single subfile compilation
 \newcommand{\biblio}{\bibliography{../main/NEMO_manual}}
 \newcommand{\pindex}{\printindex}
 
+\makeindex
+
+%% End of common preamble between main and sub-files
 \begin{document}
 
 %% Override custom cmds for full manual compilation
@@ -38,15 +33,15 @@
 %% ==============================================================================
 
 %% Frontpage
-
 \title{
-%\vspace{-6.0cm}\includegraphics[width=1.1\textwidth]{logo_ALL}				\\
-%\vspace{ 5.1cm}\includegraphics[width=0.9\textwidth]{NEMO_logo_Black}	\\
-\vspace{ 1.4cm}\rule{345pt}{1.5pt}													\\
-\vspace{0.45cm}{\Huge NEMO ocean engine}											\\
-\rule{345pt}{1.5pt}
+  \includegraphics[height=0.05\textheight]{CMCC}\hfill
+  \includegraphics[height=0.05\textheight]{CNRS}\hfill
+  \includegraphics[height=0.05\textheight]{MOI} \hfill
+  \includegraphics[height=0.05\textheight]{UKMO}\hfill
+  \includegraphics[height=0.05\textheight]{NERC}       \\
+  \includegraphics[ width=0.8\textwidth  ]{NEMO_grey}  \\
+  {\Huge NEMO ocean engine}                            \\
 }
-
 \author{
   \Large Gurvan Madec and NEMO System Team
   \thanks{
@@ -61,7 +56,6 @@
   \textit{Institut Pierre-Simon Laplace (IPSL)}            \\
   \textit{ISSN 1288-1619}
 }
-
 \date{Version 4.0 -- January 2019}
 %\date{\today}
 
@@ -70,7 +64,6 @@
 
 
 %% ToC i.e. Table of Contents
-
 \dominitoc
 \tableofcontents
 
@@ -80,69 +73,40 @@
 
 \mainmatter
 
-
 %% Foreword
-
 \subfile{../subfiles/foreword}
 
-
-% Introduction
-
+%% Introduction
 \subfile{../subfiles/introduction}
 
-
-% Chapters
-
+%% Chapters
 \subfile{../subfiles/chap_model_basics}
-
 \subfile{../subfiles/chap_time_domain}   % Time discretisation (time stepping strategy)
-
 \subfile{../subfiles/chap_DOM}           % Space discretisation
-
 \subfile{../subfiles/chap_TRA}           % Tracer advection/diffusion equation
-
 \subfile{../subfiles/chap_DYN}           % Dynamics : momentum equation
-
 \subfile{../subfiles/chap_SBC}           % Surface Boundary Conditions
-
 \subfile{../subfiles/chap_LBC}           % Lateral Boundary Conditions
-
 \subfile{../subfiles/chap_LDF}           % Lateral diffusion
-
 \subfile{../subfiles/chap_ZDF}           % Vertical diffusion
-
 \subfile{../subfiles/chap_DIA}           % Outputs and Diagnostics
-
 \subfile{../subfiles/chap_OBS}           % Observation operator
-
 \subfile{../subfiles/chap_ASM}           % Assimilation increments
-
 \subfile{../subfiles/chap_STO}           % Stochastic param.
-
 \subfile{../subfiles/chap_misc}          % Miscellaneous topics
-
 \subfile{../subfiles/chap_CONFIG}        % Predefined configurations
 
-
 %% Appendix
-
 \appendix
-
 \subfile{../subfiles/annex_A}					% Generalised vertical coordinate
-
 \subfile{../subfiles/annex_B}					% Diffusive operator
-
 \subfile{../subfiles/annex_C}					% Discrete invariants of the eqs.
-
 \subfile{../subfiles/annex_iso}				% Isoneutral diffusion using triads
-
 \subfile{../subfiles/annex_D}					% Coding rules
 
 %% Not included
 %\subfile{../subfiles/chap_conservation}	%
 %\subfile{../subfiles/annex_E}				% Notes on some on going staff
-%\subfile{../subfiles/annex_Fox-Kemper}	% Notes on Fox-Kemper
-%\subfile{../subfiles/annex_EVP}				% Notes on EVP
 
 
 %% Backmatter
@@ -150,9 +114,7 @@
 
 \backmatter
 
-
 %% Bibliography
-
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Bibliography}
@@ -160,7 +122,6 @@
 
 
 %% Index
-
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{Index}
