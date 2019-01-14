@@ -350,9 +350,23 @@ CONTAINS
          WRITE(numout,*) '   CNRS - NERC - Met OFFICE - MERCATOR-ocean - INGV - CMCC'
          WRITE(numout,*) '                       NEMO team'
          WRITE(numout,*) '            Ocean General Circulation Model'
-         WRITE(numout,*) '                NEMO version 4.0  (2017) '
+         WRITE(numout,*) '                NEMO version 4.0  (2019) '
          WRITE(numout,*)
+         WRITE(numout,*) "           ._      ._      ._      ._      ._    "
+         WRITE(numout,*) "       _.-._)`\_.-._)`\_.-._)`\_.-._)`\_.-._)`\_ "
          WRITE(numout,*)
+         WRITE(numout,*) "           o         _,           _,             "
+         WRITE(numout,*) "            o      .' (        .-' /             "
+         WRITE(numout,*) "           o     _/..._'.    .'   /              "
+         WRITE(numout,*) "      (    o .-'`      ` '-./  _.'               "
+         WRITE(numout,*) "       )    ( o)           ;= <_         (       "
+         WRITE(numout,*) "      (      '-.,\\__ __.-;`\   '.        )      "
+         WRITE(numout,*) "       )  )       \) |`\ \)  '.   \      (   (   "
+         WRITE(numout,*) "      (  (           \_/       '-._\      )   )  "
+         WRITE(numout,*) "       )  )                        `     (   (   "
+         WRITE(numout,*) "     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ "
+         WRITE(numout,*)
+         
          DO ji = 1, SIZE(cltxt)
             IF( TRIM(cltxt (ji)) /= '' )   WRITE(numout,*) TRIM(cltxt(ji))    ! control print of mynode
          END DO
