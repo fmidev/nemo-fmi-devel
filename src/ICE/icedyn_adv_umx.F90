@@ -38,7 +38,8 @@ MODULE icedyn_adv_umx
    INTEGER ::   kn_limiter = 1
 
    ! if T interpolated at u/v points is negative, then interpolate T at u/v points using the upstream scheme
-   LOGICAL ::   ll_neg = .TRUE.
+   !   clem: if set to true, the 2D test case "diagonal advection" does not work (I do not understand why) 
+   LOGICAL ::   ll_neg = .FALSE.
    
    ! alternate directions for upstream
    LOGICAL ::   ll_upsxy = .TRUE.
@@ -47,7 +48,8 @@ MODULE icedyn_adv_umx
    LOGICAL ::   ll_hoxy = .TRUE.
    
    ! prelimiter: use it to avoid overshoot in H
-   LOGICAL ::   ll_prelimiter_zalesak = .TRUE.  ! from: Zalesak(1979) eq. 14 => better for 1D. Not well defined in 2D
+   !   clem: if set to true, the 2D test case "diagnoal advection" does not work (I do not understand why)
+   LOGICAL ::   ll_prelimiter_zalesak = .FALSE.  ! from: Zalesak(1979) eq. 14 => better for 1D. Not well defined in 2D
 
 
    !! * Substitutions

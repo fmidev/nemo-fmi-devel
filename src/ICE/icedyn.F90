@@ -145,7 +145,7 @@ CONTAINS
             END DO
          END DO
          ! ---
-         CALL ice_dyn_adv   ( kt )                                       ! -- advection of ice + correction on ice thickness
+         CALL ice_dyn_adv   ( kt )                                       ! -- advection of ice
 
          ! diagnostics: divergence at T points 
          DO jj = 2, jpjm1
@@ -166,7 +166,7 @@ CONTAINS
          !CALL RANDOM_NUMBER(u_ice(:,:)) ; u_ice(:,:) = u_ice(:,:) * 0.1 + rn_uice * 0.9 * umask(:,:,1)
          !CALL RANDOM_NUMBER(v_ice(:,:)) ; v_ice(:,:) = v_ice(:,:) * 0.1 + rn_vice * 0.9 * vmask(:,:,1)
          ! ---
-         CALL ice_dyn_adv   ( kt )   ;   CALL Hbig( zhi_max, zhs_max, zhip_max )   ! -- advection of ice + correction on ice thickness
+         CALL ice_dyn_adv   ( kt )                                       ! -- advection of ice
 
          ! diagnostics: divergence at T points 
          DO jj = 2, jpjm1
