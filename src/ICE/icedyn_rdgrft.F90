@@ -860,7 +860,7 @@ CONTAINS
          CALL tab_2d_1d( npti, nptidx(1:npti), wfx_dyn_1d    (1:npti), wfx_dyn    (:,:) )
          CALL tab_2d_1d( npti, nptidx(1:npti), hfx_dyn_1d    (1:npti), hfx_dyn    (:,:) )
          CALL tab_2d_1d( npti, nptidx(1:npti), wfx_snw_dyn_1d(1:npti), wfx_snw_dyn(:,:) )
-         CALL tab_2d_1d( npti, nptidx(1:npti), wfx_pnd_1d(1:npti), wfx_pnd(:,:) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), wfx_pnd_1d    (1:npti), wfx_pnd    (:,:) )
 
          !                 !---------------------!
       CASE( 2 )            !==  from 1D to 2D  ==!
@@ -886,7 +886,7 @@ CONTAINS
          CALL tab_1d_2d( npti, nptidx(1:npti), wfx_dyn_1d    (1:npti), wfx_dyn    (:,:) )
          CALL tab_1d_2d( npti, nptidx(1:npti), hfx_dyn_1d    (1:npti), hfx_dyn    (:,:) )
          CALL tab_1d_2d( npti, nptidx(1:npti), wfx_snw_dyn_1d(1:npti), wfx_snw_dyn(:,:) )
-         CALL tab_1d_2d( npti, nptidx(1:npti), wfx_pnd_1d(1:npti), wfx_pnd(:,:) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), wfx_pnd_1d    (1:npti), wfx_pnd    (:,:) )
          !
       END SELECT
       !

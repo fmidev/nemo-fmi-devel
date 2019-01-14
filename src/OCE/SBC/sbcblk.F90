@@ -45,7 +45,7 @@ MODULE sbcblk
    USE sbc_ice        ! Surface boundary condition: ice fields
    USE lib_fortran    ! to use key_nosignedzero
 #if defined key_si3
-   USE ice     , ONLY :   u_ice, v_ice, jpl, a_i_b, at_i_b, tm_su, rn_cnd_s, hfx_err_dif
+   USE ice     , ONLY :   u_ice, v_ice, jpl, a_i_b, at_i_b, t_su, rn_cnd_s, hfx_err_dif
    USE icethd_dh      ! for CALL ice_thd_snwblow
 #endif
    USE sbcblk_algo_ncar     ! => turb_ncar     : NCAR - CORE (Large & Yeager, 2009) 
@@ -1098,7 +1098,7 @@ CONTAINS
       !
       REAL(wp), DIMENSION(:,:), INTENT(inout) ::   Cd
       REAL(wp), DIMENSION(:,:), INTENT(inout) ::   Ch
-      REAL(wp), DIMENSION(jpi,jpj)            ::   zst, zqo_sat, zqi_sat
+      REAL(wp), DIMENSION(jpi,jpj)            ::   ztm_su, zst, zqo_sat, zqi_sat
       !
       ! ECHAM6 constants
       REAL(wp), PARAMETER ::   z0_skin_ice  = 0.69e-3_wp  ! Eq. 43 [m]
@@ -1126,6 +1126,11 @@ CONTAINS
       REAL(wp) ::   zCdn_form_tmp
       !!----------------------------------------------------------------------
 
+      ! mean temperature
+      WHERE( at_i_b(:,:) > 1.e-20 )   ;   ztm_su(:,:) = SUM( t_su(:,:,:) * a_i_b(:,:,:) , dim=3 ) / at_i_b(:,:)
+      ELSEWHERE                       ;   ztm_su(:,:) = rt0
+      ENDWHERE
+      
       ! Momentum Neutral Transfert Coefficients (should be a constant)
       zCdn_form_tmp = zce10 * ( LOG( 10._wp / z0_form_ice + 1._wp ) / LOG( rn_zu / z0_form_ice + 1._wp ) )**2   ! Eq. 40
       zCdn_skin_ice = ( vkarmn                                      / LOG( rn_zu / z0_skin_ice + 1._wp ) )**2   ! Eq. 7
@@ -1136,16 +1141,16 @@ CONTAINS
       zChn_skin_ice = vkarmn**2 / ( LOG( rn_zu / z0_ice + 1._wp ) * LOG( rn_zu * z1_alpha / z0_skin_ice + 1._wp ) )   ! Eq. 50 + Eq. 52 (cf Lupkes email for details)
      
       ! Atmospheric and Surface Variables
-      zst(:,:)     = sst_m(:,:) + rt0                                       ! convert SST from Celcius to Kelvin
-      zqo_sat(:,:) = 0.98_wp * q_sat( zst(:,:)  , sf(jp_slp)%fnow(:,:,1) )  ! saturation humidity over ocean [kg/kg]
-      zqi_sat(:,:) = 0.98_wp * q_sat( tm_su(:,:), sf(jp_slp)%fnow(:,:,1) )  ! saturation humidity over ice   [kg/kg]
+      zst(:,:)     = sst_m(:,:) + rt0                                        ! convert SST from Celcius to Kelvin
+      zqo_sat(:,:) = 0.98_wp * q_sat( zst(:,:)   , sf(jp_slp)%fnow(:,:,1) )  ! saturation humidity over ocean [kg/kg]
+      zqi_sat(:,:) = 0.98_wp * q_sat( ztm_su(:,:), sf(jp_slp)%fnow(:,:,1) )  ! saturation humidity over ice   [kg/kg]
       !
       DO jj = 2, jpjm1           ! reduced loop is necessary for reproducibility
          DO ji = fs_2, fs_jpim1
             ! Virtual potential temperature [K]
-            zthetav_os = zst(ji,jj)   * ( 1._wp + rctv0 * zqo_sat(ji,jj) )   ! over ocean
-            zthetav_is = tm_su(ji,jj) * ( 1._wp + rctv0 * zqi_sat(ji,jj) )   ! ocean ice
-            zthetav_zu = t_zu (ji,jj) * ( 1._wp + rctv0 * q_zu(ji,jj)    )   ! at zu
+            zthetav_os = zst(ji,jj)    * ( 1._wp + rctv0 * zqo_sat(ji,jj) )   ! over ocean
+            zthetav_is = ztm_su(ji,jj) * ( 1._wp + rctv0 * zqi_sat(ji,jj) )   ! ocean ice
+            zthetav_zu = t_zu (ji,jj)  * ( 1._wp + rctv0 * q_zu(ji,jj)    )   ! at zu
             
             ! Bulk Richardson Number (could use Ri_bulk function from aerobulk instead)
             zrib_o = grav / zthetav_os * ( zthetav_zu - zthetav_os ) * rn_zu / MAX( 0.5, wndm(ji,jj)     )**2   ! over ocean

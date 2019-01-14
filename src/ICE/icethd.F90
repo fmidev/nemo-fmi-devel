@@ -151,7 +151,7 @@ CONTAINS
 
             ! --- Sensible ocean-to-ice heat flux (mostly>0 but <0 if supercooling, W/m2)
             zfric_u            = MAX( SQRT( zfric(ji,jj) ), zfric_umin ) 
-            qsb_ice_bot(ji,jj) = rswitch * rau0 * rcp * zch  * zfric_u * ( ( sst_m(ji,jj) + rt0 ) - t_bo(ji,jj) ) ! W.m-2
+            qsb_ice_bot(ji,jj) = rswitch * rau0 * rcp * zch * zfric_u * ( ( sst_m(ji,jj) + rt0 ) - t_bo(ji,jj) ) ! W.m-2
 
             qsb_ice_bot(ji,jj) = rswitch * MIN( qsb_ice_bot(ji,jj), - zqfr_neg * r1_rdtice / MAX( at_i(ji,jj), epsi10 ) )
             ! upper bound for qsb_ice_bot: the heat retrieved from the ocean must be smaller than the heat necessary to reach 
