@@ -2,7 +2,7 @@ MODULE usrdef_zgr
    !!======================================================================
    !!                   ***  MODULE  usrdef_zgr  ***
    !!
-   !!                   ===      ICEDYN case     ===
+   !!                   ===      ICE_AGRIF case     ===
    !!
    !! Ocean domain : user defined vertical coordinate system 
    !!======================================================================
@@ -58,11 +58,11 @@ CONTAINS
       !!----------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) 'usr_def_zgr : ICEDYN configuration (slab ocean - advection of an ice patch in a biperiodic square box domain)'
-      IF(lwp) WRITE(numout,*) '~~~~~~~~~~~'
+      IF(lwp) WRITE(numout,*) 'usr_def_zgr : ICE_AGRIF configuration '
+      IF(lwp) WRITE(numout,*) '~~~~~~~~~~~   (slab ocean - advection of an ice patch in a biperiodic square box domain)'
       !
       !
-      ! type of vertical coordinate  ==>>>   here ICEDYN : slab ocean always
+      ! type of vertical coordinate  ==>>>   here ICE_AGRIF : slab ocean always
       ! ---------------------------
       ld_zco    = .TRUE.       ! z-full-step coordinate
       ld_zps    = .FALSE.      ! z-partial-step coordinate

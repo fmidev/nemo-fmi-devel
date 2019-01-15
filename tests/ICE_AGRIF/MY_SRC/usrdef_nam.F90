@@ -2,7 +2,7 @@ MODULE usrdef_nam
    !!======================================================================
    !!                       ***  MODULE  usrdef_nam  ***
    !!
-   !!                      ===  ICEDYN configuration  ===
+   !!                      ===  ICE_AGRIF configuration  ===
    !!
    !! User defined : set the domain characteristics of a user configuration
    !!======================================================================
@@ -47,7 +47,7 @@ CONTAINS
       !!
       !! ** Method  :   read in namusr_def containing all the user specific namelist parameter
       !!
-      !!                Here ICEDYN configuration
+      !!                Here ICE_AGRIF configuration
       !!
       !! ** input   : - namusr_def namelist found in namelist_cfg
       !!----------------------------------------------------------------------
@@ -80,10 +80,10 @@ CONTAINS
       !
       WRITE( ldnam(:), namusr_def )
       !
-      cd_cfg = 'ICEDYN'           ! name & resolution (not used)
+      cd_cfg = 'ICE_AGRIF'           ! name & resolution (not used)
       kk_cfg = INT( rn_dx )
       !
-      ! Global Domain size:  ICEDYN domain is  300 km x 300 Km x 10 m
+      ! Global Domain size:  ICE_AGRIF domain is  300 km x 300 Km x 10 m
       kpi = INT( 300.e3 / rn_dx ) -1
       kpj = INT( 300.e3 / rn_dy ) -1
 #if defined key_agrif
@@ -102,10 +102,10 @@ CONTAINS
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) 'usr_def_nam  : read the user defined namelist (namusr_def) in namelist_cfg'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '~~~~~~~~~~~ '                                                                 ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '   Namelist namusr_def : ICEDYN test case'                                    ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '   Namelist namusr_def : ICE_AGRIF test case'                                 ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dx  = ', rn_dx, ' meters'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dy  = ', rn_dy, ' meters'   ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      ICEDYN domain = 300 km x 300Km x 1 grid-point '                         ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '      ICE_AGRIF domain = 300 km x 300Km x 1 grid-point '                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         LX [km]: ', zlx                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         LY [km]: ', zly                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         resulting global domain size :        jpiglo = ', kpi                ;   ii = ii + 1
@@ -114,7 +114,7 @@ CONTAINS
       WRITE(ldtxt(ii),*) '         Coriolis:', ln_corio                                                 ;   ii = ii + 1
       !
       !                             ! Set the lateral boundary condition of the global domain
-      kperio = 7                    ! ICEDYN configuration : bi-periodic basin
+      kperio = 7                    ! ICE_AGRIF configuration : bi-periodic basin
 #if defined key_agrif
       IF( .NOT. Agrif_Root() ) THEN
       kperio = 0
@@ -123,7 +123,7 @@ CONTAINS
       !
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '   Lateral boundary condition of the global domain'                           ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      ICEDYN : bi-periodic basin               jperio = ', kperio             ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '      ICE_AGRIF : bi-periodic basin               jperio = ', kperio          ;   ii = ii + 1
       !
    END SUBROUTINE usr_def_nam
 

@@ -88,15 +88,6 @@ cdftmi[:,:,:]=rn_tmi_ini
 cdftsu[:,:,:]=rn_tsu_ini
 
 # --------------------------------------
-# for basin=99x99km with dx=1km ; dy=3km
-#sigx=-0.04
-#sigy=-0.04*9.
-#xshift=50.-1.
-#yshift=17.-1.
-#dlat=7
-#dlon=21
-
-# --------------------------------------
 # for basin=99x99km with dx=1km ; dy=1km
 #sigx=-0.04
 #sigy=-0.04
@@ -113,28 +104,9 @@ cdftsu[:,:,:]=rn_tsu_ini
 #        cdfati[:,y,x] = rn_ati_ini
 #        cdfsmi[:,y,x] = rn_smi_ini
 #
-# --- Lipscomb 2004 experiment ---
-#cdfhti[:,:,:]=1.
-#cdfati[:,:,:]=0.1
-#for y in np.arange(0,LAT1,1) :
-#    for x in np.arange(0,LON1,1) :
-#        if (x > ceil(0.5*xshift) and x < xshift): # and (y > ceil(0.5*yshift) and y < yshift):
-#            cdfati[:,y,x] = rn_ati_ini / (ceil(0.5*xshift)*ceil(0.5*yshift)) * (x - ceil(0.5*xshift)) * (y - ceil(0.5*yshift))
-#            cdfsmi[:,y,x] = rn_smi_ini / (ceil(0.5*xshift)*ceil(0.5*yshift)) * (x - ceil(0.5*xshift)) * (y - ceil(0.5*yshift))
-#            cdfhti[:,y,x] = rn_hti_ini
-#            cdfhts[:,y,x] = rn_hts_ini
-#        if (x >= 25. and x < 50.):
-#            cdfati[:,y,x] = 0.9 * (x - 25.) / 25.
-#            cdfhti[:,y,x] = 1.
-#        elif (x >= 50. and x <= 75.):
-#            cdfati[:,y,x] = 0.9
-#            cdfhti[:,y,x] = 1.
-#        if (x > 30. and x < 70.):
-#            cdfhti[:,y,x] = 0.2
-            
             
 # ----------------------------------------------
-# for basin=99x99km with dx=1km ; dy=1km + AGRIF
+# for basin=300x300km with dx=3km ; dy=3km + AGRIF
 sigx=-0.012
 sigy=-0.012
 xshift=20.-1.

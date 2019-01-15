@@ -10,7 +10,7 @@
     <file_definition type="one_file" name="@expname@_@freq@_@startdate@_@enddate@" sync_freq="1d" min_digits="4">
     
     
-      <file_group id="1d" output_freq="1d"  output_level="10" enabled=".TRUE.">  <!-- 1 day files -->   	
+      <file_group id="5ts" output_freq="5ts"  output_level="10" enabled=".TRUE.">  <!-- 1 day files -->   	
 
 	<file id="file1" name_suffix="_icemod" description="ice variables" enabled=".true." >
 
@@ -20,6 +20,11 @@
         <!-- general -->
         <field field_ref="snwvolu"          name="snvolu" />
         <field field_ref="icethic"          name="sithic" />
+        <field field_ref="icethic"          name="sithic_max" operation="maximum" />
+        <field field_ref="icethic"          name="sithic_min" operation="minimum" />
+        <field field_ref="iceneg_pres"      name="sineg_pres" />
+        <field field_ref="iceneg_volu"      name="sineg_volu" />
+        <field field_ref="fasticepres"      name="fasticepres" />
         <field field_ref="icevolu"          name="sivolu" />
         <field field_ref="iceconc"          name="siconc" />
         <field field_ref="icesalt"          name="sisali" />

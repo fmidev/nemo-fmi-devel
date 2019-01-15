@@ -1,7 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !! NEMO/OCE  Configuration namelist : overwrite defaults values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!!               ICEDYN (SAS BIPERIODIC) configuration                !!
+!!               ICE_AGRIF configuration                              !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
@@ -17,7 +17,7 @@
 !!======================================================================
 !
 !-----------------------------------------------------------------------
-&namusr_def    !   ICEDYN user defined namelist
+&namusr_def    !   ICE_AGRIF user defined namelist
 !-----------------------------------------------------------------------
    rn_dx       =    1000.   ! horizontal resolution in meters
    rn_dy       =    1000.   ! horizontal resolution in meters
@@ -28,7 +28,7 @@
 &namrun        !   parameters of the run
 !-----------------------------------------------------------------------
    nn_no       =       0      !  job number (no more used...)
-   cn_exp      =  "ICEDYN"    !  experience name
+   cn_exp      =  "ICE_AGRIF" !  experience name
    nn_it000    =       1      !  first time step
    nn_itend    =    1500      !  last  time step (std 5475)
    nn_istate   =       1      !  output the initial state (1) or not (0)
@@ -47,7 +47,7 @@
 !-----------------------------------------------------------------------
    ln_read_cfg = .false.    !  (=T) read the domain configuration file
       !                     !  (=F) user defined configuration  ==>>>  see usrdef(_...) modules
-      cn_domcfg = "ICEDYN_domcfg"    ! domain configuration filename
+      cn_domcfg = "ICE_AGRIF_domcfg"    ! domain configuration filename
 /
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!
