@@ -2,7 +2,7 @@ MODULE usrdef_hgr
    !!======================================================================
    !!                       ***  MODULE  usrdef_hgr  ***
    !!
-   !!                      ===  ICEADV configuration  ===
+   !!                      ===  ICE_ADV1D configuration  ===
    !!
    !! User defined :   mesh and Coriolis parameter of a user configuration
    !!======================================================================
@@ -10,7 +10,7 @@ MODULE usrdef_hgr
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
-   !!   usr_def_hgr    : initialize the horizontal mesh for ICEADV configuration
+   !!   usr_def_hgr    : initialize the horizontal mesh for ICE_ADV1D configuration
    !!----------------------------------------------------------------------
    USE dom_oce         ! ocean space and time domain
    USE par_oce         ! ocean space and time domain
@@ -44,7 +44,7 @@ CONTAINS
       !! ** Purpose :   user defined mesh and Coriolis parameter
       !!
       !! ** Method  :   set all intent(out) argument to a proper value
-      !!                ICEADV configuration : uniform grid spacing (rn_dx)
+      !!                ICE_ADV1D configuration : uniform grid spacing (rn_dx)
       !!                without Coriolis force (f=0)
       !!
       !! ** Action  : - define longitude & latitude of t-, u-, v- and f-points (in degrees) 
@@ -67,7 +67,7 @@ CONTAINS
       !!-------------------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) 'usr_def_hgr : ICEADV configuration bassin'
+      IF(lwp) WRITE(numout,*) 'usr_def_hgr : ICE_ADV1D configuration bassin'
       IF(lwp) WRITE(numout,*)
       IF(lwp) WRITE(numout,*) '          f-plane with regular grid-spacing rn_dx, rn_dy'
 

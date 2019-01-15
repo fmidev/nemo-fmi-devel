@@ -2,7 +2,7 @@ MODULE usrdef_sbc
    !!======================================================================
    !!                       ***  MODULE  usrdef_sbc  ***
    !! 
-   !!                      ===  ICEADV configuration  ===
+   !!                      ===  ICE_ADV1D configuration  ===
    !!
    !! User defined :   surface forcing of a user configuration
    !!======================================================================
@@ -10,7 +10,7 @@ MODULE usrdef_sbc
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
-   !!   usr_def_sbc    : user defined surface bounday conditions in ICEADV case
+   !!   usr_def_sbc    : user defined surface bounday conditions in ICE_ADV1D case
    !!----------------------------------------------------------------------
    USE oce             ! ocean dynamics and tracers
    USE dom_oce         ! ocean space and time domain
@@ -48,7 +48,7 @@ CONTAINS
       !! ** Purpose :   provide at each time-step the surface boundary
       !!              condition, i.e. the momentum, heat and freshwater fluxes.
       !!
-      !! ** Method  :   all 0 fields, for ICEADV case
+      !! ** Method  :   all 0 fields, for ICE_ADV1D case
       !!                CAUTION : never mask the surface stress field !
       !!
       !! ** Action  : - set to ZERO all the ocean surface boundary condition, i.e.   
@@ -60,7 +60,7 @@ CONTAINS
       !
       IF( kt == nit000 ) THEN
          !
-         IF(lwp)   WRITE(numout,*)' usrdef_sbc_oce : ICEADV case: NO surface forcing'
+         IF(lwp)   WRITE(numout,*)' usrdef_sbc_oce : ICE_ADV1D case: NO surface forcing'
          ! --- oce variables --- !
          utau(:,:) = 0._wp 
          vtau(:,:) = 0._wp
@@ -90,7 +90,7 @@ CONTAINS
       !!---------------------------------------------------------------------
       INTEGER, INTENT(in) ::   kt   ! ocean time step
       !!---------------------------------------------------------------------
-      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : ICEADV case: no stress forcing'
+      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : ICE_ADV1D case: no stress forcing'
       !
       utau_ice(:,:) = 0._wp
       vtau_ice(:,:) = 0._wp
@@ -111,7 +111,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zsnw   ! snw distribution after wind blowing
       !!---------------------------------------------------------------------
       !
-      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : ICEADV case: NO flux forcing'
+      IF( kt==nit000 .AND. lwp)   WRITE(numout,*)' usrdef_sbc_ice : ICE_ADV1D case: NO flux forcing'
       !
       ! ocean variables (renaming)
       emp_oce (:,:)   = 0._wp   ! uniform value for freshwater budget (E-P)

@@ -1,7 +1,7 @@
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 !! NEMO  Configuration namelist : overwrite default values defined in SHARED/namelist_ref
 !!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-!!               ICEADV (LIPSCOMB test) configuration                 !!
+!!               ICE_ADV1D configuration                              !!
 !!======================================================================
 !!              ***  Domain & Run management namelists  ***           !!
 !!                                                                    !!
@@ -17,7 +17,7 @@
 !!======================================================================
 !
 !-----------------------------------------------------------------------
-&namusr_def    !   ICEADV user defined namelist
+&namusr_def    !   ICE_ADV1D user defined namelist
 !-----------------------------------------------------------------------
    rn_dx       =    4.   ! horizontal resolution in meters
    rn_dy       =    4.   ! horizontal resolution in meters
@@ -28,9 +28,9 @@
 &namrun        !   parameters of the run
 !-----------------------------------------------------------------------
    nn_no       =       0      !  job number (no more used...)
-   cn_exp      =  "ICEADV"    !  experience name
+   cn_exp      =  "ICE_ADV1D" !  experience name
    nn_it000    =       1      !  first time step
-   nn_itend    =     160      !  last  time step (std 5475)
+   nn_itend    =      80      !  last  time step (std 5475)
    nn_istate   =       1      !  output the initial state (1) or not (0)
 /
 !-----------------------------------------------------------------------
@@ -47,7 +47,7 @@
 !-----------------------------------------------------------------------
    ln_read_cfg = .false.    !  (=T) read the domain configuration file
       !                     !  (=F) user defined configuration  ==>>>  see usrdef(_...) modules
-      cn_domcfg = "ICEADV_domcfg"    ! domain configuration filename
+      cn_domcfg = "ICE_ADV1D_domcfg"    ! domain configuration filename
 /
 !!======================================================================
 !!            ***  Surface Boundary Condition namelists  ***          !!

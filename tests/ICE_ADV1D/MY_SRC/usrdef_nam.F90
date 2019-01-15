@@ -2,7 +2,7 @@ MODULE usrdef_nam
    !!======================================================================
    !!                       ***  MODULE  usrdef_nam  ***
    !!
-   !!                      ===  ICEADV configuration  ===
+   !!                      ===  ICE_ADV1D configuration  ===
    !!
    !! User defined : set the domain characteristics of a user configuration
    !!======================================================================
@@ -47,7 +47,7 @@ CONTAINS
       !!
       !! ** Method  :   read in namusr_def containing all the user specific namelist parameter
       !!
-      !!                Here ICEADV configuration
+      !!                Here ICE_ADV1D configuration
       !!
       !! ** input   : - namusr_def namelist found in namelist_cfg
       !!----------------------------------------------------------------------
@@ -71,10 +71,10 @@ CONTAINS
       !
       WRITE( ldnam(:), namusr_def )
       !
-      cd_cfg = 'ICEADV'           ! name & resolution (not used)
+      cd_cfg = 'ICE_ADV1D'           ! name & resolution (not used)
       kk_cfg = INT( rn_dx )
       !
-      ! Global Domain size:  ICEADV domain is  480 m x 480 m x 10 m
+      ! Global Domain size:  ICE_ADV1D domain is  480 m x 480 m x 10 m
       kpi = INT( 480.*0.5 / rn_dx ) -1
       kpj = INT( 480.*0.5 / rn_dy ) -1
       kpk = 1
@@ -85,10 +85,10 @@ CONTAINS
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) 'usr_def_nam  : read the user defined namelist (namusr_def) in namelist_cfg'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '~~~~~~~~~~~ '                                                                 ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '   Namelist namusr_def : ICEADV test case'                                    ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '   Namelist namusr_def : ICE_ADV1D test case'                                 ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dx  = ', rn_dx, ' meters'   ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '      horizontal resolution                    rn_dy  = ', rn_dy, ' meters'   ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      ICEADV domain  '                                                        ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '      ICE_ADV1D domain  '                                                     ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         LX [km]: ', zlx                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         LY [km]: ', zly                                                      ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '         resulting global domain size :        jpiglo = ', kpi                ;   ii = ii + 1
@@ -97,11 +97,11 @@ CONTAINS
       WRITE(ldtxt(ii),*) '         Coriolis:', ln_corio                                                 ;   ii = ii + 1
       !
       !                             ! Set the lateral boundary condition of the global domain
-      kperio = 0                    ! ICEADV configuration : bi-periodic basin
+      kperio = 0                    ! ICE_ADV1D configuration : bi-periodic basin
       !
       WRITE(ldtxt(ii),*) '   '                                                                          ;   ii = ii + 1
       WRITE(ldtxt(ii),*) '   Lateral boundary condition of the global domain'                           ;   ii = ii + 1
-      WRITE(ldtxt(ii),*) '      ICEADV : closed basin                    jperio = ', kperio             ;   ii = ii + 1
+      WRITE(ldtxt(ii),*) '      ICE_ADV1D : closed basin                    jperio = ', kperio          ;   ii = ii + 1
       !
    END SUBROUTINE usr_def_nam
 

@@ -2,7 +2,7 @@ MODULE usrdef_zgr
    !!======================================================================
    !!                   ***  MODULE  usrdef_zgr  ***
    !!
-   !!                   ===      ICEADV case     ===
+   !!                   ===      ICE_ADV1D case     ===
    !!
    !! Ocean domain : user defined vertical coordinate system 
    !!======================================================================
@@ -58,11 +58,11 @@ CONTAINS
       !!----------------------------------------------------------------------
       !
       IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) 'usr_def_zgr : ICEADV configuration (slab ocean - advection of ice in one direction)'
+      IF(lwp) WRITE(numout,*) 'usr_def_zgr : ICE_ADV1D configuration (slab ocean - advection of ice in one direction)'
       IF(lwp) WRITE(numout,*) '~~~~~~~~~~~'
       !
       !
-      ! type of vertical coordinate  ==>>>   here ICEADV : slab ocean always
+      ! type of vertical coordinate  ==>>>   here ICE_ADV1D : slab ocean always
       ! ---------------------------
       ld_zco    = .TRUE.       ! z-full-step coordinate
       ld_zps    = .FALSE.      ! z-partial-step coordinate
