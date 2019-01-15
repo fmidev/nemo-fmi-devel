@@ -13,7 +13,7 @@ MODULE icedyn_adv_umx
    !!   ice_dyn_adv_umx   : update the tracer trend with the 3D advection trends using a TVD scheme
    !!   ultimate_x(_y)    : compute a tracer value at velocity points using ULTIMATE scheme at various orders
    !!   macho             : ???
-   !!   nonosc            : compute monotonic tracer fluxes by a non-oscillatory algorithm 
+   !!   nonosc_ice        : compute monotonic tracer fluxes by a non-oscillatory algorithm 
    !!----------------------------------------------------------------------
    USE phycst         ! physical constant
    USE dom_oce        ! ocean domain
@@ -34,7 +34,7 @@ MODULE icedyn_adv_umx
    REAL(wp) ::   z1_6   = 1._wp /   6._wp   ! =1/6
    REAL(wp) ::   z1_120 = 1._wp / 120._wp   ! =1/120
    
-   ! limiter: 1=nonosc, 2=superbee, 3=h3(rachid)
+   ! limiter: 1=nonosc_ice, 2=superbee, 3=h3(rachid)
    INTEGER ::   kn_limiter = 1
 
    ! if T interpolated at u/v points is negative, then interpolate T at u/v points using the upstream scheme
@@ -222,13 +222,13 @@ CONTAINS
       !! **  Method  :   - calculate upstream fluxes and upstream solution for tracer H
       !!                 - calculate tracer H at u and v points (Ultimate)
       !!                 - calculate the high order fluxes using alterning directions (Macho?)
-      !!                 - apply a limiter on the fluxes (nonosc)
+      !!                 - apply a limiter on the fluxes (nonosc_ice)
       !!                 - convert this tracer flux to a tracer content flux (uH -> uV)
       !!                 - calculate the high order solution for tracer content V
       !!
       !! ** Action : solve 2 equations => a) da/dt = -div(ua)
       !!                                  b) dV/dt = -div(uV) using dH/dt = -u.grad(H)
-      !!             in eq. b), - fluxes uH are evaluated (with UMx) and limited (with nonosc). This step is necessary to get a good H.
+      !!             in eq. b), - fluxes uH are evaluated (with UMx) and limited (with nonosc_ice). This step is necessary to get a good H.
       !!                        - then we convert this flux to a "volume" flux this way => uH*ua/u
       !!                             where ua is the flux from eq. a)
       !!                        - at last we estimate dV/dt = -div(uH*ua/u)
@@ -484,7 +484,7 @@ CONTAINS
          END DO
          !
          IF    ( kn_limiter == 1 ) THEN
-            CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+            CALL nonosc_ice( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
          ELSEIF( kn_limiter == 2 .OR. kn_limiter == 3 ) THEN
             CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
             CALL limiter_y( pdt, pv, pt, pfv_ups, pfv_ho )
@@ -557,7 +557,7 @@ CONTAINS
             IF( kn_limiter == 2 .OR. kn_limiter == 3 )   CALL limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )
 
          ENDIF
-         IF( kn_limiter == 1 )   CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+         IF( kn_limiter == 1 )   CALL nonosc_ice( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
          
       ENDIF
    
@@ -649,7 +649,7 @@ CONTAINS
          !
       ENDIF
 
-      IF( kn_limiter == 1 )   CALL nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+      IF( kn_limiter == 1 )   CALL nonosc_ice( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !
    END SUBROUTINE macho
 
@@ -963,12 +963,12 @@ CONTAINS
    END SUBROUTINE ultimate_y
      
 
-   SUBROUTINE nonosc( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
+   SUBROUTINE nonosc_ice( pamsk, pdt, pu, pv, pt, pt_ups, pfu_ups, pfv_ups, pfu_ho, pfv_ho )
       !!---------------------------------------------------------------------
-      !!                    ***  ROUTINE nonosc  ***
+      !!                    ***  ROUTINE nonosc_ice  ***
       !!     
       !! **  Purpose :   compute monotonic tracer fluxes from the upstream 
-      !!       scheme and the before field by a nonoscillatory algorithm 
+      !!       scheme and the before field by a non-oscillatory algorithm 
       !!
       !! **  Method  :   ...
       !!----------------------------------------------------------------------
@@ -1142,14 +1142,14 @@ CONTAINS
 !!                  &                     + pt(ji,jj,jl) * pdt * ( pv(ji,jj) - pv(ji,jj-1) ) * r1_e1e2t(ji,jj) * (1.-pamsk) &
 !!                  &         ) * tmask(ji,jj,1)
 !!               IF( zzt < -epsi20 ) THEN
-!!                  WRITE(numout,*) 'T<0 nonosc',zzt
+!!                  WRITE(numout,*) 'T<0 nonosc_ice',zzt
 !!               ENDIF
 !!            END DO
 !!         END DO
 
       END DO
       !
-   END SUBROUTINE nonosc
+   END SUBROUTINE nonosc_ice
 
    
    SUBROUTINE limiter_x( pdt, pu, pt, pfu_ups, pfu_ho )

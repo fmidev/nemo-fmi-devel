@@ -225,7 +225,10 @@ CONTAINS
       INTEGER :: ji, jj, ierr
       !!----------------------------------------------------------------------
       IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) 'ice_init: Arrays allocation & Initialization off all routines & init state' 
+      IF(lwp) WRITE(numout,*) 'Sea Ice Model: SI3 (Sea Ice modelling Integrated Initiative)' 
+      IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~'
+      IF(lwp) WRITE(numout,*)
+      IF(lwp) WRITE(numout,*) 'ice_init: Arrays allocation & Initialization of all routines & init state' 
       IF(lwp) WRITE(numout,*) '~~~~~~~~'
       !
       !                                ! Open the reference and configuration namelist files and namelist output file
