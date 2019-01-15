@@ -269,18 +269,12 @@ CONTAINS
             ! Set gradient direction:
             zcoef1 = bdytmask(ii-1,ij  ) +  bdytmask(ii+1,ij  )
             zcoef2 = bdytmask(ii  ,ij-1) +  bdytmask(ii  ,ij+1)
-            IF ( zcoef1+zcoef2 == 0 ) THEN
-               ! corner
-!               zcoef = tmask(ii-1,ij,1) + tmask(ii+1,ij,1) +  tmask(ii,ij-1,1) +  tmask(ii,ij+1,1)
-!               zssh(ii,ij) = zssh(ii-1,ij  ) * tmask(ii-1,ij  ,1) + &
-!                 &           zssh(ii+1,ij  ) * tmask(ii+1,ij  ,1) + &
-!                 &           zssh(ii  ,ij-1) * tmask(ii  ,ij-1,1) + &
-!                 &           zssh(ii  ,ij+1) * tmask(ii  ,ij+1,1)
-               zcoef = bdytmask(ii-1,ij) + bdytmask(ii+1,ij) +  bdytmask(ii,ij-1) +  bdytmask(ii,ij+1)
-               zssh(ii,ij) = zssh(ii-1,ij  ) * bdytmask(ii-1,ij  ) + &
-                 &           zssh(ii+1,ij  ) * bdytmask(ii+1,ij  ) + &
-                 &           zssh(ii  ,ij-1) * bdytmask(ii  ,ij-1) + &
-                 &           zssh(ii  ,ij+1) * bdytmask(ii  ,ij+1)
+            IF ( zcoef1+zcoef2 == 0 ) THEN   ! corner
+               zcoef = bdytmask(ii-1,ij-1) + bdytmask(ii+1,ij+1) + bdytmask(ii+1,ij-1) + bdytmask(ii-1,ij+1)
+               zssh(ii,ij) = zssh( ii-1, ij-1 ) * bdytmask( ii-1, ij-1) + &
+                 &           zssh( ii+1, ij+1 ) * bdytmask( ii+1, ij+1) + &
+                 &           zssh( ii+1, ij-1 ) * bdytmask( ii+1, ij-1) + &
+                 &           zssh( ii-1, ij+1 ) * bdytmask( ii-1, ij+1)
                zssh(ii,ij) = ( zssh(ii,ij) / MAX( 1, zcoef) ) * tmask(ii,ij,1)
             ELSE
                ip = bdytmask(ii+1,ij  ) - bdytmask(ii-1,ij  )
