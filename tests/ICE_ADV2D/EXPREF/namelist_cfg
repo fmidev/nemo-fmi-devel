@@ -30,7 +30,7 @@
    nn_no       =       0      !  job number (no more used...)
    cn_exp      =  "ICE_ADV2D" !  experience name
    nn_it000    =       1      !  first time step
-   nn_itend    =     500      !  last  time step (std 5475)
+   nn_itend    =     485      !  last  time step (std 5475)
    nn_istate   =       1      !  output the initial state (1) or not (0)
 /
 !-----------------------------------------------------------------------
