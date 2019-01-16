@@ -14,7 +14,6 @@ MODULE iom_nf90
    !!   iom_open       : open a file read only
    !!   iom_close      : close a file or all files opened by iom
    !!   iom_get        : read a field (interfaced to several routines)
-   !!   iom_gettime    : read the time axis kvid in the file
    !!   iom_varid      : get the id of a variable in a file
    !!   iom_rstput     : write a field in a restart file (interfaced to several routines)
    !!----------------------------------------------------------------------
@@ -28,7 +27,7 @@ MODULE iom_nf90
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC iom_nf90_open  , iom_nf90_close, iom_nf90_varid, iom_nf90_get, iom_nf90_gettime, iom_nf90_rstput
+   PUBLIC iom_nf90_open  , iom_nf90_close, iom_nf90_varid, iom_nf90_get, iom_nf90_rstput
    PUBLIC iom_nf90_chkatt, iom_nf90_getatt, iom_nf90_putatt
 
    INTERFACE iom_nf90_get
@@ -490,35 +489,6 @@ CONTAINS
       IF(lldata)   CALL iom_nf90_check(NF90_ENDDEF( if90id ), clinfo)   ! leave define mode to data mode
       !
    END SUBROUTINE iom_nf90_putatt
-
-
-   SUBROUTINE iom_nf90_gettime( kiomid, kvid, ptime, cdunits, cdcalendar )
-      !!--------------------------------------------------------------------
-      !!                   ***  SUBROUTINE iom_gettime  ***
-      !!
-      !! ** Purpose : read the time axis kvid in the file with NF90
-      !!--------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   kiomid     ! file Identifier
-      INTEGER                   , INTENT(in   ) ::   kvid       ! variable id
-      REAL(wp), DIMENSION(:)    , INTENT(  out) ::   ptime      ! the time axis
-      CHARACTER(len=*), OPTIONAL, INTENT(  out) ::   cdunits    ! units attribute
-      CHARACTER(len=*), OPTIONAL, INTENT(  out) ::   cdcalendar ! calendar attribute
-      !
-      CHARACTER(LEN=100) ::   clinfo     ! info character
-      !---------------------------------------------------------------------
-      clinfo = 'iom_nf90_gettime, file: '//TRIM(iom_file(kiomid)%name)//', var: '//TRIM(iom_file(kiomid)%cn_var(kvid))
-      CALL iom_nf90_check(NF90_GET_VAR(iom_file(kiomid)%nfid, iom_file(kiomid)%nvid(kvid), ptime(:),   &
-            &                           start=(/ 1 /), count=(/ iom_file(kiomid)%dimsz(1, kvid) /)), clinfo)
-      IF ( PRESENT(cdunits) ) THEN 
-         CALL iom_nf90_check(NF90_GET_ATT(iom_file(kiomid)%nfid, iom_file(kiomid)%nvid(kvid), "units", &
-            &                           values=cdunits), clinfo)
-      ENDIF
-      IF ( PRESENT(cdcalendar) ) THEN 
-         CALL iom_nf90_check(NF90_GET_ATT(iom_file(kiomid)%nfid, iom_file(kiomid)%nvid(kvid), "calendar", &
-            &                           values=cdcalendar), clinfo)
-      ENDIF
-      !
-   END SUBROUTINE iom_nf90_gettime
 
 
    SUBROUTINE iom_nf90_rp0123d( kt, kwrite, kiomid, cdvar , kvid  , ktype,   &

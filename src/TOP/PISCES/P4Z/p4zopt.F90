@@ -388,7 +388,6 @@ CONTAINS
       !! ** Input   :   external ascii and netcdf files
       !!----------------------------------------------------------------------
       INTEGER :: numpar, ierr, ios   ! Local integer 
-      REAL(wp), DIMENSION(nbtimes) ::   zsteps   ! times records
       !
       CHARACTER(len=100) ::  cn_dir          ! Root directory for location of ssr files
       TYPE(FLD_N) ::   sn_par                ! informations about the fields to be read
@@ -433,7 +432,7 @@ CONTAINS
          IF( sn_par%ln_tint )      ALLOCATE( sf_par(1)%fdta(jpi,jpj,1,2) )
 
          CALL iom_open (  TRIM( sn_par%clname ) , numpar )
-         CALL iom_gettime( numpar, zsteps, kntime=ntimes_par)  ! get number of record in file
+         ntimes_par = iom_getszuld( numpar )   ! get number of record in file
       ENDIF
       !
       CALL trc_oce_rgb( xkrgb )                  ! tabulated attenuation coefficients

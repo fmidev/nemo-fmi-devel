@@ -210,7 +210,6 @@ CONTAINS
       INTEGER  :: isrow             ! index for ORCA1 starting row
       REAL(wp) :: zexpide, zdenitide, zmaskt, zsurfc, zsurfp,ze3t, ze3t2, zcslp
       REAL(wp) :: ztimes_dust, ztimes_riv, ztimes_ndep 
-      REAL(wp), DIMENSION(nbtimes) :: zsteps                 ! times records
       REAL(wp), DIMENSION(:), ALLOCATABLE :: rivinput
       REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zriver, zcmask
       !
@@ -308,7 +307,7 @@ CONTAINS
          IF( Agrif_Root() ) THEN   !  Only on the master grid
             ! Get total input dust ; need to compute total atmospheric supply of Si in a year
             CALL iom_open (  TRIM( sn_dust%clname ) , numdust )
-            CALL iom_gettime( numdust, zsteps, kntime=ntimes_dust)  ! get number of record in file
+            ntimes_dust = iom_getszuld( numdust )   ! get number of record in file
          END IF
       END IF
 
@@ -330,7 +329,7 @@ CONTAINS
          IF( sn_solub%ln_tint )    ALLOCATE( sf_solub(1)%fdta(jpi,jpj,1,2) )
          ! get number of record in file
          CALL iom_open (  TRIM( sn_solub%clname ) , numsolub )
-         CALL iom_gettime( numsolub, zsteps, kntime=ntimes_solub)  ! get number of record in file
+         ntimes_solub = iom_getszuld( numsolub )   ! get number of record in file
          CALL iom_close( numsolub )
       ENDIF
 
@@ -359,7 +358,7 @@ CONTAINS
             ! Get total input rivers ; need to compute total river supply in a year
             DO ifpr = 1, jpriv
                CALL iom_open ( TRIM( slf_river(ifpr)%clname ), numriv )
-               CALL iom_gettime( numriv, zsteps, kntime=ntimes_riv)
+               ntimes_riv = iom_getszuld( numriv )
                ALLOCATE( zriver(jpi,jpj,ntimes_riv) )
                DO jm = 1, ntimes_riv
                   CALL iom_get( numriv, jpdom_data, TRIM( slf_river(ifpr)%clvar ), zriver(:,:,jm), jm )
@@ -406,7 +405,7 @@ CONTAINS
          IF( Agrif_Root() ) THEN   !  Only on the master grid
             ! Get total input dust ; need to compute total atmospheric supply of N in a year
             CALL iom_open ( TRIM( sn_ndepo%clname ), numdepo )
-            CALL iom_gettime( numdepo, zsteps, kntime=ntimes_ndep)
+            ntimes_ndep = iom_getszuld( numdepo )
          ENDIF
       ENDIF
 

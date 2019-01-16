@@ -16,7 +16,6 @@ MODULE iom
    !!   iom_open       : open a file read only
    !!   iom_close      : close a file or all files opened by iom
    !!   iom_get        : read a field (interfaced to several routines)
-   !!   iom_gettime    : read the time axis cdvar in the file
    !!   iom_varid      : get the id of a variable in a file
    !!   iom_rstput     : write a field in a restart file (interfaced to several routines)
    !!----------------------------------------------------------------------
@@ -57,7 +56,7 @@ MODULE iom
    LOGICAL, PUBLIC, PARAMETER ::   lk_iomput = .FALSE.       !: iom_put flag
 #endif
    PUBLIC iom_init, iom_swap, iom_open, iom_close, iom_setkt, iom_varid, iom_get
-   PUBLIC iom_chkatt, iom_getatt, iom_putatt, iom_gettime, iom_rstput, iom_delay_rst, iom_put
+   PUBLIC iom_chkatt, iom_getatt, iom_putatt, iom_getszuld, iom_rstput, iom_delay_rst, iom_put
    PUBLIC iom_use, iom_context_finalize
 
    PRIVATE iom_rp0d, iom_rp1d, iom_rp2d, iom_rp3d
@@ -1341,61 +1340,25 @@ CONTAINS
    END SUBROUTINE iom_get_123d
 
 
-   SUBROUTINE iom_gettime( kiomid, ptime, cdvar, kntime, cdunits, cdcalendar )
-      !!--------------------------------------------------------------------
-      !!                   ***  SUBROUTINE iom_gettime  ***
+   FUNCTION iom_getszuld ( kiomid )  
+      !!-----------------------------------------------------------------------
+      !!                  ***  FUNCTION  iom_getszuld  ***
       !!
-      !! ** Purpose : read the time axis cdvar in the file 
-      !!--------------------------------------------------------------------
-      INTEGER                    , INTENT(in   ) ::   kiomid     ! file Identifier
-      REAL(wp), DIMENSION(:)     , INTENT(  out) ::   ptime      ! the time axis
-      CHARACTER(len=*), OPTIONAL , INTENT(in   ) ::   cdvar      ! time axis name
-      INTEGER         , OPTIONAL , INTENT(  out) ::   kntime     ! number of times in file
-      CHARACTER(len=*), OPTIONAL , INTENT(  out) ::   cdunits    ! units attribute of time coordinate
-      CHARACTER(len=*), OPTIONAL , INTENT(  out) ::   cdcalendar ! calendar attribute of 
+      !! ** Purpose : get the size of the unlimited dimension in a file
+      !!              (return -1 if not found)
+      !!-----------------------------------------------------------------------
+      INTEGER, INTENT(in   ) ::   kiomid   ! file Identifier
       !
-      INTEGER, DIMENSION(1) :: kdimsz
-      INTEGER            ::   idvar    ! id of the variable
-      CHARACTER(LEN=32)  ::   tname    ! local name of time coordinate
-      CHARACTER(LEN=100) ::   clinfo   ! info character
-      !---------------------------------------------------------------------
-      !
-      IF ( PRESENT(cdvar) ) THEN
-         tname = cdvar
-      ELSE
-         tname = iom_file(kiomid)%uldname
-      ENDIF
+      INTEGER                ::   iom_getszuld
+      !!-----------------------------------------------------------------------
+      iom_getszuld = -1
       IF( kiomid > 0 ) THEN
-         clinfo = 'iom_gettime, file: '//trim(iom_file(kiomid)%name)//', var: '//trim(tname)
-         IF ( PRESENT(kntime) ) THEN
-            idvar  = iom_varid( kiomid, tname, kdimsz = kdimsz )
-            kntime = kdimsz(1)
-         ELSE
-            idvar = iom_varid( kiomid, tname )
-         ENDIF
-         !
-         ptime(:) = 0. ! default definition
-         IF( idvar > 0 ) THEN
-            IF( iom_file(kiomid)%ndims(idvar) == 1 ) THEN
-               IF( iom_file(kiomid)%luld(idvar) ) THEN
-                  IF( iom_file(kiomid)%dimsz(1,idvar) <= size(ptime) ) THEN
-                     CALL iom_nf90_gettime(   kiomid, idvar, ptime, cdunits, cdcalendar )
-                  ELSE
-                     WRITE(ctmp1,*) 'error with the size of ptime ',size(ptime),iom_file(kiomid)%dimsz(1,idvar)
-                     CALL ctl_stop( trim(clinfo), trim(ctmp1) )
-                  ENDIF
-               ELSE
-                  CALL ctl_stop( trim(clinfo), 'variable dimension is not unlimited... use iom_get' )
-               ENDIF
-            ELSE
-               CALL ctl_stop( trim(clinfo), 'the variable has more than 1 dimension' )
-            ENDIF
-         ELSE
-            CALL ctl_stop( trim(clinfo), 'variable not found in '//iom_file(kiomid)%name )
+         IF( iom_file(kiomid)%iduld .GE. 0 ) THEN
+            iom_getszuld = iom_file(kiomid)%lenuld
          ENDIF
       ENDIF
-      !
-   END SUBROUTINE iom_gettime
+   END FUNCTION iom_getszuld
+   
 
    !!----------------------------------------------------------------------
    !!                   INTERFACE iom_chkatt

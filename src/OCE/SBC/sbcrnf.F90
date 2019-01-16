@@ -239,7 +239,6 @@ CONTAINS
       INTEGER           ::   ios           ! Local integer output status for namelist read
       INTEGER           ::   nbrec         ! temporary integer
       REAL(wp)          ::   zacoef  
-      REAL(wp), DIMENSION(12)                 :: zrec             ! times records
       REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zrnfcl    
       REAL(wp), DIMENSION(:,:  ), ALLOCATABLE :: zrnf
       !!
@@ -371,7 +370,7 @@ CONTAINS
          IF(lwp) WRITE(numout,*) '        create (=1) a runoff depth file or not (=0)      nn_rnf_depth_file  = ', nn_rnf_depth_file
 
          CALL iom_open( TRIM( sn_rnf%clname ), inum )    !  open runoff file
-         CALL iom_gettime( inum, zrec, kntime=nbrec)
+         nbrec = iom_getszuld( inum )
          ALLOCATE( zrnfcl(jpi,jpj,nbrec) )     ;      ALLOCATE( zrnf(jpi,jpj) )
          DO jm = 1, nbrec
             CALL iom_get( inum, jpdom_data, TRIM( sn_rnf%clvar ), zrnfcl(:,:,jm), jm )
