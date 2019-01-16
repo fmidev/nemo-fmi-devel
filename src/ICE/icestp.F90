@@ -296,7 +296,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       INTEGER  ::   ios                 ! Local integer
       !!
-      NAMELIST/nampar/ jpl, nlay_i, nlay_s, nn_virtual_itd, ln_icedyn, ln_icethd, rn_amax_n, rn_amax_s,  &
+      NAMELIST/nampar/ jpl, nlay_i, nlay_s, ln_virtual_itd, ln_icedyn, ln_icethd, rn_amax_n, rn_amax_s,  &
          &             cn_icerst_in, cn_icerst_indir, cn_icerst_out, cn_icerst_outdir
       !!-------------------------------------------------------------------
       !
@@ -316,17 +316,17 @@ CONTAINS
          WRITE(numout,*) '         number of ice  categories                           jpl       = ', jpl
          WRITE(numout,*) '         number of ice  layers                               nlay_i    = ', nlay_i
          WRITE(numout,*) '         number of snow layers                               nlay_s    = ', nlay_s
-         WRITE(numout,*) '         virtual ITD param for jpl=1 (1-3) or not (0)   nn_virtual_itd = ', nn_virtual_itd
+         WRITE(numout,*) '         virtual ITD param for jpl=1 (T) or not (F)     ln_virtual_itd = ', ln_virtual_itd
          WRITE(numout,*) '         Ice dynamics       (T) or not (F)                   ln_icedyn = ', ln_icedyn
          WRITE(numout,*) '         Ice thermodynamics (T) or not (F)                   ln_icethd = ', ln_icethd
          WRITE(numout,*) '         maximum ice concentration for NH                              = ', rn_amax_n 
          WRITE(numout,*) '         maximum ice concentration for SH                              = ', rn_amax_s
       ENDIF
       !                                        !--- check consistency
-      IF ( jpl > 1 .AND. nn_virtual_itd == 1 ) THEN
-         nn_virtual_itd = 0
+      IF ( jpl > 1 .AND. ln_virtual_itd ) THEN
+         ln_virtual_itd = .FALSE.
          IF(lwp) WRITE(numout,*)
-         IF(lwp) WRITE(numout,*) '   nn_virtual_itd forced to 0 as jpl>1, no need with multiple categories to emulate them'
+         IF(lwp) WRITE(numout,*) '   ln_virtual_itd forced to false as jpl>1, no need with multiple categories to emulate them'
       ENDIF
       !
       IF( ln_cpl .AND. nn_cats_cpl /= 1 .AND. nn_cats_cpl /= jpl ) THEN

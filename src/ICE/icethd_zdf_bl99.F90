@@ -264,9 +264,7 @@ CONTAINS
          ! Fichefet and Morales Maqueda, JGR 1997
          zghe(1:npti) = 1._wp
          !
-         SELECT CASE ( nn_virtual_itd )
-         !
-         CASE ( 1 , 2 )
+         IF( ln_virtual_itd ) THEN
             !
             zepsilon = 0.1_wp
             DO ji = 1, npti
@@ -276,7 +274,7 @@ CONTAINS
                   &   zghe(ji) = MIN( 2._wp, 0.5_wp * ( 1._wp + LOG( 2._wp * zhe / zepsilon ) ) )   ! G(he)
             END DO
             !
-         END SELECT
+         ENDIF
          !
          !-----------------
          ! 4) kappa factors

@@ -925,7 +925,7 @@ CONTAINS
    END SUBROUTINE blk_ice_flx
    
 
-   SUBROUTINE blk_ice_qcn( k_virtual_itd, ptsu, ptb, phs, phi )
+   SUBROUTINE blk_ice_qcn( ld_virtual_itd, ptsu, ptb, phs, phi )
       !!---------------------------------------------------------------------
       !!                     ***  ROUTINE blk_ice_qcn  ***
       !!
@@ -940,7 +940,7 @@ CONTAINS
       !!              - qcn_ice : surface inner conduction flux (W/m2)
       !!
       !!---------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   k_virtual_itd   ! single-category option
+      LOGICAL                   , INTENT(in   ) ::   ld_virtual_itd  ! single-category option
       REAL(wp), DIMENSION(:,:,:), INTENT(inout) ::   ptsu            ! sea ice / snow surface temperature
       REAL(wp), DIMENSION(:,:)  , INTENT(in   ) ::   ptb             ! sea ice base temperature
       REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   phs             ! snow thickness
@@ -961,14 +961,12 @@ CONTAINS
       ! -------------------------------------!
       !      I   Enhanced conduction factor  !
       ! -------------------------------------!
-      ! Emulates the enhancement of conduction by unresolved thin ice (k_virtual_itd = 1/2)
+      ! Emulates the enhancement of conduction by unresolved thin ice (ld_virtual_itd = T)
       ! Fichefet and Morales Maqueda, JGR 1997
       !
       zgfac(:,:,:) = 1._wp
       
-      SELECT CASE ( k_virtual_itd )
-      !
-      CASE ( 1 , 2 )
+      IF( ld_virtual_itd ) THEN
          !
          zfac  = 1._wp /  ( rn_cnd_s + rcnd_i )
          zfac2 = EXP(1._wp) * 0.5_wp * zepsilon
@@ -983,7 +981,7 @@ CONTAINS
             END DO
          END DO
          !      
-      END SELECT
+      ENDIF
       
       ! -------------------------------------------------------------!
       !      II   Surface temperature and conduction flux            !

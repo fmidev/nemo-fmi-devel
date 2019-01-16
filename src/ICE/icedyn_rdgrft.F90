@@ -585,14 +585,6 @@ CONTAINS
                wfx_snw_dyn_1d(ji) = wfx_snw_dyn_1d(ji) + ( rhos * vsrdg(ji) * ( 1._wp - rn_fsnwrdg )   &   ! fresh water source for ocean
                   &                                      + rhos * vsrft(ji) * ( 1._wp - rn_fsnwrft ) ) * r1_rdtice
 
-               ! Put the melt pond water into the ocean
-               ! clem: I think the following lines must be commented since there
-               !       is no net mass flux between melt ponds and the ocean (see icethd_pnd.F90 for ex.)
-               !IF ( ln_pnd_fwb ) THEN
-               !   wfx_pnd_1d(ji) = wfx_pnd_1d(ji) + ( rhow * vprdg(ji) * ( 1._wp - rn_fpndrdg )   &        ! fresh water source for ocean
-               !      &                              + rhow * vprft(ji) * ( 1._wp - rn_fpndrft ) ) * r1_rdtice
-               !ENDIF
-
                ! virtual salt flux to keep salinity constant
                IF( nn_icesal /= 2 )  THEN
                   sirdg2(ji)     = sirdg2(ji)     - vsw * ( sss_1d(ji) - s_i_1d(ji) )        ! ridge salinity = s_i

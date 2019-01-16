@@ -113,7 +113,7 @@ MODULE ice
    INTEGER           , PUBLIC ::   jpl              !: number of ice  categories 
    INTEGER           , PUBLIC ::   nlay_i           !: number of ice  layers 
    INTEGER           , PUBLIC ::   nlay_s           !: number of snow layers 
-   INTEGER           , PUBLIC ::   nn_virtual_itd   !: virtual ITD mono-category parameterizations (1-3) or not (0)
+   LOGICAL           , PUBLIC ::   ln_virtual_itd   !: virtual ITD mono-category parameterization (T) or not (F)
    LOGICAL           , PUBLIC ::   ln_icedyn        !: flag for ice dynamics (T) or not (F)
    LOGICAL           , PUBLIC ::   ln_icethd        !: flag for ice thermo   (T) or not (F)
    REAL(wp)          , PUBLIC ::   rn_amax_n        !: maximum ice concentration Northern hemisphere

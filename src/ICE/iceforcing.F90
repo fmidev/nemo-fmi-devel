@@ -144,7 +144,7 @@ CONTAINS
          IF( nn_flxdist /= -1 )   CALL ice_flx_dist   ( t_su, alb_ice, qns_ice, qsr_ice, dqns_ice, evap_ice, devap_ice, nn_flxdist )
          SELECT CASE( nice_jules )
          CASE( np_jules_ACTIVE )  !    compute conduction flux and surface temperature (as in Jules surface module)
-                                  CALL blk_ice_qcn    ( nn_virtual_itd, t_su, t_bo, h_s, h_i )
+                                  CALL blk_ice_qcn    ( ln_virtual_itd, t_su, t_bo, h_s, h_i )
          END SELECT
       CASE ( jp_purecpl )         !--- coupled formulation
                                   CALL sbc_cpl_ice_flx( picefr=at_i_b, palbi=alb_ice, psst=sst_m, pist=t_su, phs=h_s, phi=h_i )

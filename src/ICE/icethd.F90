@@ -232,15 +232,8 @@ CONTAINS
             !
                               CALL ice_thd_temp                     ! --- temperature update --- !
             !
-!!gm please create a new logical (l_thd_mono or a better explicit name) set one for all in icestp.F90 module
-!!gm        l_thd_mono = ln_icedH .AND. ( ( nn_virtual_itd == 1 .OR. nn_virtual_itd == 4 ) .AND. jpl == 1 )
-!!gm        by the way, the different options associated with nn_virtual_itd =1 to 4  are quite impossible to identify
-!!gm        more comment to add when ready the namelist, with an explicit print in the ocean.output
-            IF( ln_icedH ) THEN
-               IF ( ( nn_virtual_itd == 1 .OR. nn_virtual_itd == 3 ) .AND. jpl == 1 ) THEN
-                              CALL ice_thd_mono                      ! --- extra lateral melting if virtual_itd --- !
-               END IF
-            END IF
+            IF( ln_icedH .AND. ln_virtual_itd ) &
+               &              CALL ice_thd_mono                     ! --- extra lateral melting if virtual_itd --- !
             !
             IF( ln_icedA )    CALL ice_thd_da                       ! --- lateral melting --- !
             !
