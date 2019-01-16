@@ -1,7 +1,7 @@
-MODULE iceforcing
+MODULE icesbc
    !!======================================================================
-   !!                       ***  MODULE  iceforcing  ***
-   !! Sea-Ice :   air-ice forcing fields
+   !!                       ***  MODULE  icesbc  ***
+   !! Sea-Ice :   air-ice sbc fields
    !!=====================================================================
    !! History :  4.0  !  2017-08  (C. Rousset)       Original code
    !!            4.0  !  2018     (many people)      SI3 [aka Sea Ice cube]
@@ -30,9 +30,9 @@ MODULE iceforcing
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC ice_forcing_tau   ! called by icestp.F90
-   PUBLIC ice_forcing_flx   ! called by icestp.F90
-   PUBLIC ice_forcing_init  ! called by icestp.F90
+   PUBLIC ice_sbc_tau   ! called by icestp.F90
+   PUBLIC ice_sbc_flx   ! called by icestp.F90
+   PUBLIC ice_sbc_init  ! called by icestp.F90
 
    !! * Substitutions
 #  include "vectopt_loop_substitute.h90"
@@ -43,9 +43,9 @@ MODULE iceforcing
    !!----------------------------------------------------------------------
 CONTAINS
 
-   SUBROUTINE ice_forcing_tau( kt, ksbc, utau_ice, vtau_ice )
+   SUBROUTINE ice_sbc_tau( kt, ksbc, utau_ice, vtau_ice )
       !!-------------------------------------------------------------------
-      !!                  ***  ROUTINE ice_forcing_tau  ***
+      !!                  ***  ROUTINE ice_sbc_tau  ***
       !!
       !! ** Purpose : provide surface boundary condition for sea ice (momentum)
       !!
@@ -60,11 +60,11 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zutau_ice, zvtau_ice 
       !!-------------------------------------------------------------------
       !
-      IF( ln_timing )   CALL timing_start('ice_forcing')
+      IF( ln_timing )   CALL timing_start('ice_sbc')
       !
       IF( kt == nit000 .AND. lwp ) THEN
          WRITE(numout,*)
-         WRITE(numout,*)'ice_forcing_tau: Surface boundary condition for sea ice (momentum)'
+         WRITE(numout,*)'ice_sbc_tau: Surface boundary condition for sea ice (momentum)'
          WRITE(numout,*)'~~~~~~~~~~~~~~~'
       ENDIF
       !
@@ -82,17 +82,17 @@ CONTAINS
                vtau_ice(ji,jj) = vtau_ice(ji,jj) * xcplmask(ji,jj,0) + zvtau_ice(ji,jj) * ( 1. - xcplmask(ji,jj,0) )
             END DO
          END DO
-         CALL lbc_lnk_multi( 'iceforcing', utau_ice, 'U', -1., vtau_ice, 'V', -1. )
+         CALL lbc_lnk_multi( 'icesbc', utau_ice, 'U', -1., vtau_ice, 'V', -1. )
       ENDIF
       !
-      IF( ln_timing )   CALL timing_stop('ice_forcing')
+      IF( ln_timing )   CALL timing_stop('ice_sbc')
       !
-   END SUBROUTINE ice_forcing_tau
+   END SUBROUTINE ice_sbc_tau
 
    
-   SUBROUTINE ice_forcing_flx( kt, ksbc )
+   SUBROUTINE ice_sbc_flx( kt, ksbc )
       !!-------------------------------------------------------------------
-      !!                  ***  ROUTINE ice_forcing_flx  ***
+      !!                  ***  ROUTINE ice_sbc_flx  ***
       !!
       !! ** Purpose : provide surface boundary condition for sea ice (flux)
       !!
@@ -118,11 +118,11 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj)     ::   zalb              ! 2D workspace
       !!--------------------------------------------------------------------
       !
-      IF( ln_timing )   CALL timing_start('ice_forcing_flx')
+      IF( ln_timing )   CALL timing_start('ice_sbc_flx')
 
       IF( kt == nit000 .AND. lwp ) THEN
          WRITE(numout,*)
-         WRITE(numout,*)'ice_forcing_flx: Surface boundary condition for sea ice (flux)'
+         WRITE(numout,*)'ice_sbc_flx: Surface boundary condition for sea ice (flux)'
          WRITE(numout,*)'~~~~~~~~~~~~~~~'
       ENDIF
 
@@ -162,9 +162,9 @@ CONTAINS
          CALL iom_put( "albedo" , zalb(:,:) )
       ENDIF
       !
-      IF( ln_timing )   CALL timing_stop('ice_forcing_flx')
+      IF( ln_timing )   CALL timing_stop('ice_sbc_flx')
       !
-   END SUBROUTINE ice_forcing_flx
+   END SUBROUTINE ice_sbc_flx
 
 
    SUBROUTINE ice_flx_dist( ptn_ice, palb_ice, pqns_ice, pqsr_ice, pdqn_ice, pevap_ice, pdevap_ice, k_flxdist )
@@ -253,35 +253,35 @@ CONTAINS
    END SUBROUTINE ice_flx_dist
 
 
-   SUBROUTINE ice_forcing_init
+   SUBROUTINE ice_sbc_init
       !!-------------------------------------------------------------------
-      !!                  ***  ROUTINE ice_forcing_init  ***
+      !!                  ***  ROUTINE ice_sbc_init  ***
       !!
       !! ** Purpose :   Physical constants and parameters linked to the ice dynamics
       !!      
-      !! ** Method  :   Read the namforcing namelist and check the ice-dynamic
+      !! ** Method  :   Read the namsbc namelist and check the ice-dynamic
       !!              parameter values called at the first timestep (nit000)
       !!
-      !! ** input   :   Namelist namforcing
+      !! ** input   :   Namelist namsbc
       !!-------------------------------------------------------------------
       INTEGER ::   ios, ioptio   ! Local integer
       !!
-      NAMELIST/namforcing/ rn_cio, rn_blow_s, nn_flxdist, ln_cndflx, ln_cndemulate
+      NAMELIST/namsbc/ rn_cio, rn_blow_s, nn_flxdist, ln_cndflx, ln_cndemulate
       !!-------------------------------------------------------------------
       !
-      REWIND( numnam_ice_ref )         ! Namelist namforcing in reference namelist : Ice dynamics
-      READ  ( numnam_ice_ref, namforcing, IOSTAT = ios, ERR = 901)
-901   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namforcing in reference namelist', lwp )
-      REWIND( numnam_ice_cfg )         ! Namelist namforcing in configuration namelist : Ice dynamics
-      READ  ( numnam_ice_cfg, namforcing, IOSTAT = ios, ERR = 902 )
-902   IF( ios >  0 )   CALL ctl_nam ( ios , 'namforcing in configuration namelist', lwp )
-      IF(lwm) WRITE( numoni, namforcing )
+      REWIND( numnam_ice_ref )         ! Namelist namsbc in reference namelist : Ice dynamics
+      READ  ( numnam_ice_ref, namsbc, IOSTAT = ios, ERR = 901)
+901   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namsbc in reference namelist', lwp )
+      REWIND( numnam_ice_cfg )         ! Namelist namsbc in configuration namelist : Ice dynamics
+      READ  ( numnam_ice_cfg, namsbc, IOSTAT = ios, ERR = 902 )
+902   IF( ios >  0 )   CALL ctl_nam ( ios , 'namsbc in configuration namelist', lwp )
+      IF(lwm) WRITE( numoni, namsbc )
       !
       IF(lwp) THEN                     ! control print
          WRITE(numout,*)
-         WRITE(numout,*) 'ice_forcing_init: ice parameters for ice dynamics '
+         WRITE(numout,*) 'ice_sbc_init: ice parameters for ice dynamics '
          WRITE(numout,*) '~~~~~~~~~~~~~~~~'
-         WRITE(numout,*) '   Namelist namforcing:'
+         WRITE(numout,*) '   Namelist namsbc:'
          WRITE(numout,*) '      drag coefficient for oceanic stress              rn_cio        = ', rn_cio
          WRITE(numout,*) '      coefficient for ice-lead partition of snowfall   rn_blow_s     = ', rn_blow_s
          WRITE(numout,*) '      Multicategory heat flux formulation              nn_flxdist    = ', nn_flxdist
@@ -305,7 +305,7 @@ CONTAINS
          CALL ctl_stop( 'ice_thd_init: SI3 option, nn_flxdist, should be between -1 and 2' )
       END SELECT
       !
-   END SUBROUTINE ice_forcing_init
+   END SUBROUTINE ice_sbc_init
 
 #else
    !!----------------------------------------------------------------------
@@ -314,4 +314,4 @@ CONTAINS
 #endif
 
    !!======================================================================
-END MODULE iceforcing
+END MODULE icesbc

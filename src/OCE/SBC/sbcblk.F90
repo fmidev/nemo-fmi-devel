@@ -65,9 +65,9 @@ MODULE sbcblk
    PUBLIC   sbc_blk_init  ! called in sbcmod
    PUBLIC   sbc_blk       ! called in sbcmod
 #if defined key_si3
-   PUBLIC   blk_ice_tau   ! routine called in iceforcing
-   PUBLIC   blk_ice_flx   ! routine called in iceforcing
-   PUBLIC   blk_ice_qcn   ! routine called in iceforcing
+   PUBLIC   blk_ice_tau   ! routine called in icesbc
+   PUBLIC   blk_ice_flx   ! routine called in icesbc
+   PUBLIC   blk_ice_qcn   ! routine called in icesbc
 #endif 
 
 !!Lolo: should ultimately be moved in the module with all physical constants ?

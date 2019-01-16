@@ -149,7 +149,7 @@ MODULE ice
    LOGICAL , PUBLIC ::   ln_adv_Pra       !: Prather        advection scheme
    LOGICAL , PUBLIC ::   ln_adv_UMx       !: Ultimate-Macho advection scheme
    !
-   !                                     !!** ice-surface forcing namelist (namforcing) **
+   !                                     !!** ice-surface boundary conditions namelist (namsbc) **
                                           ! -- icethd_dh -- !
    REAL(wp), PUBLIC ::   rn_blow_s        !: coef. for partitioning of snowfall between leads and sea ice
                                           ! -- icethd -- !

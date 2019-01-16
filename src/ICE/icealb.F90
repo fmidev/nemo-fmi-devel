@@ -26,7 +26,7 @@ MODULE icealb
    PRIVATE
 
    PUBLIC   ice_alb_init   ! called in icestp
-   PUBLIC   ice_alb        ! called in iceforcing.F90 and iceupdate.F90
+   PUBLIC   ice_alb        ! called in icesbc.F90 and iceupdate.F90
 
    REAL(wp), PUBLIC, PARAMETER ::   rn_alb_oce = 0.066   !: ocean or lead albedo (Pegau and Paulson, Ann. Glac. 2001)
    !

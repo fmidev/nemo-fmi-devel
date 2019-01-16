@@ -6,7 +6,7 @@
 !!              4 - Ice ridging/rafting                (namdyn_rdgrft)
 !!              5 - Ice rheology                       (namdyn_rhg)
 !!              6 - Ice advection                      (namdyn_adv)
-!!              7 - Ice surface forcing                (namforcing)
+!!              7 - Ice surface boundary conditions    (namsbc)
 !!              8 - Ice thermodynamics                 (namthd)
 !!              9 - Ice heat diffusion                 (namthd_zdf)
 !!             10 - Ice lateral melting                (namthd_da)
@@ -48,7 +48,7 @@
 !------------------------------------------------------------------------------
 /
 !------------------------------------------------------------------------------
-&namforcing     !   Ice surface forcing
+&namsbc         !   Ice surface boundary conditions
 !------------------------------------------------------------------------------
 /
 !------------------------------------------------------------------------------

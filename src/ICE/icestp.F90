@@ -51,7 +51,7 @@ MODULE icestp
    USE sbc_oce        ! Surface boundary condition: ocean fields
    USE sbc_ice        ! Surface boundary condition: ice   fields
    !
-   USE iceforcing     ! sea-ice: Surface boundary condition       !!gm why not icesbc module name
+   USE icesbc         ! sea-ice: Surface boundary conditions
    USE icedyn         ! sea-ice: dynamics
    USE icethd         ! sea-ice: thermodynamics
    USE icecor         ! sea-ice: corrections
@@ -151,7 +151,7 @@ CONTAINS
          ! It provides the following fields used in sea ice model:
          !    utau_ice, vtau_ice = surface ice stress [N/m2]
          !------------------------------------------------!
-                                        CALL ice_forcing_tau( kt, ksbc, utau_ice, vtau_ice )          
+                                        CALL ice_sbc_tau( kt, ksbc, utau_ice, vtau_ice )          
          !-------------------------------------!
          ! --- ice dynamics and advection  --- !
          !-------------------------------------!
@@ -182,7 +182,7 @@ CONTAINS
          !    qemp_oce, qemp_ice,  = sensible heat (associated with evap & precip) [W/m2]
          !    qprec_ice, qevap_ice
          !------------------------------------------------------!
-                                        CALL ice_forcing_flx( kt, ksbc )
+                                        CALL ice_sbc_flx( kt, ksbc )
          !----------------------------!
          ! --- ice thermodynamics --- !
          !----------------------------!
@@ -240,7 +240,7 @@ CONTAINS
       !
       !                                ! Allocate the ice arrays (sbc_ice already allocated in sbc_init)
       ierr =        ice_alloc        ()      ! ice variables
-      ierr = ierr + sbc_ice_alloc    ()      ! surface forcing 
+      ierr = ierr + sbc_ice_alloc    ()      ! surface boundary conditions 
       ierr = ierr + ice1D_alloc      ()      ! thermodynamics
       !
       CALL mpp_sum( 'icestp', ierr )
@@ -260,7 +260,7 @@ CONTAINS
       CALL ice_var_glo2eqv
       CALL ice_var_agg(1)
       !
-      CALL ice_forcing_init            ! set ice-ocean and ice-atm. coupling parameters
+      CALL ice_sbc_init                ! set ice-ocean and ice-atm. coupling parameters
       !
       CALL ice_dyn_init                ! set ice dynamics parameters
       !
