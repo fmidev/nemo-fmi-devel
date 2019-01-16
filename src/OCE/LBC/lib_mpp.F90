@@ -1642,6 +1642,7 @@ CONTAINS
    INTEGER, PARAMETER, PUBLIC               ::   nbdelay = 0   ! make sure we don't enter loops: DO ji = 1, nbdelay
    CHARACTER(len=32), DIMENSION(1), PUBLIC  ::   c_delaylist = 'empty'
    CHARACTER(len=32), DIMENSION(1), PUBLIC  ::   c_delaycpnt = 'empty'
+   LOGICAL, PUBLIC                          ::   l_full_nf_update = .TRUE.
    TYPE ::   DELAYARR
       REAL(   wp), POINTER, DIMENSION(:) ::  z1d => NULL()
       COMPLEX(wp), POINTER, DIMENSION(:) ::  y1d => NULL()
