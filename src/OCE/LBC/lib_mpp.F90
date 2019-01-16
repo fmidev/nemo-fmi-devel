@@ -638,7 +638,13 @@ CONTAINS
       pout(:) = todelay(idvar)%z1d(:)
 
       ! send y_in into todelay(idvar)%y1d with a non-blocking communication
+#if defined key_mpi2
+      IF( ln_timing ) CALL tic_tac( .TRUE., ld_global = .TRUE.)
+      CALL  mpi_allreduce( y_in(:), todelay(idvar)%y1d(:), isz, MPI_DOUBLE_COMPLEX, mpi_sumdd, ilocalcomm, ndelayid(idvar), ierr )
+      IF( ln_timing ) CALL tic_tac(.FALSE., ld_global = .TRUE.)
+#else
       CALL mpi_iallreduce( y_in(:), todelay(idvar)%y1d(:), isz, MPI_DOUBLE_COMPLEX, mpi_sumdd, ilocalcomm, ndelayid(idvar), ierr )
+#endif
 
    END SUBROUTINE mpp_delay_sum
 
@@ -695,7 +701,13 @@ CONTAINS
       pout(:) = todelay(idvar)%z1d(:)
 
       ! send p_in into todelay(idvar)%z1d with a non-blocking communication
+#if defined key_mpi2
+      IF( ln_timing ) CALL tic_tac( .TRUE., ld_global = .TRUE.)
+      CALL  mpi_allreduce( p_in(:), todelay(idvar)%z1d(:), isz, MPI_DOUBLE_PRECISION, mpi_max, ilocalcomm, ndelayid(idvar), ierr )
+      IF( ln_timing ) CALL tic_tac(.FALSE., ld_global = .TRUE.)
+#else
       CALL mpi_iallreduce( p_in(:), todelay(idvar)%z1d(:), isz, MPI_DOUBLE_PRECISION, mpi_max, ilocalcomm, ndelayid(idvar), ierr )
+#endif
 
    END SUBROUTINE mpp_delay_max
 
@@ -711,9 +723,11 @@ CONTAINS
       INTEGER ::   ierr
       !!----------------------------------------------------------------------
       IF( ndelayid(kid) /= -2 ) THEN  
+#if ! defined key_mpi2
          IF( ln_timing ) CALL tic_tac( .TRUE., ld_global = .TRUE.)
          CALL mpi_wait( ndelayid(kid), MPI_STATUS_IGNORE, ierr )                        ! make sure todelay(kid) is received
          IF( ln_timing ) CALL tic_tac(.FALSE., ld_global = .TRUE.)
+#endif
          IF( ASSOCIATED(todelay(kid)%y1d) )   todelay(kid)%z1d(:) = REAL(todelay(kid)%y1d(:), wp)  ! define %z1d from %y1d
          ndelayid(kid) = -2   ! add flag to know that mpi_wait was already called on kid
       ENDIF
