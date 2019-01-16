@@ -390,28 +390,26 @@ Therefore, user should not eliminate land processors when creating a meshmask fi
 %-----------------------------------------------------------------------------------------------
 
 Options are defined through the \ngn{nambdy} \ngn{nambdy\_dta} namelist variables.
-The BDY module is the core implementation of open boundary conditions for regional configurations.
-It implements the Flow Relaxation Scheme algorithm for temperature, salinity, velocities and ice fields, and
-the Flather radiation condition for the depth-mean transports.
-The specification of the location of the open boundary is completely flexible and
-allows for example the open boundary to follow an isobath or other irregular contour. 
+The BDY module is the core implementation of open boundary conditions for regional configurations on 
+temperature, salinity, barotropic and baroclinic velocities, as well as ice concentration, ice and snow thicknesses).
 
 The BDY module was modelled on the OBC module (see NEMO 3.4) and shares many features and
 a similar coding structure \citep{Chanut2005}.
-
-Boundary data files used with earlier versions of NEMO may need to be re-ordered to work with this version.
+The specification of the location of the open boundary is completely flexible and
+allows for example the open boundary to follow an isobath or other irregular contour. 
+Boundary data files used with versions of NEMO prior to Version 3.4 may need to be re-ordered to work with this version.
 See the section on the Input Boundary Data Files for details.
 
 %----------------------------------------------
 \subsection{Namelists}
 \label{subsec:BDY_namelist}
 
-The BDY module is activated by setting \np{ln\_bdy} to true.
+The BDY module is activated by setting \np{ln\_bdy}\forcode{ = .true.} .
 It is possible to define more than one boundary ``set'' and apply different boundary conditions to each set.
 The number of boundary sets is defined by \np{nb\_bdy}.
 Each boundary set may be defined as a set of straight line segments in a namelist
 (\np{ln\_coords\_file}\forcode{ = .false.}) or read in from a file (\np{ln\_coords\_file}\forcode{ = .true.}).
-If the set is defined in a namelist, then the namelists nambdy\_index must be included separately, one for each set.
+If the set is defined in a namelist, then the namelists \ngn{nambdy\_index} must be included separately, one for each set.
 If the set is defined by a file, then a ``\ifile{coordinates.bdy}'' file must be provided.
 The coordinates.bdy file is analagous to the usual NEMO ``\ifile{coordinates}'' file.
 In the example above, there are two boundary sets, the first of which is defined via a file and
@@ -419,45 +417,58 @@ the second is defined in a namelist.
 For more details of the definition of the boundary geometry see section \autoref{subsec:BDY_geometry}.
 
 For each boundary set a boundary condition has to be chosen for the barotropic solution
-(``u2d'':sea-surface height and barotropic velocities), for the baroclinic velocities (``u3d''), and
-for the active tracers \footnote{The BDY module does not deal with passive tracers at this version} (``tra'').
+(``u2d'':sea-surface height and barotropic velocities), for the baroclinic velocities (``u3d''), 
+for the active tracers \footnote{The BDY module does not deal with passive tracers at this version} (``tra''), and sea-ice (``ice'').
 For each set of variables there is a choice of algorithm and a choice for the data,
-eg. for the active tracers the algorithm is set by \np{nn\_tra} and the choice of data is set by \np{nn\_tra\_dta}. 
+eg. for the active tracers the algorithm is set by \np{cn\_tra} and the choice of data is set by \np{nn\_tra\_dta}.\\ 
 
 The choice of algorithm is currently as follows:
 
-\begin{itemize}
-\item[0.] No boundary condition applied.
+\begin{description}
+\item[\forcode{'none'}:] No boundary condition applied.
   So the solution will ``see'' the land points around the edge of the edge of the domain.
-\item[1.] Flow Relaxation Scheme (FRS) available for all variables.
-\item[2.] Flather radiation scheme for the barotropic variables.
-  The Flather scheme is not compatible with the filtered free surface
-  ({\it dynspg\_ts}). 
-\end{itemize}
+\item[\forcode{'specified'}:] Specified boundary condition applied (only available for baroclinic velocity and tracer variables).
+\item[\forcode{'neumann'}:] Value at the boundary are duplicated (No gradient). Only available for baroclinic velocity and tracer variables.
+\item[\forcode{'frs'}:] Flow Relaxation Scheme (FRS) available for all variables.
+\item[\forcode{'Orlanski'}:] Orlanski radiation scheme (fully oblique) for barotropic, baroclinic and tracer variables. 
+\item[\forcode{'Orlanski_npo'}:] Orlanski radiation scheme for barotropic, baroclinic and tracer variables. 
+\item[\forcode{'flather'}:] Flather radiation scheme for the barotropic variables only.
+\end{description}
 
 The main choice for the boundary data is to use initial conditions as boundary data
 (\np{nn\_tra\_dta}\forcode{ = 0}) or to use external data from a file (\np{nn\_tra\_dta}\forcode{ = 1}).
+In case the 3d velocity data contain the total velocity (ie, baroclinic and barotropic velocity), 
+the bdy code can derived baroclinic and barotropic velocities by setting \np{ln\_full\_vel}\forcode{ = .true. }
 For the barotropic solution there is also the option to use tidal harmonic forcing either by
-itself or in addition to other external data. 
+itself (\np{nn\_dyn2d\_dta}\forcode{ = 2}) or in addition to other external data (\np{nn\_dyn2d\_dta}\forcode{ = 3}).\\
+Sea-ice salinity, temperature and age data at the boundary are constant and defined repectively by \np{rn\_ice\_sal}, \np{rn\_ice\_tem} and \np{rn\_ice\_age}. 
 
-If external boundary data is required then the nambdy\_dta namelist must be defined.
-One nambdy\_dta namelist is required for each boundary set in the order in which
+If external boundary data is required then the \ngn{nambdy\_dta} namelist must be defined.
+One \ngn{nambdy\_dta} namelist is required for each boundary set in the order in which
 the boundary sets are defined in nambdy.
-In the example given, two boundary sets have been defined and so there are two nambdy\_dta namelists.
+In the example given, two boundary sets have been defined. The first one is reading data file in the \ngn{nambdy\_dta} namelist shown above 
+and the second one is using data from intial condition (no namelist bloc needed).
 The boundary data is read in using the fldread module,
-so the nambdy\_dta namelist is in the format required for fldread.
+so the \ngn{nambdy\_dta} namelist is in the format required for fldread.
 For each variable required, the filename, the frequency of the files and
 the frequency of the data in the files is given.
-Also whether or not time-interpolation is required and whether the data is climatological (time-cyclic) data.
-Note that on-the-fly spatial interpolation of boundary data is not available at this version. 
+Also whether or not time-interpolation is required and whether the data is climatological (time-cyclic) data.\\
+
+There is currently an option to vertically interpolate the open boundary data onto the native grid at run-time.
+If \np{nn\_bdy\_jpk} $< -1$, it is assumed that the lateral boundary data are already on the native grid. 
+However, if \np{nn\_bdy\_jpk} is set to the number of vertical levels present in the boundary data, 
+a bilinear interpolation onto the native grid will be triggered at runtime. 
+For this to be successful the additional variables: $gdept$, $gdepu$, $gdepv$, $e3t$, $e3u$ and $e3v$, are required to be present in the lateral boundary files. 
+These correspond to the depths and scale factors of the input data, 
+the latter used to make any adjustment to the velocity fields due to differences in the total water depths between the two vertical grids.\\
 
 In the example namelists given, two boundary sets are defined.
 The first set is defined via a file and applies FRS conditions to temperature and salinity and
-Flather conditions to the barotropic variables.
+Flather conditions to the barotropic variables. No condition specified for the baroclinic velocity and sea-ice.
 External data is provided in daily files (from a large-scale model).
 Tidal harmonic forcing is also used.
 The second set is defined in a namelist.
-FRS conditions are applied on temperature and salinity and climatological data is read from external files. 
+FRS conditions are applied on temperature and salinity and climatological data is read from initial condition files. 
 
 %----------------------------------------------
 \subsection{Flow relaxation scheme}
@@ -520,6 +531,69 @@ so that $\eta_{e}$ is defined on the $T$ points with $nbr=1$ and $\eta$ is defin
 $U$ and $U_{e}$ are defined on the $U$ or $V$ points with $nbr=1$, \ie between the two $T$ grid points.
 
 %----------------------------------------------
+\subsection{Orlanski radiation scheme}
+\label{subsec:BDY_orlanski_scheme}
+
+The Orlanski scheme is based on the algorithm described by \citep{Marchesiello2001}, hereafter MMS.
+
+The adaptive Orlanski condition solves a wave plus relaxation equation at the boundary:
+\begin{equation}
+\frac{\partial\phi}{\partial t} + c_x \frac{\partial\phi}{\partial x} + c_y \frac{\partial\phi}{\partial y} =
+                                                -\frac{1}{\tau}(\phi - \phi^{ext})
+\label{eq:wave_continuous}
+\end{equation}
+
+where $\phi$ is the model field, $x$ and $y$ refer to the normal and tangential directions to the boundary respectively, and the phase
+velocities are diagnosed from the model fields as:
+
+\begin{equation} \label{eq:cx}
+c_x = -\frac{\partial\phi}{\partial t}\frac{\partial\phi / \partial x}{(\partial\phi /\partial x)^2 + (\partial\phi /\partial y)^2}
+\end{equation}
+\begin{equation}
+\label{eq:cy}
+c_y = -\frac{\partial\phi}{\partial t}\frac{\partial\phi / \partial y}{(\partial\phi /\partial x)^2 + (\partial\phi /\partial y)^2}
+\end{equation}
+
+(As noted by MMS, this is a circular diagnosis of the phase speeds which only makes sense on a discrete grid).
+Equation (\autoref{eq:wave_continuous}) is defined adaptively depending on the sign of the phase velocity normal to the boundary $c_x$.
+For $c_x$ outward, we have
+
+\begin{equation}
+\tau = \tau_{out}
+\end{equation}
+
+For $c_x$ inward, the radiation equation is not applied:
+
+\begin{equation}
+\tau = \tau_{in}\,\,\,;\,\,\, c_x = c_y = 0
+\label{eq:tau_in}
+\end{equation}
+
+Generally the relaxation time scale at inward propagation points \np{(rn\_time\_dmp}) is set much shorter than the time scale at outward propagation
+points (\np{rn\_time\_dmp\_out}) so that the solution is constrained more strongly by the external data at inward propagation points.
+See \autoref{subsec:BDY_relaxation} for detailed on the spatial shape of the scaling.\\ 
+The ``normal propagation of oblique radiation'' or NPO approximation (called \forcode{'orlanski_npo'}) involves assuming 
+that $c_y$ is zero in equation (\autoref{eq:wave_continuous}), but including
+this term in the denominator of equation (\autoref{eq:cx}). Both versions of the scheme are options in BDY. Equations
+(\autoref{eq:wave_continuous}) - (\autoref{eq:tau_in}) correspond to equations (13) - (15) and (2) - (3) in MMS.\\
+
+%----------------------------------------------
+\subsection{Relaxation at the boundary}
+\label{subsec:BDY_relaxation}
+
+In addition to a specific boundary condition specified as \np{cn\_tra} and \np{cn\_dyn3d}, relaxation on baroclinic velocities and tracers variables are available. 
+It is control by the namelist parameter \np{ln\_tra\_dmp} and \np{ln\_dyn3d\_dmp} for each boundary set.
+
+The relaxation time scale value (\np{rn\_time\_dmp} and \np{rn\_time\_dmp\_out}, $\tau$) are defined at the boundaries itself. 
+This time scale ($\alpha$) is weighted by the distance ($d$) from the boundary over \np{nn\_rimwidth} cells ($N$):
+
+\[
+  \alpha = \frac{1}{\tau}(\frac{N+1-d}{N})^2,       \quad d=1,N
+\]
+
+The same scaling is applied in the Orlanski damping. 
+
+%----------------------------------------------
 \subsection{Boundary geometry}
 \label{subsec:BDY_geometry}
 
@@ -535,11 +609,12 @@ Figure \autoref{fig:LBC_bdy_geom} shows an example of an irregular boundary.
 The boundary geometry for each set may be defined in a namelist nambdy\_index or
 by reading in a ``\ifile{coordinates.bdy}'' file.
 The nambdy\_index namelist defines a series of straight-line segments for north, east, south and west boundaries.
+One nambdy\_index namelist bloc is needed for each boundary condition defined by indexes. 
 For the northern boundary, \np{nbdysegn} gives the number of segments,
 \np{jpjnob} gives the $j$ index for each segment and \np{jpindt} and
 \np{jpinft} give the start and end $i$ indices for each segment with similar for the other boundaries.
 These segments define a list of $T$ grid points along the outermost row of the boundary ($nbr\,=\, 1$).
-The code deduces the $U$ and $V$ points and also the points for $nbr\,>\, 1$ if $nn\_rimwidth\,>\,1$.
+The code deduces the $U$ and $V$ points and also the points for $nbr\,>\, 1$ if \np{nn\_rimwidth}\forcode{ > 1}.
 
 The boundary geometry may also be defined from a ``\ifile{coordinates.bdy}'' file.
 Figure \autoref{fig:LBC_nc_header} gives an example of the header information from such a file.
@@ -580,7 +655,7 @@ $xb$ which is the index of the boundary data point in the horizontal;
 and $yb$ which is a degenerate dimension of 1 to enable the file to be read by the standard NEMO I/O routines.
 The 3D fields also have a depth dimension. 
 
-At Version 3.4 there are new restrictions on the order in which the boundary points are defined
+From Version 3.4 there are new restrictions on the order in which the boundary points are defined
 (and therefore restrictions on the order of the data in the file).
 In particular:
 
@@ -592,9 +667,10 @@ In particular:
   the data for tracers and baroclinic velocities). 
 \end{enumerate}
 
-These restrictions mean that data files used with previous versions of the model may not work with version 3.4.
-A\fortran utility {\it bdy\_reorder} exists in the TOOLS directory which
-will re-order the data in old BDY data files. 
+These restrictions mean that data files used with versions of the
+model prior to Version 3.4 may not work with Version 3.4 onwards.
+A \fortran utility {\it bdy\_reorder} exists in the TOOLS directory which
+will re-order the data in old BDY data files.
 
 %>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \begin{figure}[!t]
@@ -625,7 +701,6 @@ the correction velocity corrects for this as well.
 If more than one boundary set is used then volume correction is
 applied to all boundaries at once.
 
-\newpage
 %----------------------------------------------
 \subsection{Tidal harmonic forcing}
 \label{subsec:BDY_tides}
@@ -635,8 +710,27 @@ applied to all boundaries at once.
 \nlst{nambdy_tide} 
 %-----------------------------------------------------------------------------------------------
 
-Options are defined through the  \ngn{nambdy\_tide} namelist variables.
- To be written....
+Options are defined through the \ngn{nambdy\_tide} namelist variables 
+for reading in the complex harmonic amplitudes of elevation (ssh) and barotropic velocity (u,v). 
+
+The tidal harmonic data can be specified in 2 ways.\\
+First it can be specified on a 2D grid covering the entire model domain in which case the user should set \np{ln\_bdytide\_2ddta }\forcode{ = .true.}. 
+In this case the model assumes that the real and imaginary parts are split.
+The variable naming convention is \textit{constituent\_name\_z1} for real SSH and \textit{constituent\_name\_z2} for imaginary SSH. 
+The available \textit{constituent\_names} in NEMO are defined in \rou{SBC/tide.h90}
+Likewise for $u$ and $v$ data. File name is assumed to be \np{filtide}\ifile{\_grid\_T} for the elevation component 
+and \np{filtide}\ifile{\_grid\_U} for the u barotropic velocity and \np{filtide}\ifile{\_grid\_V} for the v barotropic velocity.\\ 
+Otherwise, the tidal data must be specified along bdy segments. 
+In this case each constituent has its own file name and the real part is assumed to be z1 and the imaginary part z2 for SSH. 
+Similarly u1, u2 and v1, v2 for velocities. Input file name convention (for elevation of the M2 tidal component) is \np{filtide}\ifile{M2\_grid\_T}. 
+Similar logic applies for other components and u and v barotropic velocities.\\
+
+The data may also be in complex conjugate form. If that is the case then the user should set \np{ln\_bdytide\_conj}\forcode{ = .true. } 
+so the model correctly interprets the data. The default case assumes it is not in complex conjugate form. 
+
+Note the barotropic velocities are assumed to be on the model native grid and must be rotated as appropriate from the source grid upon which they are extracted from. 
+To do so convert to U, V amplitude and phase into tidal ellipses. Add the grid rotation to ellipse inclination and convert back. Be careful about conventions 
+of direction of rotation, e.g. anticlockwise or clockwise. 
 
 \biblio
 
