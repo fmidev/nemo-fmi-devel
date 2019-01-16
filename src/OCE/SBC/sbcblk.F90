@@ -16,7 +16,7 @@ MODULE sbcblk
    !!            4.0  !  2016-06  (L. Brodeau)  sbcblk_core becomes sbcblk and is not restricted to the CORE algorithm anymore
    !!                 !                        ==> based on AeroBulk (http://aerobulk.sourceforge.net/)
    !!            4.0  !  2016-10  (G. Madec)  introduce a sbc_blk_init routine
-   !!            4.0  !  2016-10  (M. Vancoppenolle)  Introduce Jules emulator (M. Vancoppenolle) 
+   !!            4.0  !  2016-10  (M. Vancoppenolle)  Introduce conduction flux emulator (M. Vancoppenolle) 
    !!----------------------------------------------------------------------
 
    !!----------------------------------------------------------------------
@@ -30,7 +30,7 @@ MODULE sbcblk
    !!             sea-ice case only : 
    !!   blk_ice_tau   : provide the air-ice stress
    !!   blk_ice_flx   : provide the heat and mass fluxes at air-ice interface
-   !!   blk_ice_qcn   : provide ice surface temperature and snow/ice conduction flux (emulating JULES coupler)
+   !!   blk_ice_qcn   : provide ice surface temperature and snow/ice conduction flux (emulating conduction flux)
    !!   Cdn10_Lupkes2012 : Lupkes et al. (2012) air-ice drag
    !!   Cdn10_Lupkes2015 : Lupkes et al. (2015) air-ice drag 
    !!----------------------------------------------------------------------
@@ -687,7 +687,7 @@ CONTAINS
    !!----------------------------------------------------------------------
    !!   blk_ice_tau : provide the air-ice stress
    !!   blk_ice_flx : provide the heat and mass fluxes at air-ice interface
-   !!   blk_ice_qcn : provide ice surface temperature and snow/ice conduction flux (emulating JULES coupler)
+   !!   blk_ice_qcn : provide ice surface temperature and snow/ice conduction flux (emulating conduction flux)
    !!   Cdn10_Lupkes2012 : Lupkes et al. (2012) air-ice drag
    !!   Cdn10_Lupkes2015 : Lupkes et al. (2015) air-ice drag 
    !!----------------------------------------------------------------------
@@ -931,7 +931,7 @@ CONTAINS
       !!
       !! ** Purpose :   Compute surface temperature and snow/ice conduction flux
       !!                to force sea ice / snow thermodynamics
-      !!                in the case JULES coupler is emulated
+      !!                in the case conduction flux is emulated
       !!                
       !! ** Method  :   compute surface energy balance assuming neglecting heat storage
       !!                following the 0-layer Semtner (1976) approach

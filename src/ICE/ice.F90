@@ -159,10 +159,12 @@ MODULE ice
    !                                      !   = 0  Average N(cat) fluxes then apply the average over the N(cat) ice 
    !                                      !   = 1  Average N(cat) fluxes then redistribute over the N(cat) ice using T-ice and albedo sensitivity
    !                                      !   = 2  Redistribute a single flux over categories
-   INTEGER , PUBLIC            ::   nice_jules           !: Choice of jules coupling 
-   INTEGER , PUBLIC, PARAMETER ::   np_jules_OFF    = 0  !: no Jules coupling (ice thermodynamics forced via qsr and qns)
-   INTEGER , PUBLIC, PARAMETER ::   np_jules_EMULE  = 1  !: emulated Jules coupling via icethd_zdf.F90 (BL99) (1st round compute qcn and qsr_tr, 2nd round use it)
-   INTEGER , PUBLIC, PARAMETER ::   np_jules_ACTIVE = 2  !: active Jules coupling                      (SM0L) (compute qcn and qsr_tr via sbcblk.F90 or sbccpl.F90)
+   LOGICAL , PUBLIC ::   ln_cndflx        !: use conduction flux as surface boundary condition (instead of qsr and qns) 
+   LOGICAL , PUBLIC ::   ln_cndemulate    !: emulate conduction flux (if not provided) 
+   !                                      ! Conduction flux as surface forcing or not
+   INTEGER, PUBLIC, PARAMETER ::   np_cnd_OFF = 0  !: no forcing from conduction flux (ice thermodynamics forced via qsr and qns)
+   INTEGER, PUBLIC, PARAMETER ::   np_cnd_ON  = 1  !: forcing from conduction flux (SM0L) (compute qcn and qsr_tr via sbcblk.F90 or sbccpl.F90)
+   INTEGER, PUBLIC, PARAMETER ::   np_cnd_EMU = 2  !: emulate conduction flux via icethd_zdf.F90 (BL99) (1st round compute qcn and qsr_tr, 2nd round use it)
 
    !                                     !!** ice-vertical diffusion namelist (namthd_zdf) **
    LOGICAL , PUBLIC ::   ln_cndi_U64      !: thermal conductivity: Untersteiner (1964)
@@ -280,8 +282,8 @@ MODULE ice
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   rn_amax_2d     !: maximum ice concentration 2d array
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   qtr_ice_bot    !: transmitted solar radiation under ice
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   t1_ice         !: temperature of the first layer (Jules coupling) [K]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   cnd_ice        !: effective conductivity at the top of ice/snow (Jules coupling) [W.m-2.K-1]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   t1_ice         !: temperature of the first layer                (ln_cndflx=T) [K]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   cnd_ice        !: effective conductivity at the top of ice/snow (ln_cndflx=T) [W.m-2.K-1]
 
    !!----------------------------------------------------------------------
    !! * Ice global state variables

@@ -56,19 +56,14 @@ CONTAINS
       !                             !-------------!      
       CASE( np_BL99 )               ! BL99 solver !
          !                          !-------------!
-         SELECT CASE( nice_jules )
-         !                         ! No Jules coupler ==> default option
-         CASE( np_jules_OFF    )   ;   CALL ice_thd_zdf_BL99 ( np_jules_OFF    )
-         !
-         !                         ! Jules coupler is emulated => 1st call to get the needed fields (conduction...)
-         !                                                        2nd call to use these fields to calculate heat diffusion   
-         CASE( np_jules_EMULE  )   ;   CALL ice_thd_zdf_BL99 ( np_jules_EMULE  )
-                                       CALL ice_thd_zdf_BL99 ( np_jules_ACTIVE )
-         !
-         !                         ! Jules coupler is active ==> Met Office default option
-         CASE( np_jules_ACTIVE )   ;   CALL ice_thd_zdf_BL99 ( np_jules_ACTIVE )
-         !
-         END SELECT
+         IF( .NOT.ln_cndflx ) THEN                           ! No conduction flux ==> default option
+            CALL ice_thd_zdf_BL99( np_cnd_OFF )
+         ELSEIF( ln_cndflx .AND. .NOT.ln_cndemulate ) THEN   ! Conduction flux as surface boundary condition ==> Met Office default option
+            CALL ice_thd_zdf_BL99( np_cnd_ON  )
+         ELSEIF( ln_cndflx .AND.      ln_cndemulate ) THEN   ! Conduction flux is emulated 
+            CALL ice_thd_zdf_BL99( np_cnd_EMU )
+            CALL ice_thd_zdf_BL99( np_cnd_ON  )
+         ENDIF
          !
       END SELECT
       !

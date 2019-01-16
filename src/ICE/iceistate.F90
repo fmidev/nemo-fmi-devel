@@ -111,7 +111,7 @@ CONTAINS
       ! init surface temperature
       DO jl = 1, jpl
          t_su   (:,:,jl) = rt0 * tmask(:,:,1)  ! temp at the surface
-         cnd_ice(:,:,jl) = 0._wp               ! initialisation of the effective conductivity at the top of ice/snow (Jules coupling)
+         cnd_ice(:,:,jl) = 0._wp               ! initialisation of the effective conductivity at the top of ice/snow (ln_cndflx=T)
       END DO
       !
       ! init basal temperature (considered at freezing point)   [Kelvin]

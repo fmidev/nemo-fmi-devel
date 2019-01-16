@@ -142,10 +142,9 @@ CONTAINS
                                   CALL blk_ice_flx    ( t_su, h_s, h_i, alb_ice )    ! 
          IF( ln_mixcpl        )   CALL sbc_cpl_ice_flx( picefr=at_i_b, palbi=alb_ice, psst=sst_m, pist=t_su, phs=h_s, phi=h_i )
          IF( nn_flxdist /= -1 )   CALL ice_flx_dist   ( t_su, alb_ice, qns_ice, qsr_ice, dqns_ice, evap_ice, devap_ice, nn_flxdist )
-         SELECT CASE( nice_jules )
-         CASE( np_jules_ACTIVE )  !    compute conduction flux and surface temperature (as in Jules surface module)
-                                  CALL blk_ice_qcn    ( ln_virtual_itd, t_su, t_bo, h_s, h_i )
-         END SELECT
+         !                        !    compute conduction flux and surface temperature (as in Jules surface module)
+         IF( ln_cndflx .AND. .NOT.ln_cndemulate ) &
+            &                     CALL blk_ice_qcn    ( ln_virtual_itd, t_su, t_bo, h_s, h_i )
       CASE ( jp_purecpl )         !--- coupled formulation
                                   CALL sbc_cpl_ice_flx( picefr=at_i_b, palbi=alb_ice, psst=sst_m, pist=t_su, phs=h_s, phi=h_i )
          IF( nn_flxdist /= -1 )   CALL ice_flx_dist   ( t_su, alb_ice, qns_ice, qsr_ice, dqns_ice, evap_ice, devap_ice, nn_flxdist )
@@ -168,7 +167,7 @@ CONTAINS
    END SUBROUTINE ice_forcing_flx
 
 
-   SUBROUTINE ice_flx_dist( ptn_ice, palb_ice, pqns_ice, pqsr_ice, pdqn_ice, pevap_ice, pdevap_ice, k_iceflx )
+   SUBROUTINE ice_flx_dist( ptn_ice, palb_ice, pqns_ice, pqsr_ice, pdqn_ice, pevap_ice, pdevap_ice, k_flxdist )
       !!-------------------------------------------------------------------
       !!                  ***  ROUTINE ice_flx_dist  ***
       !!
@@ -177,14 +176,14 @@ CONTAINS
       !!
       !! ** Method  :   average then redistribute
       !!
-      !! ** Action  :   depends on k_iceflx
+      !! ** Action  :   depends on k_flxdist
       !!                = -1  Do nothing (needs N(cat) fluxes)
       !!                =  0  Average N(cat) fluxes then apply the average over the N(cat) ice 
       !!                =  1  Average N(cat) fluxes then redistribute over the N(cat) ice
       !!                                                 using T-ice and albedo sensitivity
       !!                =  2  Redistribute a single flux over categories
       !!-------------------------------------------------------------------
-      INTEGER                   , INTENT(in   ) ::   k_iceflx   ! redistributor
+      INTEGER                   , INTENT(in   ) ::   k_flxdist  ! redistributor
       REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   ptn_ice    ! ice surface temperature
       REAL(wp), DIMENSION(:,:,:), INTENT(in   ) ::   palb_ice   ! ice albedo
       REAL(wp), DIMENSION(:,:,:), INTENT(inout) ::   pqns_ice   ! non solar flux
@@ -210,7 +209,7 @@ CONTAINS
       ELSEWHERE                      ; z1_at_i(:,:) = 0._wp
       END WHERE
       
-      SELECT CASE( k_iceflx )       !==  averaged on all ice categories  ==!
+      SELECT CASE( k_flxdist )       !==  averaged on all ice categories  ==!
       !
       CASE( 0 , 1 )
          !
@@ -233,7 +232,7 @@ CONTAINS
          !
       END SELECT
       !
-      SELECT CASE( k_iceflx )       !==  redistribution on all ice categories  ==!
+      SELECT CASE( k_flxdist )       !==  redistribution on all ice categories  ==!
       !
       CASE( 1 , 2 )
          !
@@ -267,7 +266,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       INTEGER ::   ios, ioptio   ! Local integer
       !!
-      NAMELIST/namforcing/ rn_cio, rn_blow_s, nn_flxdist, nice_jules
+      NAMELIST/namforcing/ rn_cio, rn_blow_s, nn_flxdist, ln_cndflx, ln_cndemulate
       !!-------------------------------------------------------------------
       !
       REWIND( numnam_ice_ref )         ! Namelist namforcing in reference namelist : Ice dynamics
@@ -283,10 +282,11 @@ CONTAINS
          WRITE(numout,*) 'ice_forcing_init: ice parameters for ice dynamics '
          WRITE(numout,*) '~~~~~~~~~~~~~~~~'
          WRITE(numout,*) '   Namelist namforcing:'
-         WRITE(numout,*) '      drag coefficient for oceanic stress              rn_cio     = ', rn_cio
-         WRITE(numout,*) '      coefficient for ice-lead partition of snowfall   rn_blow_s  = ', rn_blow_s
-         WRITE(numout,*) '      Multicategory heat flux formulation              nn_flxdist = ', nn_flxdist
-         WRITE(numout,*) '      Jules coupling (0=no, 1=emulated, 2=active)      nice_jules = ', nice_jules
+         WRITE(numout,*) '      drag coefficient for oceanic stress              rn_cio        = ', rn_cio
+         WRITE(numout,*) '      coefficient for ice-lead partition of snowfall   rn_blow_s     = ', rn_blow_s
+         WRITE(numout,*) '      Multicategory heat flux formulation              nn_flxdist    = ', nn_flxdist
+         WRITE(numout,*) '      Use conduction flux as surface condition         ln_cndflx     = ', ln_cndflx
+         WRITE(numout,*) '         emulate conduction flux                       ln_cndemulate = ', ln_cndemulate
       ENDIF
       !
       IF(lwp) WRITE(numout,*)

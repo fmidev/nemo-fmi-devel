@@ -35,7 +35,7 @@ MODULE icethd_zdf_BL99
    !!----------------------------------------------------------------------
 CONTAINS
 
-   SUBROUTINE ice_thd_zdf_BL99( k_jules )
+   SUBROUTINE ice_thd_zdf_BL99( k_cnd )
       !!-------------------------------------------------------------------
       !!                ***  ROUTINE ice_thd_zdf_BL99  ***
       !!
@@ -72,7 +72,7 @@ CONTAINS
       !!           number of layers in the ice/snow : nlay_i, nlay_s
       !!           total ice/snow thickness         : h_i_1d, h_s_1d
       !!-------------------------------------------------------------------
-      INTEGER, INTENT(in) ::   k_jules     ! Jules coupling (0=OFF, 1=EMULATED, 2=ACTIVE)
+      INTEGER, INTENT(in) ::   k_cnd     ! conduction flux (off, on, emulated)
       !
       INTEGER ::   ji, jk         ! spatial loop index
       INTEGER ::   jm             ! current reference number of equation
@@ -163,7 +163,7 @@ CONTAINS
       END WHERE
       !
       ! Store initial temperatures and non solar heat fluxes
-      IF( k_jules == np_jules_OFF .OR. k_jules == np_jules_EMULE ) THEN
+      IF( k_cnd == np_cnd_OFF .OR. k_cnd == np_cnd_EMU ) THEN
          !
          ztsub      (1:npti) = t_su_1d(1:npti)                          ! surface temperature at iteration n-1
          ztsuold    (1:npti) = t_su_1d(1:npti)                          ! surface temperature initial value
@@ -331,11 +331,11 @@ CONTAINS
          !
          !----------------------------------------!
          !                                        !
-         !   JULES COUPLING IS OFF OR EMULATED    !
+         !   Conduction flux is off or emulated   !
          !                                        !
          !----------------------------------------!
          !
-         IF( k_jules == np_jules_OFF .OR. k_jules == np_jules_EMULE ) THEN
+         IF( k_cnd == np_cnd_OFF .OR. k_cnd == np_cnd_EMU ) THEN
             !
             ! ==> The original BL99 temperature computation is used
             !       (with qsr_ice, qns_ice and dqns_ice as inputs)
@@ -580,11 +580,11 @@ CONTAINS
 
          !----------------------------------------!
          !                                        !
-         !      JULES COUPLING IS ACTIVE          !
+         !      Conduction flux is on             !
          !                                        !
          !----------------------------------------!
          !
-         ELSEIF( k_jules == np_jules_ACTIVE ) THEN
+         ELSEIF( k_cnd == np_cnd_ON ) THEN
             !
             ! ==> we use a modified BL99 solver with conduction flux (qcn_ice) as forcing term
             !
@@ -753,7 +753,7 @@ CONTAINS
 
             END DO
 
-         ENDIF ! k_jules
+         ENDIF ! k_cnd
          
       END DO  ! End of the do while iterative procedure
       
@@ -780,13 +780,13 @@ CONTAINS
       !
       ! --- Diagnose the heat loss due to changing non-solar / conduction flux --- !
       !
-      IF( k_jules == np_jules_OFF .OR. k_jules == np_jules_EMULE ) THEN
+      IF( k_cnd == np_cnd_OFF .OR. k_cnd == np_cnd_EMU ) THEN
          !
          DO ji = 1, npti
             hfx_err_dif_1d(ji) = hfx_err_dif_1d(ji) - ( qns_ice_1d(ji) - zqns_ice_b(ji) ) * a_i_1d(ji) 
          END DO
          !
-      ELSEIF( k_jules == np_jules_ACTIVE ) THEN
+      ELSEIF( k_cnd == np_cnd_ON ) THEN
          !
          DO ji = 1, npti
             hfx_err_dif_1d(ji) = hfx_err_dif_1d(ji) - ( qcn_ice_top_1d(ji) - qcn_ice_1d(ji) ) * a_i_1d(ji) 
@@ -797,7 +797,7 @@ CONTAINS
       !
       ! --- Diagnose the heat loss due to non-fully converged temperature solution (should not be above 10-4 W-m2) --- !
       !
-      IF( k_jules == np_jules_OFF .OR. k_jules == np_jules_ACTIVE ) THEN
+      IF( k_cnd == np_cnd_OFF .OR. k_cnd == np_cnd_ON ) THEN
          
          CALL ice_var_enthalpy       
          
@@ -806,7 +806,7 @@ CONTAINS
             zdq = - zq_ini(ji) + ( SUM( e_i_1d(ji,1:nlay_i) ) * h_i_1d(ji) * r1_nlay_i +  &
                &                   SUM( e_s_1d(ji,1:nlay_s) ) * h_s_1d(ji) * r1_nlay_s )
             
-            IF( k_jules == np_jules_OFF ) THEN
+            IF( k_cnd == np_cnd_OFF ) THEN
                
                IF( t_su_1d(ji) < rt0 ) THEN  ! case T_su < 0degC
                   zhfx_err = ( qns_ice_1d(ji)     + qsr_ice_1d(ji)     - zradtr_i(ji,nlay_i) - qcn_ice_bot_1d(ji)  &
@@ -816,7 +816,7 @@ CONTAINS
                      &       + zdq * r1_rdtice ) * a_i_1d(ji)
                ENDIF
                
-            ELSEIF( k_jules == np_jules_ACTIVE ) THEN
+            ELSEIF( k_cnd == np_cnd_ON ) THEN
             
                zhfx_err    = ( qcn_ice_top_1d(ji) + qtr_ice_top_1d(ji) - zradtr_i(ji,nlay_i) - qcn_ice_bot_1d(ji)  &
                   &          + zdq * r1_rdtice ) * a_i_1d(ji)
@@ -833,9 +833,9 @@ CONTAINS
          !
       ENDIF
       !
-      !---------------------------------------------------------------------------------------
-      ! 11) Jules coupling: reset inner snow and ice temperatures, update conduction fluxes
-      !---------------------------------------------------------------------------------------
+      !--------------------------------------------------------------------
+      ! 11) reset inner snow and ice temperatures, update conduction fluxes
+      !--------------------------------------------------------------------
       ! effective conductivity and 1st layer temperature (needed by Met Office)
       DO ji = 1, npti
          IF( h_s_1d(ji) > 0.1_wp ) THEN 
@@ -850,7 +850,7 @@ CONTAINS
          t1_ice_1d(ji) = isnow(ji) * t_s_1d(ji,1) + ( 1._wp - isnow(ji) ) * t_i_1d(ji,1)
       END DO
       !
-      IF( k_jules == np_jules_EMULE ) THEN
+      IF( k_cnd == np_cnd_EMU ) THEN
          ! Restore temperatures to their initial values
          t_s_1d    (1:npti,:) = ztsold        (1:npti,:)
          t_i_1d    (1:npti,:) = ztiold        (1:npti,:)

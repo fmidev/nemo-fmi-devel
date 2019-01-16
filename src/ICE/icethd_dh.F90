@@ -125,15 +125,14 @@ CONTAINS
       !                       ! ============================================== !
       !                       ! Available heat for surface and bottom ablation !
       !                       ! ============================================== !
-      SELECT CASE( nice_jules )
       !
-      CASE( np_jules_ACTIVE )
+      IF( ln_cndflx .AND. .NOT.ln_cndemulate ) THEN
          !
          DO ji = 1, npti
             zq_top(ji)     = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
          !
-      CASE( np_jules_OFF , np_jules_EMULE )
+      ELSE
          !
          DO ji = 1, npti
             zdum           = qns_ice_1d(ji) + qsr_ice_1d(ji) - qtr_ice_top_1d(ji) - qcn_ice_top_1d(ji)
@@ -141,7 +140,7 @@ CONTAINS
             zq_top(ji)     = MAX( 0._wp, qml_ice_1d(ji) * rdt_ice )
          END DO
          !
-      END SELECT
+      ENDIF
       !
       DO ji = 1, npti
          zf_tt(ji)         = qcn_ice_bot_1d(ji) + qsb_ice_bot_1d(ji) + fhld_1d(ji) 

@@ -40,8 +40,8 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qml_ice_1d     !: heat available for snow / ice surface melting [W/m2] 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qcn_ice_1d     !: heat available for snow / ice surface sublimation [W/m2] 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   qtr_ice_top_1d !: solar flux transmitted below the ice surface [W/m2] 
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t1_ice_1d      !: temperature of the 1st layer (Jules coupling) [K]
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   cnd_ice_1d     !: conductivity at the top of ice/snow (Jules coupling) [W/K/m2]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   t1_ice_1d      !: temperature of the 1st layer        (ln_cndflx=T) [K]
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   cnd_ice_1d     !: conductivity at the top of ice/snow (ln_cndflx=T) [W/K/m2]
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_sum_1d
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   hfx_bom_1d

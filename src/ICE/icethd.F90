@@ -503,7 +503,7 @@ CONTAINS
          !
          CALL tab_1d_2d( npti, nptidx(1:npti), qns_ice_1d    (1:npti), qns_ice    (:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), qtr_ice_bot_1d(1:npti), qtr_ice_bot(:,:,kl) )
-         ! effective conductivity and 1st layer temperature (for Jules coupling)
+         ! effective conductivity and 1st layer temperature (ln_cndflx=T)
          CALL tab_1d_2d( npti, nptidx(1:npti), cnd_ice_1d(1:npti), cnd_ice(:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), t1_ice_1d (1:npti), t1_ice (:,:,kl) )
          ! SIMIP diagnostics         
