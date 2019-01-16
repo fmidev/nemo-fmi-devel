@@ -21,6 +21,7 @@ MODULE bdydyn2d
    USE lbclnk          ! ocean lateral boundary conditions (or mpp link)
    USE wet_dry         ! Use wet dry to get reference ssh level
    USE in_out_manager  !
+   USE lib_mpp, ONLY: ctl_stop
 
    IMPLICIT NONE
    PRIVATE

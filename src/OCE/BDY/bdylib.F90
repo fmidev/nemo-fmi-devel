@@ -17,6 +17,7 @@ MODULE bdylib
    !
    USE in_out_manager !
    USE lbclnk         ! ocean lateral boundary conditions (or mpp link)
+   USE lib_mpp, ONLY: ctl_stop
 
    IMPLICIT NONE
    PRIVATE

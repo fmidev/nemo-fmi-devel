@@ -16,6 +16,7 @@ MODULE bdydyn3d
    USE bdylib          ! for orlanski library routines
    USE lbclnk          ! ocean lateral boundary conditions (or mpp link)
    USE in_out_manager  !
+   USE lib_mpp, ONLY: ctl_stop
    Use phycst
 
    IMPLICIT NONE

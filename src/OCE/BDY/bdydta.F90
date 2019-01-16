@@ -30,6 +30,7 @@ MODULE bdydta
    USE icevar         ! redistribute ice input into categories
 #endif
    !
+   USE lib_mpp, ONLY: ctl_stop, ctl_nam
    USE fldread        ! read input fields
    USE iom            ! IOM library
    USE in_out_manager ! I/O logical units

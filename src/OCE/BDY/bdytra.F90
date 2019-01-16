@@ -18,6 +18,7 @@ MODULE bdytra
    !
    USE in_out_manager ! I/O manager
    USE lbclnk         ! ocean lateral boundary conditions (or mpp link)
+   USE lib_mpp, ONLY: ctl_stop
    USE timing         ! Timing
 
    IMPLICIT NONE
