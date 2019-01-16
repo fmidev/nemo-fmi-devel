@@ -167,7 +167,8 @@ MODULE lib_mpp
    LOGICAL, PUBLIC                               ::   l_full_nf_update = .TRUE.    !: logical for a full (2lines) update of bc at North fold report
    INTEGER,                    PARAMETER, PUBLIC ::   nbdelay = 2       !: number of delayed operations
    !: name (used as id) of allreduce-delayed operations
-   CHARACTER(len=32), DIMENSION(nbdelay), PUBLIC ::   c_delaylist = (/ 'cflice', 'fwb' /)
+   ! Warning: we must use the same character length in an array constructor (at least for gcc compiler)
+   CHARACTER(len=32), DIMENSION(nbdelay), PUBLIC ::   c_delaylist = (/ 'cflice', 'fwb   ' /)
    !: component name where the allreduce-delayed operation is performed
    CHARACTER(len=3),  DIMENSION(nbdelay), PUBLIC ::   c_delaycpnt = (/ 'ICE'   , 'OCE' /)
    TYPE, PUBLIC ::   DELAYARR

@@ -571,7 +571,8 @@ CONTAINS
             CALL iom_nf90_check(NF90_REDEF( if90id ), clinfo)   ;   iom_file(kiomid)%irec = -1
          ENDIF
          ! define the dimension variables if it is not already done
-         cltmp = (/ 'nav_lon', 'nav_lat', 'nav_lev', 'time_counter', 'numcat' /)
+         ! Warning: we must use the same character length in an array constructor (at least for gcc compiler)
+         cltmp = (/ 'nav_lon     ', 'nav_lat     ', 'nav_lev     ', 'time_counter', 'numcat      ' /)   
          CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(1)), NF90_FLOAT , (/ 1, 2 /), iom_file(kiomid)%nvid(1) ), clinfo)
          CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(2)), NF90_FLOAT , (/ 1, 2 /), iom_file(kiomid)%nvid(2) ), clinfo)
          CALL iom_nf90_check(NF90_DEF_VAR( if90id, TRIM(cltmp(3)), NF90_FLOAT , (/ 3    /), iom_file(kiomid)%nvid(3) ), clinfo)
