@@ -481,6 +481,8 @@ CONTAINS
       oa_i_b (:,:,:)   = oa_i (:,:,:)
       u_ice_b(:,:)     = u_ice(:,:)
       v_ice_b(:,:)     = v_ice(:,:)
+      ! total concentration is needed for Lupkes parameterizations
+      at_i_b (:,:)     = at_i (:,:) 
 
 !!clem: output of initial state should be written here but it is impossible because
 !!      the ocean and ice are in the same file
