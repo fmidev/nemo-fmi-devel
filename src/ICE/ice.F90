@@ -181,7 +181,6 @@ MODULE ice
 
    !                                     !!** ice-ponds namelist (namthd_pnd)
    LOGICAL , PUBLIC ::   ln_pnd_H12       !: Melt ponds scheme from Holland et al 2012
-   LOGICAL , PUBLIC ::   ln_pnd_fwb       !: melt ponds store freshwater
    LOGICAL , PUBLIC ::   ln_pnd_CST       !: Melt ponds scheme with constant fraction and depth
    REAL(wp), PUBLIC ::   rn_apnd          !: prescribed pond fraction (0<rn_apnd<1)
    REAL(wp), PUBLIC ::   rn_hpnd          !: prescribed pond depth    (0<rn_hpnd<1)

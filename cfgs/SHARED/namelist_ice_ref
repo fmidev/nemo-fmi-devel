@@ -24,7 +24,7 @@
    jpl              =   5             !  number of ice  categories
    nlay_i           =   2             !  number of ice  layers
    nlay_s           =   1             !  number of snow layers (only 1 is working)
-   ln_virtual_itd   =   .FALSE.       !  virtual ITD mono-category parameterization (jpl=1 only)
+   ln_virtual_itd   =   .false.       !  virtual ITD mono-category parameterization (jpl=1 only)
                                       !     i.e. enhanced thermal conductivity & virtual thin ice melting
    ln_icedyn        = .true.          !  ice dynamics (T) or not (F)
    ln_icethd        = .true.          !  ice thermo   (T) or not (F)
@@ -164,7 +164,7 @@
    nn_icesal        =   2             !  ice salinity option
                                       !     1: constant ice salinity (S=rn_icesal)
                                       !     2: varying salinity parameterization S(z,t)
-                                      !     3: prescribed salinity profile S(z), Schwarzacher, 1959
+                                      !     3: prescribed salinity profile S(z) (Schwarzacher 1959)
    rn_icesal        =   4.            !      (nn_icesal=1) ice salinity (g/kg)
    rn_sal_gd        =   5.            !      (nn_icesal=2) restoring ice salinity, gravity drainage (g/kg)
    rn_time_gd       =   1.73e+6       !      (nn_icesal=2) restoring time scale,   gravity drainage  (s)
@@ -177,10 +177,9 @@
 &namthd_pnd     !   Melt ponds
 !------------------------------------------------------------------------------
    ln_pnd_H12       = .false.         !  activate evolutive melt ponds (from Holland et al 2012)
-      ln_pnd_fwb    = .false.         !     melt ponds store freshwater or not
-   ln_pnd_CST       = .false.         !  activate constant melt ponds
-      rn_apnd       =   0.2           !     prescribed pond fraction, at Tsu=0
-      rn_hpnd       =   0.05          !     prescribed pond depth, at Tsu=0
+   ln_pnd_CST       = .false.         !  activate constant  melt ponds
+      rn_apnd       =   0.2           !     prescribed pond fraction, at Tsu=0 degC
+      rn_hpnd       =   0.05          !     prescribed pond depth,    at Tsu=0 degC
    ln_pnd_alb       = .false.         !  melt ponds affect albedo or not
 /
 !------------------------------------------------------------------------------

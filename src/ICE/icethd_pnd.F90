@@ -165,7 +165,7 @@ CONTAINS
             v_ip_1d(ji) = MAX( 0._wp, v_ip_1d(ji) + zfr_mlt * zdv_mlt )
             !
             ! melt pond mass flux (<0)
-            IF( ln_pnd_fwb .AND. zdv_mlt > 0._wp ) THEN
+            IF( zdv_mlt > 0._wp ) THEN
                zfac = zfr_mlt * zdv_mlt * rhow * r1_rdtice
                wfx_pnd_1d(ji) = wfx_pnd_1d(ji) - zfac
                !
@@ -204,7 +204,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       INTEGER  ::   ios, ioptio   ! Local integer
       !!
-      NAMELIST/namthd_pnd/  ln_pnd_H12, ln_pnd_fwb, ln_pnd_CST, rn_apnd, rn_hpnd, ln_pnd_alb
+      NAMELIST/namthd_pnd/  ln_pnd_H12, ln_pnd_CST, rn_apnd, rn_hpnd, ln_pnd_alb
       !!-------------------------------------------------------------------
       !
       REWIND( numnam_ice_ref )              ! Namelist namthd_pnd  in reference namelist : Melt Ponds  
@@ -220,9 +220,8 @@ CONTAINS
          WRITE(numout,*) 'ice_thd_pnd_init: ice parameters for melt ponds'
          WRITE(numout,*) '~~~~~~~~~~~~~~~~'
          WRITE(numout,*) '   Namelist namicethd_pnd:'
-         WRITE(numout,*) '      Evolutive melt pond fraction and depth (Holland et al 2012)  ln_pnd_H12 = ', ln_pnd_H12
-         WRITE(numout,*) '         Melt ponds store fresh water or not                       ln_pnd_fwb = ', ln_pnd_fwb
-         WRITE(numout,*) '      Prescribed melt pond fraction and depth                      ln_pnd_Cst = ', ln_pnd_CST
+         WRITE(numout,*) '      Evolutive  melt pond fraction and depth (Holland et al 2012) ln_pnd_H12 = ', ln_pnd_H12
+         WRITE(numout,*) '      Prescribed melt pond fraction and depth                      ln_pnd_CST = ', ln_pnd_CST
          WRITE(numout,*) '         Prescribed pond fraction                                  rn_apnd    = ', rn_apnd
          WRITE(numout,*) '         Prescribed pond depth                                     rn_hpnd    = ', rn_hpnd
          WRITE(numout,*) '      Melt ponds affect albedo or not                              ln_pnd_alb = ', ln_pnd_alb
@@ -237,10 +236,7 @@ CONTAINS
       !
       SELECT CASE( nice_pnd )
       CASE( np_pndNO )         
-         IF(ln_pnd_fwb) THEN ; ln_pnd_fwb = .FALSE. ; CALL ctl_warn( 'ln_pnd_fwb=false when no ponds' ) ; ENDIF
-         IF(ln_pnd_alb) THEN ; ln_pnd_alb = .FALSE. ; CALL ctl_warn( 'ln_pnd_alb=false when no ponds' ) ; ENDIF
-      CASE( np_pndCST)
-         IF(ln_pnd_fwb) THEN ; ln_pnd_fwb = .FALSE. ; CALL ctl_warn( 'ln_pnd_fwb=false when ln_pnd_CST=true' ) ; ENDIF
+         IF( ln_pnd_alb ) THEN ; ln_pnd_alb = .FALSE. ; CALL ctl_warn( 'ln_pnd_alb=false when no ponds' ) ; ENDIF
       END SELECT
       !
    END SUBROUTINE ice_thd_pnd_init
