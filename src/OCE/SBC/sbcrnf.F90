@@ -239,8 +239,7 @@ CONTAINS
       INTEGER           ::   ios           ! Local integer output status for namelist read
       INTEGER           ::   nbrec         ! temporary integer
       REAL(wp)          ::   zacoef  
-      REAL(wp), DIMENSION(:,:,:), ALLOCATABLE :: zrnfcl    
-      REAL(wp), DIMENSION(:,:  ), ALLOCATABLE :: zrnf
+      REAL(wp), DIMENSION(jpi,jpj,2) :: zrnfcl    
       !!
       NAMELIST/namsbc_rnf/ cn_dir            , ln_rnf_depth, ln_rnf_tem, ln_rnf_sal,   &
          &                 sn_rnf, sn_cnf    , sn_s_rnf    , sn_t_rnf  , sn_dep_rnf,   &
@@ -371,23 +370,22 @@ CONTAINS
 
          CALL iom_open( TRIM( sn_rnf%clname ), inum )    !  open runoff file
          nbrec = iom_getszuld( inum )
-         ALLOCATE( zrnfcl(jpi,jpj,nbrec) )     ;      ALLOCATE( zrnf(jpi,jpj) )
+         zrnfcl(:,:,1) = 0._wp                                                          ! init the max to 0. in 1
          DO jm = 1, nbrec
-            CALL iom_get( inum, jpdom_data, TRIM( sn_rnf%clvar ), zrnfcl(:,:,jm), jm )
+            CALL iom_get( inum, jpdom_data, TRIM( sn_rnf%clvar ), zrnfcl(:,:,2), jm )   ! read the value in 2
+            zrnfcl(:,:,1) = MAXVAL( zrnfcl(:,:,:), DIM=3 )                              ! store the maximum value in time in 1
          END DO
          CALL iom_close( inum )
-         zrnf(:,:) = MAXVAL( zrnfcl(:,:,:), DIM=3 )   !  maximum value in time
-         DEALLOCATE( zrnfcl )
          !
          h_rnf(:,:) = 1.
          !
          zacoef = rn_dep_max / rn_rnf_max            ! coef of linear relation between runoff and its depth (150m for max of runoff)
          !
-         WHERE( zrnf(:,:) > 0._wp )  h_rnf(:,:) = zacoef * zrnf(:,:)   ! compute depth for all runoffs
+         WHERE( zrnfcl(:,:,1) > 0._wp )  h_rnf(:,:) = zacoef * zrnfcl(:,:,1)   ! compute depth for all runoffs
          !
          DO jj = 1, jpj                     ! take in account min depth of ocean rn_hmin
             DO ji = 1, jpi
-               IF( zrnf(ji,jj) > 0._wp ) THEN
+               IF( zrnfcl(ji,jj,1) > 0._wp ) THEN
                   jk = mbkt(ji,jj)
                   h_rnf(ji,jj) = MIN( h_rnf(ji,jj), gdept_0(ji,jj,jk ) )
                ENDIF
@@ -397,7 +395,7 @@ CONTAINS
          nk_rnf(:,:) = 0                       ! number of levels on which runoffs are distributed
          DO jj = 1, jpj
             DO ji = 1, jpi
-               IF( zrnf(ji,jj) > 0._wp ) THEN
+               IF( zrnfcl(ji,jj,1) > 0._wp ) THEN
                   jk = 2
                   DO WHILE ( jk /= mbkt(ji,jj) .AND. gdept_0(ji,jj,jk) < h_rnf(ji,jj) ) ;  jk = jk + 1
                   END DO
@@ -407,8 +405,6 @@ CONTAINS
                ENDIF
             END DO
          END DO
-         !
-         DEALLOCATE( zrnf )
          !
          DO jj = 1, jpj                                ! set the associated depth
             DO ji = 1, jpi

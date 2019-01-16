@@ -1353,9 +1353,7 @@ CONTAINS
       !!-----------------------------------------------------------------------
       iom_getszuld = -1
       IF( kiomid > 0 ) THEN
-         IF( iom_file(kiomid)%iduld .GE. 0 ) THEN
-            iom_getszuld = iom_file(kiomid)%lenuld
-         ENDIF
+         IF( iom_file(kiomid)%iduld > 0 )   iom_getszuld = iom_file(kiomid)%lenuld
       ENDIF
    END FUNCTION iom_getszuld
    
