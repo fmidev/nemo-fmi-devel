@@ -940,14 +940,14 @@ CONTAINS
                      ! check if point has to be sent
                      ii = idx_bdy(ib_bdy)%nbi(icount,igrd)
                      ij = idx_bdy(ib_bdy)%nbj(icount,igrd)
-                     if((com_east .ne. 1) .and. (ii == (nlci-1)) .and. (nbondi .le. 0)) then
+                     if((com_east .ne. 1) .and. (ii == nlci) .and. (nbondi .le. 0)) then
                         com_east = 1
                      elseif((com_west .ne. 1) .and. (ii == 2) .and. (nbondi .ge. 0) .and. (nbondi .ne. 2)) then
                         com_west = 1
                      endif 
                      if((com_south .ne. 1) .and. (ij == 2) .and. (nbondj .ge. 0) .and. (nbondj .ne. 2)) then
                         com_south = 1
-                     elseif((com_north .ne. 1) .and. (ij == (nlcj-1)) .and. (nbondj .le. 0)) then
+                     elseif((com_north .ne. 1) .and. (ij == nlcj) .and. (nbondj .le. 0)) then
                         com_north = 1
                      endif 
                      idx_bdy(ib_bdy)%nbr(icount,igrd)   = nbrdta(ib,igrd,ib_bdy)
@@ -959,7 +959,7 @@ CONTAINS
                        & nbjdta(ib,igrd,ib_bdy) >= is_b(1) .AND. nbjdta(ib,igrd,ib_bdy) <= in_b(1) .AND.   &
                        & nbrdta(ib,igrd,ib_bdy) == ir  ) THEN
                        ii = nbidta(ib,igrd,ib_bdy)- iw_b(1)+2
-                       if((com_west_b .ne. 1) .and. (ii == (nlcit(nowe+1)-1))) then
+                       if((com_west_b .ne. 1) .and. (ii == (nlcit(nowe+1)))) then
                           ij = nbjdta(ib,igrd,ib_bdy) - is_b(1)+2
                           if((ij == 2) .and. (nbondj == 0 .or. nbondj == 1)) then
                             com_south = 1
@@ -988,7 +988,7 @@ CONTAINS
                        & nbjdta(ib,igrd,ib_bdy) >= is_b(1) .AND. nbjdta(ib,igrd,ib_bdy) <= in_b(1) .AND.   &
                        & nbrdta(ib,igrd,ib_bdy) == ir  ) THEN
                        ii = nbidta(ib,igrd,ib_bdy)- iw_b(1)+2
-                       if((com_west_b .ne. 1) .and. (ii == (nlcit(nowe+1)-1))) then
+                       if((com_west_b .ne. 1) .and. (ii == (nlcit(nowe+1)))) then
                           ij = nbjdta(ib,igrd,ib_bdy) - is_b(1)+2
                           if((ij == 2) .and. (nbondj == 0 .or. nbondj == 1)) then
                             com_south = 1
@@ -1029,7 +1029,7 @@ CONTAINS
                        & nbjdta(ib,igrd,ib_bdy) >= is_b(3) .AND. nbjdta(ib,igrd,ib_bdy) <= in_b(3) .AND.   &
                        & nbrdta(ib,igrd,ib_bdy) == ir  ) THEN
                        ij = nbjdta(ib,igrd,ib_bdy)- is_b(3)+2
-                       if((com_south_b .ne. 1) .and. (ij == (nlcjt(noso+1)-1))) then
+                       if((com_south_b .ne. 1) .and. (ij == (nlcjt(noso+1)))) then
                           com_south_b = 1
                        endif 
                      ENDIF
@@ -1051,7 +1051,7 @@ CONTAINS
                        & nbjdta(ib,igrd,ib_bdy) >= is_b(3) .AND. nbjdta(ib,igrd,ib_bdy) <= in_b(3) .AND.   &
                        & nbrdta(ib,igrd,ib_bdy) == ir  ) THEN
                        ij = nbjdta(ib,igrd,ib_bdy)- is_b(3)+2
-                       if((com_south_b .ne. 1) .and. (ij == (nlcjt(noso+1)-1))) then
+                       if((com_south_b .ne. 1) .and. (ij == (nlcjt(noso+1)))) then
                           com_south_b = 1
                        endif 
                      ENDIF
