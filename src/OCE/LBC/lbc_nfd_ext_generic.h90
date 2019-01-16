@@ -11,7 +11,7 @@
 
    SUBROUTINE ROUTINE_NFD( ptab, cd_nat, psgn, kextj )
       !!----------------------------------------------------------------------
-      INTEGER          , INTENT(in   ) ::   kextj       ! extra halo width at north fold, declared before its use in ARRAY_TYPE (neded by some compilers...)
+      INTEGER          , INTENT(in   ) ::   kextj       ! extra halo width at north fold, declared before its use in ARRAY_TYPE
       ARRAY_TYPE(:,1-kextj:,:,:,:)                      ! array or pointer of arrays on which the boundary condition is applied
       CHARACTER(len=1) , INTENT(in   ) ::   NAT_IN(:)   ! nature of array grid-points
       REAL(wp)         , INTENT(in   ) ::   SGN_IN(:)   ! sign used across the north fold boundary
