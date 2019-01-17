@@ -23,10 +23,8 @@
 &nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
 !-----------------------------------------------------------------------
    ln_nnogather=  .true.   !  activate code to avoid mpi_allgather use at the northfold
-   jpni        =   3       !  jpni   number of processors following i (set automatically if < 1)
-   jpnj        =   3       !  jpnj   number of processors following j (set automatically if < 1)
-   nn_comm_mod  =   1      !  step routine call frequency
-   ln_comm_only = .false.  !  replace step routine by realistic communications only
+   jpni        =   0       !  jpni   number of processors following i (set automatically if < 1)
+   jpnj        =   0       !  jpnj   number of processors following j (set automatically if < 1)
 /
 !-----------------------------------------------------------------------
 &namctl        !   Control prints                                       (default: OFF)
