@@ -669,7 +669,7 @@ CONTAINS
       INTEGER, DIMENSION(knbi,knbj), OPTIONAL, INTENT(  out) ::   klci, klcj
       !
       INTEGER ::   ji, jj
-      INTEGER ::   iresti, irestj
+      INTEGER ::   iresti, irestj, irm, ijpjmin
       INTEGER ::   ireci, irecj
       !!----------------------------------------------------------------------
       !
@@ -704,8 +704,31 @@ CONTAINS
 #else
       klci(1:iresti      ,:) = kimax
       klci(iresti+1:knbi ,:) = kimax-1
-      klcj(:,      1:irestj) = kjmax
-      klcj(:, irestj+1:knbj) = kjmax-1
+      IF( MINVAL(klci) < 3 ) THEN
+         WRITE(ctmp1,*) '   mpp_basic_decomposition: minimum value of jpi must be >= 3'
+         WRITE(ctmp2,*) '   We have ', MINVAL(klci)
+        CALL ctl_stop( 'STOP', ctmp1, ctmp2 )
+      ENDIF
+      IF( jperio == 3 .OR. jperio == 4 .OR. jperio == 5 .OR. jperio == 6 ) THEN
+         ! minimize the size of the last row to compensate for the north pole folding coast
+         IF( jperio == 3 .OR. jperio == 4 )   ijpjmin = 5   ! V and F folding involves line jpj-3 that must not be south boundary
+         IF( jperio == 5 .OR. jperio == 6 )   ijpjmin = 4   ! V and F folding involves line jpj-2 that must not be south boundary
+         irm = knbj - irestj                                    ! total number of lines to be removed
+         klcj(:,            knbj) = MAX( ijpjmin, kjmax-irm )   ! we must have jpj >= ijpjmin in the last row
+         irm = irm - ( kjmax - klcj(1,knbj) )                   ! remaining number of lines to remove 
+         irestj = knbj - 1 - irm                        
+         klcj(:,        1:irestj) = kjmax
+         klcj(:, irestj+1:knbj-1) = kjmax-1
+      ELSE
+         ijpjmin = 3
+         klcj(:,      1:irestj) = kjmax
+         klcj(:, irestj+1:knbj) = kjmax-1
+      ENDIF
+      IF( MINVAL(klcj) < ijpjmin ) THEN
+         WRITE(ctmp1,*) '   mpp_basic_decomposition: minimum value of jpj must be >= ', ijpjmin
+         WRITE(ctmp2,*) '   We have ', MINVAL(klcj)
+         CALL ctl_stop( 'STOP', ctmp1, ctmp2 )
+      ENDIF
 #endif
 
       !  2. Index arrays for subdomains

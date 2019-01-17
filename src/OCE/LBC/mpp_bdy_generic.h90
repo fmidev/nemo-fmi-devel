@@ -190,7 +190,20 @@
          !
       END DO
 
-      ! 3. North and south directions
+      ! 3. north fold treatment
+      ! -----------------------
+      !
+      ! do it before south directions so concerned processes can do it without waiting for the comm with the sourthern neighbor
+      IF( npolj /= 0) THEN
+         !
+         SELECT CASE ( jpni )
+         CASE ( 1 )     ;   CALL lbc_nfd( ptab, NAT_IN(:), SGN_IN(:) OPT_K(:) )   ! only 1 northern proc, no mpp
+         CASE DEFAULT   ;   CALL mpp_nfd( ptab, NAT_IN(:), SGN_IN(:) OPT_K(:) )   ! for all northern procs.
+         END SELECT
+         !
+      ENDIF
+
+      ! 4. North and south directions
       ! -----------------------------
       ! always closed : we play only with the neigbours
       !
@@ -264,18 +277,6 @@
             END DO
          END SELECT
       END DO
-
-      ! 4. north fold treatment
-      ! -----------------------
-      !
-      IF( npolj /= 0) THEN
-         !
-         SELECT CASE ( jpni )
-         CASE ( 1 )     ;   CALL lbc_nfd( ptab, NAT_IN(:), SGN_IN(:) OPT_K(:) )   ! only 1 northern proc, no mpp
-         CASE DEFAULT   ;   CALL mpp_nfd( ptab, NAT_IN(:), SGN_IN(:) OPT_K(:) )   ! for all northern procs.
-         END SELECT
-         !
-      ENDIF
       !
       DEALLOCATE( zt3ns, zt3sn, zt3ew, zt3we  )
       !
