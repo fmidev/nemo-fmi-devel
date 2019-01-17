@@ -155,10 +155,11 @@ CONTAINS
             IF ( ABS( zs   ) > zs_sill )   WRITE(numout,*) 'violation saline [psu*Mt/day] (',cd_routine,') = ',zs
             IF ( ABS( zt   ) > zt_sill )   WRITE(numout,*) 'violation enthalpy [GW]       (',cd_routine,') = ',zt
             IF ( zvmin < -epsi10 )         WRITE(numout,*) 'violation v_i<0  [m]          (',cd_routine,') = ',zvmin
-            IF ( zamax > MAX(rn_amax_n,rn_amax_s)+epsi10 .AND. cd_routine /= 'icedyn_adv' .AND. cd_routine /= 'icedyn_rdgrft' )  &
+            IF ( zamax > MAX( rn_amax_n, rn_amax_s ) + epsi10   &
+               & .AND. cd_routine /= 'icedyn_adv' .AND. cd_routine /= 'icedyn_rdgrft' .AND. cd_routine /= 'Hbig' ) &
                &                           WRITE(numout,*) 'violation a_i>amax            (',cd_routine,') = ',zamax
             IF ( zamin < -epsi10 )         WRITE(numout,*) 'violation a_i<0               (',cd_routine,') = ',zamin
-!clem: the following check fails when using UM3-5 advection scheme (see comments in icedyn_adv.F90)
+!clem: the following check fails when using UMx advection scheme (see comments in icedyn_adv.F90)
 !            IF ( ABS(zvtrp ) > zv_sill .AND. cd_routine == 'icedyn_adv' ) THEN
 !                                           WRITE(numout,*) 'violation vtrp [Mt/day]       (',cd_routine,') = ',zvtrp
 !                                           WRITE(numout,*) 'violation etrp [GW]           (',cd_routine,') = ',zetrp

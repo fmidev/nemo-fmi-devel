@@ -159,7 +159,7 @@ MODULE lib_mpp
    INTEGER, PUBLIC                               ::   ncom_dttrc = 1               !: copy of top time step # nn_dttrc
    INTEGER, PUBLIC                               ::   ncom_freq                    !: frequency of comm diagnostic
    INTEGER, PUBLIC , DIMENSION(:,:), ALLOCATABLE ::   ncomm_sequence               !: size of communicated arrays (halos)
-   INTEGER, PARAMETER, PUBLIC                    ::   ncom_rec_max = 2000          !: max number of communication record
+   INTEGER, PARAMETER, PUBLIC                    ::   ncom_rec_max = 3000          !: max number of communication record
    INTEGER, PUBLIC                               ::   n_sequence_lbc = 0           !: # of communicated arraysvia lbc
    INTEGER, PUBLIC                               ::   n_sequence_glb = 0           !: # of global communications
    INTEGER, PUBLIC                               ::   n_sequence_dlg = 0           !: # of delayed global communications

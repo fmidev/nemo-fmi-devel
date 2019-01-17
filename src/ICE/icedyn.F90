@@ -80,8 +80,7 @@ CONTAINS
       !!--------------------------------------------------------------------
       !
       ! controls
-      IF( ln_timing    )   CALL timing_start('icedyn')                                                             ! timing
-      IF( ln_icediachk )   CALL ice_cons_hsm(0, 'icedyn', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation
+      IF( ln_timing )   CALL timing_start('icedyn')
       !
       IF( kt == nit000 .AND. lwp ) THEN
          WRITE(numout,*)
@@ -181,10 +180,9 @@ CONTAINS
          DEALLOCATE( zdivu_i )
 
       END SELECT
-       !
+      !
       ! controls
-      IF( ln_icediachk )   CALL ice_cons_hsm(1, 'icedyn', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation
-      IF( ln_timing    )   CALL timing_stop ('icedyn')                                                             ! timing
+      IF( ln_timing )   CALL timing_stop ('icedyn')
       !
    END SUBROUTINE ice_dyn
 
@@ -211,6 +209,8 @@ CONTAINS
       INTEGER  ::   ji, jj, jl         ! dummy loop indices
       REAL(wp) ::   zhip, zhi, zhs, zvs_excess, zfra
       !!-------------------------------------------------------------------
+      ! controls
+      IF( ln_icediachk )   CALL ice_cons_hsm(0, 'Hbig', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation
       !
       CALL ice_var_zapsmall                       !-- zap small areas
       !
@@ -269,6 +269,9 @@ CONTAINS
       !                                           !-- correct pond fraction to avoid a_ip > a_i
       WHERE( a_ip(:,:,:) > a_i(:,:,:) )   a_ip(:,:,:) = a_i(:,:,:)
       !
+      ! controls
+      IF( ln_icediachk )   CALL ice_cons_hsm(1, 'Hbig', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation
+      !
    END SUBROUTINE Hbig
 
 
@@ -284,6 +287,8 @@ CONTAINS
       !!-------------------------------------------------------------------
       INTEGER ::   jl         ! dummy loop indices
       !!-------------------------------------------------------------------
+      ! controls
+      IF( ln_icediachk )   CALL ice_cons_hsm(0, 'Hpiling', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation
       !
       CALL ice_var_zapsmall                       !-- zap small areas
       !
@@ -293,6 +298,8 @@ CONTAINS
             a_i(:,:,jl) = a_i(:,:,jl) * (  1._wp + MIN( rn_amax_2d(:,:) - at_i(:,:) , 0._wp ) / at_i(:,:)  )
          END WHERE
       END DO
+      ! controls
+      IF( ln_icediachk )   CALL ice_cons_hsm(1, 'Hpiling', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft) ! conservation
       !
    END SUBROUTINE Hpiling
 
