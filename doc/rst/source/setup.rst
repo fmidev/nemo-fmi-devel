@@ -16,22 +16,22 @@ The NEMO so-called Reference Configurations cover a number of major features for
 (global, regional, 1D, using embeded zoom with AGRIF...)
 
 One can create a new configuration by duplicating one of the reference configurations
-(``ORCA2_LIM3_PISCES`` in the following example)
+(``ORCA2_ICE_PISCES`` in the following example)
 
 .. code-block:: sh
 
-	makenemo –n 'ORCA2_LIM3_PISCES_MINE' -r 'ORCA2_LIM3_PISCES'
+	makenemo –n 'ORCA2_ICE_PISCES_MINE' -r 'ORCA2_ICE_PISCES'
 
 Option 2: Duplicate with differences
 ------------------------------------
 
 Create and compile a new configuration based on a reference configuration
-(``ORCA2_LIM3_PISCES`` in the following example) but with different pre-processor options.
+(``ORCA2_ICE_PISCES`` in the following example) but with different pre-processor options.
 For this either add ``add_key`` or ``del_key`` keys as required; e.g.
 
 .. code-block:: sh
 
-	makenemo –n 'ORCA2_LIM3_PISCES_MINE' -r 'ORCA2_LIM3_PISCES' del_key 'key_iomput' add_key 'key_xios'
+	makenemo –n 'ORCA2_ICE_PISCES_MINE' -r 'ORCA2_ICE_PISCES' del_key 'key_iomput' add_key 'key_diahth'
 
 Option 3: Use the SIREN tools to subset an existing model
 ---------------------------------------------------------
@@ -64,15 +64,15 @@ Option 1: Create and use a domain configuration file
 
 This method is used by each of the reference configurations,
 so that downloading their input files linked to their description can help.
-Although starting from scratch it is advisable to create the directory structure to house your new configuration by
+Although starting from scratch, it is advisable to create the directory structure to house your new configuration by
 duplicating the closest reference configuration to your target application.
 For example, if your application requires both ocean ice and passive tracers,
-then use the ``ORCA2_LIM3_PISCES`` as template,
+then use the ``ORCA2_ICE_PISCES`` as template,
 and execute following command to build your ``MY_NEW_CONFIG`` configuration:
 
 .. code-block:: sh
 
-	makenemo –n 'MY_NEW_CONFIG' -r 'ORCA2_LIM3_PISCES'
+	makenemo –n 'MY_NEW_CONFIG' -r 'ORCA2_ICE_PISCES'
 
 where ``MY_NEW_CONFIG`` can be substituted with a suitably descriptive name for your new configuration.  
 
@@ -131,7 +131,7 @@ This method can be used whenever the domain geometry has a simple mathematical d
 the ocean initial state and boundary forcing is described analytically. 
 As a start, consider the case of starting a completely new ocean-only test case based on
 the ``LOCK_EXCHANGE`` example.
-[Note: we probably need an even more basic example than this with only one namelist and
+.. [Note: we probably need an even more basic example than this with only one namelist and
 minimal changes to the usrdef modules]
 
 Firstly, construct the directory structure, starting in the ``cfgs`` directory:
@@ -142,7 +142,7 @@ Firstly, construct the directory structure, starting in the ``cfgs`` directory:
 
 where the ``-t`` option has been used to locate the new configuration in the ``tests`` subdirectory
 (it is recommended practice to keep full configurations and idealised cases clearly distinguishable).
-This command will have created (amongst others) the following files and directories::
+This command will create (amongst others) the following files and directories::
 
 	./tests/MY_NEW_TEST:
 	BLD	  MY_SRC cpp_MY_NEW_TEST.fcm
@@ -210,8 +210,8 @@ the various resolutions of the global models.
 They do not need to be considered here in the context of idealised cases but it is worth noting that all
 configuration specific code has now been isolated in the usrdef modules.
 In the case of these last two modules, they are activated only if an ORCA configuration is detected.
-Currently this requires a specific integer variable named ``ORCA`` to be set in a ``domain_cfg.nc`` file.
-[Note: this would be less confusing if the cn_cfg string is read directly as a character attribue from
+Currently, this requires a specific integer variable named ``ORCA`` to be set in a ``domain_cfg.nc`` file.
+.. [Note: this would be less confusing if the cn_cfg string is read directly as a character attribue from
 the ``domain_cfg.nc`` ]
 
 So, in most cases, the set up of idealised model configurations can be completed by
@@ -221,7 +221,7 @@ The default set are those used for the GYRE reference configuration.
 The contents of ``MY_SRC`` directories from other idealised configurations may provide more convenient templates if
 they share common characteristics with your target application.
 
-Whatever the starting point it should not require too many changes or additional lines of code to
+Whatever the starting point, it should not require too many changes or additional lines of code to
 produce routines in ``./src/OCE/USR`` that define analytically the domain,
 the initial state and the surface boundary conditions for your new configuration.
 
@@ -242,7 +242,7 @@ ORCA2 reference configurations and established global configurations using the O
 
 From version 4.0, the NEMO release includes a ``tests`` subdirectory containing available and
 up to date test cases build by the community.
-These will not be fully supported as is NEMO reference but should provide a source of raw material.
+These will not be fully supported as are NEMO reference configurations, but should provide a source of raw material.
 
 .. _here:                     http://prodn.idris.fr/thredds/catalog/ipsl_public/rron463/catalog.html?dataset=DatasetScanipsl_public/rron463/INPUT_SIREN.tar
 .. _the corresponding forum:  http://forge.ipsl.jussieu.fr/nemo/discussion/forum/2
