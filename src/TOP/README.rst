@@ -25,7 +25,7 @@ the following modules are available:
 	Interface to NEMO physical core for computing tracers transport
 
 ``CFC``
-	Inert carbon tracers (CFC11,CFC12, SF6)
+	Inert carbon tracers (CFC11,CFC12,SF6)
 
 ``C14``
 	Radiocarbon passive tracer
@@ -57,12 +57,6 @@ Here below the list of preprocessing keys that applies to the TOP interface (bes
 
 ``key_iomput``
 	use XIOS I/O
-
-``key_zdfddm`` & ``key_zdftke`` & ``key_zdfgls``
-	vertical schemes (need to be updated after Merge2017 finalization)
-
-``key_trabbl``
-	bottom boundary layer parameterization
 
 ``key_agrif``
 	enable AGRIF coupling
@@ -143,6 +137,8 @@ Note that ## is used to refer to a number in an array field.
 .. literalinclude:: ../../namelists/namtrc_ldf
 
 .. literalinclude:: ../../namelists/namtrc_rad
+
+.. literalinclude:: ../../namelists/namtrc_snk
 
 .. literalinclude:: ../../namelists/namtrc_dmp
 
@@ -295,7 +291,7 @@ and the related ``cpp_MYBGC.fcm`` content will be
 
 .. code-block:: perl
 
-	bld::tool::fppkeys  key_zdftke key_dynspg_ts key_iomput key_mpp_mpi key_top
+	bld::tool::fppkeys  key_iomput key_mpp_mpi key_top
 
 the compilation with ``makenemo`` will be executed through the following syntax
 
@@ -323,7 +319,7 @@ it will be necessary to extend the configuration ``cpp_NEMO_MYBGC.fcm`` file to 
 
 .. code-block:: perl
 
-	bld::tool::fppkeys  key_zdftke key_dynspg_ts key_iomput key_mpp_mpi key_top
+	bld::tool::fppkeys  key_iomput key_mpp_mpi key_top
 	
 	src::MYBGC::initialization         <MYBGCPATH>/initialization
 	src::MYBGC::pelagic                <MYBGCPATH>/pelagic
