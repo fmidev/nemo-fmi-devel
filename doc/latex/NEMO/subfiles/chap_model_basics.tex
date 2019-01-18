@@ -1094,13 +1094,13 @@ an additional tracer advection is introduced in combination with the isoneutral 
 \]
 where $ \vect U^\ast = \lt( u^\ast,v^\ast,w^\ast \rt)$ is a non-divergent,
 eddy-induced transport velocity. This velocity field is defined by:
-\[
+\begin{gather}
   % \label{eq:PE_eiv}
-  u^\ast &=   \frac{1}{e_3}            \pd[]{k} \lt( A^{eiv} \;        \tilde{r}_1 \rt) \\
-  v^\ast &=   \frac{1}{e_3}            \pd[]{k} \lt( A^{eiv} \;        \tilde{r}_2 \rt) \\
-  w^\ast &= - \frac{1}{e_1 e_2} \lt[   \pd[]{i} \lt( A^{eiv} \; e_2 \, \tilde{r}_1 \rt)
+  u^\ast =   \frac{1}{e_3}            \pd[]{k} \lt( A^{eiv} \;        \tilde{r}_1 \rt) \\
+  v^\ast =   \frac{1}{e_3}            \pd[]{k} \lt( A^{eiv} \;        \tilde{r}_2 \rt) \\
+  w^\ast = - \frac{1}{e_1 e_2} \lt[   \pd[]{i} \lt( A^{eiv} \; e_2 \, \tilde{r}_1 \rt)
                                      + \pd[]{j} \lt( A^{eiv} \; e_1 \, \tilde{r}_2 \rt) \rt]
-\]
+\end{gather}
 where $A^{eiv}$ is the eddy induced velocity coefficient
 (or equivalently the isoneutral thickness diffusivity coefficient),
 and $\tilde r_1$ and $\tilde r_2$ are the slopes between isoneutral and \textit{geopotential} surfaces.

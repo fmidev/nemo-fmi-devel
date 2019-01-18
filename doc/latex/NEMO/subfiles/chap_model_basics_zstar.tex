@@ -88,7 +88,7 @@ while in the nonlinear case (\autoref{subsec:PE_free_surface}) they are time-dep
 With both linear and nonlinear free surface, external gravity waves are allowed in the equations,
 which imposes a very small time step when an explicit time stepping is used.
 Two methods are proposed to allow a longer time step for the three-dimensional equations:
-the filtered free surface, which is a modification of the continuous equations (see \autoref{eq:PE_flt}),
+the filtered free surface, which is a modification of the continuous equations %(see \autoref{eq:PE_flt}),
 and the split-explicit free surface described below.
 The extra term introduced in the filtered method is calculated implicitly,
 so that the update of the next velocities is done in module \mdl{dynspg\_flt} and not in \mdl{dynnxt}.
