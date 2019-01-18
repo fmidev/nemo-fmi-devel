@@ -25,28 +25,34 @@ for model in $models; do
 	 done
 
     echo; echo
-	 echo '¤ Vanished references in '$model' manual (\\autoref{...})'
+	 echo '¤ Chapters with vanished entries in '$model' manual (\{hf,jp,key,mdl,ngn,nlst,np,rou}{...})'
 
-	 for item in 'mdl' 'ngn' 'nlst' 'np' 'rou'; do
-        echo '- '$item':'
-        args_list=$( extract_arg $item )
+    for file in ${tex_files}; do
 
-        for arg in ${args_list}; do
+        items=$( grep -Eho "(hf|jp|key|mdl|ngn|nlst|np|rou){[a-zA-Z0-9_\]*}" $file | sort -u )
 
-            if   [[ "$item" == 'nlst' && ! -f namelists/$arg ]]; then
-			       printf '%15s: ' $arg
-			       grep -l \\nlst{$arg} ${tex_files} | sed 's/^.*\///'
-		      elif [[ ( "$item" == 'mdl' && ! $( find ../src -type f -name $arg.[Ffh]90  ) ) || \
-                    ( "$item" == 'ngn' && ! $( grep     \&$arg             namelists/* ) ) || \
-                    ( "$item" == 'rou' && ! $( grep -ri "SUBROUTINE *$arg" ../src      ) ) || \
-                    ( "$item" == 'np'  && ! $( grep     " $arg *="         namelists/* ) )      ]]; then
-                printf '%s ' $arg
+        [[ $items == '' ]] && continue
+
+        printf $file': '
+
+        for item in $items; do
+
+		      if [[ ( $item =~ 'hf'   && ! $( find ../src -type f -name   $arg.h90               ) ) || \
+                  ( $item =~ 'jp'   && ! $( grep ":: *$arg"             ../src/OCE/par_oce.F90 ) ) || \
+                  ( $item =~ 'key'  && ! $( grep -ri "#if .* $arg"      ../src                 ) ) || \
+		            ( $item =~ 'mdl'  && ! $( find ../src -type f -name   $arg.[Ff]90            ) ) || \
+                  ( $item =~ 'ngn'  && ! $( grep \&$arg                 namelists/*            ) ) || \
+                  ( $item =~ 'nlst' && ! -f namelists/$arg                                       ) || \
+                  ( $item =~ 'np'   && ! $( grep " $arg *="             namelists/*            ) ) || \
+                  ( $item =~ 'rou'  && ! $( grep -ri "SUBROUTINE *$arg" ../src                 ) )      ]]; then
+                printf $item' '
             fi
-        
+
         done
 
-        [ "$item" != 'nlst' ] && echo
-	 done
+        echo
+
+    done
 
 done
 
