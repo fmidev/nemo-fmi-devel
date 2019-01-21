@@ -10,15 +10,17 @@ List
 
   The description below is a brief description of the test cases available in NEMO. 
 
-ICEDYN
-------
+ICE_AGRIF
+---------
   
-  This test case illustrates the advection of an ice patch across a East/West and North/South periodic channel. 
-  This configuration can be used to test the advection of the ice patch in an AGRIF zoom (1:3) 
-  and across the AGRIF boundary or to test the ice advection schemes (Prather and Ultimate-Macho). 
-  In the latest case user need to remove ``key_agrif`` out of the CPP keys list. 
+  This test case illustrates the advection of an ice patch across an East/West and North/South periodic channel
+  over a slab ocean (i.e. one ocean layer), and with an AGRIF zoom (1:3) in the center
+  The purpose of this configuration is to test the advection of the ice patch in  
+  and across the AGRIF boundary
+  One can either impose ice velocities or ice-atm. stresses and let rheology define velocities
+  (see README for details)
 
-  .. image:: _static/ICEDYN_UDIAG_43days_UM5.gif
+  .. image:: _static/ICE_AGRIF_UDIAG_43days_UM5.gif
 
 VORTEX
 ------
@@ -89,6 +91,31 @@ CANAL
 
   .. image::_static/CANAL_image.gif
 
+ICE_ADV2D
+---------
+  
+  This test case illustrates the advection of an ice patch across an East/West and North/South periodic channel
+  over a slab ocean (i.e. one ocean layer).
+  The configuration is similar to ICE_AGRIF, except for the AGRIF zoom.
+  The purpose of this configuration is to test the advection schemes available in the sea-ice code
+  (for now, Prather and Ultimate-Macho from 1st to 5th order),
+  especially the occurence of overshoots in ice thickness
+  
+
+ICE_ADV1D
+---------
+  
+  This experiment is the classical Schar & Smolarkiewicz (1996) test case :cite:`SCHAR1996`,
+  which has been used in :cite:`LIPSCOMB2004`,
+  and in which very specific shapes of ice concentration, thickness and volume converge toward the center of a basin.
+  Convergence is unidirectional (in x) while fields are homogeneous in y.
+  The purpose of this configuration is to test the caracteristics of advection schemes available in the sea-ice code
+  (for now, Prather and Ultimate-Macho from 1st to 5th order),
+  especially the constitency between concentration, thickness and volume, and the preservation of initial shapes.
+  
+  
+
+  
 Compile test cases
 ==================
 

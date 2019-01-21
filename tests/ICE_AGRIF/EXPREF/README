@@ -34,7 +34,7 @@ What to look at
 ---------------
 the advection through an agrif zoom 1:3
    for a square (ice concentration) or a gaussian (ice volume)
-      with either a constant velocity (ln_dynADV2D=T)
+      with either a constant velocity (ln_dynADV2D=T and define rn_uice & rn_vice)
                or a constant ice-atm. stress, thus velocity is calculated by rheology (ln_dynRHGADV=T)
       with 1 or 5 ice categories (jpl=1 or 5)
          (note that ln_dynADV2D=T only works with jpl=1)
