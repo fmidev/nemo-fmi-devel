@@ -566,7 +566,7 @@ CONTAINS
             DO jj = 1 , jpj
                DO ji = 1 , jpi
                   IF( pe_i(ji,jj,jk,jl) < 0._wp .OR. pa_i(ji,jj,jl) < 0._wp ) THEN
-                     hfx_res(ji,jj)   = hfx_res(ji,jj) - pe_i(ji,jj,jk,jl) * r1_rdtice ! W.m-2 <0
+                     hfx_res(ji,jj)   = hfx_res(ji,jj) - pe_i(ji,jj,jk,jl) * r1_rdtice ! W.m-2 >0
                      pe_i(ji,jj,jk,jl) = 0._wp
                   ENDIF
                END DO

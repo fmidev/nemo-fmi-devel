@@ -111,6 +111,8 @@ CONTAINS
       REAL(wp), DIMENSION(:,:), INTENT(inout) ::   pstress1_i, pstress2_i, pstress12_i   !
       REAL(wp), DIMENSION(:,:), INTENT(  out) ::   pshear_i  , pdivu_i   , pdelta_i      !
       !!
+      LOGICAL, PARAMETER ::   ll_bdy_substep = .FALSE. ! temporary option to call bdy at each sub-time step (T)
+      !                                                                              or only at the main time step (F)
       INTEGER ::   ji, jj       ! dummy loop indices
       INTEGER ::   jter         ! local integers
       !
@@ -534,7 +536,7 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
             CALL agrif_interp_ice( 'V' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
+            IF( ln_bdy .AND. ll_bdy_substep ) CALL bdy_ice_dyn( 'V' )
             !
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1          
@@ -582,7 +584,7 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
             CALL agrif_interp_ice( 'U' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
+            IF( ln_bdy .AND. ll_bdy_substep ) CALL bdy_ice_dyn( 'U' )
             !
          ELSE ! odd iterations
             !
@@ -632,7 +634,7 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'U', jter, nn_nevp )
             CALL agrif_interp_ice( 'U' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'U' )
+            IF( ln_bdy .AND. ll_bdy_substep ) CALL bdy_ice_dyn( 'U' )
             !
             DO jj = 2, jpjm1
                DO ji = fs_2, fs_jpim1
@@ -680,7 +682,7 @@ CONTAINS
 !!            CALL agrif_interp_ice( 'V', jter, nn_nevp )
             CALL agrif_interp_ice( 'V' )
 #endif
-            IF( ln_bdy ) CALL bdy_ice_dyn( 'V' )
+            IF( ln_bdy .AND. ll_bdy_substep ) CALL bdy_ice_dyn( 'V' )
             !
          ENDIF
 
@@ -695,6 +697,11 @@ CONTAINS
          !                                                ! ==================== !
       END DO                                              !  end loop over jter  !
       !                                                   ! ==================== !
+      !
+      IF( ln_bdy .AND. .NOT.ll_bdy_substep ) THEN
+         CALL bdy_ice_dyn( 'U' )
+         CALL bdy_ice_dyn( 'V' )
+      ENDIF
       !
       !------------------------------------------------------------------------------!
       ! 4) Recompute delta, shear and div (inputs for mechanical redistribution) 
