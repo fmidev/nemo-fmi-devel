@@ -117,7 +117,7 @@ Setup your architecture configuration file
 ==========================================
 
 All compiler options in NEMO are controlled using files in
-NEMOGCM/ARCH/arch-'my_arch'.fcm where 'my_arch' is the name of the computing
+trunk/arch/arch-'my_arch'.fcm where 'my_arch' is the name of the computing
 architecture.  It is recommended to copy and rename an configuration file from
 an architecture similar to your owns. You will need to set appropriate values
 for all of the variables in the file. In particular the FCM variables:
@@ -256,7 +256,7 @@ For a given configuration (here called MY_CONFIG), the list of active CPP keys c
 
 .. code-block:: sh
 
-        NEMOGCM/CONFIG/'MYCONFIG'/cpp_'MY_CONFIG'.fcm
+        trunk/cfgs/'MYCONFIG'/cpp_'MY_CONFIG'.fcm
 
 
 This text file can be edited to change the list of active CPP keys. Once changed, one needs to recompile opa executable using makenemo command in order for this change to be taken in account.
