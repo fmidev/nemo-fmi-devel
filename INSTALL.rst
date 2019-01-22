@@ -1,6 +1,6 @@
-*********************
-Install the framework
-*********************
+*****************************
+Obtaining and installing NEMO
+*****************************
 
 .. contents::
 	:local:
@@ -162,32 +162,57 @@ Compilation folder (executables, headers files, libraries, preprocessed routines
 Computation folder for running the model (namelists, xml, executables and inputs-outputs)
 Folder intended to contain your customised routines (modified from initial ones or new entire routines)
 
-When you compile NEMO you will need to specify the following CPP keys:
-
-*   key_iomput
-*   key_mpp_mpi
-
 After successful execution of makenemo command, the executable called opa is created in the EXP00 directory (in the example above, the executable is created in CONFIG/MY_GYRE/EXP00).
-More options
 
-..
-	.. literalinclude::
+More makenemo options
+---------------------
+
+``makenemo`` has several other options that can control which source files are selected and the operation
+of the build process itself. These are:
+
+.. code-block:: sh
+
+        Optional:
+           -d   Set of new sub-components (space separated list from ./src directory)
+           -e   Path for alternative patch  location (default: 'MY_SRC' in configuration folder)
+           -h   Print this help
+           -j   Number of processes to compile (0: no build)
+           -n   Name for new configuration
+           -s   Path for alternative source location (default: 'src' root directory)
+           -t   Path for alternative build  location (default: 'BLD' in configuration folder)
+           -v   Level of verbosity ([0-3])
+
+These options can be useful for maintaining several code versions with only minor differences but they 
+should be used sparingly. Note however the ``-j`` option which should be used more routinely to speed up
+the build process. For example:
+
+.. code-block:: sh
+
+        ./makenemo –m 'my_arch' –r GYRE -n 'MY_GYRE' -j 8
+
+which will compile up to 8 modules simultaneously.
+
 
 Default behaviour
 -----------------
 
-    At the first use, you need the -m option to specify the architecture configuration file (compiler and its options, routines and libraries to include), then for next compilation, it is assumed you will be using the same compiler.
-    If –n option is not specified, ORCA2_LIM is the default configuration used. 
+At the first use, you need the -m option to specify the architecture
+configuration file (compiler and its options, routines and libraries to
+include), then for next compilation, it is assumed you will be using the
+same compiler.  If the –n option is not specified the last compiled configuration
+will be used.
 
 Tools used during the process
 -----------------------------
 
-    functions.sh : bash functions used by makenemo, for instance to create the WORK directory
-    cfg.txt : text list of configurations and source directories
-    bld.cfg : FCM rules to compile 
+*   functions.sh : bash functions used by makenemo, for instance to create the WORK directory
+*   cfg.txt : text list of configurations and source directories
+*   bld.cfg : FCM rules to compile 
 
 Examples
 --------
+
+.. code-block:: sh
 
         echo "Example to install a new configuration MY_CONFIG";
         echo "with OPA_SRC and LIM_SRC_2 ";
@@ -218,17 +243,28 @@ Running the model
 Once makenemo has run successfully, the opa executable is available in ``CONFIG/MY_CONFIG/EXP00``
 For the reference configurations, the EXP00 folder also contains the initial input files (namelists, \*xml files for the IOs…). If the configuration also needs NetCDF input files, this should be downloaded here from the corresponding tar file, see Users/Reference Configurations
 
-   cd 'MY_CONFIG'/EXP00
-   mpirun -n $NPROCS ./opa    # $NPROCS is the number of processes ; mpirun is your MPI wrapper
+.. code-block:: sh
+
+        cd 'MY_CONFIG'/EXP00
+        mpirun -n $NPROCS ./opa    # $NPROCS is the number of processes ; mpirun is your MPI wrapper
+
 
 Viewing and changing list of active CPP keys
 ============================================
 
-For a given configuration (here called MY_CONFIG), the list of active CPP keys can be found in::
+For a given configuration (here called MY_CONFIG), the list of active CPP keys can be found in:
 
-	NEMOGCM/CONFIG/'MYCONFIG'/cpp_'MY_CONFIG'.fcm
+.. code-block:: sh
+
+        NEMOGCM/CONFIG/'MYCONFIG'/cpp_'MY_CONFIG'.fcm
+
 
 This text file can be edited to change the list of active CPP keys. Once changed, one needs to recompile opa executable using makenemo command in order for this change to be taken in account.
+Note that most NEMO configurations will need to specify the following CPP keys:
+
+*   key_iomput
+*   key_mpp_mpi
+
 
 .. _HDF5:   http://www.hdfgroup.org/downloads/hdf5
 .. _NetCDF4: http://www.unidata.ucar.edu/downloads/netcdf
