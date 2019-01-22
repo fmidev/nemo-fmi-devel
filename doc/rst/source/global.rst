@@ -17,7 +17,7 @@
 
 .. _CMCC:           http://www.cmcc.it 
 .. _CNRS:           http://www.cnrs.fr
-.. _Mercator Océan: http://www.mercator-ocean.fr
+.. _Mercator Ocean: http://www.mercator-ocean.fr
 .. _Met Office:     http://www.metoffice.gov.uk
 .. _MOI:            http://www.mercator-ocean.fr
 .. _NERC:           http://nerc.ukri.org
