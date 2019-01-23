@@ -1005,7 +1005,7 @@ CONTAINS
       INTEGER, DIMENSION(knbi,knbj) ::   inboce                        ! number oce oce pint in each mpi subdomain
       INTEGER, DIMENSION(knbi*knbj) ::   inboce_1d
       INTEGER :: idiv, iimax, ijmax, iarea
-      INTEGER :: ji
+      INTEGER :: ji, jn
       LOGICAL, ALLOCATABLE, DIMENSION(:,:) ::   lloce                  ! lloce(i,j) = .true. if the point (i,j) is ocean 
       INTEGER, ALLOCATABLE, DIMENSION(:,:) ::   iimppt, ilci
       INTEGER, ALLOCATABLE, DIMENSION(:,:) ::   ijmppt, ilcj
@@ -1017,27 +1017,32 @@ CONTAINS
       ENDIF
 
       ! we want to read knbj strips of the land-sea mask. -> pick up knbj processes every idiv processes starting at 1
-      IF( knbj == 1 ) THEN   ;   idiv = mppsize
-      ELSE                   ;   idiv = ( mppsize - 1 ) / ( knbj - 1 )
+      IF           ( knbj == 1 ) THEN   ;   idiv = mppsize
+      ELSE IF ( mppsize < knbj ) THEN   ;   idiv = 1
+      ELSE                              ;   idiv = ( mppsize - 1 ) / ( knbj - 1 )
       ENDIF
       inboce(:,:) = 0          ! default no ocean point found
-      iarea = (narea-1)/idiv   ! involed process number (starting counting at 0)
-      IF( MOD( narea-1, idiv ) == 0 .AND. iarea < knbj ) THEN   ! beware idiv can be = to 1
+
+      DO jn = 0, (knbj-1)/mppsize   ! if mppsize < knbj : more strips than mpi processes (because of potential land domains)
          !
-         ALLOCATE( iimppt(knbi,knbj), ijmppt(knbi,knbj), ilci(knbi,knbj), ilcj(knbi,knbj) )
-         CALL mpp_basic_decomposition( knbi, knbj, iimax, ijmax, iimppt, ijmppt, ilci, ilcj )
-         !
-         ALLOCATE( lloce(jpiglo, ilcj(1,iarea+1)) )                                         ! allocate the strip
-         CALL mpp_init_readbot_strip( ijmppt(1,iarea+1), ilcj(1,iarea+1), lloce )           ! read the strip
-         DO  ji = 1, knbi
-            inboce(ji,iarea+1) = COUNT( lloce(iimppt(ji,1):iimppt(ji,1)+ilci(ji,1)-1,:) )   ! number of ocean point in a subdomain
-         END DO
-         !
-         DEALLOCATE(lloce)
-         DEALLOCATE(iimppt, ijmppt, ilci, ilcj)
-         !
-      ENDIF
-      
+         iarea = (narea-1)/idiv + jn * mppsize   ! involed process number (starting counting at 0)
+         IF( MOD( narea-1, idiv ) == 0 .AND. iarea < knbj ) THEN   ! beware idiv can be = to 1
+            !
+            ALLOCATE( iimppt(knbi,knbj), ijmppt(knbi,knbj), ilci(knbi,knbj), ilcj(knbi,knbj) )
+            CALL mpp_basic_decomposition( knbi, knbj, iimax, ijmax, iimppt, ijmppt, ilci, ilcj )
+            !
+            ALLOCATE( lloce(jpiglo, ilcj(1,iarea+1)) )                                         ! allocate the strip
+            CALL mpp_init_readbot_strip( ijmppt(1,iarea+1), ilcj(1,iarea+1), lloce )           ! read the strip
+            DO  ji = 1, knbi
+               inboce(ji,iarea+1) = COUNT( lloce(iimppt(ji,1):iimppt(ji,1)+ilci(ji,1)-1,:) )   ! number of ocean point in subdomain
+            END DO
+            !
+            DEALLOCATE(lloce)
+            DEALLOCATE(iimppt, ijmppt, ilci, ilcj)
+            !
+         ENDIF
+      END DO
+   
       inboce_1d = RESHAPE(inboce, (/ knbi*knbj /))
       CALL mpp_sum( 'mppini', inboce_1d )
       inboce = RESHAPE(inboce_1d, (/knbi, knbj/))
