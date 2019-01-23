@@ -239,7 +239,7 @@ CONTAINS
                   ! if h_s is larger than the surrounding 9 pts => put the snow excess in the ocean
                   zhs = v_s(ji,jj,jl) / a_i(ji,jj,jl)
                   IF( v_s(ji,jj,jl) > 0._wp .AND. zhs > phs_max(ji,jj,jl) .AND. a_i(ji,jj,jl) < 0.15 ) THEN
-                     zfra = a_i(ji,jj,jl) * phs_max(ji,jj,jl) / MAX( v_s(ji,jj,jl), epsi20 )
+                     zfra = phs_max(ji,jj,jl) / MAX( zhs, epsi20 )
                      !
                      wfx_res(ji,jj) = wfx_res(ji,jj) + ( v_s(ji,jj,jl) - a_i(ji,jj,jl) * phs_max(ji,jj,jl) ) * rhos * r1_rdtice
                      hfx_res(ji,jj) = hfx_res(ji,jj) - SUM( e_s(ji,jj,1:nlay_s,jl) ) * ( 1._wp - zfra ) * r1_rdtice ! W.m-2 <0
@@ -254,7 +254,7 @@ CONTAINS
                   !    this imposed mini can artificially make the snow very thick (if concentration decreases drastically)
                   zvs_excess = MAX( 0._wp, v_s(ji,jj,jl) - v_i(ji,jj,jl) * (rau0-rhoi) * r1_rhos )
                   IF( zvs_excess > 0._wp ) THEN
-                     zfra = zvs_excess / MAX( v_s(ji,jj,jl), epsi20 )
+                     zfra = ( v_s(ji,jj,jl) - zvs_excess ) / MAX( v_s(ji,jj,jl), epsi20 )
                      wfx_res(ji,jj) = wfx_res(ji,jj) + zvs_excess * rhos * r1_rdtice
                      hfx_res(ji,jj) = hfx_res(ji,jj) - SUM( e_s(ji,jj,1:nlay_s,jl) ) * ( 1._wp - zfra ) * r1_rdtice ! W.m-2 <0
                      !
