@@ -147,7 +147,7 @@ CONTAINS
          &  zmax(3) >= 100._wp .OR.   &                    ! too small sea surface salinity ( < -100 )
          &  zmax(4) >= 100._wp .OR.   &                    ! too large sea surface salinity ( > 100 )
          &  zmax(4) < -100._wp .OR.   &                    ! too large sea surface salinity (keep this line for sea-ice)
-         &  ISNAN( zmax(1) + zmax(2) + zmax(3) )  ) THEN   ! NaN encounter in the tests
+         &  ISNAN( zmax(1) + zmax(2) + zmax(3) ) ) ) THEN  ! NaN encounter in the tests
          IF( lk_mpp .AND. ln_ctl ) THEN
             CALL mpp_maxloc( 'stpctl', ABS(sshn)        , ssmask(:,:)  , zzz, ih  )
             CALL mpp_maxloc( 'stpctl', ABS(un)          , umask (:,:,:), zzz, iu  )
