@@ -150,6 +150,7 @@ CONTAINS
       INTEGER ::   ierr, ios                  ! 
       INTEGER ::   inbi, inbj, iimax,  ijmax, icnt1, icnt2
       LOGICAL ::   llbest
+      LOGICAL ::   llwrtlay
       INTEGER, ALLOCATABLE, DIMENSION(:)     ::   iin, ii_nono, ii_noea          ! 1D workspace
       INTEGER, ALLOCATABLE, DIMENSION(:)     ::   ijn, ii_noso, ii_nowe          !  -     -
       INTEGER, ALLOCATABLE, DIMENSION(:,:) ::   iimppt, ilci, ibondi, ipproc   ! 2D workspace
@@ -166,6 +167,7 @@ CONTAINS
            &             ln_vol, nn_volctl, nn_rimwidth, nb_jpk_bdy
       !!----------------------------------------------------------------------
 
+      llwrtlay = lwp .OR. ln_ctl .OR. sn_cfctl%l_layout
       ! do we need to take into account bdy_msk?
       REWIND( numnam_ref )              ! Namelist nambdy in reference namelist : BDY
       READ  ( numnam_ref, nambdy, IOSTAT = ios, ERR = 903)
@@ -553,7 +555,7 @@ CONTAINS
       END DO
 
       ! Save processor layout in ascii file
-      IF (lwp) THEN
+      IF (llwrtlay) THEN
          CALL ctl_opn( inum, 'layout.dat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, .FALSE., narea )
          WRITE(inum,'(a)') '   jpnij   jpimax  jpjmax    jpk  jpiglo  jpjglo'//&
    &           ' ( local:    narea     jpi     jpj )'
@@ -614,6 +616,8 @@ CONTAINS
             WRITE(numout,*)
             WRITE(numout,*) '   ==>>>   North fold boundary prepared for jpni >1'
             ! additional prints in layout.dat
+         ENDIF
+         IF (llwrtlay) THEN
             WRITE(inum,*)
             WRITE(inum,*)
             WRITE(inum,*) 'number of subdomains located along the north fold : ', ndim_rank_north
@@ -628,7 +632,7 @@ CONTAINS
       !
       IF( ln_nnogather ) THEN
          CALL mpp_init_nfdcom     ! northfold neighbour lists
-         IF (lwp) THEN
+         IF (llwrtlay) THEN
             WRITE(inum,*)
             WRITE(inum,*)
             WRITE(inum,*) 'north fold exchanges with explicit point-to-point messaging :'
@@ -639,7 +643,7 @@ CONTAINS
          ENDIF
       ENDIF
       !
-      IF (lwp) CLOSE(inum)   
+      IF (llwrtlay) CLOSE(inum)   
       !
       DEALLOCATE(iin, ijn, ii_nono, ii_noea, ii_noso, ii_nowe,    &
          &       iimppt, ijmppt, ibondi, ibondj, ipproc, ipolj,   &

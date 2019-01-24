@@ -99,6 +99,26 @@ MODULE in_out_manager
    !!                    output monitoring
    !!----------------------------------------------------------------------
    LOGICAL ::   ln_ctl           !: run control for debugging
+   TYPE :: sn_ctl                !: optional use structure for finer control over output selection
+      LOGICAL :: l_config  = .FALSE.  !: activate/deactivate finer control
+                                      !  Note if l_config is True then ln_ctl is ignored.
+                                      !  Otherwise setting ln_ctl True is equivalent to setting
+                                      !  all the following logicals in this structure True
+      LOGICAL :: l_runstat = .FALSE.  !: Produce/do not produce run.stat file (T/F)
+      LOGICAL :: l_trcstat = .FALSE.  !: Produce/do not produce tracer.stat file (T/F)
+      LOGICAL :: l_oceout  = .FALSE.  !: Produce all ocean.outputs    (T) or just one (F)
+      LOGICAL :: l_layout  = .FALSE.  !: Produce all layout.dat files (T) or just one (F)
+      LOGICAL :: l_mppout  = .FALSE.  !: Produce/do not produce mpp.output_XXXX files (T/F)
+      LOGICAL :: l_mpptop  = .FALSE.  !: Produce/do not produce mpp.top.output_XXXX files (T/F)
+                                      !  Optional subsetting of processor report files
+                                      !  Default settings of 0/1000000/1 should ensure all areas report.
+                                      !  Set to a more restrictive range to select specific areas
+      INTEGER :: procmin   = 0        !: Minimum narea to output
+      INTEGER :: procmax   = 1000000  !: Maximum narea to output
+      INTEGER :: procincr  = 1        !: narea increment to output
+      INTEGER :: ptimincr  = 1        !: timestep increment to output (time.step and run.stat)
+   END TYPE
+   TYPE (sn_ctl) :: sn_cfctl     !: run control structure for selective output
    LOGICAL ::   ln_timing        !: run control for timing
    LOGICAL ::   ln_diacfl        !: flag whether to create CFL diagnostics
    INTEGER ::   nn_print         !: level of print (0 no print)

@@ -209,7 +209,7 @@ CONTAINS
       IF( lk_mpp ) THEN
          sind = narea
          eind = narea
-         clb_name = "('mpp.top.output_',I3.3)"
+         clb_name = "('mpp.top.output_',I4.4)"
          cl_run = 'MULTI processor run'
          ! use indices for each area computed by mpp_init subroutine
          nlditl(1:jpnij) = nldit(:) 
@@ -228,7 +228,7 @@ CONTAINS
       ELSE
          sind = 1
          eind = ijsplt
-         clb_name = "('mono.top.output_',I3.3)"
+         clb_name = "('mono.top.output_',I4.4)"
          cl_run   = 'MONO processor run '
          ! compute indices for each area as done in mpp_init subroutine
          CALL sub_dom

@@ -92,8 +92,8 @@ CONTAINS
       INTEGER ::   ios, ilocal_comm   ! local integer
       CHARACTER(len=120), DIMENSION(30) ::   cltxt, cltxt2, clnam
       !
-      NAMELIST/namctl/ ln_ctl   , nn_print, nn_ictls, nn_ictle,   &
-         &             nn_isplt , nn_jsplt, nn_jctls, nn_jctle,   &
+      NAMELIST/namctl/ ln_ctl   , sn_cfctl, nn_print, nn_ictls, nn_ictle,   &
+         &             nn_isplt , nn_jsplt, nn_jctls, nn_jctle,             &
          &             ln_timing, ln_diacfl
       NAMELIST/namcfg/ ln_read_cfg, cn_domcfg, ln_closea, ln_write_cfg, cn_domcfg_out, ln_use_jattr
       !!----------------------------------------------------------------------
@@ -163,6 +163,18 @@ CONTAINS
 
       narea = narea + 1                                     ! mynode return the rank of proc (0 --> jpnij -1 )
 
+      IF( sn_cfctl%l_config ) THEN
+         ! Activate finer control of report outputs
+         ! optionally switch off output from selected areas (note this only
+         ! applies to output which does not involve global communications
+         IF( ( narea < sn_cfctl%procmin .OR. narea > sn_cfctl%procmax  ) .OR. &
+           & ( MOD( narea - sn_cfctl%procmin, sn_cfctl%procincr ) /= 0 ) )    &
+           &   CALL nemo_set_cfctl( sn_cfctl, .FALSE., .FALSE. )
+      ELSE
+         ! Use ln_ctl to turn on or off all options.
+         CALL nemo_set_cfctl( sn_cfctl, ln_ctl, .TRUE. )
+      ENDIF
+
       lwm = (narea == 1)                                    ! control of output namelists
       lwp = (narea == 1) .OR. ln_ctl                        ! control of all listing output print
 
@@ -187,16 +199,29 @@ CONTAINS
          WRITE(numout,*) '   CNRS - NERC - Met OFFICE - MERCATOR-ocean - INGV - CMCC'
          WRITE(numout,*) '                       NEMO team'
          WRITE(numout,*) '            Stand Alone Observation operator'
-         WRITE(numout,*) '                NEMO version 4.0  (2017) '
+         WRITE(numout,*) '                NEMO version 4.0  (2019) '
          WRITE(numout,*)
+         WRITE(numout,*) "           ._      ._      ._      ._      ._    "
+         WRITE(numout,*) "       _.-._)`\_.-._)`\_.-._)`\_.-._)`\_.-._)`\_ "
+         WRITE(numout,*)
+         WRITE(numout,*) "           o         _,           _,             "
+         WRITE(numout,*) "            o      .' (        .-' /             "
+         WRITE(numout,*) "           o     _/..._'.    .'   /              "
+         WRITE(numout,*) "      (    o .-'`      ` '-./  _.'               "
+         WRITE(numout,*) "       )    ( o)           ;= <_         (       "
+         WRITE(numout,*) "      (      '-.,\\__ __.-;`\   '.        )      "
+         WRITE(numout,*) "       )  )       \) |`\ \)  '.   \      (   (   "
+         WRITE(numout,*) "      (  (           \_/       '-._\      )   )  "
+         WRITE(numout,*) "       )  )                        `     (   (   "
+         WRITE(numout,*) "     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ "
          WRITE(numout,*)
          DO ji = 1, SIZE(cltxt)
-            IF( TRIM(cltxt (ji)) /= '' )   WRITE(numout,*) cltxt(ji)    ! control print of mynode
+            IF( TRIM(cltxt (ji)) /= '' )   WRITE(numout,*) TRIM(cltxt(ji))    ! control print of mynode
          END DO
          WRITE(numout,*)
          WRITE(numout,*)
          DO ji = 1, SIZE(cltxt2)
-            IF( TRIM(cltxt2(ji)) /= '' )   WRITE(numout,*) cltxt2(ji)   ! control print of domain size
+            IF( TRIM(cltxt2(ji)) /= '' )   WRITE(numout,*) TRIM(cltxt2(ji))   ! control print of domain size
          END DO
          !
          WRITE(numout,cform_aaa)                                        ! Flag AAAAAAA
@@ -244,6 +269,17 @@ CONTAINS
          WRITE(numout,*) '~~~~~~~~'
          WRITE(numout,*) '   Namelist namctl'
          WRITE(numout,*) '      run control (for debugging)     ln_ctl     = ', ln_ctl
+         WRITE(numout,*) '       finer control over o/p sn_cfctl%l_config  = ', sn_cfctl%l_config
+         WRITE(numout,*) '                              sn_cfctl%l_runstat = ', sn_cfctl%l_runstat
+         WRITE(numout,*) '                              sn_cfctl%l_trcstat = ', sn_cfctl%l_trcstat
+         WRITE(numout,*) '                              sn_cfctl%l_oceout  = ', sn_cfctl%l_oceout
+         WRITE(numout,*) '                              sn_cfctl%l_layout  = ', sn_cfctl%l_layout
+         WRITE(numout,*) '                              sn_cfctl%l_mppout  = ', sn_cfctl%l_mppout
+         WRITE(numout,*) '                              sn_cfctl%l_mpptop  = ', sn_cfctl%l_mpptop
+         WRITE(numout,*) '                              sn_cfctl%procmin   = ', sn_cfctl%procmin  
+         WRITE(numout,*) '                              sn_cfctl%procmax   = ', sn_cfctl%procmax  
+         WRITE(numout,*) '                              sn_cfctl%procincr  = ', sn_cfctl%procincr 
+         WRITE(numout,*) '                              sn_cfctl%ptimincr  = ', sn_cfctl%ptimincr 
          WRITE(numout,*) '      level of print                  nn_print   = ', nn_print
          WRITE(numout,*) '      Start i indice for SUM control  nn_ictls   = ', nn_ictls
          WRITE(numout,*) '      End i indice for SUM control    nn_ictle   = ', nn_ictle
@@ -265,13 +301,11 @@ CONTAINS
 
       IF(lwp) THEN                  ! control print
          WRITE(numout,*)
-         WRITE(numout,*) 'namcfg  : configuration initialization through namelist read'
-         WRITE(numout,*) '~~~~~~~ '
          WRITE(numout,*) '   Namelist namcfg'
          WRITE(numout,*) '      read domain configuration file                ln_read_cfg      = ', ln_read_cfg
          WRITE(numout,*) '         filename to be read                           cn_domcfg     = ', TRIM(cn_domcfg)
          WRITE(numout,*) '         keep closed seas in the domain (if exist)     ln_closea     = ', ln_closea
-         WRITE(numout,*) '      write configuration definition file           ln_write_cfg     = ', ln_write_cfg
+         WRITE(numout,*) '      create a configuration definition file        ln_write_cfg     = ', ln_write_cfg
          WRITE(numout,*) '         filename to be written                        cn_domcfg_out = ', TRIM(cn_domcfg_out)
          WRITE(numout,*) '      use file attribute if exists as i/p j-start   ln_use_jattr     = ', ln_use_jattr
       ENDIF
@@ -316,9 +350,9 @@ CONTAINS
          ENDIF
       ENDIF
       !
-      IF( 1_wp /= SIGN(1._wp,-0._wp)  )   CALL ctl_stop( 'nemo_ctl: The intrinsec SIGN function follows ',  &
-         &                                               'f2003 standard. '                              ,  &
-         &                                               'Compile with key_nosignedzero enabled' )
+      IF( 1._wp /= SIGN(1._wp,-0._wp)  )   CALL ctl_stop( 'nemo_ctl: The intrinsec SIGN function follows f2003 standard.',  &
+         &                                                'Compile with key_nosignedzero enabled:',   &
+         &                                                '--> add -Dkey_nosignedzero to the definition of %CPP in your arch file' )
       !
    END SUBROUTINE nemo_ctl
 
@@ -375,6 +409,33 @@ CONTAINS
       IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'nemo_alloc : unable to allocate standard ocean arrays' )
       !
    END SUBROUTINE nemo_alloc
+
+   SUBROUTINE nemo_set_cfctl(sn_cfctl, setto, for_all )
+      !!----------------------------------------------------------------------
+      !!                     ***  ROUTINE nemo_set_cfctl  ***
+      !!
+      !! ** Purpose :   Set elements of the output control structure to setto.
+      !!                for_all should be .false. unless all areas are to be
+      !!                treated identically.
+      !!
+      !! ** Method  :   Note this routine can be used to switch on/off some
+      !!                types of output for selected areas but any output types
+      !!                that involve global communications (e.g. mpp_max, glob_sum)
+      !!                should be protected from selective switching by the
+      !!                for_all argument
+      !!----------------------------------------------------------------------
+      LOGICAL :: setto, for_all
+      TYPE (sn_ctl) :: sn_cfctl
+      !!----------------------------------------------------------------------
+      IF( for_all ) THEN
+         sn_cfctl%l_runstat = setto
+         sn_cfctl%l_trcstat = setto
+      ENDIF
+      sn_cfctl%l_oceout  = setto
+      sn_cfctl%l_layout  = setto
+      sn_cfctl%l_mppout  = setto
+      sn_cfctl%l_mpptop  = setto
+   END SUBROUTINE nemo_set_cfctl
 
    !!======================================================================
 END MODULE nemogcm

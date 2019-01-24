@@ -77,7 +77,9 @@ CONTAINS
       !                          ! open ascii output file or files for iceberg status information
       !                          ! note that we choose to do this on all processors since we cannot
       !                          ! predict where icebergs will be ahead of time
-      CALL ctl_opn( numicb, 'icebergs.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
+      IF( nn_verbose_level > 0) THEN
+         CALL ctl_opn( numicb, 'icebergs.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
+      ENDIF
 
       ! set parameters (mostly from namelist)
       !
@@ -240,8 +242,10 @@ CONTAINS
          ENDIF
          CALL iom_close( inum )                                     ! close file
          !
-         WRITE(numicb,*)
-         WRITE(numicb,*) '          calving read in a file'
+         IF( nn_verbose_level > 0) THEN
+            WRITE(numicb,*)
+            WRITE(numicb,*) '          calving read in a file'
+         ENDIF
          ALLOCATE( sf_icb(1), STAT=istat1 )         ! Create sf_icb structure (calving)
          ALLOCATE( sf_icb(1)%fnow(jpi,jpj,1), STAT=istat2 )
          ALLOCATE( sf_icb(1)%fdta(jpi,jpj,1,2), STAT=istat3 )
@@ -335,7 +339,9 @@ CONTAINS
       !
       ibergs = icb_utl_count()
       CALL mpp_sum('icbini', ibergs)
-      WRITE(numicb,'(a,i6,a)') 'diamonds, icb_ini_gen: ',ibergs,' were generated'
+      IF( nn_verbose_level > 0) THEN
+         WRITE(numicb,'(a,i6,a)') 'diamonds, icb_ini_gen: ',ibergs,' were generated'
+      ENDIF
       !
    END SUBROUTINE icb_ini_gen
 

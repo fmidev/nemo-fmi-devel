@@ -639,7 +639,7 @@ CONTAINS
    
             zsbergs(0) = narea
             zsbergs(1) = nicbfldnsend(jn)
-            !IF ( nicbfldnsend(jn) .GT. 0) write(numicb,*) 'ICB sending ',nicbfldnsend(jn),' to ', ifldproc
+            !IF ( nicbfldnsend(jn) .GT. 0 .AND. nn_verbose_level > 0 ) write(numicb,*) 'ICB sending ',nicbfldnsend(jn),' to ', ifldproc
             CALL mppsend( 21, zsbergs(0:1), 2, ifldproc-1, nicbfldreq(jn))
          ENDIF
          !
@@ -655,10 +655,10 @@ CONTAINS
             DO jjn = 1,jpni
              IF( nicbfldproc(jjn) .eq. INT(znbergs(1)) ) EXIT
             END DO
-            IF( jjn .GT. jpni ) write(numicb,*) 'ICB ERROR'
+            IF( jjn .GT. jpni .AND. nn_verbose_level > 0 ) write(numicb,*) 'ICB ERROR'
             nicbfldexpect(jjn) = INT( znbergs(2) )
-            !IF ( nicbfldexpect(jjn) .GT. 0) write(numicb,*) 'ICB expecting ',nicbfldexpect(jjn),' from ', nicbfldproc(jjn)
-            !CALL FLUSH(numicb)
+            !IF ( nicbfldexpect(jjn) .GT. 0 .AND. nn_verbose_level > 0 ) write(numicb,*) 'ICB expecting ',nicbfldexpect(jjn),' from ', nicbfldproc(jjn)
+            !IF (nn_verbose_level > 0) CALL FLUSH(numicb)
          ENDIF
          !
       END DO
@@ -910,7 +910,7 @@ CONTAINS
             DEALLOCATE(old)
          ENDIF
          old => new
-        !WRITE( numicb,*) 'icb_increase_ibuffer',narea,' increased to',inew_size
+         !IF (nn_verbose_level > 0) WRITE( numicb,*) 'icb_increase_ibuffer',narea,' increased to',inew_size
       ENDIF
       !
    END SUBROUTINE icb_increase_ibuffer

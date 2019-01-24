@@ -71,7 +71,9 @@ CONTAINS
       CALL trc_ini_trp   ! passive tracers transport
       CALL trc_ice_ini   ! Tracers in sea ice
       !
-      IF(lwm) CALL ctl_opn( numstr, 'tracer.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp , narea )
+      IF( lwm .AND. sn_cfctl%l_trcstat ) THEN
+         CALL ctl_opn( numstr, 'tracer.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp , narea )
+      ENDIF
       !
       CALL trc_ini_state  !  passive tracers initialisation : from a restart or from clim
       IF( nn_dttrc /= 1 ) &

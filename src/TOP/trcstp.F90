@@ -56,6 +56,7 @@ CONTAINS
       !
       INTEGER ::   jk, jn   ! dummy loop indices
       REAL(wp)::   ztrai    ! local scalar
+      LOGICAL ::   ll_trcstat ! local logical
       CHARACTER (len=25) ::   charout   !
       !!-------------------------------------------------------------------
       !
@@ -67,6 +68,8 @@ CONTAINS
          r2dttrc = 2. * rdttrc       ! = 2 rdttrc (leapfrog)
       ENDIF
       !
+      ll_trcstat  = ( ln_ctl .OR. sn_cfctl%l_trcstat ) .AND. &
+     &              ( ( MOD( kt, sn_cfctl%ptimincr ) == 0 ) .OR. ( kt == nitend ) )
       IF( kt == nittrc000 .AND. lk_trdmxl_trc )  CALL trd_mxl_trc_init    ! trends: Mixed-layer
       !
       IF( .NOT.ln_linssh ) THEN                                           ! update ocean volume due to ssh temporal evolution
@@ -108,7 +111,7 @@ CONTAINS
          !
       ENDIF
       !
-      IF (ln_ctl ) THEN
+      IF (ll_trcstat) THEN
          ztrai = 0._wp                                                   !  content of all tracers
          DO jn = 1, jptra
             ztrai = ztrai + glob_sum( 'trcstp', trn(:,:,:,jn) * cvol(:,:,:)   )

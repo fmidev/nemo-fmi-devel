@@ -326,8 +326,10 @@ CONTAINS
             CALL report_consistant( 'bot interface','kg','sent',calving_out_net, &
                &                    'returned',calving_ret_net)
          ENDIF
-         WRITE( numicb, '("calved by class = ",i6,20(",",i6))') (nbergs_calved_by_class(ik),ik=1,nclasses)
-         IF( nspeeding_tickets > 0 )   WRITE( numicb, '("speeding tickets issued = ",i6)') nspeeding_tickets
+         IF (nn_verbose_level > 0) THEN
+            WRITE( numicb, '("calved by class = ",i6,20(",",i6))') (nbergs_calved_by_class(ik),ik=1,nclasses)
+            IF( nspeeding_tickets > 0 )   WRITE( numicb, '("speeding tickets issued = ",i6)') nspeeding_tickets
+         ENDIF
          !
          nbergs_start              = nbergs_end
          stored_start              = stored_end
@@ -436,11 +438,13 @@ CONTAINS
       IF( kt == nit000 ) THEN
          stored_start = SUM( berg_grid%stored_ice(:,:,:) )
          CALL mpp_sum( 'icbdia', stored_start )
-         WRITE(numicb,'(a,es13.6,a)')   'icb_dia_income: initial stored mass=',stored_start,' kg'
          !
          stored_heat_start = SUM( berg_grid%stored_heat(:,:) )
          CALL mpp_sum( 'icbdia', stored_heat_start )
-         WRITE(numicb,'(a,es13.6,a)')    'icb_dia_income: initial stored heat=',stored_heat_start,' J'
+         IF (nn_verbose_level > 0) THEN
+            WRITE(numicb,'(a,es13.6,a)')   'icb_dia_income: initial stored mass=',stored_start,' kg'
+            WRITE(numicb,'(a,es13.6,a)')   'icb_dia_income: initial stored heat=',stored_heat_start,' J'
+         ENDIF
       ENDIF
       !
       calving_rcv_net = calving_rcv_net + SUM( berg_grid%calving(:,:) ) * berg_dt
@@ -514,6 +518,7 @@ CONTAINS
       INTEGER,       INTENT(in), OPTIONAL :: kbergs
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       IF( PRESENT(kbergs) ) THEN
          WRITE(numicb,100) cd_budgetstr // ' state:',                                    &
             &              cd_startstr  // ' start',  pstartval,         cd_budgetunits, &
@@ -538,6 +543,7 @@ CONTAINS
       REAL(wp),      INTENT(in) :: pstartval, pendval
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       WRITE(numicb,200) cd_budgetstr // ' check:',                 &
          &              cd_startstr,    pstartval, cd_budgetunits, &
          &              cd_endstr,      pendval,   cd_budgetunits, &
@@ -557,6 +563,7 @@ CONTAINS
       REAL(wp) ::   zval
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       zval = ( ( pendval - pstartval ) - ( pinval - poutval ) ) /   &
          &   MAX( 1.e-30, MAX( ABS( pendval - pstartval ) , ABS( pinval - poutval ) ) )
          !
@@ -577,6 +584,7 @@ CONTAINS
       INTEGER      , INTENT(in) ::   pstartval, pendval
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       WRITE(numicb,100) cd_budgetstr // ' state:',           &
          &              cd_startstr  // ' start', pstartval, &
          &              cd_endstr    // ' end',   pendval,   &
@@ -594,6 +602,7 @@ CONTAINS
       INTEGER,       INTENT(in) :: pinval, poutval, pstartval, pendval
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       WRITE(numicb,200) cd_budgetstr // ' budget:', &
          &              cd_instr     // ' in',      pinval, &
          &              cd_outstr    // ' out',     poutval, &

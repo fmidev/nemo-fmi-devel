@@ -624,6 +624,7 @@ CONTAINS
       INTEGER                :: kt      ! timestep number
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       pt => berg%current_point
       WRITE(numicb, 9200) kt, berg%number(1), &
                    pt%xi, pt%yj, pt%lon, pt%lat, pt%uvel, pt%vvel,  &
@@ -648,6 +649,7 @@ CONTAINS
       TYPE(iceberg), POINTER :: this
       !!----------------------------------------------------------------------
       !
+      IF (nn_verbose_level == 0) RETURN
       this => first_berg
       IF( ASSOCIATED(this) ) THEN
          WRITE(numicb,'(a," pe=(",i3,")")' ) cd_label, narea

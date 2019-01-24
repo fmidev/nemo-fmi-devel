@@ -143,7 +143,7 @@ CONTAINS
             qns(:,:) = qns(:,:) - zcoef * sst_m(:,:) * tmask(:,:,1) ! account for change to the heat budget due to fw correction
          ENDIF
          !
-         IF( kt == nitend .AND. lwp ) THEN            ! save fwfold value in a file
+         IF( kt == nitend .AND. lwm ) THEN            ! save fwfold value in a file (only one required)
             CALL ctl_opn( inum, 'EMPave.dat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, .FALSE., narea )
             WRITE( inum, "(24X,I8,2ES24.16)" ) nyear, a_fwb_b, a_fwb
             CLOSE( inum )

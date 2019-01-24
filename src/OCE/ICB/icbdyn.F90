@@ -370,10 +370,12 @@ CONTAINS
          ENDIF
       ENDIF
       !                                      ! check the speed and acceleration limits
-      IF( ABS( zuveln ) > pp_vel_lim   .OR. ABS( zvveln ) > pp_vel_lim   )   &
-         WRITE(numicb,'("pe=",i3,x,a)') narea,'Dump triggered by excessive velocity'
-      IF( ABS( pax    ) > pp_accel_lim .OR. ABS( pay    ) > pp_accel_lim )   &
-         WRITE(numicb,'("pe=",i3,x,a)') narea,'Dump triggered by excessive acceleration'
+      IF (nn_verbose_level > 0) THEN
+         IF( ABS( zuveln ) > pp_vel_lim   .OR. ABS( zvveln ) > pp_vel_lim   )   &
+            WRITE(numicb,'("pe=",i3,x,a)') narea,'Dump triggered by excessive velocity'
+         IF( ABS( pax    ) > pp_accel_lim .OR. ABS( pay    ) > pp_accel_lim )   &
+            WRITE(numicb,'("pe=",i3,x,a)') narea,'Dump triggered by excessive acceleration'
+      ENDIF
       !
    END SUBROUTINE icb_accel
 

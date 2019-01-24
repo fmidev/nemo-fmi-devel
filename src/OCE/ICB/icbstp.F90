@@ -162,8 +162,10 @@ CONTAINS
 
       IF(lwp) WRITE(numout,'(a,i6)') 'icebergs: icb_end complete', narea
       !
-      CALL flush( numicb )
-      CLOSE( numicb )
+      IF( nn_verbose_level > 0 ) THEN
+         CALL flush( numicb )
+         CLOSE( numicb )
+      ENDIF
       !
    END SUBROUTINE icb_end
 
