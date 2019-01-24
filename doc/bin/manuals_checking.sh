@@ -8,43 +8,42 @@ else
 	 models='NEMO'
 fi
 
-extract_arg() {
-    ## $1: macro name, $2: prefix for filtering args (optional)
-	 eval grep -Poh "\\$1{\\$2\\\K[^}]+" ${tex_files} | tr -d '\\' | sort -u
-}
-
 for model in $models; do
 	 [[ $model =~ ^(SI3|TOP)$ ]] && continue
 
-    tex_files=$( find latex/$model -type f -name *.tex )
+    files=$( find latex/$model -type f -name *.tex )
 
 	 echo '¤ Missing namelist groups in '$model' manual'
 
 	 for nlst in $( ls namelists ); do
-        [[ ! $( grep \\nlst{$nlst} ${tex_files} ) ]] && printf '%s ' $nlst
+        [[ ! $( grep \\nlst{$nlst} $files ) ]] && printf '%s ' $nlst
 	 done
 
     echo; echo
-	 echo '¤ Chapters with vanished entries in '$model' manual (\{hf,jp,key,mdl,ngn,nlst,np,rou}{...})'
+	 echo '¤ Vanished index entries in '$model' manual (\{hf,jp,key,mdl,ngn,nlst,np,rou}{...})'
 
-    for file in ${tex_files}; do
+    for file in $files; do
 
         items=$( grep -Eho "(hf|jp|key|mdl|ngn|nlst|np|rou){[a-zA-Z0-9_\]*}" $file | sort -u )
 
-        [[ $items == '' ]] && continue
-
-        printf $file': '
+        if [[ $items == '' ]]; then
+            continue
+        else
+            printf ${file/latex\/*\/subfiles\/}': '
+        fi
 
         for item in $items; do
 
-		      if [[ ( $item =~ 'hf'   && ! $( find ../src -type f -name   $arg.h90               ) ) || \
-                  ( $item =~ 'jp'   && ! $( grep ":: *$arg"             ../src/OCE/par_oce.F90 ) ) || \
-                  ( $item =~ 'key'  && ! $( grep -ri "#if .* $arg"      ../src                 ) ) || \
-		            ( $item =~ 'mdl'  && ! $( find ../src -type f -name   $arg.[Ff]90            ) ) || \
-                  ( $item =~ 'ngn'  && ! $( grep \&$arg                 namelists/*            ) ) || \
-                  ( $item =~ 'nlst' && ! -f namelists/$arg                                       ) || \
-                  ( $item =~ 'np'   && ! $( grep " $arg *="             namelists/*            ) ) || \
-                  ( $item =~ 'rou'  && ! $( grep -ri "SUBROUTINE *$arg" ../src                 ) )      ]]; then
+            arg=$( echo $item | sed 's/.*{\([^}]*\)}/\1/' | tr -d '\\' )
+
+		      if [[ ( $item =~ ^hf   && ! $( find ../src -type f -name   $arg.h90               ) ) || \
+                  ( $item =~ ^jp   && ! $( grep ":: *$arg"             ../src/OCE/par_oce.F90 ) ) || \
+                  ( $item =~ ^key  && ! $( grep -ri "#if .* $arg"      ../src                 ) ) || \
+		            ( $item =~ ^mdl  && ! $( find ../src -type f -name   $arg.[Ff]90            ) ) || \
+                  ( $item =~ ^ngn  && ! $( grep \&$arg                 namelists/*            ) ) || \
+                  ( $item =~ ^nlst && ! -f namelists/$arg                                       ) || \
+                  ( $item =~ ^np   && ! $( grep " $arg *="             namelists/*            ) ) || \
+                  ( $item =~ ^rou  && ! $( grep -ri "SUBROUTINE *$arg" ../src                 ) )      ]]; then
                 printf $item' '
             fi
 
