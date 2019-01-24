@@ -135,7 +135,7 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj,jpk,kjpt), INTENT(inout) ::   pta      ! in: tracer trend ; out: after tracer field
       !
       INTEGER  ::  ji, jj, jk, jn   ! dummy loop indices
-      REAL(wp) ::  zrhs             ! local scalars
+      REAL(wp) ::  zrhs, zzwi, zzws ! local scalars
       REAL(wp), DIMENSION(jpi,jpj,jpk) ::  zwi, zwt, zwd, zws
       !!---------------------------------------------------------------------
       !
@@ -176,16 +176,30 @@ CONTAINS
             ENDIF
             !
             ! Diagonal, lower (i), upper (s)  (including the bottom boundary condition since avt is masked)
-            DO jk = 1, jpkm1
-               DO jj = 2, jpjm1
-                  DO ji = fs_2, fs_jpim1   ! vector opt.
-!!gm BUG  I think, use e3w_a instead of e3w_n, not sure of that
-                     zwi(ji,jj,jk) = - p2dt * zwt(ji,jj,jk  ) / e3w_n(ji,jj,jk  )
-                     zws(ji,jj,jk) = - p2dt * zwt(ji,jj,jk+1) / e3w_n(ji,jj,jk+1)
-                     zwd(ji,jj,jk) = e3t_a(ji,jj,jk) - zwi(ji,jj,jk) - zws(ji,jj,jk)
-                 END DO
+            IF( ln_zad_Aimp ) THEN         ! Adaptive implicit vertical advection
+               DO jk = 1, jpkm1
+                  DO jj = 2, jpjm1
+                     DO ji = fs_2, fs_jpim1   ! vector opt. (ensure same order of calculation as below if wi=0.)
+                        zzwi = - p2dt * zwt(ji,jj,jk  ) / e3w_n(ji,jj,jk  )
+                        zzws = - p2dt * zwt(ji,jj,jk+1) / e3w_n(ji,jj,jk+1)
+                        zwd(ji,jj,jk) = e3t_a(ji,jj,jk) - zzwi - zzws   &
+                           &                 + p2dt * ( MAX( wi(ji,jj,jk  ) , 0._wp ) - MIN( wi(ji,jj,jk+1) , 0._wp ) )
+                        zwi(ji,jj,jk) = zzwi + p2dt *   MIN( wi(ji,jj,jk  ) , 0._wp )
+                        zws(ji,jj,jk) = zzws - p2dt *   MAX( wi(ji,jj,jk+1) , 0._wp )
+                    END DO
+                  END DO
                END DO
-            END DO
+            ELSE
+               DO jk = 1, jpkm1
+                  DO jj = 2, jpjm1
+                     DO ji = fs_2, fs_jpim1   ! vector opt.
+                        zwi(ji,jj,jk) = - p2dt * zwt(ji,jj,jk  ) / e3w_n(ji,jj,jk)
+                        zws(ji,jj,jk) = - p2dt * zwt(ji,jj,jk+1) / e3w_n(ji,jj,jk+1)
+                        zwd(ji,jj,jk) = e3t_a(ji,jj,jk) - zwi(ji,jj,jk) - zws(ji,jj,jk)
+                    END DO
+                  END DO
+               END DO
+            ENDIF
             !
             !! Matrix inversion from the first level
             !!----------------------------------------------------------------------

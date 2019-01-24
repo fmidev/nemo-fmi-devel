@@ -937,7 +937,7 @@ CONTAINS
                     &            + e3t_0(:,:,jk) * ( 1._wp - tmask(:,:,jk) )   ! make sure e3t_b != 0 on land points
                END DO
                e3t_n(:,:,:) = e3t_b(:,:,:)
-!!$                sshn(:,:)=0._wp
+               sshn(:,:) = sshb(:,:)   ! needed later for gde3w
 !!$                e3t_n(:,:,:)=e3t_0(:,:,:)
 !!$                e3t_b(:,:,:)=e3t_0(:,:,:)
                !
