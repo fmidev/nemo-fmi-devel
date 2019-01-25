@@ -38,8 +38,9 @@ MODULE icedyn_adv_umx
    INTEGER ::   kn_limiter = 1
 
    ! if T interpolated at u/v points is negative, then interpolate T at u/v points using the upstream scheme
-   !   clem: if set to true, the 2D test case "diagonal advection" does not work (I do not understand why) 
-   LOGICAL ::   ll_neg = .FALSE.
+   !   clem: if set to true, the 2D test case "diagonal advection" does not work (I do not understand why)
+   !         but in realistic cases, it avoids having very negative ice temperature (-50) at low ice concentration 
+   LOGICAL ::   ll_neg = .TRUE.
    
    ! alternate directions for upstream
    LOGICAL ::   ll_upsxy = .TRUE.
