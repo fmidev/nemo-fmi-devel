@@ -507,7 +507,7 @@ CONTAINS
       ENDDO
       !
       IF( id /= -1 ) THEN
-#if defined key_oa3mct_v3
+#if ! defined key_oa3mct_v1v2
          CALL oasis_get_freqs(id, mop, 1, itmp, info)
 #else
          CALL oasis_get_freqs(id,      1, itmp, info)
