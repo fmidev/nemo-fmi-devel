@@ -599,11 +599,11 @@ CONTAINS
       WRITE(numout,*) 'oasis_get: Error you sould not be there...'
    END SUBROUTINE oasis_get
 
-   SUBROUTINE oasis_get_freqs(k1,k2,k3,k4)
+   SUBROUTINE oasis_get_freqs(k1,k5,k2,k3,k4)
       INTEGER              , INTENT(in   ) ::  k1,k2
       INTEGER, DIMENSION(1), INTENT(  out) ::  k3
-      INTEGER              , INTENT(  out) ::  k4
-      k3(1) = k1 ; k4 = k2
+      INTEGER              , INTENT(  out) ::  k4,k5
+      k3(1) = k1 ; k4 = k2 ; k5 = k2
       WRITE(numout,*) 'oasis_get_freqs: Error you sould not be there...'
    END SUBROUTINE oasis_get_freqs
 
