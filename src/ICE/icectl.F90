@@ -197,7 +197,8 @@ CONTAINS
       zsfx  = glob_sum( 'icectl', ( sfx + diag_sice ) * e1e2t ) * zconv * rday
 
       ! heat flux
-      zhfx  = glob_sum( 'icectl', ( qt_atm_oi - qt_oce_ai - diag_heat ) * e1e2t ) * zconv
+      ! clem: not the good formulation
+      !!zhfx  = glob_sum( 'icectl', ( qt_atm_oi - qt_oce_ai - diag_heat ) * e1e2t ) * zconv
 
       ! set threshold values and calculate the ice area (+epsi10 to set a threshold > 0 when there is no ice) 
       zarea   = glob_sum( 'icectl', SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2
@@ -208,7 +209,7 @@ CONTAINS
       IF(lwp) THEN
          IF( ABS( zvfx ) > zv_sill )   WRITE(numout,*) 'violation vfx  [Mt/day]       (',cd_routine,') = ',zvfx
          IF( ABS( zsfx ) > zs_sill )   WRITE(numout,*) 'violation sfx  [psu*Mt/day]   (',cd_routine,') = ',zsfx
-         IF( ABS( zhfx ) > zt_sill )   WRITE(numout,*) 'violation hfx  [GW]           (',cd_routine,') = ',zhfx
+         !!IF( ABS( zhfx ) > zt_sill )   WRITE(numout,*) 'violation hfx  [GW]           (',cd_routine,') = ',zhfx
       ENDIF
       !
    END SUBROUTINE ice_cons_final
