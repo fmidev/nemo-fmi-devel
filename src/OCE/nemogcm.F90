@@ -375,7 +375,7 @@ CONTAINS
          WRITE(numout,*) "      (      '-.,\\__ __.-;`\   '.        )      "
          WRITE(numout,*) "       )  )       \) |`\ \)  '.   \      (   (   "
          WRITE(numout,*) "      (  (           \_/       '-._\      )   )  "
-         WRITE(numout,*) "       )  )                        `     (   (   "
+         WRITE(numout,*) "       )  ) jgs                     `    (   (   "
          WRITE(numout,*) "     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ "
          WRITE(numout,*)
          
