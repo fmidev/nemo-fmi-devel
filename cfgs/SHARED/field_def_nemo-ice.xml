@@ -148,7 +148,7 @@
           <!-- heat fluxes associated with mass exchange -->
           <field id="hfxthd"       long_name="heat fluxes from ice-ocean mass exchange during thermo"       unit="W/m2" />
           <field id="hfxdyn"       long_name="heat fluxes from ice-ocean mass exchange during dynamic"      unit="W/m2" />
-          <field id="hfxres"       long_name="heat fluxes from ice-ocean mass exchange during resultant"    unit="W/m2" />
+          <field id="hfxres"       long_name="heat fluxes from undiagnosed processes"                       unit="W/m2" />
           <field id="hfxsub"       long_name="heat fluxes from ice-atm. mass exchange during sublimation"   unit="W/m2" />
           <field id="hfxspr"       long_name="heat fluxes from ice-atm. mass exchange during snow precip"   unit="W/m2" />
 
