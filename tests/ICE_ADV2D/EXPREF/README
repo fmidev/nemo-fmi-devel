@@ -1,3 +1,5 @@
+WARNING: For now, the test case ICE_ADV2D only works if the logical "ll_neg" is set to FALSE in the routine icedyn_adv_umx.F90
+                  (it is still unclear why)
 -------
 Purpose
 -------
