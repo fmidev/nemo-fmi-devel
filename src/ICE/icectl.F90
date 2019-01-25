@@ -185,7 +185,7 @@ CONTAINS
       !!              and a heat content of 3e5 J/kg (=latent heat of fusion) 
       !!-------------------------------------------------------------------
       CHARACTER(len=*), INTENT(in)    :: cd_routine    ! name of the routine
-      REAL(wp)                        :: zhfx, zsfx, zvfx
+      REAL(wp)                        :: zqmass, zhfx, zsfx, zvfx
       REAL(wp)                        :: zarea, zv_sill, zs_sill, zt_sill
       REAL(wp), PARAMETER             :: zconv = 1.e-9 ! convert W to GW and kg to Mt
       !!-------------------------------------------------------------------
@@ -198,7 +198,8 @@ CONTAINS
 
       ! heat flux
       ! clem: not the good formulation
-      !!zhfx  = glob_sum( 'icectl', ( qt_atm_oi - qt_oce_ai - diag_heat ) * e1e2t ) * zconv
+      !!zhfx  = glob_sum( 'icectl', ( qt_oce_ai - qt_atm_oi + diag_heat + hfx_thd + hfx_dyn + hfx_res + hfx_sub + hfx_spr  &
+      !!   &                        ) * e1e2t ) * zconv
 
       ! set threshold values and calculate the ice area (+epsi10 to set a threshold > 0 when there is no ice) 
       zarea   = glob_sum( 'icectl', SUM( a_i + epsi10, dim=3 ) * e1e2t ) * zconv ! in 1.e9 m2
