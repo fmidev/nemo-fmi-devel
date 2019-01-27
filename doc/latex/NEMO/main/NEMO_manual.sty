@@ -124,11 +124,12 @@
 %% Text env. for Gurvan
 \newcommand{\gmcomment}[1]{}
 
-%% Index (italic font for files, preformat for code)
+%% Index entries (italic font for files, preformat for code)
+\newcommand{\hf}[1]{\textit{#1.h90}            \index{h90 file!#1}}
 \newcommand{\ifile}[1]{\textit{#1.nc}          \index{Input NetCDF files!#1.nc}}
-\newcommand{\mdl}[1]{\textit{#1.F90}           \index{Modules!#1}}
 \newcommand{\jp}[1]{\texttt{#1}                \index{Model parameters!#1}}
 \newcommand{\key}[1]{\texttt{\textbf{key\_#1}} \index{CPP keys!key\_#1}}
+\newcommand{\mdl}[1]{\textit{#1.F90}           \index{Modules!#1}}
 \newcommand{\ngn}[1]{\texttt{#1}               \index{Namelist Group Name!#1}}
 \newcommand{\np}[1]{\texttt{#1}                \index{Namelist variables!#1}}
 \newcommand{\rou}[1]{\texttt{#1}               \index{Routines!#1}}
