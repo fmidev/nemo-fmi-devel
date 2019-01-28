@@ -42,7 +42,7 @@ Quick Start Guide
 
 	zooms
 	coupling
-	assimilation
+	data_assimilation
 	tracers
 
 .. toctree::

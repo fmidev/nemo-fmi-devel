@@ -11,8 +11,7 @@ New sea-ice component SI3 (in place of LIMx)
 - Physics
   - Lateral melting
   - Melt ponds: constant or :doi:`10.1175/JCLI-D-11-00078.1 <Holland et al. 2012>` formulation (and soon topographic melt ponds)
-  - Ice-atm. drags from :doi:`10.1029/2012JD017630 <Lupkes et al. 2012>` (depending on ice concentration) or
-    :doi:`10.1002/2014JD022418 <Lupkes et al. 2015>` (depending on sea ice concentration and atm. stability)
+  - Ice-atm. drags from :doi:`10.1029/2012JD017630 <Lupkes et al. 2012>` (depending on ice concentration) or :doi:`10.1002/2014JD022418 <Lupkes et al. 2015>` (depending on sea ice concentration and atm. stability)
   - Landfast ice (:doi:`10.1002/2016JC012006 <Lemieux et al. 2016>`)
 
 - Numerics
@@ -63,21 +62,12 @@ Test Cases
 
 The first test cases available for now are:
 - ``CANAL``: east-west periodic canal of variable size with several initial states and associated geostrophic currents (zonal jets or vortex)
-- ``ICE_AGRIF``: east-west + north-south periodic channel.
-  The common configuration includes an AGRIF zoom (1:3) in the middle of the basin to test how an ice patch is advected through it but one can also test the advection schemes (Prather and Ultimate-Macho) by removing the key_agrif in the cpp keys.
-- ``ISOMIP``: simple box configuration with an ice shelf with simple geometry on top.
-  The purpose of this test case is to evaluate the impact of various schemes and new development with iceshelf cavities.
-  The exact original setup is described ​here.
-- ``LOCK-EXCHANGE``:classical fluid dynamics experiment that has been adapted by Haidvogel and Beckmann (1999) for testing advection schemes in ocean circulation models.
-  It has been used by several authors including Burchard and Bolding (2002) and Ilıcak et al. (2012).
-  The LOCK EXCHANGE experiment can in particular illustrate the impact of different choices of numerical schemes and/or subgrid closures on spurious interior mixing
-- ``OVERFLOW``: illustrates the impact of different choices of numerical schemes and/or subgrid closures on spurious interior mixing close to bottom topography.
-  It is adapted from the non-rotating overflow configuration described in Haidvogel and Beckmann (1999) and further used by Ilıcak et al. (2012)
-- ``VORTEX``: illustrates the propagation of an anticyclonic eddy over a Beta plan and flat bottom.
-  It is implemented here with an online refined subdomain (thanks to AGRIF library) out of which the vortex propagates.
-  It serves as a benchmark to diagnose nesting errors as in Debreu et al. (2012), Penven et al. (2006) and Spall and Holland (1991)
-- ``WAD``: a set of simple closed basin geometries for testing the Wetting and drying capabilities.
-  Examples range from a closed channel with EW linear bottom slope to a parabolic EW channel with a Gaussian ridge. 
+- ``ICE_AGRIF``: east-west + north-south periodic channel. The common configuration includes an AGRIF zoom (1:3) in the middle of the basin to test how an ice patch is advected through it but one can also test the advection schemes (Prather and Ultimate-Macho) by removing the key_agrif in the cpp keys.
+- ``ISOMIP``: simple box configuration with an ice shelf with simple geometry on top. The purpose of this test case is to evaluate the impact of various schemes and new development with iceshelf cavities. The exact original setup is described ​here.
+- ``LOCK-EXCHANGE``:classical fluid dynamics experiment that has been adapted by Haidvogel and Beckmann (1999) for testing advection schemes in ocean circulation models. It has been used by several authors including Burchard and Bolding (2002) and Ilıcak et al. (2012). The LOCK EXCHANGE experiment can in particular illustrate the impact of different choices of numerical schemes and/or subgrid closures on spurious interior mixing
+- ``OVERFLOW``: illustrates the impact of different choices of numerical schemes and/or subgrid closures on spurious interior mixing close to bottom topography. It is adapted from the non-rotating overflow configuration described in Haidvogel and Beckmann (1999) and further used by Ilıcak et al. (2012)
+- ``VORTEX``: illustrates the propagation of an anticyclonic eddy over a Beta plan and flat bottom. It is implemented here with an online refined subdomain (thanks to AGRIF library) out of which the vortex propagates. It serves as a benchmark to diagnose nesting errors as in Debreu et al. (2012), Penven et al. (2006) and Spall and Holland (1991)
+- ``WAD``: a set of simple closed basin geometries for testing the Wetting and drying capabilities. Examples range from a closed channel with EW linear bottom slope to a parabolic EW channel with a Gaussian ridge. 
 
 New Reference configurations
 ============================
@@ -96,12 +86,12 @@ Passive tracer TOP and biogeochemical PISCES components
 
 - The passive tracers transport component was redesigned toward a modular structure and users can enable each module directly through logical flags in namelist_top (no more fortran macros!).
 - :doc:`tracers <TOP on-line user documentation>`
-- TOP currently accounts for the following 5 modules:
-  CFC contains inorganic carbon tracers (CFC11/CFC12/SF6),
-  MY_TRC is a template for new modules (or external couplings),
-  AGE deals with water age tracking,
-  C14 as a radiocarbon passive tracer, and
-  the companion ecosystem model PISCES.
+- ``TOP`` currently accounts for the following 5 modules:
+  ``CFC`` contains inorganic carbon tracers (CFC11/CFC12/SF6),
+  ``MY_TRC`` is a template for new modules (or external couplings),
+  ``AGE`` deals with water age tracking,
+  ``C14`` as a radiocarbon passive tracer, and
+  the companion ecosystem model ``PISCES``.
 - A generalized infrastructure was developed to handle the prescription of either surface, coastal, or open boundaries conditions for each passive tracer.
 - A new configuration, named ORCA2_OFF_TRC, was created to provide a benchmark simulation environment to deal with inert carbon tracers dynamics by exploiting the offline coupling with NEMO.
 - PISCES model contains new developments and modifications:

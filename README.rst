@@ -59,22 +59,8 @@ It defines the NEMO strategy that is implemented by the System Team on a yearly 
 When the need arises, `working groups`_ are created or resumed to gather the community expertise for advising on the development activities.
 
 ..  _external biogeochemistry model : http://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups/TOP/TOP-UserQuickGuide
-.. _NEMO : https://www.nemo-ocean.eu/
-.. _OASIS : https://portal.enes.org/oasis
-.. _XIOS : http://forge.ipsl.jussieu.fr/ioserver
-.. _AGRIF : https://www-ljk.imag.fr/MOISE/AGRIF/
 .. _working groups : https://forge.ipsl.jussieu.fr/nemo/wiki/WorkingGroups
 .. _reference documentation : https://www.nemo-ocean.eu/bibliography/documentation/
 .. _Special Issue : http://www.geosci-model-dev.net/special_issue40.html
 .. _associated projects : https://www.nemo-ocean.eu/projects/
 .. _bibliography : https://www.nemo-ocean.eu/wp-content/plugins/wp-bibtexbrowser/bibtexbrowser.php?bib=nemo.bib
-.. _CMCC : https://www.cmcc.it/
-.. _CNRS : http://www.cnrs.fr/
-.. _MOI : https://www.mercator-ocean.fr
-.. _Met Office : https://www.metoffice.gov.uk/
-.. _NERC : https://nerc.ukri.org/
-.. _`NEMO manual` : http://zenodo.org/badge/DOI/10.5281/zenodo.1464816.svg
-.. _`NEMO guide` : http://zenodo.org/badge/DOI/10.5281/zenodo.1475325.svg
-.. _`SI3 manual` : http://zenodo.org/badge/DOI/10.5281/zenodo.1471689.svg
-.. _`TOP manual` : http://zenodo.org/badge/DOI/10.5281/zenodo.1471700.svg
-

@@ -79,7 +79,7 @@ Data provided with INPUTS_C1D_PAPA_v4.0.tar_ file account for :
 GYRE_BFM
 --------
 
-GYRE_BFM shares the same physical setup of GYRE_PISCES_, but NEMO is coupled with the `BFM <http://www.bfm-community.eu/>`_ biogeochemical model as described in :trac:`source:/NEMO/trunk/cfgs/GYRE_BFM/README`.
+GYRE_BFM shares the same physical setup of GYRE_PISCES_, but NEMO is coupled with the `BFM <http://www.bfm-community.eu/>`_ biogeochemical model as described in :forge:`browser/NEMO/trunk/cfgs/GYRE_BFM/README`.
 
 
 GYRE_PISCES
@@ -99,7 +99,7 @@ This configuration act also as demonstrator of the **USER DEFINED setup** (``ln_
      jpkglo      =    31     !  number of model levels
   /
 
-Note that, the default grid size is 30x20 grid points (with ``nn_GYRE = 1``) and vertical levels are set by ``jpkglo``. The specific code changes can be inspected at :trac:`source:/NEMO/trunk/src/OCE/USR` 
+Note that, the default grid size is 30x20 grid points (with ``nn_GYRE = 1``) and vertical levels are set by ``jpkglo``. The specific code changes can be inspected at :forge:`browser/NEMO/trunk/src/OCE/USR` 
 
 **Running GYRE as a benchmark** :  this simple configuration can be used as a benchmark since it is easy to increase resolution, with the drawback of getting results that have a very limited physical meaning.
 
@@ -216,7 +216,7 @@ Input dynamical fields for this configuration (ORCA2_OFF_v4.0.tar_) comes from a
 
 Note that, this configuration default uses linear free surface (``ln_linssh = .true.``) assuming that model mesh is not varying in time and it includes the bottom boundary layer parameterization (``ln_trabbl = .true.``) that requires the provision of bbl coefficients through ``sn_ubl`` and ``sn_vbl`` fields.
 
-It is also possible to activate PISCES model (see ORCA2_OFF_PISCES_) or a user defined set of tracers and source-sink terms with ``ln_my_trc = .true.`` (and adaptation of :trac:`source:/NEMO/trunk/src/TOP/MY_TRC` routines).
+It is also possible to activate PISCES model (see ORCA2_OFF_PISCES_) or a user defined set of tracers and source-sink terms with ``ln_my_trc = .true.`` (and adaptation of :forge:`browser/NEMO/trunk/src/TOP/MY_TRC` routines).
 
 In addition, the offline module (OFF) allows for the provision of further fields:
 
@@ -234,7 +234,7 @@ In addition, the offline module (OFF) allows for the provision of further fields
      sn_empb      = 'dyna_grid_T'           ,       120         , 'sowaflupb'  ,  .true.   , .true. , 'yearly'  , ''               , ''       , ''
 
 
-More details can be found by inspecting the offline data manager at :trac:`source:/NEMO/trunk/src/OFF/dtadyn.F90`
+More details can be found by inspecting the offline data manager at :forge:`browser/NEMO/trunk/src/OFF/dtadyn.F90`
 
 
 ORCA2_SAS_ICE

@@ -12,7 +12,6 @@ Prerequisites
   tools and libraries are already included in the (``./ext``) subdirectory. These
   include: the AGRIF preprocessing program "conv"; the FCM build system and the 
   IOIPSL library for parts of the output.
-|
 - Other requirements that your system needs to provide include: a Perl 5 interpreter; a modern
   Fortran compiler (ifort, gfortran, pgfortran, ...) and (in most cases) a MPI library
   (e.g. OpenMPI or MPICH). The latter is not strictly essential since it is possible
@@ -23,7 +22,7 @@ Prerequisites
   the key_mpi2 preprocessor key should be used at compile time. This will limit MPI
   features to those defined within the MPI-2 standard (but will lose some performance
   benefits).
-|
+
 The following prerequisites may already be installed or be available from the
 official repositories of your Linux distribution. However access to all the
 options available with the XIOS IO-server will require the parallel form of the
@@ -39,12 +38,11 @@ Note that particular versions of these libraries may have their own
 restrictions. For example, the latest versions of the netCDF libraries:
 netcdf-c-4.6.2 and netcdf-fortran-4.4.4, state the following requirements for netCDF-4 support:
 
-* HDF5 1.8.9 or later.
-* HDF5 1.10.1 or later.
-* zlib 1.2.5 or later (for netCDF-4 compression)
-* curl 7.18.0 or later (for DAP remote access client support)
+- HDF5 1.8.9 or later.
+- HDF5 1.10.1 or later.
+- zlib 1.2.5 or later (for netCDF-4 compression)
+- curl 7.18.0 or later (for DAP remote access client support)
 
-|
 `Important Note: When building netCDF-C library versions older than 4.4.1,
 use only HDF5 1.8.x versions. Combining older netCDF-C versions with newer
 HDF5 1.10 versions will create superblock 3 files that are not readable by

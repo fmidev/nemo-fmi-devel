@@ -15,24 +15,24 @@
 
 .. Institutes
 
-.. _CMCC:           http://www.cmcc.it 
-.. _CNRS:           http://www.cnrs.fr
-.. _Mercator Ocean: http://www.mercator-ocean.fr
-.. _Met Office:     http://www.metoffice.gov.uk
-.. _MOI:            http://www.mercator-ocean.fr
-.. _NERC:           http://nerc.ukri.org
+.. _CMCC:           https://www.cmcc.it 
+.. _CNRS:           https://www.cnrs.fr
+.. _Mercator Ocean: https://www.mercator-ocean.fr
+.. _Met Office:     https://www.metoffice.gov.uk
+.. _MOI:            https://www.mercator-ocean.fr
+.. _NERC:           https://nerc.ukri.org
 
 .. Models / Softwares
 
-.. _AGRIF: http://agrif.imag.fr
-.. _OASIS: http://verc.enes.org/oasis
-.. _XIOS:  http://forge.ipsl.jussieu.fr/ioserver
+.. _AGRIF: https://agrif.imag.fr
+.. _OASIS: https://portal.enes.org/oasis
+.. _XIOS:  https://forge.ipsl.jussieu.fr/ioserver
 
 .. NEMO
 
-.. _NEMO:          http://www.nemo-ocean.eu
-.. _NEMO strategy: http://doi.org/10.5281/zenodo.1471663
-.. _NEMO guide:    http://doi.org/10.5281/zenodo.1475325
-.. _NEMO manual:   http://doi.org/10.5281/zenodo.1464816
-.. _SI3 manual:    http://doi.org/10.5281/zenodo.1471689
-.. _TOP manual:    http://doi.org/10.5281/zenodo.1471700
+.. _NEMO:          https://www.nemo-ocean.eu
+.. _NEMO strategy: https://doi.org/10.5281/zenodo.1471663
+.. _NEMO guide:    https://doi.org/10.5281/zenodo.1475325
+.. _NEMO manual:   https://doi.org/10.5281/zenodo.1464816
+.. _SI3 manual:    https://doi.org/10.5281/zenodo.1471689
+.. _TOP manual:    https://doi.org/10.5281/zenodo.1471700
