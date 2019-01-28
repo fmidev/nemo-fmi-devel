@@ -14,7 +14,7 @@ author = 'NEMO System Team'
 # The short X.Y version
 version = '4.0'
 # The full version, including alpha/beta/rc tags
-release = '4.0.0'
+release = '4.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -23,6 +23,9 @@ release = '4.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.extlinks', 'sphinxcontrib.bibtex']
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ['_templates']
 
 # The master toctree document.
 master_doc = 'NEMO_guide'
