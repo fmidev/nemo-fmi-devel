@@ -16,8 +16,9 @@ Quick Start Guide
 
 .. toctree::
 	:hidden:
+	:caption: What's new in NEMO 4.0
 
-	release_notes.rst
+	release_notes
 
 .. toctree::
 	:hidden:
