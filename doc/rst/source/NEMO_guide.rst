@@ -45,6 +45,12 @@ Quick Start Guide
 	tracers
 
 .. toctree::
+   :hidden:
+   :caption: Contributions are welcome!
+
+   contributing
+
+.. toctree::
 	:hidden:
 	:caption: Glossary
 
