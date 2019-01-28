@@ -5,54 +5,65 @@ Contributing
 .. contents::
 	:local:
 
-Support
-=======
+Sending feedbacks
+=================
 
-| First of all, :forge:`search <search on the developement platform>` in the most comprehensive way 
-  (wiki, tickets, forum and online doc) to check if the subject has not already been discussed.
-| If you found no answer after that, create the corresponding ressource online according to your need
+|  Sending feedbacks is a useful way to contribute to NEMO efficency and reliability. Before doing so,
+   please check here :forge:`search <search on the developement platform>` in wiki, tickets, forum and online
+   documentation if the subject has already been discussed. You can either contribute to an existing
+   discussion, or
+| Create an entry for the discussion online, according to your needs
 
-- Question: create a topic in the appropriate :forge:`discussion <forum>`
-- Issue: open a new ticket of the right type depending of its severity
+- You have a question: create a topic in the appropriate :forge:`discussion <forum>`
+- You would like to raise and issue: open a new ticket of the right type depending of its severity
+  
   - "Unavoidable" :forge:`newticket?type=Bug       <bug>`
+    
   - "Workable"    :forge:`newticket?type=Defect <defect>`
 
-Please follow the guidelines and also be as specific as possible for the ticket description.
+Please follow the guidelines and try to be as specific as possible in the ticket description.
 
 New development
 ===============
 
-You have developed something related to the NEMO project: a personal configuration, 
-an addition of the source code, a full fork of the reference, a {pre,post}-processing tool, ...
-Done initially for your own purpose, you believe your work is of interest for the community.
-You can report it in different ways depending on your motivation and your willingness to 
-see it included in the NEMO shared reference.
+You have build a development relevant for NEMO shared reference: an addition of the source code,  
+a full fork of the reference, ...
 
-Beforehand, you should know that the NEMO Developers Committee will decide 
-if the development is relevant and useful. 
-First criteria will be of course the scientific interest, 
-but the amount of work needed to successfully meet the quality control requirements is also going to be evaluated.
+You may want to share it with the community (see Hack below) or to propose it for implementation in the future
+NEMO release (see Proposal / Task below).
+
+The proposals for developments to be included in the shared NEMO reference are first examined by NEMO Developers
+Committee / Scientific Advisory Board. 
+The implementation of a new development requires some additionnal work from the intial developer.
+These tasks will need to be scheduled with NEMO System Team.
+
 
 Hack
 ----
 
-You're not ready to do more other than to inform other users of your development, 
-you can promote your work by creating a specific topic on this :forge:`discussion/forum/5 <dedicated forum>` 
-which brings together all the contributions from the community.
+You only would like to inform NEMO community about your developments. 
+You can promote your work on NEMO forum gathering  the contributions fromof the community by creating
+a specific topic here :forge:`discussion/forum/5 <dedicated forum>` 
+
 
 Proposal / Task
 ---------------
 
-| You can suggest a :forge:`newticket?type=Enhancement <enhancement>` to be made which can be supplemented by 
-  the output of ``svn diff`` from your working copy 
-  (easier for integration with ``svn patch`` than the attachement of modified routines).
-| But without a little more work, 
-
-If you really think your development worths the integration into the NEMO shared reference, 
-your ticket should describe the development and its implementation, so as the existing validations.
-
-Once the approval of Developers Committee is given, 
-the development can be added to the yearly development work plan.
-From there you will be in charge of an development action, 
-with the perspective of merging it by the end of civil year, 
-but also with the help of NEMO System Team to follow the different development steps.
+| Your development is quite small, and you would only like to offer it as a possible enhancement. Please suggest it
+  as an enhancement here :forge:`newticket?type=Enhancement <enhancement>` . It will be taken in account, if
+  feasible, by NEMO System Team. To ease the process, it is suggested, rather than attaching the modified
+  routines to the ticket, to highlight the proposed changes by adding to the ticket the output of ``svn diff``
+  or ``svn patch`` from your working copy.
+  
+| Your development seems relevant for addition into the future release of NEMO shared reference.
+  Implementing it into NEMO shared reference following the usual quality control will require some additionnal work
+  from you and also from the NEMO System Team in charge of NEMO development. In order to evaluate the work,
+  your suggestion should be send as a proposed enhancement here :forge:`newticket?type=Enhancement <enhancement>`
+  including description of the development, its implementation, and the existing validations.
+  
+  The proposed enhancement will be examined  by NEMO Developers Committee / Scientific Advisory Board. 
+  Once approved by the  Committee, the assicated development task can be scheduled in NEMO development work plan,
+  and tasks distributed between you as initial developer and PI of this development action, and the NEMO System Team.
+  
+  Once sucessful (meeting the usual quality control steps) this action will allow the merge of these developments with
+  other developments of the year, building the future NEMO.
