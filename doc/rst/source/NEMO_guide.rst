@@ -46,10 +46,10 @@ Quick Start Guide
 	tracers
 
 .. toctree::
-   :hidden:
-   :caption: Contributions are welcome!
+        :hidden:
+        :caption: Contributions are welcome!
 
-   contributing
+        contributing
 
 .. toctree::
 	:hidden:

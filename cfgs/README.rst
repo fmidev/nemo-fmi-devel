@@ -1,5 +1,6 @@
-REFERENCE CONFIGURATIONS
-========================
+************************
+Reference configurations
+************************
 
 NEMO is distributed with a set of reference configurations allowing both the user to set up his own first applications and the developer to test/validate his NEMO developments (using SETTE package).
 *The NEMO System Team is in charge only for these configurations.*

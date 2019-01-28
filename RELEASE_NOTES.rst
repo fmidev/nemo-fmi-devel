@@ -1,5 +1,5 @@
 *************
-RELEASE NOTES
+Release Notes
 *************
 
 .. contents::

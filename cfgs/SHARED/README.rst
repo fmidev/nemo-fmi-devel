@@ -1,5 +1,6 @@
-DIAGNOSTICS
-===========
+***********
+Diagnostics
+***********
 
 .. contents::
            :local:
