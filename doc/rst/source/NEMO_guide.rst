@@ -15,47 +15,46 @@ Quick Start Guide
 	It is loaded for each file thanks to 'rst_epilog' setting in 'conf.py'
 
 .. toctree::
-	:hidden:
-	:caption: What's new in NEMO 4.0
+   :hidden:
 
-	release_notes
-
-.. toctree::
-	:hidden:
-	:caption: Getting started
-
-	install
-	configurations
-	test_cases
+   release_notes
 
 .. toctree::
-	:hidden:
-	:caption: Setup your configuration
+   :hidden:
+   :caption: Getting started
 
-	setup
-	diagnostics
-	tools
-
-.. toctree::
-	:hidden:
-	:caption: Advanced use
-
-	zooms
-	coupling
-	data_assimilation
-	tracers
+   install
+   configurations
+   test_cases
 
 .. toctree::
-        :hidden:
-        :caption: Contributions are welcome!
+   :hidden:
+   :caption: Setup your configuration
 
-        contributing
+   setup
+   diagnostics
+   tools
 
 .. toctree::
-	:hidden:
-	:caption: Glossary
+   :hidden:
+   :caption: Advanced use
 
-	definitions
+   zooms
+   coupling
+   data_assimilation
+   tracers
+
+.. toctree::
+   :hidden:
+   :caption: Contributions are welcome!
+
+   contributing
+
+.. toctree::
+   :hidden:
+   :caption: Glossary
+
+   definitions
 
 .. include:: readme.rst
 
@@ -64,10 +63,10 @@ Quick Start Guide
 Reference publications
 ======================
 
-..	bibliography:: references.bib
-	:all:
-	:style: unsrt
-	:labelprefix: R
+.. bibliography:: references.bib
+   :all:
+   :style: unsrt
+   :labelprefix: R
 
 Disclaimer
 ==========
