@@ -16,11 +16,6 @@ Quick Start Guide
 
 .. toctree::
    :hidden:
-
-   release_notes
-
-.. toctree::
-   :hidden:
    :caption: Getting started
 
    install
@@ -46,22 +41,18 @@ Quick Start Guide
 
 .. toctree::
    :hidden:
-   :caption: Contributions are welcome!
+   :caption: Miscellaneous
 
    contributing
-
-.. toctree::
-   :hidden:
-   :caption: Glossary
-
-   definitions
+   release_notes
+   Glossary<definitions>
 
 .. include:: readme.rst
 
 .. Next headings markup acording to readme.rst
 
-Reference publications
-======================
+References
+==========
 
 .. bibliography:: references.bib
    :all:
