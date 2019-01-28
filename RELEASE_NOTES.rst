@@ -12,8 +12,7 @@ Original sea-ice component SI\ :sup:`3`\
   scientific expertise within the NEMO community in order to build a unified model.
   The replacement of LIM (Louvain-la-Neuve Ice Model) has required the backport of
   the desired functionalities from each of CICE, GELATO and LIM into a common code in the NEMO framework.
-| This new model has been named SI\ :sup:`3`\ ("sea ice cubed") and
-  means "**Sea Ice modelling Integrated Initiative**".
+| This new model has been named |SI3| ("sea ice cubed") and means "**Sea Ice modelling Integrated Initiative**".
 
 - Physics
 
@@ -78,9 +77,6 @@ AGRIF (embedded zooms)
 ----------------------
 
 The NEMO 4.0 includes new capabilities, configurations and test cases with AGRIF:
-
-.. role:: underline
-	:class: underline
 
 :underline:`New capabilities from NEMO 3.6 to NEMO 4.0`
 

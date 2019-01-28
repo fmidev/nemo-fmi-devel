@@ -27,7 +27,7 @@ Several built-in configurations are provided to evaluate the skills and performa
 
 NEMO user can also checkout available idealized test cases that address specific physical processes(``./tests``).
 
-A set of utilities is also provided to [pre|post]process your data (``./tools``).
+A set of utilities is also provided to {pre,post}process your data (``./tools``).
 
 Documentation and references
 ============================
@@ -52,7 +52,7 @@ Used by a wide audience, numerous `associated projects`_ have been carried out a
 NEMO Consortium
 ===============
 
-The NEMO Consortium pulling together 5 European institutes (CMCC_, CNRS_, MOI_, `Met Office`_ and NERC_)        plans the sustainable development in order to keep a reliable evolving framework since 2008.
+The NEMO Consortium pulling together 5 European institutes (CMCC_, CNRS_, MOI_, `Met Office`_ and NERC_) plans the sustainable development in order to keep a reliable evolving framework since 2008.
 
 It defines the NEMO strategy that is implemented by the System Team on a yearly basis in order to release a new version almost every four years.
 
