@@ -128,8 +128,6 @@ MODULE in_out_manager
    INTEGER ::   nn_jctle         !: End   j indice for the SUM control
    INTEGER ::   nn_isplt         !: number of processors following i
    INTEGER ::   nn_jsplt         !: number of processors following j
-   INTEGER ::   nn_bench         !: benchmark parameter (0/1)
-   INTEGER ::   nn_bit_cmp = 0   !: bit reproducibility  (0/1)
    !                                          
    INTEGER ::   nprint, nictls, nictle, njctls, njctle, isplt, jsplt    !: OLD namelist names
 

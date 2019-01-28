@@ -543,7 +543,7 @@ CONTAINS
       !!                for_all argument
       !!----------------------------------------------------------------------
       LOGICAL :: setto, for_all
-      TYPE (sn_ctl) :: sn_cfctl
+      TYPE(sn_ctl) :: sn_cfctl
       !!----------------------------------------------------------------------
       IF( for_all ) THEN
          sn_cfctl%l_runstat = setto

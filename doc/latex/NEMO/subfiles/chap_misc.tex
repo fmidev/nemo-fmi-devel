@@ -327,10 +327,9 @@ non-reference configuration.
 \nlst{namctl} 
 %--------------------------------------------------------------------------------------------------------------
 
- \gmcomment{why not make these bullets into subsections?}
 Options are defined through the  \ngn{namctl} namelist variables.
 
-$\bullet$ Vector optimisation:
+\subsection{Vector optimisation}
 
 \key{vectopt\_loop} enables the internal loops to collapse.
 This is very a very efficient way to increase the length of vector calculations and thus
@@ -340,32 +339,58 @@ to speed up the model on vector computers.
  
 % Add also one word on NEC specific optimisation (Novercheck option for example)
  
-$\bullet$ Control print %: describe here 4 things:
+\subsection{Control print}
 
-1- \np{ln\_ctl}: compute and print the trends averaged over the interior domain in all TRA, DYN, LDF and
+The \np{ln\_ctl} switch was originally used as a debugging option in two modes:
+
+\begin{enumerate}
+\item{\np{ln\_ctl}: compute and print the trends averaged over the interior domain in all TRA, DYN, LDF and
 ZDF modules.
-This option is very helpful when diagnosing the origin of an undesired change in model results. 
+This option is very helpful when diagnosing the origin of an undesired change in model results. }
 
-2- also \np{ln\_ctl} but using the nictl and njctl namelist parameters to check the source of differences between
-mono and multi processor runs.
+\item{also \np{ln\_ctl} but using the nictl and njctl namelist parameters to check the source of differences between
+mono and multi processor runs.}
+\end{enumerate}
 
-%%gm   to be removed both here and in the code
-3- last digit comparison (\np{nn\_bit\_cmp}).
-In an MPP simulation, the computation of a sum over the whole domain is performed as the summation over
-all processors of each of their sums over their interior domains.
-This double sum never gives exactly the same result as a single sum over the whole domain,
-due to truncation differences.
-The "bit comparison" option has been introduced in order to be able to check that
-mono-processor and multi-processor runs give exactly the same results.
-% THIS is to be updated with the mpp_sum_glo  introduced in v3.3
-% nn_bit_cmp  today only check that the nn_cla = 0 (no cross land advection)
-%%gm end
+However, in recent versions it has also been used to force all processors to assume the
+reporting role. Thus when \np{ln\_ctl} is true all processors produce their own versions
+of files such as: ocean.output, layout.dat, etc.  All such files, beyond the the normal
+reporting processor (narea == 1), are named with a \_XXXX extension to their name, where
+XXXX is a 4-digit area number (with leading zeros, if required). Other reporting files
+such as run.stat (and its netCDF counterpart: run.stat.nc) and tracer.stat contain global
+information and are only ever produced by the reporting master (narea == 1). For version
+4.0 a start has been made to return \np{ln\_ctl} to its original function by introducing
+a new control structure which allows finer control over which files are produced. This
+feature is still evolving but it does already allow the user to: select individually the
+production of run.stat and tracer.stat files and to toggle the production of other files
+on processors other than the reporting master. These other reporters can be a simple
+subset of processors as defined by a minimum, maximum and incremental processor number.
 
-$\bullet$  Benchmark (\np{nn\_bench}).
-This option defines a benchmark run based on a GYRE configuration (see \autoref{sec:CFG_gyre}) in which
-the resolution remains the same whatever the domain size.
-This allows a very large model domain to be used, just by changing the domain size (\jp{jpiglo}, \jp{jpjglo}) and
-without adjusting either the time-step or the physical parameterisations. 
+Note, that production of the run.stat and tracer.stat files require global communications.
+For run.stat, these are global min and max operations to find metrics such as the gloabl
+maximum velocity. For tracer.stat these are global sums of tracer fields. To improve model
+performance these operations are disabled by default and, where necessary, any use of the
+global values have been replaced with local calculations. For example, checks on the CFL
+criterion are now done on the local domain and only reported if a breach is detected.
+
+Experienced users may wish to still monitor this information as a check on model progress.
+If so, the best compromise will be to activate the files with:
+
+\begin{verbatim}
+     sn_cfctl%l_config = .TRUE.
+       sn_cfctl%l_runstat = .TRUE.
+       sn_cfctl%l_trcstat = .TRUE.
+\end{verbatim}
+
+and to use the new time increment setting to ensure the values are collected and reported
+at a suitably long interval. For example:
+
+\begin{verbatim}     
+       sn_cfctl%ptimincr  = 25
+\end{verbatim}
+
+will carry out the global communications and write the information every 25 timesteps. This 
+increment also applies to the time.step file which is otherwise updated every timestep.
 
 % ================================================================
 \biblio
