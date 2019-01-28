@@ -795,7 +795,7 @@ CONTAINS
       !!-------------------------------------------------------------------
       INTEGER  ::   ji, jl, jl1, jl2             ! dummy loop indices
       INTEGER  ::   idim, icat  
-      INTEGER, PARAMETER ::   ztrans = 0.25_wp
+      REAL(wp), PARAMETER ::   ztrans = 0.25_wp
       REAL(wp), DIMENSION(:,:), INTENT(in)    ::   zhti, zhts, zati    ! input ice/snow variables
       REAL(wp), DIMENSION(:,:), INTENT(inout) ::   zh_i, zh_s, za_i    ! output ice/snow variables
       INTEGER , DIMENSION(:,:), ALLOCATABLE   ::   jlfil, jlfil2
