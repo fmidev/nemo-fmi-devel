@@ -57,17 +57,22 @@ CONTAINS
       INTEGER, INTENT( inout ) ::   kindic   ! indicator of solver convergence
       !!
       REAL(wp), DIMENSION(3) ::   zmax
+      LOGICAL                ::   ll_wrtstp, ll_colruns, ll_wrtruns
       CHARACTER(len=20) :: clname
       !!----------------------------------------------------------------------
-
+      !
+      ll_wrtstp  = ( MOD( kt, sn_cfctl%ptimincr ) == 0 ) .OR. ( kt == nitend )
+      ll_colruns = ll_wrtstp .AND. ( ln_ctl .OR. sn_cfctl%l_runstat )
+      ll_wrtruns = ll_colruns .AND. lwm
       IF( kt == nit000 .AND. lwp ) THEN
          WRITE(numout,*)
          WRITE(numout,*) 'stp_ctl : time-stepping control'
          WRITE(numout,*) '~~~~~~~'
          !                                ! open time.step file
          IF( lwm ) CALL ctl_opn( numstp, 'time.step', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
-         !                                ! open run.stat file
-         IF( ln_ctl .AND. lwm ) THEN
+         !                                ! open run.stat file(s) at start whatever
+         !                                ! the value of sn_cfctl%ptimincr
+         IF( lwm .AND. ( ln_ctl .OR. sn_cfctl%l_runstat ) ) THEN
             CALL ctl_opn( numrun, 'run.stat', 'REPLACE', 'FORMATTED', 'SEQUENTIAL', -1, numout, lwp, narea )
             clname = 'run.stat.nc'
             IF( .NOT. Agrif_Root() )   clname = TRIM(Agrif_CFixed())//"_"//TRIM(clname)
@@ -81,20 +86,20 @@ CONTAINS
       ENDIF
       IF( kt == nit000 )   lsomeoce = COUNT( ssmask(:,:) == 1._wp ) > 0
       !
-      IF(lwm) THEN                        !==  current time step  ==!   ("time.step" file)
+      IF(lwm .AND. ll_wrtstp) THEN        !==  current time step  ==!   ("time.step" file)
          WRITE ( numstp, '(1x, i8)' )   kt
          REWIND( numstp )
       ENDIF
       !                                   !==  test of extrema  ==!
-      IF( ln_ctl ) THEN   ! must be done by all processes because of the mpp_max
+      IF( ll_colruns ) THEN
          zmax(1) = MAXVAL(      vt_i (:,:) )                                           ! max ice thickness
          zmax(2) = MAXVAL( ABS( u_ice(:,:) ) )                                         ! max ice velocity (zonal only)
          zmax(3) = MAXVAL(     -tm_i (:,:)+273.15_wp , mask = ssmask(:,:) == 1._wp )   ! min ice temperature
          CALL mpp_max( "stpctl", zmax )                                   ! max over the global domain
       END IF
       !                                            !==  run statistics  ==!   ("run.stat" file)
-      IF( ln_ctl .AND. lwm ) THEN
-         IF(lwp) WRITE(numrun,9500) kt, zmax(1), zmax(2), - zmax(3)
+      IF( ll_wrtruns ) THEN
+         WRITE(numrun,9500) kt, zmax(1), zmax(2), - zmax(3)
          istatus = NF90_PUT_VAR( idrun, idssh, (/ zmax(1)/), (/kt/), (/1/) )
          istatus = NF90_PUT_VAR( idrun,   idu, (/ zmax(2)/), (/kt/), (/1/) )
          istatus = NF90_PUT_VAR( idrun,   ids, (/-zmax(3)/), (/kt/), (/1/) )
