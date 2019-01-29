@@ -28,13 +28,12 @@
 .. _FCM:    https://metomi.github.io/fcm/doc/
 .. _IOIPSL: https://forge.ipsl.jussieu.fr/igcmg/browser/IOIPSL
 .. _OASIS:  https://portal.enes.org/oasis
-.. _XIOS:   https://forge.ipsl.jussieu.fr/ioserver
 
 .. NEMO
 
 .. _NEMO:          https://www.nemo-ocean.eu
 .. _NEMO strategy: https://doi.org/10.5281/zenodo.1471663
-.. _NEMO guide:    https://doi.org/10.5281/zenodo.1475325
+.. _NEMO guide:    :samp: https://doi.org/10.5281/zenodo.1475325
 .. _NEMO manual:   https://doi.org/10.5281/zenodo.1464816
-.. _SI3 manual:    https://doi.org/10.5281/zenodo.1471689
-.. _TOP manual:    https://doi.org/10.5281/zenodo.1471700
+.. _SI3 manual:    :samp: https://doi.org/10.5281/zenodo.1471689
+.. _TOP manual:    :samp: https://doi.org/10.5281/zenodo.1471700

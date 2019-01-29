@@ -2,16 +2,45 @@
 Explore the test cases
 **********************
 
+The complete and up-to-date set of test cases is available on
+`NEMO test cases Github repository <http://github.com/NEMO-ocean/NEMO-examples>`_.
+
+Download it directly in the ``./tests`` root directory with
+
+.. code-block:: console
+
+   $ git clone http://github.com/NEMO-ocean/NEMO-examples
+
 .. contents::
 	:local:
 
-List
-====
+Procedure
+=========
 
-  The description below is a brief description of the test cases available in NEMO. 
+Compile test cases
+------------------
+
+The compilation of the test cases is very similar to the manner the reference configurations are compiled.
+If you are not familiar on how to compile NEMO, it is first recomended to read :doc:`the instructions <install>`
+
+| In the same manner as the ref. cfg are compiled with '-r' option, test cases can be compile by the use of makenemo with '-a' option.
+| Here an example to compile a copy named WAD2 of the wetting and drying test case (WAD) on the macport_osx architecture on 4 cores:
+
+.. code-block:: console
+
+   $ ./makenemo -n 'WAD2' -a 'WAD' -m 'macport_osx' -j '4'
+
+Run and analyse the test cases
+------------------------------
+
+There no requirement of specific input file for the test_cases presented here. The XIOS xml input files and namelist are already setup correctly. 
+For detailed description and Jupyter notebook, the reader is directed on
+the `NEMO test cases repository <http://github.com/NEMO-ocean/NEMO-examples>`_
+
+The description below is a brief advertisement of some test cases.
 
 ICE_AGRIF
----------
+=========
   
   This test case illustrates the advection of an ice patch across an East/West and North/South periodic channel
   over a slab ocean (i.e. one ocean layer), and with an AGRIF zoom (1:3) in the center
@@ -23,7 +52,7 @@ ICE_AGRIF
   .. image:: _static/ICE_AGRIF_UDIAG_43days_UM5.gif
 
 VORTEX
-------
+======
   
   This test case illustrates the propagation of an anticyclonic eddy over a Beta plan and a flat bottom.
   It is implemented here with an online refined subdomain (1:3) out of which the vortex propagates.
@@ -36,7 +65,7 @@ VORTEX
   .. image:: _static/VORTEX_anim.gif
 
 ISOMIP
-------
+======
 
   The purpose of this test case is to evaluate the impact of various schemes and new development with the iceshelf cavities circulation and melt.
   This configuration served as initial assesment of the ice shelf module in Losh et al. (2008) :cite:`LOSCH2008` and Mathiot et al. (2017) :cite:`MATHIOT2017`. 
@@ -47,7 +76,7 @@ ISOMIP
   .. image:: _static/ISOMIP_moc.png
 
 LOCK_EXCHANGE
--------------
+=============
 
   The LOCK EXCHANGE experiment is a classical fluid dynamics experiment that has been adapted
   by Haidvogel and Beckmann (1999) :cite:`HAIDVOGEL1999` for testing advection schemes in ocean circulation models.
@@ -60,7 +89,7 @@ LOCK_EXCHANGE
   .. image:: _static/LOCK-FCT4_flux_ubs.gif
 
 OVERFLOW
---------
+========
 
   The OVERFLOW experiment illustrates the impact of different choices of numerical schemes 
   and/or subgrid closures on spurious interior mixing close to bottom topography. 
@@ -73,7 +102,7 @@ OVERFLOW
   .. image:: _static/OVF-sco_FCT4_flux_cen-ahm1000.gif
 
 WAD
----
+===
 
   A set of simple closed basin geometries for testing the Wetting and drying capabilities. 
   Examples range from a closed channel with EW linear bottom slope to a parabolic EW channel with a Gaussian ridge.
@@ -85,14 +114,14 @@ WAD
   .. image:: _static/wad_testcase_7.gif
 
 CANAL
------
+=====
 
   East-west periodic canal of variable size with several initial states and associated geostrophic currents (zonal jets or vortex).
 
   .. image::_static/CANAL_image.gif
 
 ICE_ADV2D
----------
+=========
   
   This test case illustrates the advection of an ice patch across an East/West and North/South periodic channel
   over a slab ocean (i.e. one ocean layer).
@@ -103,7 +132,7 @@ ICE_ADV2D
   
 
 ICE_ADV1D
----------
+=========
   
   This experiment is the classical Schar & Smolarkiewicz (1996) test case :cite:`SCHAR1996`,
   which has been used in :cite:`LIPSCOMB2004`,
@@ -111,31 +140,7 @@ ICE_ADV1D
   Convergence is unidirectional (in x) while fields are homogeneous in y.
   The purpose of this configuration is to test the caracteristics of advection schemes available in the sea-ice code
   (for now, Prather and Ultimate-Macho from 1st to 5th order),
-  especially the constitency between concentration, thickness and volume, and the preservation of initial shapes.
-  
-  
-
-  
-Compile test cases
-==================
-
-The compilation of the test cases is very similar to the manner the reference configurations are compiled.
-If you are not familiar on how to compile NEMO, it is first recomended to read :doc:`the instructions <install>`
-
-| In the same manner as the ref. cfg are compiled with '-r' option, test cases can be compile by the use of makenemo with '-a' option.
-
-| Here an example to compile a copy named WAD2 of the wetting and drying test case (WAD) on the macport_osx architecture on 4 cores:
-
-.. code-block:: console
- 
-	$ ./makenemo -n WAD2 -a WAD -m macport_osx -j 4
-
-Run and analyse the test cases
-==============================
-
-There no requirement of specific input file for the test_cases presented here. The XIOS xml input files and namelist are already setup correctly. 
-For detailed description and Jupyter notebook, the reader is directed on
-the `NEMO test cases repository <http://github.com/NEMO-ocean/NEMO-examples>`_
+  especially the constitency between concentration, thickness and volume, and the preservation of initial shapes.  
 
 References
 ==========

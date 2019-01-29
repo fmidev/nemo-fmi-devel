@@ -57,11 +57,11 @@ downloaded directly from the :website:`website<bibliography/documentation>`.
 =========== ===================== ===============
  Component   Reference Manual      Quick start
 =========== ===================== ===============
- |OPA|       |NEMO manual|_        |NEMO guide|_
+ |OPA|       |NEMO manual|_        |NEMO guide|
              :cite:`NEMO_manual`
- |SI3|       |SI3 manual|_
+ |SI3|       |SI3 manual|
              :cite:`SI3_manual`
- |TOP|       |TOP manual|_
+ |TOP|       |TOP manual|
              :cite:`TOP_manual`
 =========== ===================== ===============
 
@@ -96,4 +96,4 @@ gather the community expertise for advising on the development activities.
 
 .. |NEMO strategy| replace:: multi-year development strategy
 
-.. _Special Issue: http://www.geosci-model-dev.net/special_issue40.html
+.. _Special Issue: https://www.geosci-model-dev.net/special_issue40.html
