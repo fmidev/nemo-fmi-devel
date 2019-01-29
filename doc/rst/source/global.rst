@@ -24,9 +24,11 @@
 
 .. Models / Softwares
 
-.. _AGRIF: https://agrif.imag.fr
-.. _OASIS: https://portal.enes.org/oasis
-.. _XIOS:  https://forge.ipsl.jussieu.fr/ioserver
+.. _AGRIF:  http://agrif.imag.fr
+.. _FCM:    https://metomi.github.io/fcm/doc/
+.. _IOIPSL: https://forge.ipsl.jussieu.fr/igcmg/browser/IOIPSL
+.. _OASIS:  https://portal.enes.org/oasis
+.. _XIOS:   https://forge.ipsl.jussieu.fr/ioserver
 
 .. NEMO
 

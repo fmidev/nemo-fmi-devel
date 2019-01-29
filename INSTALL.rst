@@ -1,85 +1,116 @@
-*****************************
-Obtaining and installing NEMO
-*****************************
+*******************
+Build the framework
+*******************
 
 .. contents::
-	:local:
-      
+   :local:
+
 Prerequisites
 =============
 
-- The NEMO source code is written in Fortran 95 and some of its prerequisite
-  tools and libraries are already included in the (``./ext``) subdirectory. These
-  include: the AGRIF preprocessing program "conv"; the FCM build system and the 
-  IOIPSL library for parts of the output.
-- Other requirements that your system needs to provide include: a Perl 5 interpreter; a modern
-  Fortran compiler (ifort, gfortran, pgfortran, ...) and (in most cases) a MPI library
-  (e.g. OpenMPI or MPICH). The latter is not strictly essential since it is possible
-  to compile and run NEMO on a single processor. However most realistic configurations
-  will require the parallel capabilities of NEMO and these use the Message Passing
-  Interface (MPI) library. NEMO v4.0, by default, uses some MPI features introduced
-  into the MPI-3 standard. On older systems, that do not support these features, 
-  the key_mpi2 preprocessor key should be used at compile time. This will limit MPI
-  features to those defined within the MPI-2 standard (but will lose some performance
-  benefits).
+| The NEMO source code is written in *Fortran 95* and
+  some of its prerequisite tools and libraries are already included in the ``./ext`` subdirectory.
+| It contains the AGRIF_ preprocessing program ``conv``; the FCM_ build system and
+  the IOIPSL_ library for parts of the output.
 
-The following prerequisites may already be installed or be available from the
-official repositories of your Linux distribution. However access to all the
-options available with the XIOS IO-server will require the parallel form of the
-netcdf4 library and its underlying HDF5 library. It is also necessary to compile
-these libraries with the same version of the MPI library that both NEMO and XIOS
-(see below) are compiled and linked with. To satisfy these requirements, it is common 
-to have to compile the following from source.
+System dependencies
+-------------------
 
-- `HDF5`_   (C library) (use: --enable-fortran --enable-parallel with configure)
-- `NetCDF4`_ (C and Fortran libraries)
+In the first place the other requirements should be provided natively by your system or
+can be installed from the official repositories of your Unix-like distribution:
 
-Note that particular versions of these libraries may have their own
-restrictions. For example, the latest versions of the netCDF libraries:
-netcdf-c-4.6.2 and netcdf-fortran-4.4.4, state the following requirements for netCDF-4 support:
+- *Perl* interpreter
+- *Fortran* compiler (``ifort``, ``gfortran``, ``pgfortran``, ...),
+- *Message Passing Interface (MPI)* implementation (e.g. |OpenMPI|_ or |MPICH|_).
+- |NetCDF|_ library with its underlying |HDF|_ 
 
-- HDF5 1.8.9 or later.
-- HDF5 1.10.1 or later.
-- zlib 1.2.5 or later (for netCDF-4 compression)
-- curl 7.18.0 or later (for DAP remote access client support)
+**NEMO, by default, takes advantage of some MPI features introduced into the MPI-3 standard.**
 
-`Important Note: When building netCDF-C library versions older than 4.4.1,
-use only HDF5 1.8.x versions. Combining older netCDF-C versions with newer
-HDF5 1.10 versions will create superblock 3 files that are not readable by
-lots of older software.`
+.. hint::
 
+   The MPI implementation is not strictly essential
+   since it is possible to compile and run NEMO on a single processor.
+   However most realistic configurations will require the parallel capabilities of NEMO and
+   these use the MPI standard.
+
+.. note::
+
+   On older systems, that do not support MPI-3 features,
+   the ``key_mpi2`` preprocessor key should be used at compile time.
+   This will limit MPI features to those defined within the MPI-2 standard
+   (but will lose some performance benefits).
+
+Specifics for NetCDF and HDF
+----------------------------
+
+NetCDF and HDF versions from .
+However access to all the options available with the XIOS IO-server will require
+the parallel IO support of these libraries which can be unavailable.
+
+| **To satisfy these requirements, it is common to have to compile from source
+  in this order HDF (C library) then NetCDF (C and Fortran libraries)**
+| It is also necessary to compile these libraries with the same version of the MPI implementation that
+  both NEMO and XIOS (see below) are compiled and linked with.
+
+.. hint::
+
+   | It is difficult to define the options for the compilation as
+     they differ from one architecture to another according to
+     the hardware used and the software installed.
+   | The following is provided without any warranty
+
+   .. code-block:: console
+
+      $ ./configure [--{enable-fortran,disable-shared,enable-parallel}] ...
+
+   It is recommended to build the tests ``--enable-parallel-tests`` and run them with ``make check``
+
+Particular versions of these libraries may have their own restrictions.
+State the following requirements for netCDF-4 support:
+
+.. caution::
+
+   | When building NetCDF-C library versions older than 4.4.1, use only HDF5 1.8.x versions.
+   | Combining older NetCDF-C versions with newer HDF5 1.10 versions will create superblock 3 files
+     that are not readable by lots of older software.
+   
 Extract and install XIOS
 ========================
 
-With the sole exception of running NEMO in mono-processor mode (in which case
-output options are limited to those supported by the IOIPSL library), diagnostic
-outputs from NEMO are handled by the third party XIOS library. This can be used
-in two different modes:
+With the sole exception of running NEMO in mono-processor mode
+(in which case output options are limited to those supported by the ``IOIPSL`` library),
+diagnostic outputs from NEMO are handled by the third party ``XIOS`` library.
+This can be used in two different modes:
 
-* attached - Every NEMO process also acts as a XIOS server
-* dettached - Every NEMO process runs as a XIOS client. Output is collected and collated by external,
-  stand-alone XIOS server processors.
+- *attached* - Every NEMO process also acts as a XIOS server
+- *detached* - Every NEMO process runs as a XIOS client.
+  Output is collected and collated by external, stand-alone XIOS server processors.
 
-In either case, it is important to note that XIOS needs to be compiled before
-NEMO, since the libraries are needed to successfully create the NEMO executable.
+.. important::
 
-Instructions on how to obtain and install the software can be found on the `XIOS Wiki`_ .
+   In either case, XIOS needs to be compiled before NEMO,
+   since the libraries are needed to successfully create the NEMO executable.
 
-It is recommended to use XIOS version 2.5 with NEMOv4.0. This version should be more stable (in terms of 
-future code changes) than the XIOS trunk. It is also the version used by the NEMO system team when 
-testing all developments and new releases. This particular version has its own branch and can be 
-checked out and downloaded with:
+Instructions on how to obtain and install the software can be found on the :xios:`XIOS wiki<wiki>`.
 
-.. code:: console
+.. hint::
 
-        $ svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/branchs/xios-2.5
+   It is recommended to use XIOS version 2.5.
+   This version should be more stable (in terms of future code changes) than the XIOS trunk.
+   It is also the version used by the NEMO system team when testing all developments and new releases.
+   
+   This particular version has its own branch and can be checked out and downloaded with:
+
+   .. code:: console
+
+      $ svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/branchs/xios-2.5
 
 Download the NEMO source code
 =============================
 
 .. code:: console
 
-	$ svn co http://forge.ipsl.jussieu.fr/nemo/svn/NEMO/releases/release-4.0
+   $ svn co https://forge.ipsl.jussieu.fr/nemo/svn/NEMO/trunk
 
 Description of directory tree
 -----------------------------
@@ -91,11 +122,11 @@ Description of directory tree
 +-----------+------------------------------------------------------------+
 | ``cfgs``  | :doc:`Reference configurations <configurations>`           |
 +-----------+------------------------------------------------------------+
-| ``doc``   | - ``latex``: reference manuals for |OPA|, |SI3| & |TOP|    |
+| ``doc``   | - ``latex``    : LaTex source code for ref. manuals        |
 |           | - ``namelists``: k start guide                             |
-|           | - ``rst``:   quick start guide                             |
+|           | - ``rst``      : ReST files for quick start guide          |
 +-----------+------------------------------------------------------------+
-| ``ext``   | Dependencies included (AGRIF, FCM & IOIPSL)                |
+| ``ext``   | Dependencies included (``AGRIF``, ``FCM`` & ``IOIPSL``)    |
 +-----------+------------------------------------------------------------+
 | ``mk``    | Building  routines                                         |
 +-----------+------------------------------------------------------------+
@@ -165,24 +196,24 @@ After successful execution of makenemo command, the executable called opa is cre
 More makenemo options
 ---------------------
 
-``makenemo`` has several other options that can control which source files are selected and the operation
-of the build process itself. These are:
+``makenemo`` has several other options that can control which source files are selected and
+the operation of the build process itself.
+These are::
 
-.. code-block:: sh
+   Optional:
+      -d  Set of new sub-components (space separated list from ./src directory)
+      -e  Path for alternative patch  location (default: 'MY_SRC' in configuration folder)
+      -h  Print this help
+      -j  Number of processes to compile (0: no build)
+      -n  Name for new configuration
+      -s  Path for alternative source location (default: 'src' root directory)
+      -t  Path for alternative build  location (default: 'BLD' in configuration folder)
+      -v  Level of verbosity ([0-3])
 
-        Optional:
-           -d   Set of new sub-components (space separated list from ./src directory)
-           -e   Path for alternative patch  location (default: 'MY_SRC' in configuration folder)
-           -h   Print this help
-           -j   Number of processes to compile (0: no build)
-           -n   Name for new configuration
-           -s   Path for alternative source location (default: 'src' root directory)
-           -t   Path for alternative build  location (default: 'BLD' in configuration folder)
-           -v   Level of verbosity ([0-3])
-
-These options can be useful for maintaining several code versions with only minor differences but they 
-should be used sparingly. Note however the ``-j`` option which should be used more routinely to speed up
-the build process. For example:
+These options can be useful for maintaining several code versions with only minor differences but
+they should be used sparingly.
+Note however the ``-j`` option which should be used more routinely to speed up the build process.
+For example:
 
 .. code-block:: sh
 
@@ -259,12 +290,15 @@ For a given configuration (here called MY_CONFIG), the list of active CPP keys c
 
 This text file can be edited to change the list of active CPP keys. Once changed, one needs to recompile opa executable using makenemo command in order for this change to be taken in account.
 Note that most NEMO configurations will need to specify the following CPP keys:
+``key_iomput`` and ``key_mpp_mpi``
 
-*   key_iomput
-*   key_mpp_mpi
+.. Links and substitutions
 
-
-.. _HDF5:   http://www.hdfgroup.org/downloads/hdf5
-.. _NetCDF4: http://www.unidata.ucar.edu/downloads/netcdf
-.. _XIOS Wiki:    http://forge.ipsl.jussieu.fr/ioserver/wiki/documentation
-.. _XIOSSRC: http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS/branchs/xios-2.5
+.. |OpenMPI| replace:: *OpenMPI*
+.. _OpenMPI: https://www.open-mpi.org
+.. |MPICH|   replace:: *MPICH*
+.. _MPICH:   https://www.mpich.org
+.. |NetCDF|  replace:: *Network Common Data Form (NetCDF)*
+.. _NetCDF:  https://www.unidata.ucar.edu/downloads/netcdf
+.. |HDF|     replace:: *Hierarchical Data Form (HDF)*
+.. _HDF:     https://www.hdfgroup.org/downloads

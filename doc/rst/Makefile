@@ -18,3 +18,8 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+# Watch source directory and rebuild the documentation when a change is detected
+# Browse to 127.0.0.1:8000/NEMO_guide.html
+htmllive:
+	sphinx-autobuild $(SPHINXOPTS) $(SOURCEDIR) $(BUILDDIR)/html
