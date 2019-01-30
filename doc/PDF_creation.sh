@@ -40,6 +40,8 @@ if [ $? -ne 0 ]; then echo 'Required python module pygments to correctly build t
 
 clean
 
+[ ! -d figures ] && svn co http://forge.ipsl.jussieu.fr/nemo/svn/utils/figures
+
 build $model
 
 exit 0
