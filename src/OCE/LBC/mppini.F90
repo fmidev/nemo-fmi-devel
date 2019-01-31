@@ -149,7 +149,7 @@ CONTAINS
       INTEGER ::   iarea0                     !   -       -
       INTEGER ::   ierr, ios                  ! 
       INTEGER ::   inbi, inbj, iimax,  ijmax, icnt1, icnt2
-      LOGICAL ::   llbest
+      LOGICAL ::   llbest, llauto
       LOGICAL ::   llwrtlay
       INTEGER, ALLOCATABLE, DIMENSION(:)     ::   iin, ii_nono, ii_noea          ! 1D workspace
       INTEGER, ALLOCATABLE, DIMENSION(:)     ::   ijn, ii_noso, ii_nowe          !  -     -
@@ -184,21 +184,45 @@ CONTAINS
       !
       ! If dimensions of processor grid weren't specified in the namelist file
       ! then we calculate them here now that we have our communicator size
+      IF(lwp) THEN
+         WRITE(numout,*) 'mpp_init:'
+         WRITE(numout,*) '~~~~~~~~ '
+         WRITE(numout,*)
+      ENDIF
       IF( jpni < 1 .OR. jpnj < 1 ) THEN
-         CALL mpp_init_bestpartition( mppsize, jpni, jpnj )
+         CALL mpp_init_bestpartition( mppsize, jpni, jpnj )           ! best mpi decomposition for mppsize mpi processes
+         llauto = .TRUE.
          llbest = .TRUE.
       ELSE
-         CALL mpp_init_bestpartition( mppsize, inbi, inbj, icnt2 )
+         llauto = .FALSE.
+         CALL mpp_init_bestpartition( mppsize, inbi, inbj, icnt2 )    ! best mpi decomposition for mppsize mpi processes
+         ! largest subdomain size for mpi decoposition jpni*jpnj given in the namelist
          CALL mpp_basic_decomposition( jpni, jpnj, jpimax, jpjmax )
+         ! largest subdomain size for mpi decoposition inbi*inbj given by mpp_init_bestpartition
          CALL mpp_basic_decomposition( inbi, inbj,  iimax,  ijmax )
-         IF( iimax*ijmax < jpimax*jpjmax ) THEN
+         icnt1 = jpni*jpnj - mppsize   ! number of land subdomains that should be removed to use mppsize mpi processes
+         IF(lwp) THEN
+            WRITE(numout,9000) '   The chosen domain decomposition ', jpni, ' x ', jpnj, ' with ', icnt1, ' land subdomains'
+            WRITE(numout,9002) '      - uses a total of ',  mppsize,' mpi process'
+            WRITE(numout,9000) '      - has mpi subdomains with a maximum size of (jpi = ', jpimax, ', jpj = ', jpjmax,   &
+               &                                                                ', jpi*jpj = ', jpimax*jpjmax, ')'
+            WRITE(numout,9000) '   The best domain decompostion ', inbi, ' x ', inbj, ' with ', icnt2, ' land subdomains'
+            WRITE(numout,9002) '      - uses a total of ',  inbi*inbj-icnt2,' mpi process'
+            WRITE(numout,9000) '      - has mpi subdomains with a maximum size of (jpi = ',  iimax, ', jpj = ',  ijmax,   &
+               &                                                             ', jpi*jpj = ',  iimax* ijmax, ')'
+         ENDIF
+         IF( iimax*ijmax < jpimax*jpjmax ) THEN   ! chosen subdomain size is larger that the best subdomain size
             llbest = .FALSE.
-            icnt1 = jpni*jpnj - mppsize
-            WRITE(ctmp1,9000) '   The chosen domain decomposition ', jpni, ' x ', jpnj, ' with ', icnt1, ' land sub-domains'
-            WRITE(ctmp2,9000) '   has larger MPI subdomains (jpi = ', jpimax, ', jpj = ', jpjmax, ', jpi*jpj = ', jpimax*jpjmax, ')'
-            WRITE(ctmp3,9000) '   than the following domain decompostion ', inbi, ' x ', inbj, ' with ', icnt2, ' land sub-domains'
-            WRITE(ctmp4,9000) '   which MPI subdomains size is jpi = ', iimax, ', jpj = ', ijmax, ', jpi*jpj = ', iimax*ijmax, ' '
-            CALL ctl_warn( 'mpp_init:', '~~~~~~~~ ', ctmp1, ctmp2, ctmp3, ctmp4, ' ', '    --- YOU ARE WASTING CPU... ---', ' ' )
+            IF ( inbi*inbj-icnt2 < mppsize ) THEN
+               WRITE(ctmp1,*) '   ==> You could therefore have smaller mpi subdomains with less mpi processes'
+            ELSE
+               WRITE(ctmp1,*) '   ==> You could therefore have smaller mpi subdomains with the same number of mpi processes'
+            ENDIF
+            CALL ctl_warn( ' ', ctmp1, ' ', '    ---   YOU ARE WASTING CPU...   ---', ' ' )
+         ELSE IF ( iimax*ijmax == jpimax*jpjmax .AND. (inbi*inbj-icnt2) <  mppsize) THEN
+            llbest = .FALSE.
+            WRITE(ctmp1,*) '   ==> You could therefore have the same mpi subdomains size with less mpi processes'
+            CALL ctl_warn( ' ', ctmp1, ' ', '    ---   YOU ARE WASTING CPU...   ---', ' ' )
          ELSE
             llbest = .TRUE.
          ENDIF
@@ -209,22 +233,37 @@ CONTAINS
       CALL mpp_init_isoce( jpni, jpnj, llisoce )
       inijmin = COUNT( llisoce )   ! number of oce subdomains
 
-      IF( mppsize < inijmin ) THEN
+      IF( mppsize < inijmin ) THEN   ! too many oce subdomains: can happen only if jpni and jpnj are prescribed...
          WRITE(ctmp1,9001) '   With this specified domain decomposition: jpni = ', jpni, ' jpnj = ', jpnj
          WRITE(ctmp2,9002) '   we can eliminate only ', jpni*jpnj - inijmin, ' land mpi subdomains therefore '
          WRITE(ctmp3,9001) '   the number of ocean mpi subdomains (', inijmin,') exceed the number of MPI processes:', mppsize
          WRITE(ctmp4,*) '   ==>>> There is the list of best domain decompositions you should use: '
-         CALL ctl_stop( 'mpp_init:', '~~~~~~~~ ', ctmp1, ctmp2, ctmp3, ctmp4 )
+         CALL ctl_stop( ctmp1, ctmp2, ctmp3, ' ', ctmp4, ' ' )
          CALL mpp_init_bestpartition( mppsize, ldlist = .TRUE. )   ! must be done by all core
          CALL ctl_stop( 'STOP' )
       ENDIF
 
-      IF( mppsize > jpni*jpnj ) THEN
-         WRITE(ctmp1,9003) '   The number of mpi processes: ', mppsize
-         WRITE(ctmp2,9003) '   exceeds the maximum number of subdomains (ocean+land) = ', jpni*jpnj
-         WRITE(ctmp3,9001) '   defined by the following domain decomposition: jpni = ', jpni, ' jpnj = ', jpnj
-         WRITE(ctmp4,*) '   ==>>> There is the list of best domain decompositions you should use: '
-         CALL ctl_stop( 'mpp_init:', '~~~~~~~~ ', ctmp1, ctmp2, ctmp3, ctmp4 )
+      IF( mppsize > jpni*jpnj ) THEN   ! not enough mpi subdomains for the total number of mpi processes
+         IF(lwp) THEN
+            WRITE(numout,9003) '   The number of mpi processes: ', mppsize
+            WRITE(numout,9003) '   exceeds the maximum number of subdomains (ocean+land) = ', jpni*jpnj
+            WRITE(numout,9001) '   defined by the following domain decomposition: jpni = ', jpni, ' jpnj = ', jpnj
+            WRITE(numout,   *) '   You should: '
+           IF( llauto ) THEN
+               WRITE(numout,*) '     - either prescribe your domain decomposition with the namelist variables'
+               WRITE(numout,*) '       jpni and jpnj to match the number of mpi process you want to use, '
+               WRITE(numout,*) '       even IF it not the best choice...'
+               WRITE(numout,*) '     - or keep the automatic and optimal domain decomposition by picking up one'
+               WRITE(numout,*) '       of the number of mpi process proposed in the list bellow'
+            ELSE
+               WRITE(numout,*) '     - either properly prescribe your domain decomposition with jpni and jpnj'
+               WRITE(numout,*) '       in order to be consistent with the number of mpi process you want to use'
+               WRITE(numout,*) '       even IF it not the best choice...'
+               WRITE(numout,*) '     - or use the automatic and optimal domain decomposition and pick up one of'
+               WRITE(numout,*) '       the domain decomposition proposed in the list bellow'
+            ENDIF
+            WRITE(numout,*)
+         ENDIF
          CALL mpp_init_bestpartition( mppsize, ldlist = .TRUE. )   ! must be done by all core
          CALL ctl_stop( 'STOP' )
       ENDIF
@@ -235,11 +274,11 @@ CONTAINS
          WRITE(ctmp2,9003) '   exceeds the maximum number of ocean subdomains = ', inijmin
          WRITE(ctmp3,9002) '   we suppressed ', jpni*jpnj - mppsize, ' land subdomains '
          WRITE(ctmp4,9002) '   BUT we had to keep ', mppsize - inijmin, ' land subdomains that are useless...'
-         CALL ctl_warn( 'mpp_init:', '~~~~~~~~ ', ctmp1, ctmp2, ctmp3, ctmp4, ' ', '    --- YOU ARE WASTING CPU... ---', ' ' )
+         CALL ctl_warn( ctmp1, ctmp2, ctmp3, ctmp4, ' ', '    --- YOU ARE WASTING CPU... ---', ' ' )
       ELSE   ! mppsize = inijmin
          IF(lwp) THEN
-            IF(llbest) WRITE(numout,*) 'mpp_init: You use an optimal domain decomposition'
-            WRITE(numout,*) '~~~~~~~~ '
+            IF(llbest) WRITE(numout,*) '   ==> you use the best mpi decomposition'
+            WRITE(numout,*)
             WRITE(numout,9003) '   Number of mpi processes: ', mppsize
             WRITE(numout,9003) '   Number of ocean subdomains = ', inijmin
             WRITE(numout,9003) '   Number of suppressed land subdomains = ', jpni*jpnj - inijmin
