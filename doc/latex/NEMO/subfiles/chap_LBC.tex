@@ -710,27 +710,49 @@ applied to all boundaries at once.
 \nlst{nambdy_tide} 
 %-----------------------------------------------------------------------------------------------
 
-Options are defined through the \ngn{nambdy\_tide} namelist variables 
-for reading in the complex harmonic amplitudes of elevation (ssh) and barotropic velocity (u,v). 
+Tidal forcing at open boundaries requires the activation of surface
+tides (i.e., in \ngn{nam\_tide}, \np{ln\_tide} needs to be set to
+\forcode{.true.} and the required constituents need to be activated by
+including their names in the \np{cname} array; see
+\autoref{sec:SBC_tide}). Specific options related to the reading in of
+the complex harmonic amplitudes of elevation (SSH) and barotropic
+velocity (u,v) at open boundaries are defined through the
+\ngn{nambdy\_tide} namelist parameters.\\
 
-The tidal harmonic data can be specified in 2 ways.\\
-First it can be specified on a 2D grid covering the entire model domain in which case the user should set \np{ln\_bdytide\_2ddta }\forcode{ = .true.}. 
-In this case the model assumes that the real and imaginary parts are split.
-The variable naming convention is \textit{constituent\_name\_z1} for real SSH and \textit{constituent\_name\_z2} for imaginary SSH. 
-The available \textit{constituent\_names} in NEMO are defined in \rou{SBC/tide.h90}
-Likewise for $u$ and $v$ data. File name is assumed to be \np{filtide}\ifile{\_grid\_T} for the elevation component 
-and \np{filtide}\ifile{\_grid\_U} for the u barotropic velocity and \np{filtide}\ifile{\_grid\_V} for the v barotropic velocity.\\ 
-Otherwise, the tidal data must be specified along bdy segments. 
-In this case each constituent has its own file name and the real part is assumed to be z1 and the imaginary part z2 for SSH. 
-Similarly u1, u2 and v1, v2 for velocities. Input file name convention (for elevation of the M2 tidal component) is \np{filtide}\ifile{M2\_grid\_T}. 
-Similar logic applies for other components and u and v barotropic velocities.\\
+The tidal harmonic data at open boundaries can be specified in two
+different ways, either on a two-dimensional grid covering the entire
+model domain or along open boundary segments; these two variants can
+be selected by setting \np{ln\_bdytide\_2ddta } to \forcode{.true.} or
+\forcode{.false.}, respectively. In either case, the real and
+imaginary parts of SSH and the two barotropic velocity components for
+each activated tidal constituent \textit{tcname} have to be provided
+separately: when two-dimensional data is used, variables
+\textit{tcname\_z1} and \textit{tcname\_z2} for real and imaginary SSH,
+respectively, are expected in input file \np{filtide} with suffix
+\ifile{\_grid\_T}, variables \textit{tcname\_u1} and
+\textit{tcname\_u2} for real and imaginary u, respectively, are
+expected in input file \np{filtide} with suffix \ifile{\_grid\_U}, and
+\textit{tcname\_v1} and \textit{tcname\_v2} for real and imaginary v,
+respectively, are expected in input file \np{filtide} with suffix
+\ifile{\_grid\_V}; when data along open boundary segments is used,
+variables \textit{z1} and \textit{z2} (real and imaginary part of SSH)
+are expected to be available from file \np{filtide} with suffix
+\ifile{tcname\_grid\_T}, variables \textit{u1} and \textit{u2} (real
+and imaginary part of u) are expected to be available from file
+\np{filtide} with suffix \ifile{tcname\_grid\_U}, and variables
+\textit{v1} and \textit{v2} (real and imaginary part of v) are
+expected to be available from file \np{filtide} with suffix
+\ifile{tcname\_grid\_V}. If \np{ln\_bdytide\_conj} is set to
+\forcode{.true.}, the data is expected to be in complex conjugate
+form.
 
-The data may also be in complex conjugate form. If that is the case then the user should set \np{ln\_bdytide\_conj}\forcode{ = .true. } 
-so the model correctly interprets the data. The default case assumes it is not in complex conjugate form. 
-
-Note the barotropic velocities are assumed to be on the model native grid and must be rotated as appropriate from the source grid upon which they are extracted from. 
-To do so convert to U, V amplitude and phase into tidal ellipses. Add the grid rotation to ellipse inclination and convert back. Be careful about conventions 
-of direction of rotation, e.g. anticlockwise or clockwise. 
+Note that the barotropic velocity components are assumed to be defined
+on the native model grid and should be rotated accordingly when they
+are converted from their definition on a different source grid. To do
+so, the u, v amplitudes and phases can be converted into tidal
+ellipses, the grid rotation added to the ellipse inclination, and then
+converted back (care should be taken regarding conventions of the
+direction of rotation). %, e.g. anticlockwise or clockwise.
 
 \biblio
 
