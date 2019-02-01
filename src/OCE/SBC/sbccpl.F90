@@ -248,12 +248,14 @@ CONTAINS
       REAL(wp), DIMENSION(jpi,jpj) ::   zacs, zaos
       !!
       NAMELIST/namsbc_cpl/  sn_snd_temp  , sn_snd_alb   , sn_snd_thick, sn_snd_crt   , sn_snd_co2  ,   & 
-         &                  sn_rcv_w10m  , sn_rcv_taumod, sn_rcv_tau  , sn_rcv_dqnsdt, sn_rcv_qsr  ,   & 
+         &                  sn_snd_ttilyr, sn_snd_cond  , sn_snd_mpnd , sn_snd_sstfrz, sn_snd_thick1,  & 
          &                  sn_snd_ifrac , sn_snd_crtw  , sn_snd_wlev , sn_rcv_hsig  , sn_rcv_phioc,   & 
-         &                  sn_rcv_sdrfx , sn_rcv_sdrfy , sn_rcv_wper , sn_rcv_wnum  , sn_rcv_tauwoc,   &
+         &                  sn_rcv_w10m  , sn_rcv_taumod, sn_rcv_tau  , sn_rcv_dqnsdt, sn_rcv_qsr  ,   & 
+         &                  sn_rcv_sdrfx , sn_rcv_sdrfy , sn_rcv_wper , sn_rcv_wnum  , sn_rcv_tauwoc,  &
          &                  sn_rcv_wdrag , sn_rcv_qns   , sn_rcv_emp  , sn_rcv_rnf   , sn_rcv_cal  ,   &
          &                  sn_rcv_iceflx, sn_rcv_co2   , nn_cplmodel , ln_usecplmask, sn_rcv_mslp ,   &
-         &                  sn_rcv_icb   , sn_rcv_isf   , sn_rcv_wfreq , sn_rcv_tauw, nn_cats_cpl  
+         &                  sn_rcv_icb   , sn_rcv_isf   , sn_rcv_wfreq , sn_rcv_tauw, nn_cats_cpl  ,   &
+         &                  sn_rcv_ts_ice
 
       !!---------------------------------------------------------------------
       !
