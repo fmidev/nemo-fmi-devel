@@ -139,18 +139,30 @@
          SELECT CASE ( nbondi_bdy(IBD_IN(jf)) )
          CASE ( -1 )
             CALL mppsend( 2, zt3we(1,1,1,1,1,1), imigr, noea, ml_req1 )
-            CALL mpprecv( 1, zt3ew(1,1,1,1,1,2), imigr, noea )
-            IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
          CASE ( 0 )
             CALL mppsend( 1, zt3ew(1,1,1,1,1,1), imigr, nowe, ml_req1 )
             CALL mppsend( 2, zt3we(1,1,1,1,1,1), imigr, noea, ml_req2 )
+         CASE ( 1 )
+            CALL mppsend( 1, zt3ew(1,1,1,1,1,1), imigr, nowe, ml_req1 )
+         END SELECT
+         !
+         SELECT CASE ( nbondi_bdy_b(IBD_IN(jf)) )
+         CASE ( -1 )
+            CALL mpprecv( 1, zt3ew(1,1,1,1,1,2), imigr, noea )
+         CASE ( 0 )
             CALL mpprecv( 1, zt3ew(1,1,1,1,1,2), imigr, noea )
             CALL mpprecv( 2, zt3we(1,1,1,1,1,2), imigr, nowe )
+         CASE ( 1 )
+            CALL mpprecv( 2, zt3we(1,1,1,1,1,2), imigr, nowe )
+         END SELECT
+         !
+         SELECT CASE ( nbondi_bdy(IBD_IN(jf)) )
+         CASE ( -1 )
+            IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
+         CASE ( 0 )
             IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
             IF(l_isend) CALL mpi_wait(ml_req2, ml_stat, ml_err)
          CASE ( 1 )
-            CALL mppsend( 1, zt3ew(1,1,1,1,1,1), imigr, nowe, ml_req1 )
-            CALL mpprecv( 2, zt3we(1,1,1,1,1,2), imigr, nowe )
             IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
          END SELECT
          !
@@ -229,18 +241,30 @@
          SELECT CASE ( nbondj_bdy(IBD_IN(jf)) )
          CASE ( -1 )
             CALL mppsend( 4, zt3sn(1,1,1,1,1,1), imigr, nono, ml_req1 )
-            CALL mpprecv( 3, zt3ns(1,1,1,1,1,2), imigr, nono )
-            IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
          CASE ( 0 )
             CALL mppsend( 3, zt3ns(1,1,1,1,1,1), imigr, noso, ml_req1 )
             CALL mppsend( 4, zt3sn(1,1,1,1,1,1), imigr, nono, ml_req2 )
+         CASE ( 1 )
+            CALL mppsend( 3, zt3ns(1,1,1,1,1,1), imigr, noso, ml_req1 )
+         END SELECT
+         ! 
+         SELECT CASE ( nbondj_bdy_b(IBD_IN(jf)) )
+         CASE ( -1 )
+            CALL mpprecv( 3, zt3ns(1,1,1,1,1,2), imigr, nono )
+         CASE ( 0 )
             CALL mpprecv( 3, zt3ns(1,1,1,1,1,2), imigr, nono )
             CALL mpprecv( 4, zt3sn(1,1,1,1,1,2), imigr, noso )
+         CASE ( 1 )
+            CALL mpprecv( 4, zt3sn(1,1,1,1,1,2), imigr, noso )
+         END SELECT
+         ! 
+         SELECT CASE ( nbondj_bdy(IBD_IN(jf)) )
+         CASE ( -1 )
+            IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
+         CASE ( 0 )
             IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
             IF(l_isend) CALL mpi_wait(ml_req2, ml_stat, ml_err)
          CASE ( 1 )
-            CALL mppsend( 3, zt3ns(1,1,1,1,1,1), imigr, noso, ml_req1 )
-            CALL mpprecv( 4, zt3sn(1,1,1,1,1,2), imigr, noso )
             IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
          END SELECT
          !
