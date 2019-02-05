@@ -89,10 +89,10 @@ gather the community expertise for advising on the development activities.
 
 .. Substitutions / Links
 
-.. |NEMO manual| image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1464816.svg
-.. |NEMO guide|  image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1475325.svg
-.. |SI3 manual|  image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1471689.svg
-.. |TOP manual|  image:: http://zenodo.org/badge/DOI/10.5281/zenodo.1471700.svg
+.. |NEMO manual| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1464816.svg
+.. |NEMO guide|  image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1475325.svg
+.. |SI3 manual|  image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1471689.svg
+.. |TOP manual|  image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1471700.svg
 
 .. |NEMO strategy| replace:: multi-year development strategy
 
