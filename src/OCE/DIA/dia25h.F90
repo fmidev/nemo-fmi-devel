@@ -99,7 +99,6 @@ CONTAINS
       sshn_25h(:,:)   = sshb(:,:)
       un_25h  (:,:,:) = ub  (:,:,:)
       vn_25h  (:,:,:) = vb  (:,:,:)
-      wn_25h  (:,:,:) = wn  (:,:,:)
       avt_25h (:,:,:) = avt (:,:,:)
       avm_25h (:,:,:) = avm (:,:,:)
       IF( ln_zdftke ) THEN
@@ -147,6 +146,11 @@ CONTAINS
 
       ! local variable for debugging
       ll_print = ll_print .AND. lwp
+
+      ! wn_25h could not be initialised in dia_25h_init, so we do it here instead
+      IF( kt == nn_it000 ) THEN
+         wn_25h(:,:,:) = wn(:,:,:)
+      ENDIF
 
       ! Sum of 25 hourly instantaneous values to give a 25h mean from 24hours every day
       IF( MOD( kt, i_steps ) == 0  .AND. kt /= nn_it000 ) THEN
@@ -222,7 +226,7 @@ CONTAINS
          zw3d(:,:,:) = vn_25h(:,:,:)*vmask(:,:,:) + zmdi*(1.0-vmask(:,:,:))
          CALL iom_put("vomecrty25h", zw3d  )   ! j-current
          zw3d(:,:,:) = wn_25h(:,:,:)*wmask(:,:,:) + zmdi*(1.0-tmask(:,:,:))
-         CALL iom_put("vomecrtz25h", zw3d )   ! k-current
+         CALL iom_put("vovecrtz25h", zw3d )   ! k-current
          ! Write vertical physics
          zw3d(:,:,:) = avt_25h(:,:,:)*wmask(:,:,:) + zmdi*(1.0-tmask(:,:,:))
          CALL iom_put("avt25h", zw3d )   ! diffusivity
