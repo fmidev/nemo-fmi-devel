@@ -370,6 +370,19 @@ CONTAINS
          ENDIF    ! nn_dta(jbdy) = 1
       END DO  ! jbdy
 
+      IF ( ln_apr_obc ) THEN
+         DO jbdy = 1, nb_bdy
+            IF (cn_tra(jbdy) /= 'runoff')THEN
+               igrd = 1                      ! meridional velocity
+               DO ib = 1, idx_bdy(jbdy)%nblenrim(igrd)
+                  ii   = idx_bdy(jbdy)%nbi(ib,igrd)
+                  ij   = idx_bdy(jbdy)%nbj(ib,igrd)
+                  dta_bdy(jbdy)%ssh(ib) = dta_bdy(jbdy)%ssh(ib) + ssh_ib(ii,ij)
+               END DO
+            ENDIF
+         END DO
+      ENDIF
+
       IF ( ln_tide ) THEN
          IF (ln_dynspg_ts) THEN      ! Fill temporary arrays with slow-varying bdy data                           
             DO jbdy = 1, nb_bdy    ! Tidal component added in ts loop
@@ -388,18 +401,6 @@ CONTAINS
          ENDIF
       ENDIF
 
-      IF ( ln_apr_obc ) THEN
-         DO jbdy = 1, nb_bdy
-            IF (cn_tra(jbdy) /= 'runoff')THEN
-               igrd = 1                      ! meridional velocity
-               DO ib = 1, idx_bdy(jbdy)%nblenrim(igrd)
-                  ii   = idx_bdy(jbdy)%nbi(ib,igrd)
-                  ij   = idx_bdy(jbdy)%nbj(ib,igrd)
-                  dta_bdy(jbdy)%ssh(ib) = dta_bdy(jbdy)%ssh(ib) + ssh_ib(ii,ij)
-               END DO
-            ENDIF
-         END DO
-      ENDIF
       !
       IF( ln_timing )   CALL timing_stop('bdy_dta')
       !
