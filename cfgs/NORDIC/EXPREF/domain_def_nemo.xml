@@ -1,0 +1,794 @@
+
+   <domain_definition>
+
+     <!--   T grid   -->
+     <domain id="grid_T" long_name="grid T"/>
+     
+     <!--   My zoom: example of hand defined zoom   -->
+     <domain id="myzoomT" domain_ref="grid_T" >
+       <zoom_domain ibegin="1" jbegin="1" ni="2" nj="3"/>
+     </domain>
+
+     <domain id="domain_baltic_zoom_T" domain_ref="grid_T" >
+       <zoom_domain ibegin="437" jbegin="308" ni="801" nj="738"/>
+     </domain>
+
+    <!-- NOTE: are the indices the same for U,V,W grid and T grid? -->
+     <domain id="domain_baltic_zoom_U" domain_ref="grid_U" >
+       <zoom_domain ibegin="437" jbegin="308" ni="801" nj="738"/>
+     </domain>
+
+     <domain id="domain_baltic_zoom_V" domain_ref="grid_V" >
+       <zoom_domain ibegin="437" jbegin="308" ni="801" nj="738"/>
+     </domain>
+
+     <domain id="domain_baltic_zoom_W" domain_ref="grid_W" >
+       <zoom_domain ibegin="437" jbegin="308" ni="801" nj="738"/>
+     </domain>
+
+     <domain id="1point" domain_ref="grid_T" >
+       <zoom_domain ibegin="1" jbegin="1" ni="1" nj="1"/>
+     </domain>
+
+     <!--   Eq section -->
+     <domain id="EqT" domain_ref="grid_T" > <zoom_domain id="EqT"/> </domain>
+     <!--   TAO : see example above   -->
+     <!--   137e   -->
+     <domain id="2n137eT" domain_ref="grid_T" > <zoom_domain id="2n137eT"/> </domain>
+     <domain id="5n137eT" domain_ref="grid_T" > <zoom_domain id="5n137eT"/> </domain>
+     <domain id="8n137eT" domain_ref="grid_T" > <zoom_domain id="8n137eT"/> </domain>
+     <!-- <\!--   147e   -\-> -->
+     <domain id="0n147eT" domain_ref="grid_T" > <zoom_domain id="0n147eT"/> </domain>
+     <domain id="2n147eT" domain_ref="grid_T" > <zoom_domain id="2n147eT"/> </domain>
+     <domain id="5n147eT" domain_ref="grid_T" > <zoom_domain id="5n147eT"/> </domain>
+     <!-- <\!--   156e   -\-> -->
+     <domain id="5s156eT" domain_ref="grid_T" > <zoom_domain id="5s156eT"/> </domain>
+     <domain id="2s156eT" domain_ref="grid_T" > <zoom_domain id="2s156eT"/> </domain>
+     <domain id="0n156eT" domain_ref="grid_T" > <zoom_domain id="0n156eT"/> </domain>
+     <domain id="2n156eT" domain_ref="grid_T" > <zoom_domain id="2n156eT"/> </domain>
+     <domain id="5n156eT" domain_ref="grid_T" > <zoom_domain id="5n156eT"/> </domain>
+     <domain id="8n156eT" domain_ref="grid_T" > <zoom_domain id="8n156eT"/> </domain>
+     <!-- <\!--   165e   -\-> -->
+     <domain id="8s165eT" domain_ref="grid_T" > <zoom_domain id="8s165eT"/> </domain>
+     <domain id="5s165eT" domain_ref="grid_T" > <zoom_domain id="5s165eT"/> </domain>
+     <domain id="2s165eT" domain_ref="grid_T" > <zoom_domain id="2s165eT"/> </domain>
+     <domain id="0n165eT" domain_ref="grid_T" > <zoom_domain id="0n165eT"/> </domain>
+     <domain id="2n165eT" domain_ref="grid_T" > <zoom_domain id="2n165eT"/> </domain>
+     <domain id="5n165eT" domain_ref="grid_T" > <zoom_domain id="5n165eT"/> </domain>
+     <domain id="8n165eT" domain_ref="grid_T" > <zoom_domain id="8n165eT"/> </domain>
+     <!-- <\!--   180w   -\-> -->
+     <domain id="8s180wT" domain_ref="grid_T" > <zoom_domain id="8s180wT"/> </domain>
+     <domain id="5s180wT" domain_ref="grid_T" > <zoom_domain id="5s180wT"/> </domain>
+     <domain id="2s180wT" domain_ref="grid_T" > <zoom_domain id="2s180wT"/> </domain>
+     <domain id="0n180wT" domain_ref="grid_T" > <zoom_domain id="0n180wT"/> </domain>
+     <domain id="2n180wT" domain_ref="grid_T" > <zoom_domain id="2n180wT"/> </domain>
+     <domain id="5n180wT" domain_ref="grid_T" > <zoom_domain id="5n180wT"/> </domain>
+     <domain id="8n180wT" domain_ref="grid_T" > <zoom_domain id="8n180wT"/> </domain>
+     <!-- <\!--   170w   -\-> -->
+     <domain id="8s170wT" domain_ref="grid_T" > <zoom_domain id="8s170wT"/> </domain>
+     <domain id="5s170wT" domain_ref="grid_T" > <zoom_domain id="5s170wT"/> </domain>
+     <domain id="2s170wT" domain_ref="grid_T" > <zoom_domain id="2s170wT"/> </domain>
+     <domain id="0n170wT" domain_ref="grid_T" > <zoom_domain id="0n170wT"/> </domain>
+     <domain id="2n170wT" domain_ref="grid_T" > <zoom_domain id="2n170wT"/> </domain>
+     <domain id="5n170wT" domain_ref="grid_T" > <zoom_domain id="5n170wT"/> </domain>
+     <domain id="8n170wT" domain_ref="grid_T" > <zoom_domain id="8n170wT"/> </domain>
+     <!-- <\!--   155w   -\-> -->
+     <domain id="8s155wT" domain_ref="grid_T" > <zoom_domain id="8s155wT"/> </domain>
+     <domain id="5s155wT" domain_ref="grid_T" > <zoom_domain id="5s155wT"/> </domain>
+     <domain id="2s155wT" domain_ref="grid_T" > <zoom_domain id="2s155wT"/> </domain>
+     <domain id="0n155wT" domain_ref="grid_T" > <zoom_domain id="0n155wT"/> </domain>
+     <domain id="2n155wT" domain_ref="grid_T" > <zoom_domain id="2n155wT"/> </domain>
+     <domain id="5n155wT" domain_ref="grid_T" > <zoom_domain id="5n155wT"/> </domain>
+     <domain id="8n155wT" domain_ref="grid_T" > <zoom_domain id="8n155wT"/> </domain>
+     <!-- <\!--   140w   -\-> -->
+     <domain id="8s140wT" domain_ref="grid_T" > <zoom_domain id="8s140wT"/> </domain>
+     <domain id="5s140wT" domain_ref="grid_T" > <zoom_domain id="5s140wT"/> </domain>
+     <domain id="2s140wT" domain_ref="grid_T" > <zoom_domain id="2s140wT"/> </domain>
+     <domain id="0n140wT" domain_ref="grid_T" > <zoom_domain id="0n140wT"/> </domain>
+     <domain id="2n140wT" domain_ref="grid_T" > <zoom_domain id="2n140wT"/> </domain>
+     <domain id="5n140wT" domain_ref="grid_T" > <zoom_domain id="5n140wT"/> </domain>
+     <domain id="8n140wT" domain_ref="grid_T" > <zoom_domain id="8n140wT"/> </domain>
+     <!-- <\!--   125w   -\-> -->
+     <domain id="8s125wT" domain_ref="grid_T" > <zoom_domain id="8s125wT"/> </domain>
+     <domain id="5s125wT" domain_ref="grid_T" > <zoom_domain id="5s125wT"/> </domain>
+     <domain id="2s125wT" domain_ref="grid_T" > <zoom_domain id="2s125wT"/> </domain>
+     <domain id="0n125wT" domain_ref="grid_T" > <zoom_domain id="0n125wT"/> </domain>
+     <domain id="2n125wT" domain_ref="grid_T" > <zoom_domain id="2n125wT"/> </domain>
+     <domain id="5n125wT" domain_ref="grid_T" > <zoom_domain id="5n125wT"/> </domain>
+     <domain id="8n125wT" domain_ref="grid_T" > <zoom_domain id="8n125wT"/> </domain>
+     <!-- <\!--   110w   -\-> -->
+     <domain id="8s110wT" domain_ref="grid_T" > <zoom_domain id="8s110wT"/> </domain>
+     <domain id="5s110wT" domain_ref="grid_T" > <zoom_domain id="5s110wT"/> </domain>
+     <domain id="2s110wT" domain_ref="grid_T" > <zoom_domain id="2s110wT"/> </domain>
+     <domain id="0n110wT" domain_ref="grid_T" > <zoom_domain id="0n110wT"/> </domain>
+     <domain id="2n110wT" domain_ref="grid_T" > <zoom_domain id="2n110wT"/> </domain>
+     <domain id="5n110wT" domain_ref="grid_T" > <zoom_domain id="5n110wT"/> </domain>
+     <domain id="8n110wT" domain_ref="grid_T" > <zoom_domain id="8n110wT"/> </domain>
+     <!-- <\!--   95w   -\-> -->
+     <domain id="8s95wT" domain_ref="grid_T" > <zoom_domain id="8s95wT"/> </domain>
+     <domain id="5s95wT" domain_ref="grid_T" > <zoom_domain id="5s95wT"/> </domain>
+     <domain id="2s95wT" domain_ref="grid_T" > <zoom_domain id="2s95wT"/> </domain>
+     <domain id="0n95wT" domain_ref="grid_T" > <zoom_domain id="0n95wT"/> </domain>
+     <domain id="2n95wT" domain_ref="grid_T" > <zoom_domain id="2n95wT"/> </domain>
+     <domain id="5n95wT" domain_ref="grid_T" > <zoom_domain id="5n95wT"/> </domain>
+     <domain id="8n95wT" domain_ref="grid_T" > <zoom_domain id="8n95wT"/> </domain>
+     <!-- <\!--   RAMA   -\-> -->
+     <!-- <\!--   55e   -\-> -->
+     <domain id="16s55eT"    domain_ref="grid_T" > <zoom_domain id="16s55eT"   /> </domain>
+     <domain id="12s55eT"    domain_ref="grid_T" > <zoom_domain id="12s55eT"   /> </domain>
+     <domain id="8s55eT"     domain_ref="grid_T" > <zoom_domain id="8s55eT"    /> </domain>
+     <domain id="4s55eT"     domain_ref="grid_T" > <zoom_domain id="4s55eT"    /> </domain>
+     <domain id="1.5s55eT"   domain_ref="grid_T" > <zoom_domain id="1.5s55eT"  /> </domain>
+     <domain id="0n55eT"     domain_ref="grid_T" > <zoom_domain id="0n55eT"    /> </domain>
+     <domain id="1.5n55eT"   domain_ref="grid_T" > <zoom_domain id="1.5n55eT"  /> </domain>
+     <domain id="4n55eT"     domain_ref="grid_T" > <zoom_domain id="4n55eT"    /> </domain>
+     <!--    <\!--   65e   -\-> -->
+     <domain id="15n65eT"    domain_ref="grid_T" > <zoom_domain id="15n65eT"   /> </domain>
+     <!--    <\!--   67e   -\-> -->
+     <domain id="16s67eT"    domain_ref="grid_T" > <zoom_domain id="16s67eT"   /> </domain>
+     <domain id="12s67eT"    domain_ref="grid_T" > <zoom_domain id="12s67eT"   /> </domain>
+     <domain id="8s67eT"     domain_ref="grid_T" > <zoom_domain id="8s67eT"    /> </domain>
+     <domain id="4s67eT"     domain_ref="grid_T" > <zoom_domain id="4s67eT"    /> </domain>
+     <domain id="1.5s67eT"   domain_ref="grid_T" > <zoom_domain id="1.5s67eT"  /> </domain>
+     <domain id="0n67eT"     domain_ref="grid_T" > <zoom_domain id="0n67eT"    /> </domain>
+     <domain id="1.5n67eT"   domain_ref="grid_T" > <zoom_domain id="1.5n67eT"  /> </domain>
+     <domain id="4n67eT"     domain_ref="grid_T" > <zoom_domain id="4n67eT"    /> </domain>
+     <domain id="8n67eT"     domain_ref="grid_T" > <zoom_domain id="8n67eT"    /> </domain>
+     <!-- <\!--   80.5e   -\-> -->
+     <domain id="16s80.5eT"  domain_ref="grid_T" > <zoom_domain id="16s80.5eT" /> </domain>
+     <domain id="12s80.5eT"  domain_ref="grid_T" > <zoom_domain id="12s80.5eT" /> </domain>
+     <domain id="8s80.5eT"   domain_ref="grid_T" > <zoom_domain id="8s80.5eT"  /> </domain>
+     <domain id="4s80.5eT"   domain_ref="grid_T" > <zoom_domain id="4s80.5eT"  /> </domain>
+     <domain id="1.5s80.5eT" domain_ref="grid_T" > <zoom_domain id="1.5s80.5eT"/> </domain>
+     <domain id="0n80.5eT"   domain_ref="grid_T" > <zoom_domain id="0n80.5eT"  /> </domain>
+     <domain id="1.5n80.5eT" domain_ref="grid_T" > <zoom_domain id="1.5n80.5eT"/> </domain>
+     <domain id="4n80.5eT"   domain_ref="grid_T" > <zoom_domain id="4n80.5eT"  /> </domain>
+     <!-- <\!--   90e   -\-> -->
+     <domain id="1.5s90eT"   domain_ref="grid_T" > <zoom_domain id="1.5s90eT"  /> </domain>
+     <domain id="0n90eT"     domain_ref="grid_T" > <zoom_domain id="0n90eT"    /> </domain>
+     <domain id="1.5n90eT"   domain_ref="grid_T" > <zoom_domain id="1.5n90eT"  /> </domain>
+     <domain id="4n90eT"     domain_ref="grid_T" > <zoom_domain id="4n90eT"    /> </domain>
+     <domain id="8n90eT"     domain_ref="grid_T" > <zoom_domain id="8n90eT"    /> </domain>
+     <domain id="12n90eT"    domain_ref="grid_T" > <zoom_domain id="12n90eT"   /> </domain>
+     <domain id="15n90eT"    domain_ref="grid_T" > <zoom_domain id="15n90eT"   /> </domain>
+     <!-- <\!--   95e   -\-> -->
+     <domain id="16s95eT"    domain_ref="grid_T" > <zoom_domain id="16s95eT"   /> </domain>
+     <domain id="12s95eT"    domain_ref="grid_T" > <zoom_domain id="12s95eT"   /> </domain>
+     <domain id="8s95eT"     domain_ref="grid_T" > <zoom_domain id="8s95eT"    /> </domain>
+     <domain id="5s95eT"     domain_ref="grid_T" > <zoom_domain id="5s95eT"    /> </domain>
+     <!-- <\!--   PIRATA   -\-> -->
+     <!-- <\!--   38w-30w   -\-> -->
+     <domain id="19s34wT" domain_ref="grid_T" > <zoom_domain id="19s34wT"/> </domain>
+     <domain id="14s32wT" domain_ref="grid_T" > <zoom_domain id="14s32wT"/> </domain>
+     <domain id="8s30wT"  domain_ref="grid_T" > <zoom_domain id="8s30wT" /> </domain>
+     <domain id="0n35wT"  domain_ref="grid_T" > <zoom_domain id="0n35wT" /> </domain>
+     <domain id="4n38wT"  domain_ref="grid_T" > <zoom_domain id="4n38wT" /> </domain>
+     <domain id="8n38wT"  domain_ref="grid_T" > <zoom_domain id="8n38wT" /> </domain>
+     <domain id="12n38wT" domain_ref="grid_T" > <zoom_domain id="12n38wT"/> </domain>
+     <domain id="15n38wT" domain_ref="grid_T" > <zoom_domain id="15n38wT"/> </domain>
+     <domain id="20n38wT" domain_ref="grid_T" > <zoom_domain id="20n38wT"/> </domain>
+     <!-- <\!--   23w   -\-> -->
+     <domain id="0n23wT"  domain_ref="grid_T" > <zoom_domain id="0n23wT" /> </domain>
+     <domain id="4n23wT"  domain_ref="grid_T" > <zoom_domain id="4n23wT" /> </domain>
+     <domain id="12n23wT" domain_ref="grid_T" > <zoom_domain id="12n23wT"/> </domain>
+     <domain id="21n23wT" domain_ref="grid_T" > <zoom_domain id="21n23wT"/> </domain>
+     <!-- <\!--   10w   -\-> -->
+     <domain id="10s10wT" domain_ref="grid_T" > <zoom_domain id="10s10wT"/> </domain>
+     <domain id="6s10wT"  domain_ref="grid_T" > <zoom_domain id="6s10wT" /> </domain>
+     <domain id="0n10wT"  domain_ref="grid_T" > <zoom_domain id="0n10wT" /> </domain>
+     <!-- <\!--   0e   -\-> -->
+     <domain id="0n0eT"   domain_ref="grid_T" > <zoom_domain id="0n0eT"  /> </domain>
+
+
+     <!--   U grid   -->
+     <domain id="grid_U" long_name="grid U"/>
+     <!--   Eq section   -->
+     <domain id="EqU" domain_ref="grid_U" > <zoom_domain id="EqU"/> </domain>
+
+
+     <!--   V grid   -->
+     <domain id="grid_V" long_name="grid V"/>
+     <!--   Eq section : no V point on the Equator...   -->
+
+
+     <!--   W grid   -->
+     <domain id="grid_W" long_name="grid W"/>
+     <!--   Eq section   -->
+     <domain id="EqW" domain_ref="grid_W" > <zoom_domain id="EqW"/> </domain>
+
+
+     <!--   zonal mean grid   -->
+     <domain id="gznl" long_name="gznl"/>
+     <domain id="znl_T" domain_ref="gznl" > <zoom_domain id="znl_T"/> </domain>
+     <domain id="znl_W" domain_ref="gznl" > <zoom_domain id="znl_W"/> </domain>
+
+
+     <!--   other grids   -->
+     <domain id="scalarpoint" long_name="scalar"/>
+
+     <!--   station definition   -->
+        <domain id="Aarhus" domain_ref="grid_T" >
+            <zoom_domain ibegin="518" jbegin="460" ni="1" nj="1"/>
+        </domain>
+        <domain id="Aberdeen" domain_ref="grid_T" >
+            <zoom_domain ibegin="75" jbegin="520" ni="1" nj="1"/>
+        </domain>
+        <domain id="Althagen" domain_ref="grid_T" >
+            <zoom_domain ibegin="597" jbegin="355" ni="1" nj="1"/>
+        </domain>
+        <domain id="Arkona" domain_ref="grid_T" >
+            <zoom_domain ibegin="649" jbegin="384" ni="1" nj="1"/>
+        </domain>
+        <domain id="AskoCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="784" jbegin="619" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMP" domain_ref="grid_T" >
+            <zoom_domain ibegin="855" jbegin="756" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPC1" domain_ref="grid_T" >
+            <zoom_domain ibegin="869" jbegin="846" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPF3" domain_ref="grid_T" >
+            <zoom_domain ibegin="1044" jbegin="682" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPF7" domain_ref="grid_T" >
+            <zoom_domain ibegin="1146" jbegin="714" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPG1" domain_ref="grid_T" >
+            <zoom_domain ibegin="1000" jbegin="548" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPK4" domain_ref="grid_T" >
+            <zoom_domain ibegin="636" jbegin="387" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPL1" domain_ref="grid_T" >
+            <zoom_domain ibegin="846" jbegin="381" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPM1" domain_ref="grid_T" >
+            <zoom_domain ibegin="592" jbegin="360" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPP1" domain_ref="grid_T" >
+            <zoom_domain ibegin="546" jbegin="413" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPQ2" domain_ref="grid_T" >
+            <zoom_domain ibegin="609" jbegin="443" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPR1" domain_ref="grid_T" >
+            <zoom_domain ibegin="552" jbegin="459" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPR3" domain_ref="grid_T" >
+            <zoom_domain ibegin="586" jbegin="491" ni="1" nj="1"/>
+        </domain>
+        <domain id="BMPR6" domain_ref="grid_T" >
+            <zoom_domain ibegin="570" jbegin="523" ni="1" nj="1"/>
+        </domain>
+        <domain id="BO1" domain_ref="grid_T" >
+            <zoom_domain ibegin="936" jbegin="956" ni="1" nj="1"/>
+        </domain>
+        <domain id="BO3" domain_ref="grid_T" >
+            <zoom_domain ibegin="955" jbegin="949" ni="1" nj="1"/>
+        </domain>
+        <domain id="BO5" domain_ref="grid_T" >
+            <zoom_domain ibegin="975" jbegin="942" ni="1" nj="1"/>
+        </domain>
+        <domain id="BO7" domain_ref="grid_T" >
+            <zoom_domain ibegin="986" jbegin="939" ni="1" nj="1"/>
+        </domain>
+        <domain id="BOT" domain_ref="grid_T" >
+            <zoom_domain ibegin="852" jbegin="766" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY1" domain_ref="grid_T" >
+            <zoom_domain ibegin="629" jbegin="391" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY10" domain_ref="grid_T" >
+            <zoom_domain ibegin="855" jbegin="489" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY15" domain_ref="grid_T" >
+            <zoom_domain ibegin="872" jbegin="530" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY17" domain_ref="grid_T" >
+            <zoom_domain ibegin="893" jbegin="529" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY19" domain_ref="grid_T" >
+            <zoom_domain ibegin="876" jbegin="548" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY2" domain_ref="grid_T" >
+            <zoom_domain ibegin="657" jbegin="391" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY20" domain_ref="grid_T" >
+            <zoom_domain ibegin="866" jbegin="571" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY21" domain_ref="grid_T" >
+            <zoom_domain ibegin="882" jbegin="598" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY27" domain_ref="grid_T" >
+            <zoom_domain ibegin="926" jbegin="649" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY28" domain_ref="grid_T" >
+            <zoom_domain ibegin="909" jbegin="633" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY30" domain_ref="grid_T" >
+            <zoom_domain ibegin="838" jbegin="618" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY31" domain_ref="grid_T" >
+            <zoom_domain ibegin="806" jbegin="606" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY32" domain_ref="grid_T" >
+            <zoom_domain ibegin="797" jbegin="572" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY36" domain_ref="grid_T" >
+            <zoom_domain ibegin="775" jbegin="554" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY38" domain_ref="grid_T" >
+            <zoom_domain ibegin="786" jbegin="518" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY39" domain_ref="grid_T" >
+            <zoom_domain ibegin="745" jbegin="458" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY5" domain_ref="grid_T" >
+            <zoom_domain ibegin="725" jbegin="406" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY7" domain_ref="grid_T" >
+            <zoom_domain ibegin="764" jbegin="404" ni="1" nj="1"/>
+        </domain>
+        <domain id="BY9" domain_ref="grid_T" >
+            <zoom_domain ibegin="844" jbegin="459" ni="1" nj="1"/>
+        </domain>
+        <domain id="Bagenkop" domain_ref="grid_T" >
+            <zoom_domain ibegin="534" jbegin="374" ni="1" nj="1"/>
+        </domain>
+        <domain id="Ballen" domain_ref="grid_T" >
+            <zoom_domain ibegin="533" jbegin="440" ni="1" nj="1"/>
+        </domain>
+        <domain id="Barhoeft" domain_ref="grid_T" >
+            <zoom_domain ibegin="619" jbegin="357" ni="1" nj="1"/>
+        </domain>
+        <domain id="Barseback" domain_ref="grid_T" >
+            <zoom_domain ibegin="614" jbegin="436" ni="1" nj="1"/>
+        </domain>
+        <domain id="BothnianBay" domain_ref="grid_T" >
+            <zoom_domain ibegin="987" jbegin="972" ni="1" nj="1"/>
+        </domain>
+        <domain id="BothnianSea" domain_ref="grid_T" >
+            <zoom_domain ibegin="878" jbegin="799" ni="1" nj="1"/>
+        </domain>
+        <domain id="Calais" domain_ref="grid_T" >
+            <zoom_domain ibegin="217" jbegin="149" ni="1" nj="1"/>
+        </domain>
+        <domain id="DarsserS" domain_ref="grid_T" >
+            <zoom_domain ibegin="607" jbegin="373" ni="1" nj="1"/>
+        </domain>
+        <domain id="Daugavgriva" domain_ref="grid_T" >
+            <zoom_domain ibegin="1014" jbegin="514" ni="1" nj="1"/>
+        </domain>
+        <domain id="Degerby" domain_ref="grid_T" >
+            <zoom_domain ibegin="884" jbegin="693" ni="1" nj="1"/>
+        </domain>
+        <domain id="Dover" domain_ref="grid_T" >
+            <zoom_domain ibegin="198" jbegin="158" ni="1" nj="1"/>
+        </domain>
+        <domain id="Dragor" domain_ref="grid_T" >
+            <zoom_domain ibegin="607" jbegin="427" ni="1" nj="1"/>
+        </domain>
+        <domain id="Drogden" domain_ref="grid_T" >
+            <zoom_domain ibegin="608" jbegin="423" ni="1" nj="1"/>
+        </domain>
+        <domain id="Eckernfoerde" domain_ref="grid_T" >
+            <zoom_domain ibegin="504" jbegin="359" ni="1" nj="1"/>
+        </domain>
+        <domain id="F1" domain_ref="grid_T" >
+            <zoom_domain ibegin="1098" jbegin="686" ni="1" nj="1"/>
+        </domain>
+        <domain id="F13" domain_ref="grid_T" >
+            <zoom_domain ibegin="923" jbegin="919" ni="1" nj="1"/>
+        </domain>
+        <domain id="F15" domain_ref="grid_T" >
+            <zoom_domain ibegin="925" jbegin="902" ni="1" nj="1"/>
+        </domain>
+        <domain id="F16" domain_ref="grid_T" >
+            <zoom_domain ibegin="908" jbegin="902" ni="1" nj="1"/>
+        </domain>
+        <domain id="F18" domain_ref="grid_T" >
+            <zoom_domain ibegin="880" jbegin="890" ni="1" nj="1"/>
+        </domain>
+        <domain id="F2" domain_ref="grid_T" >
+            <zoom_domain ibegin="995" jbegin="1014" ni="1" nj="1"/>
+        </domain>
+        <domain id="F26" domain_ref="grid_T" >
+            <zoom_domain ibegin="872" jbegin="810" ni="1" nj="1"/>
+        </domain>
+        <domain id="F33" domain_ref="grid_T" >
+            <zoom_domain ibegin="832" jbegin="724" ni="1" nj="1"/>
+        </domain>
+        <domain id="F40" domain_ref="grid_T" >
+            <zoom_domain ibegin="1187" jbegin="697" ni="1" nj="1"/>
+        </domain>
+        <domain id="F41" domain_ref="grid_T" >
+            <zoom_domain ibegin="1160" jbegin="698" ni="1" nj="1"/>
+        </domain>
+        <domain id="F42" domain_ref="grid_T" >
+            <zoom_domain ibegin="1139" jbegin="699" ni="1" nj="1"/>
+        </domain>
+        <domain id="F62" domain_ref="grid_T" >
+            <zoom_domain ibegin="987" jbegin="651" ni="1" nj="1"/>
+        </domain>
+        <domain id="F64" domain_ref="grid_T" >
+            <zoom_domain ibegin="839" jbegin="702" ni="1" nj="1"/>
+        </domain>
+        <domain id="F69" domain_ref="grid_T" >
+            <zoom_domain ibegin="867" jbegin="678" ni="1" nj="1"/>
+        </domain>
+        <domain id="F79" domain_ref="grid_T" >
+            <zoom_domain ibegin="876" jbegin="598" ni="1" nj="1"/>
+        </domain>
+        <domain id="F80" domain_ref="grid_T" >
+            <zoom_domain ibegin="866" jbegin="571" ni="1" nj="1"/>
+        </domain>
+        <domain id="F9" domain_ref="grid_T" >
+            <zoom_domain ibegin="944" jbegin="973" ni="1" nj="1"/>
+        </domain>
+        <domain id="FINO2" domain_ref="grid_T" >
+            <zoom_domain ibegin="624" jbegin="392" ni="1" nj="1"/>
+        </domain>
+        <domain id="FINO3" domain_ref="grid_T" >
+            <zoom_domain ibegin="408" jbegin="403" ni="1" nj="1"/>
+        </domain>
+        <domain id="FehmarnBelt" domain_ref="grid_T" >
+            <zoom_domain ibegin="551" jbegin="367" ni="1" nj="1"/>
+        </domain>
+        <domain id="FinngrundetWR" domain_ref="grid_T" >
+            <zoom_domain ibegin="820" jbegin="745" ni="1" nj="1"/>
+        </domain>
+        <domain id="Flensburg" domain_ref="grid_T" >
+            <zoom_domain ibegin="490" jbegin="380" ni="1" nj="1"/>
+        </domain>
+        <domain id="Forsmark" domain_ref="grid_T" >
+            <zoom_domain ibegin="806" jbegin="716" ni="1" nj="1"/>
+        </domain>
+        <domain id="Fredericia" domain_ref="grid_T" >
+            <zoom_domain ibegin="502" jbegin="425" ni="1" nj="1"/>
+        </domain>
+        <domain id="Frederikshavn" domain_ref="grid_T" >
+            <zoom_domain ibegin="530" jbegin="537" ni="1" nj="1"/>
+        </domain>
+        <domain id="Furuogrund" domain_ref="grid_T" >
+            <zoom_domain ibegin="914" jbegin="985" ni="1" nj="1"/>
+        </domain>
+        <domain id="Fynshav" domain_ref="grid_T" >
+            <zoom_domain ibegin="509" jbegin="391" ni="1" nj="1"/>
+        </domain>
+        <domain id="Gedser" domain_ref="grid_T" >
+            <zoom_domain ibegin="580" jbegin="364" ni="1" nj="1"/>
+        </domain>
+        <domain id="GoteborgTorshamnen" domain_ref="grid_T" >
+            <zoom_domain ibegin="574" jbegin="552" ni="1" nj="1"/>
+        </domain>
+        <domain id="Greifswald" domain_ref="grid_T" >
+            <zoom_domain ibegin="634" jbegin="337" ni="1" nj="1"/>
+        </domain>
+        <domain id="Grena" domain_ref="grid_T" >
+            <zoom_domain ibegin="544" jbegin="476" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hanobukten2BS" domain_ref="grid_T" >
+            <zoom_domain ibegin="675" jbegin="443" ni="1" nj="1"/>
+        </domain>
+        <domain id="HanobuktenBS" domain_ref="grid_T" >
+            <zoom_domain ibegin="673" jbegin="444" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hanstholm" domain_ref="grid_T" >
+            <zoom_domain ibegin="460" jbegin="518" ni="1" nj="1"/>
+        </domain>
+        <domain id="HarsfjardenWR" domain_ref="grid_T" >
+            <zoom_domain ibegin="802" jbegin="633" ni="1" nj="1"/>
+        </domain>
+        <domain id="HavstensfjordCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="573" jbegin="589" ni="1" nj="1"/>
+        </domain>
+        <domain id="Heiligenhafen" domain_ref="grid_T" >
+            <zoom_domain ibegin="546" jbegin="353" ni="1" nj="1"/>
+        </domain>
+        <domain id="Helgoland" domain_ref="grid_T" >
+            <zoom_domain ibegin="434" jbegin="342" ni="1" nj="1"/>
+        </domain>
+        <domain id="Helsinki" domain_ref="grid_T" >
+            <zoom_domain ibegin="1049" jbegin="700" ni="1" nj="1"/>
+        </domain>
+        <domain id="HelsinkiBuoy" domain_ref="grid_T" >
+            <zoom_domain ibegin="1058" jbegin="689" ni="1" nj="1"/>
+        </domain>
+        <domain id="Heltermaa" domain_ref="grid_T" >
+            <zoom_domain ibegin="980" jbegin="623" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hesnaes" domain_ref="grid_T" >
+            <zoom_domain ibegin="587" jbegin="380" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hobro" domain_ref="grid_T" >
+            <zoom_domain ibegin="503" jbegin="489" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hogland" domain_ref="grid_T" >
+            <zoom_domain ibegin="1122" jbegin="691" ni="1" nj="1"/>
+        </domain>
+        <domain id="Holbaek" domain_ref="grid_T" >
+            <zoom_domain ibegin="572" jbegin="434" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hornbaek" domain_ref="grid_T" >
+            <zoom_domain ibegin="599" jbegin="457" ni="1" nj="1"/>
+        </domain>
+        <domain id="Hov" domain_ref="grid_T" >
+            <zoom_domain ibegin="520" jbegin="446" ni="1" nj="1"/>
+        </domain>
+        <domain id="HuvudskarOst" domain_ref="grid_T" >
+            <zoom_domain ibegin="840" jbegin="627" ni="1" nj="1"/>
+        </domain>
+        <domain id="Juelsminde" domain_ref="grid_T" >
+            <zoom_domain ibegin="511" jbegin="434" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kalix" domain_ref="grid_T" >
+            <zoom_domain ibegin="982" jbegin="1033" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kalkgrund" domain_ref="grid_T" >
+            <zoom_domain ibegin="506" jbegin="380" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kappeln" domain_ref="grid_T" >
+            <zoom_domain ibegin="509" jbegin="374" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kaskinen" domain_ref="grid_T" >
+            <zoom_domain ibegin="914" jbegin="831" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kemi" domain_ref="grid_T" >
+            <zoom_domain ibegin="1032" jbegin="1031" ni="1" nj="1"/>
+        </domain>
+        <domain id="KielHoltenau" domain_ref="grid_T" >
+            <zoom_domain ibegin="516" jbegin="353" ni="1" nj="1"/>
+        </domain>
+        <domain id="KielLT" domain_ref="grid_T" >
+            <zoom_domain ibegin="520" jbegin="361" ni="1" nj="1"/>
+        </domain>
+        <domain id="Klagshamn" domain_ref="grid_T" >
+            <zoom_domain ibegin="614" jbegin="423" ni="1" nj="1"/>
+        </domain>
+        <domain id="Klaipeda" domain_ref="grid_T" >
+            <zoom_domain ibegin="909" jbegin="434" ni="1" nj="1"/>
+        </domain>
+        <domain id="Knollsgrund" domain_ref="grid_T" >
+            <zoom_domain ibegin="784" jbegin="542" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kobenhavn" domain_ref="grid_T" >
+            <zoom_domain ibegin="604" jbegin="433" ni="1" nj="1"/>
+        </domain>
+        <domain id="Koege" domain_ref="grid_T" >
+            <zoom_domain ibegin="589" jbegin="418" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kolka" domain_ref="grid_T" >
+            <zoom_domain ibegin="963" jbegin="555" ni="1" nj="1"/>
+        </domain>
+        <domain id="Korsor" domain_ref="grid_T" >
+            <zoom_domain ibegin="550" jbegin="410" ni="1" nj="1"/>
+        </domain>
+        <domain id="Koserow" domain_ref="grid_T" >
+            <zoom_domain ibegin="654" jbegin="335" ni="1" nj="1"/>
+        </domain>
+        <domain id="KosterCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="550" jbegin="624" ni="1" nj="1"/>
+        </domain>
+        <domain id="KristinebergCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="562" jbegin="586" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kronstadt" domain_ref="grid_T" >
+            <zoom_domain ibegin="1221" jbegin="689" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kuivastu" domain_ref="grid_T" >
+            <zoom_domain ibegin="992" jbegin="605" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kungsholmsfort" domain_ref="grid_T" >
+            <zoom_domain ibegin="711" jbegin="458" ni="1" nj="1"/>
+        </domain>
+        <domain id="Kungsvik" domain_ref="grid_T" >
+            <zoom_domain ibegin="551" jbegin="630" ni="1" nj="1"/>
+        </domain>
+        <domain id="L9BS" domain_ref="grid_T" >
+            <zoom_domain ibegin="608" jbegin="485" ni="1" nj="1"/>
+        </domain>
+        <domain id="LTKiel" domain_ref="grid_T" >
+            <zoom_domain ibegin="520" jbegin="361" ni="1" nj="1"/>
+        </domain>
+        <domain id="LandsortNorra" domain_ref="grid_T" >
+            <zoom_domain ibegin="793" jbegin="618" ni="1" nj="1"/>
+        </domain>
+        <domain id="Langballigau" domain_ref="grid_T" >
+            <zoom_domain ibegin="498" jbegin="380" ni="1" nj="1"/>
+        </domain>
+        <domain id="LasoOst" domain_ref="grid_T" >
+            <zoom_domain ibegin="566" jbegin="524" ni="1" nj="1"/>
+        </domain>
+        <domain id="Lehtma" domain_ref="grid_T" >
+            <zoom_domain ibegin="967" jbegin="635" ni="1" nj="1"/>
+        </domain>
+        <domain id="Luebeck" domain_ref="grid_T" >
+            <zoom_domain ibegin="538" jbegin="331" ni="1" nj="1"/>
+        </domain>
+        <domain id="MS01" domain_ref="grid_T" >
+            <zoom_domain ibegin="559" jbegin="366" ni="1" nj="1"/>
+        </domain>
+        <domain id="MS02" domain_ref="grid_T" >
+            <zoom_domain ibegin="556" jbegin="363" ni="1" nj="1"/>
+        </domain>
+        <domain id="Marviken" domain_ref="grid_T" >
+            <zoom_domain ibegin="756" jbegin="604" ni="1" nj="1"/>
+        </domain>
+        <domain id="MysingenWR" domain_ref="grid_T" >
+            <zoom_domain ibegin="807" jbegin="630" ni="1" nj="1"/>
+        </domain>
+        <domain id="Neustadt" domain_ref="grid_T" >
+            <zoom_domain ibegin="539" jbegin="335" ni="1" nj="1"/>
+        </domain>
+        <domain id="NordreRose" domain_ref="grid_T" >
+            <zoom_domain ibegin="607" jbegin="429" ni="1" nj="1"/>
+        </domain>
+        <domain id="NorrbynCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="863" jbegin="901" ni="1" nj="1"/>
+        </domain>
+        <domain id="NorthernBaltic" domain_ref="grid_T" >
+            <zoom_domain ibegin="906" jbegin="646" ni="1" nj="1"/>
+        </domain>
+        <domain id="Oderbank" domain_ref="grid_T" >
+            <zoom_domain ibegin="660" jbegin="336" ni="1" nj="1"/>
+        </domain>
+        <domain id="OlandOst" domain_ref="grid_T" >
+            <zoom_domain ibegin="764" jbegin="507" ni="1" nj="1"/>
+        </domain>
+        <domain id="OlandSodraBS" domain_ref="grid_T" >
+            <zoom_domain ibegin="749" jbegin="461" ni="1" nj="1"/>
+        </domain>
+        <domain id="OlandsNorraUdde" domain_ref="grid_T" >
+            <zoom_domain ibegin="766" jbegin="533" ni="1" nj="1"/>
+        </domain>
+        <domain id="Oskarshamn" domain_ref="grid_T" >
+            <zoom_domain ibegin="743" jbegin="527" ni="1" nj="1"/>
+        </domain>
+        <domain id="Paldiski" domain_ref="grid_T" >
+            <zoom_domain ibegin="1017" jbegin="650" ni="1" nj="1"/>
+        </domain>
+        <domain id="Parnu" domain_ref="grid_T" >
+            <zoom_domain ibegin="1031" jbegin="593" ni="1" nj="1"/>
+        </domain>
+        <domain id="Pietarsaari" domain_ref="grid_T" >
+            <zoom_domain ibegin="967" jbegin="914" ni="1" nj="1"/>
+        </domain>
+        <domain id="Plymouth" domain_ref="grid_T" >
+            <zoom_domain ibegin="1" jbegin="112" ni="1" nj="1"/>
+        </domain>
+        <domain id="Randers" domain_ref="grid_T" >
+            <zoom_domain ibegin="518" jbegin="483" ni="1" nj="1"/>
+        </domain>
+        <domain id="Ratan" domain_ref="grid_T" >
+            <zoom_domain ibegin="902" jbegin="929" ni="1" nj="1"/>
+        </domain>
+        <domain id="Ringhals" domain_ref="grid_T" >
+            <zoom_domain ibegin="586" jbegin="528" ni="1" nj="1"/>
+        </domain>
+        <domain id="Rodby" domain_ref="grid_T" >
+            <zoom_domain ibegin="559" jbegin="369" ni="1" nj="1"/>
+        </domain>
+        <domain id="Rodvig" domain_ref="grid_T" >
+            <zoom_domain ibegin="595" jbegin="405" ni="1" nj="1"/>
+        </domain>
+        <domain id="Rohukula" domain_ref="grid_T" >
+            <zoom_domain ibegin="993" jbegin="626" ni="1" nj="1"/>
+        </domain>
+        <domain id="Ronne" domain_ref="grid_T" >
+            <zoom_domain ibegin="678" jbegin="397" ni="1" nj="1"/>
+        </domain>
+        <domain id="Roskilde" domain_ref="grid_T" >
+            <zoom_domain ibegin="584" jbegin="438" ni="1" nj="1"/>
+        </domain>
+        <domain id="Rostock" domain_ref="grid_T" >
+            <zoom_domain ibegin="586" jbegin="342" ni="1" nj="1"/>
+        </domain>
+        <domain id="Sassnitz" domain_ref="grid_T" >
+            <zoom_domain ibegin="641" jbegin="361" ni="1" nj="1"/>
+        </domain>
+        <domain id="Schleimuende" domain_ref="grid_T" >
+            <zoom_domain ibegin="511" jbegin="371" ni="1" nj="1"/>
+        </domain>
+        <domain id="Schleswig" domain_ref="grid_T" >
+            <zoom_domain ibegin="504" jbegin="359" ni="1" nj="1"/>
+        </domain>
+        <domain id="Sillamae" domain_ref="grid_T" >
+            <zoom_domain ibegin="1149" jbegin="656" ni="1" nj="1"/>
+        </domain>
+        <domain id="Simrishamn" domain_ref="grid_T" >
+            <zoom_domain ibegin="667" jbegin="424" ni="1" nj="1"/>
+        </domain>
+        <domain id="SjaellandsOdde" domain_ref="grid_T" >
+            <zoom_domain ibegin="559" jbegin="450" ni="1" nj="1"/>
+        </domain>
+        <domain id="Skagen" domain_ref="grid_T" >
+            <zoom_domain ibegin="531" jbegin="553" ni="1" nj="1"/>
+        </domain>
+        <domain id="Skagsudde" domain_ref="grid_T" >
+            <zoom_domain ibegin="835" jbegin="882" ni="1" nj="1"/>
+        </domain>
+        <domain id="Skanor" domain_ref="grid_T" >
+            <zoom_domain ibegin="612" jbegin="417" ni="1" nj="1"/>
+        </domain>
+        <domain id="Slipshavn" domain_ref="grid_T" >
+            <zoom_domain ibegin="540" jbegin="409" ni="1" nj="1"/>
+        </domain>
+        <domain id="Smogen" domain_ref="grid_T" >
+            <zoom_domain ibegin="554" jbegin="592" ni="1" nj="1"/>
+        </domain>
+        <domain id="SodraOstersjon" domain_ref="grid_T" >
+            <zoom_domain ibegin="826" jbegin="446" ni="1" nj="1"/>
+        </domain>
+        <domain id="Spikarna" domain_ref="grid_T" >
+            <zoom_domain ibegin="781" jbegin="833" ni="1" nj="1"/>
+        </domain>
+        <domain id="StPetersburg" domain_ref="grid_T" >
+            <zoom_domain ibegin="1236" jbegin="687" ni="1" nj="1"/>
+        </domain>
+        <domain id="Stenungsund" domain_ref="grid_T" >
+            <zoom_domain ibegin="576" jbegin="578" ni="1" nj="1"/>
+        </domain>
+        <domain id="Stockholm" domain_ref="grid_T" >
+            <zoom_domain ibegin="801" jbegin="651" ni="1" nj="1"/>
+        </domain>
+        <domain id="Stralsund" domain_ref="grid_T" >
+            <zoom_domain ibegin="622" jbegin="350" ni="1" nj="1"/>
+        </domain>
+        <domain id="Tallinn" domain_ref="grid_T" >
+            <zoom_domain ibegin="1042" jbegin="658" ni="1" nj="1"/>
+        </domain>
+        <domain id="TangesundCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="564" jbegin="574" ni="1" nj="1"/>
+        </domain>
+        <domain id="Tejn" domain_ref="grid_T" >
+            <zoom_domain ibegin="684" jbegin="406" ni="1" nj="1"/>
+        </domain>
+        <domain id="TimmendorfPoel" domain_ref="grid_T" >
+            <zoom_domain ibegin="560" jbegin="331" ni="1" nj="1"/>
+        </domain>
+        <domain id="Travemuende" domain_ref="grid_T" >
+            <zoom_domain ibegin="542" jbegin="328" ni="1" nj="1"/>
+        </domain>
+        <domain id="Triigi" domain_ref="grid_T" >
+            <zoom_domain ibegin="968" jbegin="606" ni="1" nj="1"/>
+        </domain>
+        <domain id="Ueckermuende" domain_ref="grid_T" >
+            <zoom_domain ibegin="656" jbegin="316" ni="1" nj="1"/>
+        </domain>
+        <domain id="Vaderoarna" domain_ref="grid_T" >
+            <zoom_domain ibegin="544" jbegin="600" ni="1" nj="1"/>
+        </domain>
+        <domain id="VahemadalCU" domain_ref="grid_T" >
+            <zoom_domain ibegin="1038" jbegin="662" ni="1" nj="1"/>
+        </domain>
+        <domain id="Vedbaek" domain_ref="grid_T" >
+            <zoom_domain ibegin="602" jbegin="442" ni="1" nj="1"/>
+        </domain>
+        <domain id="VengeanceTS" domain_ref="grid_T" >
+            <zoom_domain ibegin="549" jbegin="404" ni="1" nj="1"/>
+        </domain>
+        <domain id="Viken" domain_ref="grid_T" >
+            <zoom_domain ibegin="602" jbegin="459" ni="1" nj="1"/>
+        </domain>
+        <domain id="Virtsu" domain_ref="grid_T" >
+            <zoom_domain ibegin="996" jbegin="606" ni="1" nj="1"/>
+        </domain>
+        <domain id="Visby" domain_ref="grid_T" >
+            <zoom_domain ibegin="808" jbegin="550" ni="1" nj="1"/>
+        </domain>
+        <domain id="W26" domain_ref="grid_T" >
+            <zoom_domain ibegin="544" jbegin="415" ni="1" nj="1"/>
+        </domain>
+        <domain id="Warnemuende" domain_ref="grid_T" >
+            <zoom_domain ibegin="586" jbegin="342" ni="1" nj="1"/>
+        </domain>
+        <domain id="Wismar" domain_ref="grid_T" >
+            <zoom_domain ibegin="562" jbegin="326" ni="1" nj="1"/>
+        </domain>
+        <domain id="Wolgast" domain_ref="grid_T" >
+            <zoom_domain ibegin="646" jbegin="334" ni="1" nj="1"/>
+        </domain>
+
+   </domain_definition>
+
