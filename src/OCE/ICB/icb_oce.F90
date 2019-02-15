@@ -88,6 +88,7 @@ MODULE icb_oce
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ff_e, tt_e, fr_e, hicth
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ua_e, va_e
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ssh_e
+   REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   tmask_e, umask_e, vmask_e
 #if defined key_si3 || defined key_cice
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ui_e, vi_e
 #endif
@@ -168,8 +169,8 @@ CONTAINS
       icb_alloc = icb_alloc + ill
       !
       ! expanded arrays for bilinear interpolation
-      ALLOCATE( uo_e(0:jpi+1,0:jpj+1) , ua_e(0:jpi+1,0:jpj+1) ,   &
-         &      vo_e(0:jpi+1,0:jpj+1) , va_e(0:jpi+1,0:jpj+1) ,   &
+      ALLOCATE( uo_e(0:jpi+1,0:jpj+1) , ua_e(0:jpi+1,0:jpj+1) ,    &
+         &      vo_e(0:jpi+1,0:jpj+1) , va_e(0:jpi+1,0:jpj+1) ,    &
 #if defined key_si3 || defined key_cice
          &      ui_e(0:jpi+1,0:jpj+1) ,                            &
          &      vi_e(0:jpi+1,0:jpj+1) ,                            &
@@ -180,6 +181,10 @@ CONTAINS
          &      first_width(nclasses) , first_length(nclasses) ,   &
          &      src_calving (jpi,jpj) ,                            &
          &      src_calving_hflx(jpi,jpj) , STAT=ill)
+      icb_alloc = icb_alloc + ill
+
+      ALLOCATE( tmask_e(0:jpi+1,0:jpj+1), umask_e(0:jpi+1,0:jpj+1), vmask_e(0:jpi+1,0:jpj+1), &
+         &      STAT=ill)
       icb_alloc = icb_alloc + ill
 
       ALLOCATE( nicbfldpts(jpi) , nicbflddest(jpi) , nicbfldproc(jpni) , &

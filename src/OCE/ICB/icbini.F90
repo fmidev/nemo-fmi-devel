@@ -223,6 +223,14 @@ CONTAINS
       src_calving     (:,:) = 0._wp
       src_calving_hflx(:,:) = 0._wp
 
+      ! definition of extended surface masked needed by icb_bilin_h
+      tmask_e(:,:) = 0._wp   ;   tmask_e(1:jpi,1:jpj) = tmask(:,:,1)
+      umask_e(:,:) = 0._wp   ;   umask_e(1:jpi,1:jpj) = umask(:,:,1)
+      vmask_e(:,:) = 0._wp   ;   vmask_e(1:jpi,1:jpj) = vmask(:,:,1)
+      CALL lbc_lnk_icb( 'icbini', tmask_e, 'T', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbini', umask_e, 'T', +1._wp, 1, 1 )
+      CALL lbc_lnk_icb( 'icbini', vmask_e, 'T', +1._wp, 1, 1 )
+      !
       ! assign each new iceberg with a unique number constructed from the processor number
       ! and incremented by the total number of processors
       num_bergs(:) = 0
