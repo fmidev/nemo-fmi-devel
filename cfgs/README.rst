@@ -234,7 +234,7 @@ in this case with a 5 days frequency (120 hours):
 
 .. literalinclude:: ../../../cfgs/GYRE_PISCES/EXPREF/namelist_ref
    :language: fortran
-   :lines: 306-333
+   :lines: 935-960
 
 Input dynamical fields for this configuration (``ORCA2_OFF_v4.0.tar``) comes from
 a 2000 years long climatological simulation of ORCA2_ICE using ERA40 atmospheric forcing.
