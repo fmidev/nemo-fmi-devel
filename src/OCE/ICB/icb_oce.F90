@@ -85,12 +85,12 @@ MODULE icb_oce
    ! Extra arrays with bigger halo, needed when interpolating forcing onto iceberg position
    ! particularly for MPP when iceberg can lie inside T grid but outside U, V, or f grid
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   uo_e, vo_e
-   REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ff_e, tt_e, fr_e, hicth
+   REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ff_e, tt_e, fr_e
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ua_e, va_e
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ssh_e
    REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   tmask_e, umask_e, vmask_e
 #if defined key_si3 || defined key_cice
-   REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   ui_e, vi_e
+   REAL(wp), PUBLIC, DIMENSION(:,:), ALLOCATABLE ::   hi_e, ui_e, vi_e
 #endif
 
    !!gm almost all those PARAM ARE defined in NEMO
@@ -174,10 +174,10 @@ CONTAINS
 #if defined key_si3 || defined key_cice
          &      ui_e(0:jpi+1,0:jpj+1) ,                            &
          &      vi_e(0:jpi+1,0:jpj+1) ,                            &
+         &      hi_e(0:jpi+1,0:jpj+1) ,                            &
 #endif
          &      ff_e(0:jpi+1,0:jpj+1) , fr_e(0:jpi+1,0:jpj+1)  ,   &
          &      tt_e(0:jpi+1,0:jpj+1) , ssh_e(0:jpi+1,0:jpj+1) ,   &
-         &      hicth(0:jpi+1,0:jpj+1),                            &
          &      first_width(nclasses) , first_length(nclasses) ,   &
          &      src_calving (jpi,jpj) ,                            &
          &      src_calving_hflx(jpi,jpj) , STAT=ill)

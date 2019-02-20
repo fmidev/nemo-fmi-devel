@@ -73,7 +73,18 @@ CONTAINS
 
       !                          ! allocate gridded fields
       IF( icb_alloc() /= 0 )   CALL ctl_stop( 'STOP', 'icb_alloc : unable to allocate arrays' )
-
+      !
+      !                          ! initialised variable with extra haloes to zero
+      uo_e(:,:) = 0._wp   ;   vo_e(:,:) = 0._wp   ;
+      ua_e(:,:) = 0._wp   ;   va_e(:,:) = 0._wp   ;
+      ff_e(:,:) = 0._wp   ;   tt_e(:,:) = 0._wp   ;
+      fr_e(:,:) = 0._wp   ;
+#if defined key_si3
+      hi_e(:,:) = 0._wp   ;
+      ui_e(:,:) = 0._wp   ;   vi_e(:,:) = 0._wp   ;
+#endif
+      ssh_e(:,:) = 0._wp  ; 
+      !
       !                          ! open ascii output file or files for iceberg status information
       !                          ! note that we choose to do this on all processors since we cannot
       !                          ! predict where icebergs will be ahead of time
