@@ -106,3 +106,4 @@
 #undef MPI_OPERATION
 #undef LOC_OPERATION
 #undef INDEX_TYPE
+#undef ERRVAL
