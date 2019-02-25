@@ -301,7 +301,7 @@
 !-----------------------------------------------------------------------
 &nampisfer     !   parameters for iron chemistry
 !-----------------------------------------------------------------------
-   ln_ligvar =  .true.    ! variable ligand concentration
+   ln_ligvar =  .false.    ! variable ligand concentration
    xlam1     =  0.005     ! scavenging rate of Iron
    xlamdust  =  150.0     ! Scavenging rate of dust
    ligand    =  0.7E-9    ! Ligands concentration 
