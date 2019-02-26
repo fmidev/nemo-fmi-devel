@@ -234,8 +234,8 @@ CONTAINS
       !
       IF ( ln_wave ) THEN
       !Activated wave module but neither drag nor stokes drift activated
-         IF ( .NOT.(ln_cdgw .OR. ln_sdw .OR. ln_tauwoc .OR. ln_stcor ) )   THEN
-            CALL ctl_stop( 'STOP',  'Ask for wave coupling but ln_cdgw=F, ln_sdw=F, ln_tauwoc=F, ln_stcor=F' )
+         IF ( .NOT.(ln_cdgw .OR. ln_sdw .OR. ln_tauwoc .OR. ln_stcor .OR. ln_tauw ) )   THEN
+            CALL ctl_stop( 'STOP',  'Ask for wave coupling but ln_cdgw=F, ln_sdw=F, ln_tauwoc=F, ln_stcor=F, ln_tauw=F' )
       !drag coefficient read from wave model definable only with mfs bulk formulae and core 
          ELSEIF (ln_cdgw .AND. .NOT. ln_NCAR )       THEN       
              CALL ctl_stop( 'drag coefficient read from wave model definable only with NCAR and CORE bulk formulae')
