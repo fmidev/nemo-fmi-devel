@@ -1002,8 +1002,8 @@ CONTAINS
          DO jj = 2, jpjm1
             DO ji = 2, jpim1   ! vector opt.
 
-               z1_hu = ssumask(ji,jj) / ( hu_0(ji,jj) + zhup2_e(ji,jj) + 1._wp - ssumask(ji,jj) )
-               z1_hv = ssvmask(ji,jj) / ( hv_0(ji,jj) + zhvp2_e(ji,jj) + 1._wp - ssvmask(ji,jj) )
+               z1_hu = ssumask(ji,jj) / ( zhup2_e(ji,jj) + 1._wp - ssumask(ji,jj) )
+               z1_hv = ssvmask(ji,jj) / ( zhvp2_e(ji,jj) + 1._wp - ssvmask(ji,jj) )
             
                zu_trd(ji,jj) = + r1_4 * r1_e1e2u(ji,jj) * z1_hu                   &
                   &               * (  e1e2t(ji+1,jj)*zhtp2_e(ji+1,jj)*ff_t(ji+1,jj) * ( va_e(ji+1,jj) + va_e(ji+1,jj-1) )   &
