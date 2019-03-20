@@ -61,8 +61,8 @@ MODULE ldfdyn
    LOGICAL           , PUBLIC ::   l_ldfdyn_time    !: flag for time variation of the lateral eddy viscosity coef.
 
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   ahmt, ahmf   !: eddy viscosity coef. at T- and F-points [m2/s or m4/s]
-   REAL(wp),         ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   dtensq       !: horizontal tension squared         (Smagorinsky only)
-   REAL(wp),         ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   dshesq       !: horizontal shearing strain squared (Smagorinsky only)
+   REAL(wp),         ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   dtensq       !: horizontal tension squared         (Smagorinsky only)
+   REAL(wp),         ALLOCATABLE, SAVE, DIMENSION(:,:,:) ::   dshesq       !: horizontal shearing strain squared (Smagorinsky only)
    REAL(wp),         ALLOCATABLE, SAVE, DIMENSION(:,:)   ::   esqt, esqf   !: Square of the local gridscale (e1e2/(e1+e2))**2           
 
    REAL(wp) ::   r1_2    = 0.5_wp            ! =1/2
@@ -241,8 +241,8 @@ CONTAINS
          ALLOCATE( ahmt(jpi,jpj,jpk) , ahmf(jpi,jpj,jpk) , STAT=ierr )
          IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'ldf_dyn_init: failed to allocate arrays')
          !
-         ahmt(:,:,jpk) = 0._wp                     ! last level always 0  
-         ahmf(:,:,jpk) = 0._wp
+         ahmt(:,:,:) = 0._wp                       ! init to 0 needed 
+         ahmf(:,:,:) = 0._wp
          !
          !                                         ! value of lap/blp eddy mixing coef.
          IF(     ln_dynldf_lap ) THEN   ;   zUfac = r1_2 *rn_Uv   ;   inn = 1   ;   cl_Units = ' m2/s'   !   laplacian
@@ -309,13 +309,13 @@ CONTAINS
             l_ldfdyn_time = .TRUE.     ! will be calculated by call to ldf_dyn routine in step.F90
             !
             !                          ! allocate arrays used in ldf_dyn. 
-            ALLOCATE( dtensq(jpi,jpj) , dshesq(jpi,jpj) , esqt(jpi,jpj) ,  esqf(jpi,jpj) , STAT=ierr )
+            ALLOCATE( dtensq(jpi,jpj,jpk) , dshesq(jpi,jpj,jpk) , esqt(jpi,jpj) , esqf(jpi,jpj) , STAT=ierr )
             IF( ierr /= 0 )   CALL ctl_stop( 'STOP', 'ldf_dyn_init: failed to allocate Smagorinsky arrays')
             !
-            DO jj = 2, jpjm1           ! Set local gridscale values
-               DO ji = fs_2, fs_jpim1
-                  esqt(ji,jj) = ( e1e2t(ji,jj) /( e1t(ji,jj) + e2t(ji,jj) ) )**2 
-                  esqf(ji,jj) = ( e1e2f(ji,jj) /( e1f(ji,jj) + e2f(ji,jj) ) )**2 
+            DO jj = 1, jpj             ! Set local gridscale values
+               DO ji = 1, jpi
+                  esqt(ji,jj) = ( e1e2t(ji,jj) / ( e1t(ji,jj) + e2t(ji,jj) ) )**2 
+                  esqf(ji,jj) = ( e1e2f(ji,jj) / ( e1f(ji,jj) + e2f(ji,jj) ) )**2 
                END DO
             END DO
             !
@@ -358,8 +358,8 @@ CONTAINS
       INTEGER, INTENT(in) ::   kt   ! time step index
       !
       INTEGER  ::   ji, jj, jk   ! dummy loop indices
-      REAL(wp) ::   zu2pv2_ij_p1, zu2pv2_ij, zu2pv2_ij_m1, zetmax, zefmax   ! local scalar
-      REAL(wp) ::   zcmsmag, zstabf_lo, zstabf_up, zdelta, zdb              ! local scalar
+      REAL(wp) ::   zu2pv2_ij_p1, zu2pv2_ij, zu2pv2_ij_m1, zemax   ! local scalar (option 31)
+      REAL(wp) ::   zcmsmag, zstabf_lo, zstabf_up, zdelta, zdb     ! local scalar (option 32)
       !!----------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('ldf_dyn')
@@ -372,13 +372,18 @@ CONTAINS
             DO jk = 1, jpkm1
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1
-                     zu2pv2_ij_p1 = ub(ji  ,jj+1,jk) * ub(ji  ,jj+1,jk) + vb(ji+1,jj  ,jk) * vb(ji+1,jj  ,jk)
                      zu2pv2_ij    = ub(ji  ,jj  ,jk) * ub(ji  ,jj  ,jk) + vb(ji  ,jj  ,jk) * vb(ji  ,jj  ,jk)
                      zu2pv2_ij_m1 = ub(ji-1,jj  ,jk) * ub(ji-1,jj  ,jk) + vb(ji  ,jj-1,jk) * vb(ji  ,jj-1,jk)
-                     zetmax = MAX( e1t(ji,jj) , e2t(ji,jj) )
-                     zefmax = MAX( e1f(ji,jj) , e2f(ji,jj) )
-                     ahmt(ji,jj,jk) = SQRT( (zu2pv2_ij + zu2pv2_ij_m1) * r1_288 ) * zetmax * tmask(ji,jj,jk)      ! 288= 12*12 * 2
-                     ahmf(ji,jj,jk) = SQRT( (zu2pv2_ij + zu2pv2_ij_p1) * r1_288 ) * zefmax * fmask(ji,jj,jk)
+                     zemax = MAX( e1t(ji,jj) , e2t(ji,jj) )
+                     ahmt(ji,jj,jk) = SQRT( (zu2pv2_ij + zu2pv2_ij_m1) * r1_288 ) * zemax * tmask(ji,jj,jk)      ! 288= 12*12 * 2
+                  END DO
+               END DO
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
+                     zu2pv2_ij_p1 = ub(ji  ,jj+1,jk) * ub(ji  ,jj+1,jk) + vb(ji+1,jj  ,jk) * vb(ji+1,jj  ,jk)
+                     zu2pv2_ij    = ub(ji  ,jj  ,jk) * ub(ji  ,jj  ,jk) + vb(ji  ,jj  ,jk) * vb(ji  ,jj  ,jk)
+                     zemax = MAX( e1f(ji,jj) , e2f(ji,jj) )
+                     ahmf(ji,jj,jk) = SQRT( (zu2pv2_ij + zu2pv2_ij_p1) * r1_288 ) * zemax * fmask(ji,jj,jk)      ! 288= 12*12 * 2
                   END DO
                END DO
             END DO
@@ -386,13 +391,18 @@ CONTAINS
             DO jk = 1, jpkm1
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1
-                     zu2pv2_ij_p1 = ub(ji  ,jj+1,jk) * ub(ji  ,jj+1,jk) + vb(ji+1,jj  ,jk) * vb(ji+1,jj  ,jk)
                      zu2pv2_ij    = ub(ji  ,jj  ,jk) * ub(ji  ,jj  ,jk) + vb(ji  ,jj  ,jk) * vb(ji  ,jj  ,jk)
                      zu2pv2_ij_m1 = ub(ji-1,jj  ,jk) * ub(ji-1,jj  ,jk) + vb(ji  ,jj-1,jk) * vb(ji  ,jj-1,jk)
-                     zetmax = MAX( e1t(ji,jj) , e2t(ji,jj) )
-                     zefmax = MAX( e1f(ji,jj) , e2f(ji,jj) )
-                     ahmt(ji,jj,jk) = SQRT(  SQRT( (zu2pv2_ij + zu2pv2_ij_m1) * r1_288 ) * zetmax  ) * zetmax * tmask(ji,jj,jk)
-                     ahmf(ji,jj,jk) = SQRT(  SQRT( (zu2pv2_ij + zu2pv2_ij_p1) * r1_288 ) * zefmax  ) * zefmax * fmask(ji,jj,jk)
+                     zemax = MAX( e1t(ji,jj) , e2t(ji,jj) )
+                     ahmt(ji,jj,jk) = SQRT(  SQRT( (zu2pv2_ij + zu2pv2_ij_m1) * r1_288 ) * zemax  ) * zemax * tmask(ji,jj,jk)
+                  END DO
+               END DO
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
+                     zu2pv2_ij_p1 = ub(ji  ,jj+1,jk) * ub(ji  ,jj+1,jk) + vb(ji+1,jj  ,jk) * vb(ji+1,jj  ,jk)
+                     zu2pv2_ij    = ub(ji  ,jj  ,jk) * ub(ji  ,jj  ,jk) + vb(ji  ,jj  ,jk) * vb(ji  ,jj  ,jk)
+                     zemax = MAX( e1f(ji,jj) , e2f(ji,jj) )
+                     ahmf(ji,jj,jk) = SQRT(  SQRT( (zu2pv2_ij + zu2pv2_ij_p1) * r1_288 ) * zemax  ) * zemax * fmask(ji,jj,jk)
                   END DO
                END DO
             END DO
@@ -405,58 +415,67 @@ CONTAINS
          !
          IF( ln_dynldf_lap .OR. ln_dynldf_blp  ) THEN        ! laplacian operator : (C_smag/pi)^2 L^2 |D|
             !
-            zcmsmag = (rn_csmc/rpi)**2                                              ! (C_smag/pi)^2
-            zstabf_lo  = rn_minfac * rn_minfac / ( 2._wp * 4._wp * zcmsmag )        ! lower limit stability factor scaling
-            zstabf_up  = rn_maxfac / ( 4._wp * zcmsmag * 2._wp * rdt )              ! upper limit stability factor scaling
+            zcmsmag   = (rn_csmc/rpi)**2                                            ! (C_smag/pi)^2
+            zstabf_lo = rn_minfac * rn_minfac / ( 2._wp * 4._wp * zcmsmag )         ! lower limit stability factor scaling
+            zstabf_up = rn_maxfac / ( 4._wp * zcmsmag * 2._wp * rdt )               ! upper limit stability factor scaling
             IF( ln_dynldf_blp ) zstabf_lo = ( 16._wp / 9._wp ) * zstabf_lo          ! provide |U|L^3/12 lower limit instead 
             !                                                                       ! of |U|L^3/16 in blp case
             DO jk = 1, jpkm1
                !
-               DO jj = 2, jpj
-                  DO ji = 2, jpi
-                     zdb = ( (  ub(ji,jj,jk) * r1_e2u(ji,jj) -  ub(ji-1,jj,jk) * r1_e2u(ji-1,jj) )  &
-                          &                  * r1_e1t(ji,jj) * e2t(ji,jj)                           &
-                          & - ( vb(ji,jj,jk) * r1_e1v(ji,jj) -  vb(ji,jj-1,jk) * r1_e1v(ji,jj-1) )  &
-                          &                  * r1_e2t(ji,jj) * e1t(ji,jj)    ) * tmask(ji,jj,jk)
-                     dtensq(ji,jj) = zdb * zdb
+               DO jj = 2, jpjm1
+                  DO ji = 2, jpim1
+                     zdb =   ( ub(ji,jj,jk) * r1_e2u(ji,jj) - ub(ji-1,jj,jk) * r1_e2u(ji-1,jj) ) * r1_e1t(ji,jj) * e2t(ji,jj)  &
+                        &  - ( vb(ji,jj,jk) * r1_e1v(ji,jj) - vb(ji,jj-1,jk) * r1_e1v(ji,jj-1) ) * r1_e2t(ji,jj) * e1t(ji,jj)
+                     dtensq(ji,jj,jk) = zdb * zdb * tmask(ji,jj,jk)
                   END DO
                END DO
                !
                DO jj = 1, jpjm1
                   DO ji = 1, jpim1
-                     zdb = ( (  ub(ji,jj+1,jk) * r1_e1u(ji,jj+1) -  ub(ji,jj,jk) * r1_e1u(ji,jj) )  &
-                          &                    * r1_e2f(ji,jj)   * e1f(ji,jj)                       &
-                          & + ( vb(ji+1,jj,jk) * r1_e2v(ji+1,jj) -  vb(ji,jj,jk) * r1_e2v(ji,jj) )  &
-                          &                    * r1_e1f(ji,jj)   * e2f(ji,jj)  ) * fmask(ji,jj,jk)
-                     dshesq(ji,jj) = zdb * zdb
+                     zdb =   ( ub(ji,jj+1,jk) * r1_e1u(ji,jj+1) - ub(ji,jj,jk) * r1_e1u(ji,jj) ) * r1_e2f(ji,jj) * e1f(ji,jj)  &
+                        &  + ( vb(ji+1,jj,jk) * r1_e2v(ji+1,jj) - vb(ji,jj,jk) * r1_e2v(ji,jj) ) * r1_e1f(ji,jj) * e2f(ji,jj)
+                     dshesq(ji,jj,jk) = zdb * zdb * fmask(ji,jj,jk)
                   END DO
                END DO
                !
-               DO jj = 2, jpjm1
+            END DO
+            !
+            CALL lbc_lnk_multi( 'ldfdyn', dtensq, 'T', 1. )  ! lbc_lnk on dshesq not needed
+            !
+            DO jk = 1, jpkm1
+              !
+               DO jj = 2, jpjm1                                ! T-point value
                   DO ji = fs_2, fs_jpim1
                      !
-                     zu2pv2_ij_p1 = ub(ji  ,jj+1,jk) * ub(ji  ,jj+1,jk) + vb(ji+1,jj  ,jk) * vb(ji+1,jj  ,jk)
                      zu2pv2_ij    = ub(ji  ,jj  ,jk) * ub(ji  ,jj  ,jk) + vb(ji  ,jj  ,jk) * vb(ji  ,jj  ,jk)
                      zu2pv2_ij_m1 = ub(ji-1,jj  ,jk) * ub(ji-1,jj  ,jk) + vb(ji  ,jj-1,jk) * vb(ji  ,jj-1,jk)
-                                                     ! T-point value
+                     !
                      zdelta         = zcmsmag * esqt(ji,jj)                                        ! L^2 * (C_smag/pi)^2
-                     ahmt(ji,jj,jk) = zdelta * sqrt(          dtensq(ji,jj)   +                        &
-                                     &               r1_4 * ( dshesq(ji,jj)   + dshesq(ji,jj-1)   +    &
-                                     &                        dshesq(ji-1,jj) + dshesq(ji-1,jj-1) ) )
-                     ahmt(ji,jj,jk) =   MAX( ahmt(ji,jj,jk),   &
-                                     &   SQRT( (zu2pv2_ij + zu2pv2_ij_m1) * zdelta * zstabf_lo ) ) ! Impose lower limit == minfac  * |U|L/2
-                     ahmt(ji,jj,jk) = MIN( ahmt(ji,jj,jk), zdelta * zstabf_up )                    ! Impose upper limit == maxfac  * L^2/(4*2dt)
-                                                     ! F-point value
-                     zdelta         = zcmsmag * esqf(ji,jj)                                        ! L^2 * (C_smag/pi)^2
-                     ahmf(ji,jj,jk) = zdelta * sqrt(          dshesq(ji,jj)   +                        &
-                                     &               r1_4 * ( dtensq(ji,jj)   + dtensq(ji,jj+1)   +    &
-                                     &                        dtensq(ji+1,jj) + dtensq(ji+1,jj+1) ) )
-                     ahmf(ji,jj,jk) =   MAX( ahmf(ji,jj,jk),   &
-                                     &   SQRT( (zu2pv2_ij + zu2pv2_ij_p1) * zdelta * zstabf_lo ) ) ! Impose lower limit == minfac  * |U|L/2
-                     ahmf(ji,jj,jk) = MIN( ahmf(ji,jj,jk), zdelta * zstabf_up )                    ! Impose upper limit == maxfac  * L^2/(4*2dt)
+                     ahmt(ji,jj,jk) = zdelta * SQRT(          dtensq(ji  ,jj,jk) +                         &
+                        &                            r1_4 * ( dshesq(ji  ,jj,jk) + dshesq(ji  ,jj-1,jk) +  &
+                        &                                     dshesq(ji-1,jj,jk) + dshesq(ji-1,jj-1,jk) ) )
+                     ahmt(ji,jj,jk) = MAX( ahmt(ji,jj,jk), SQRT( (zu2pv2_ij + zu2pv2_ij_m1) * zdelta * zstabf_lo ) ) ! Impose lower limit == minfac  * |U|L/2
+                     ahmt(ji,jj,jk) = MIN( ahmt(ji,jj,jk),                                    zdelta * zstabf_up )   ! Impose upper limit == maxfac  * L^2/(4*2dt)
                      !
                   END DO
                END DO
+               !
+               DO jj = 1, jpjm1                                ! F-point value
+                  DO ji = 1, fs_jpim1
+                     !
+                     zu2pv2_ij_p1 = ub(ji  ,jj+1,jk) * ub(ji  ,jj+1,jk) + vb(ji+1,jj  ,jk) * vb(ji+1,jj  ,jk)
+                     zu2pv2_ij    = ub(ji  ,jj  ,jk) * ub(ji  ,jj  ,jk) + vb(ji  ,jj  ,jk) * vb(ji  ,jj  ,jk)
+                     !
+                     zdelta         = zcmsmag * esqf(ji,jj)                                        ! L^2 * (C_smag/pi)^2
+                     ahmf(ji,jj,jk) = zdelta * SQRT(          dshesq(ji  ,jj,jk) +                         &
+                        &                            r1_4 * ( dtensq(ji  ,jj,jk) + dtensq(ji  ,jj+1,jk) +  &
+                        &                                     dtensq(ji+1,jj,jk) + dtensq(ji+1,jj+1,jk) ) )
+                     ahmf(ji,jj,jk) = MAX( ahmf(ji,jj,jk), SQRT( (zu2pv2_ij + zu2pv2_ij_p1) * zdelta * zstabf_lo ) ) ! Impose lower limit == minfac  * |U|L/2
+                     ahmf(ji,jj,jk) = MIN( ahmf(ji,jj,jk),                                    zdelta * zstabf_up )   ! Impose upper limit == maxfac  * L^2/(4*2dt)
+                     !
+                  END DO
+               END DO
+               !
             END DO
             !
          ENDIF
@@ -469,6 +488,10 @@ CONTAINS
                DO jj = 2, jpjm1
                   DO ji = fs_2, fs_jpim1
                      ahmt(ji,jj,jk) = SQRT( r1_8 * esqt(ji,jj) * ahmt(ji,jj,jk) )
+                  END DO
+               END DO
+               DO jj = 1, jpjm1
+                  DO ji = 1, fs_jpim1
                      ahmf(ji,jj,jk) = SQRT( r1_8 * esqf(ji,jj) * ahmf(ji,jj,jk) )
                   END DO
                END DO
