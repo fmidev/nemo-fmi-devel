@@ -613,16 +613,25 @@ CONTAINS
 
       DO jk = 1, nlay_s
          DO ji = 1,npti
-            ! mask enthalpy
-            rswitch       = 1._wp - MAX(  0._wp , SIGN( 1._wp, - h_s_1d(ji) )  )
+            ! where there is no ice or no snow
+            rswitch = ( 1._wp - MAX( 0._wp, SIGN( 1._wp, - h_s_1d(ji) ) ) ) * ( 1._wp - MAX( 0._wp, SIGN(1._wp, - h_i_1d(ji) ) ) )
+            ! mass & energy loss to the ocean
+            hfx_res_1d(ji) = hfx_res_1d(ji) + ( 1._wp - rswitch ) * &
+               &                              ( e_s_1d(ji,jk) * h_s_1d(ji) * r1_nlay_s * a_i_1d(ji) * r1_rdtice )  ! heat flux to the ocean [W.m-2], < 0
+            wfx_res_1d(ji) = wfx_res_1d(ji) + ( 1._wp - rswitch ) * &
+               &                              ( rhos          * h_s_1d(ji) * r1_nlay_s * a_i_1d(ji) * r1_rdtice )  ! mass flux
+            ! update energy (mass is updated in the next loop)
             e_s_1d(ji,jk) = rswitch * e_s_1d(ji,jk)
             ! recalculate t_s_1d from e_s_1d
             t_s_1d(ji,jk) = rt0 + rswitch * ( - e_s_1d(ji,jk) * r1_rhos * r1_rcpi + rLfus * r1_rcpi )
          END DO
       END DO
 
-      ! --- ensure that a_i = 0 where h_i = 0 ---
-      WHERE( h_i_1d(1:npti) == 0._wp )   a_i_1d(1:npti) = 0._wp
+      ! --- ensure that a_i = 0 & h_s = 0 where h_i = 0 ---
+      WHERE( h_i_1d(1:npti) == 0._wp )   
+         a_i_1d(1:npti) = 0._wp
+         h_s_1d(1:npti) = 0._wp
+      END WHERE
       !
    END SUBROUTINE ice_thd_dh
 

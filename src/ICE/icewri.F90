@@ -99,7 +99,7 @@ CONTAINS
       IF( iom_use('icethic'  ) )   CALL iom_put( "icethic", hm_i  * zmsk00        )   ! ice thickness
       IF( iom_use('snwthic'  ) )   CALL iom_put( "snwthic", hm_s  * zmsk00        )   ! snw thickness
       IF( iom_use('icebrv'   ) )   CALL iom_put( "icebrv" , bvm_i * zmsk00 * 100. )   ! brine volume
-      IF( iom_use('iceage'   ) )   CALL iom_put( "iceage" , om_i  * zmsk00 / rday )   ! ice age
+      IF( iom_use('iceage'   ) )   CALL iom_put( "iceage" , om_i  * zmsk15 / rday )   ! ice age
       IF( iom_use('icehnew'  ) )   CALL iom_put( "icehnew", ht_i_new              )   ! new ice thickness formed in the leads
       IF( iom_use('snwvolu'  ) )   CALL iom_put( "snwvolu", vt_s  * zmsksn        )   ! snow volume
       IF( iom_use('icefrb') ) THEN

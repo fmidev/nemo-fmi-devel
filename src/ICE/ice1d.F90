@@ -122,6 +122,7 @@ MODULE ice1D
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   v_s_1d        !:
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   sv_i_1d       !:
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   oa_i_1d       !:
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   o_i_1d        !:
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   a_ip_1d       !:
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   v_ip_1d       !:
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   h_ip_1d       !:
@@ -208,7 +209,7 @@ CONTAINS
          &      dh_i_sub(jpij) , dh_s_mlt(jpij) , dh_snowice(jpij) , s_i_1d  (jpij) , s_i_new (jpij) ,  &
          &      a_ip_1d (jpij) , v_ip_1d (jpij) , v_i_1d    (jpij) , v_s_1d  (jpij) ,                   &
          &      h_ip_1d (jpij) , a_ip_frac_1d(jpij) ,                                                   &
-         &      sv_i_1d (jpij) , oa_i_1d (jpij) , STAT=ierr(ii) )
+         &      sv_i_1d (jpij) , oa_i_1d (jpij) , o_i_1d    (jpij) , STAT=ierr(ii) )
       !
       ii = ii + 1
       ALLOCATE( t_s_1d  (jpij,nlay_s)     , t_i_1d (jpij,nlay_i)     , sz_i_1d(jpij,nlay_i) ,  &            

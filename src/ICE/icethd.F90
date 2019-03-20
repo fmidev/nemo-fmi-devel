@@ -243,8 +243,6 @@ CONTAINS
          ENDIF
          !
       END DO
-      ! update ice age (in case a_i changed, i.e. becomes 0 or lateral melting)
-      oa_i(:,:,:) = o_i(:,:,:) * a_i(:,:,:)
 
       IF( ln_icediachk )   CALL ice_cons_hsm(1, 'icethd', rdiag_v, rdiag_s, rdiag_t, rdiag_fv, rdiag_fs, rdiag_ft)
       !
@@ -417,7 +415,11 @@ CONTAINS
          ! ocean surface fields
          CALL tab_2d_1d( npti, nptidx(1:npti), sst_1d(1:npti), sst_m )
          CALL tab_2d_1d( npti, nptidx(1:npti), sss_1d(1:npti), sss_m )
-
+         !
+         ! to update ice age
+         CALL tab_2d_1d( npti, nptidx(1:npti), o_i_1d (1:npti), o_i (:,:,kl) )
+         CALL tab_2d_1d( npti, nptidx(1:npti), oa_i_1d(1:npti), oa_i(:,:,kl) )
+         !
          ! --- Change units of e_i, e_s from J/m2 to J/m3 --- !
          DO jk = 1, nlay_i
             WHERE( h_i_1d(1:npti)>0._wp ) e_i_1d(1:npti,jk) = e_i_1d(1:npti,jk) / (h_i_1d(1:npti) * a_i_1d(1:npti)) * nlay_i
@@ -442,6 +444,7 @@ CONTAINS
          v_s_1d (1:npti) = h_s_1d (1:npti) * a_i_1d (1:npti)
          sv_i_1d(1:npti) = s_i_1d (1:npti) * v_i_1d (1:npti)
          v_ip_1d(1:npti) = h_ip_1d(1:npti) * a_ip_1d(1:npti)
+         oa_i_1d(1:npti) = o_i_1d (1:npti) * a_i_1d (1:npti)
          
          CALL tab_1d_2d( npti, nptidx(1:npti), at_i_1d(1:npti), at_i             )
          CALL tab_1d_2d( npti, nptidx(1:npti), a_i_1d (1:npti), a_i (:,:,kl)     )
@@ -515,6 +518,7 @@ CONTAINS
          CALL tab_1d_2d( npti, nptidx(1:npti), v_s_1d (1:npti), v_s (:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), sv_i_1d(1:npti), sv_i(:,:,kl) )
          CALL tab_1d_2d( npti, nptidx(1:npti), v_ip_1d(1:npti), v_ip(:,:,kl) )
+         CALL tab_1d_2d( npti, nptidx(1:npti), oa_i_1d(1:npti), oa_i(:,:,kl) )
          !
       END SELECT
       !

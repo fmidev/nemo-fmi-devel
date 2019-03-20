@@ -22,6 +22,7 @@ MODULE icedyn_adv_umx
    USE icevar         ! sea-ice: operations
    !
    USE in_out_manager ! I/O manager
+   USE iom            ! I/O manager library
    USE lib_mpp        ! MPP library
    USE lib_fortran    ! fortran utilities (glob_sum + no signed zero)
    USE lbclnk         ! lateral boundary conditions (or mpp links)
@@ -159,50 +160,63 @@ CONTAINS
          END DO
          
          zamsk = 1._wp
-         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, pa_i, pa_i, zua_ho, zva_ho ) ! Ice area
+         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, pa_i, pa_i, zua_ho, zva_ho ) !-- Ice area
          zamsk = 0._wp
          !
          zhvar(:,:,:) = pv_i(:,:,:) * z1_ai(:,:,:)
-         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_i )                ! Ice volume
+         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_i )                !-- Ice volume
          !
          zhvar(:,:,:) = pv_s(:,:,:) * z1_ai(:,:,:)
-         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_s )                ! Snw volume
+         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_s )                !-- Snw volume
          !
          zhvar(:,:,:) = psv_i(:,:,:) * z1_ai(:,:,:)
-         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, psv_i )               ! Salt content
-         !
-         zhvar(:,:,:) = poa_i(:,:,:) * z1_ai(:,:,:)
-         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, poa_i )               ! Age content
+         CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, psv_i )               !-- Salt content
          !
          DO jk = 1, nlay_i
             zhvar(:,:,:) = pe_i(:,:,jk,:) * z1_ai(:,:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pe_i(:,:,jk,:) )   ! Ice heat content
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pe_i(:,:,jk,:) )   !-- Ice heat content
          END DO
          !
          DO jk = 1, nlay_s
             zhvar(:,:,:) = pe_s(:,:,jk,:) * z1_ai(:,:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pe_s(:,:,jk,:) )   ! Snw heat content
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pe_s(:,:,jk,:) )   !-- Snw heat content
          END DO
          !
-         IF ( ln_pnd_H12 ) THEN
+         IF( iom_use('iceage') .OR. iom_use('iceage_cat') ) THEN                                                              !-- Ice Age
+            ! clem: in theory we should use the formulation below to advect the ice age, but the code is unable to deal with
+            !       fields that do not depend on volume (here oa_i depends on concentration). It creates abnormal ages that
+            !       spread into the domain. Therefore we cheat and consider that ice age should be advected as ice concentration
+            !!zhvar(:,:,:) = poa_i(:,:,:) * z1_ai(:,:,:)
+            !!CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, poa_i )
+            ! set u*a=u for advection of ice age
+            DO jl = 1, jpl
+               zua_ho(:,:,jl) = zudy(:,:)
+               zva_ho(:,:,jl) = zvdx(:,:)
+            END DO
+            zamsk = 1._wp
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, poa_i, poa_i )
+            zamsk = 0._wp
+         ENDIF
+         !
+         IF ( ln_pnd_H12 ) THEN                                                                                               !-- melt ponds
             ! set u*a=u for advection of Ap only 
             DO jl = 1, jpl
                zua_ho(:,:,jl) = zudy(:,:)
                zva_ho(:,:,jl) = zvdx(:,:)
             END DO
-            
+            !
             zamsk = 1._wp
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, pa_ip, pa_ip, zua_ho, zva_ho ) ! mp fraction
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, pa_ip, pa_ip, zua_ho, zva_ho ) ! fraction
             zamsk = 0._wp
             !
             zhvar(:,:,:) = pv_ip(:,:,:) * z1_aip(:,:,:)
-            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_ip )                 ! mp volume
+            CALL adv_umx( zamsk, kn_umx, jt, kt, zdt, zudy, zvdx, zua_ho, zva_ho, zcu_box, zcv_box, zhvar, pv_ip )                 ! volume
          ENDIF
          !
          zati2(:,:) = SUM( pa_i(:,:,:), dim=3 )
          DO jj = 2, jpjm1
             DO ji = fs_2, fs_jpim1
-               pato_i(ji,jj) = pato_i(ji,jj) - ( zati2(ji,jj) - zati1(ji,jj) ) &                                                   ! Open water area
+               pato_i(ji,jj) = pato_i(ji,jj) - ( zati2(ji,jj) - zati1(ji,jj) ) &                                              !-- Open water area
                   &                          - ( zudy(ji,jj) - zudy(ji-1,jj) + zvdx(ji,jj) - zvdx(ji,jj-1) ) * r1_e1e2t(ji,jj) * zdt
             END DO
          END DO
